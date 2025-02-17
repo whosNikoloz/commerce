@@ -6,8 +6,8 @@ import * as React from "react";
 import { HeroUIProvider } from "@heroui/system";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { CartProvider } from "@/app/context/cartContext";
 
-import { CartProvider } from "./context/cartContext";
 
 export interface ProvidersProps {
   children: React.ReactNode;

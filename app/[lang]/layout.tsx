@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/Navbar/navbar";
+import { Locale } from "@/i18n.config";
 
 export const metadata: Metadata = {
   title: {
@@ -27,13 +28,16 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: { lang: Locale };
 }) {
+  const { lang } = await params;
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang={lang}>
       <head />
       <body
         className={clsx(

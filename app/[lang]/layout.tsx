@@ -9,6 +9,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/Navbar/navbar";
 import { Locale } from "@/i18n.config";
+import { getTranslations } from "@/lib/get-dictionary";
 
 export const metadata: Metadata = {
   title: {
@@ -36,6 +37,9 @@ export default async function RootLayout({
   params: { lang: Locale };
 }) {
   const { lang } = await params;
+  const dictionary = await getTranslations(lang)
+  console.log(dictionary)
+
   return (
     <html suppressHydrationWarning lang={lang}>
       <head />

@@ -1,7 +1,8 @@
-'use client'
 import ProductList from "@/components/productList";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function HomePage() {
+  
 
   return (
     <div>

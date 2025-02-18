@@ -8,9 +8,11 @@ import {
   ReactNode,
 } from "react";
 import CryptoJS from "crypto-js";
+import { toast } from 'sonner'
 
-// Types
 type CartItem = {
+  discount: any;
+  originalPrice: ReactNode;
   id: number;
   name: string;
   price: number;
@@ -28,16 +30,13 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Secret key for encryption
 const SECRET_KEY =
   process.env.NEXT_PUBLIC_CART_SECRET_KEY || "defaultSecretKey";
 
-// Encrypt data
 const encryptData = (data: object): string => {
   return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
 };
 
-// Decrypt data
 const decryptData = (encrypted: string): object | null => {
   try {
     const bytes = CryptoJS.AES.decrypt(encrypted, SECRET_KEY);
@@ -51,7 +50,6 @@ const decryptData = (encrypted: string): object | null => {
   }
 };
 
-// Custom hook
 export const useCart = () => {
   const context = useContext(CartContext);
 
@@ -62,13 +60,11 @@ export const useCart = () => {
   return context;
 };
 
-// Provider component
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Load cart from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
+    const savedCart = sessionStorage.getItem("cart");
 
     if (savedCart) {
       const decryptedCart = decryptData(savedCart);
@@ -77,14 +73,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     const encryptedCart = encryptData(cart);
 
-    localStorage.setItem("cart", encryptedCart);
+    sessionStorage.setItem("cart", encryptedCart);
   }, [cart]);
 
-  // Add item to cart
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((i) => i.id === item.id);
@@ -97,14 +91,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       return [...prevCart, { ...item, quantity: 1 }];
     });
-  };
+    toast.success(`${item.name} added to cart`);
+ };
 
-  // Remove item from cart
   const removeFromCart = (id: number) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+    toast.success("Item removed from cart")
   };
 
-  // Update item quantity
   const updateCartItem = (id: number, quantity: number) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
@@ -113,7 +107,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  // Clear cart
   const clearCart = () => setCart([]);
 
   return (

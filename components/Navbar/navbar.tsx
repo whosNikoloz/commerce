@@ -4,9 +4,11 @@ import { Link } from "@heroui/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-import { HeartFilledIcon, SearchIcon } from "../icons";
+import { HeartFilledIcon, HomeIcon, ProfileIcon, SearchIcon, ShoppingCartIcon } from "../icons";
 import { LanguageSwitch } from "../Switch/language";
-import CartDropdown from "../cart-dropdown";
+import CartDropdown from "../Cart/cart-dropdown";
+import Cartlink from "../Cart/cart-link";
+import SearchModal from "../Search/serach-modal";
 
 export const Navbar = () => {
   const user = null;
@@ -30,7 +32,7 @@ export const Navbar = () => {
     <>
       <nav className=" justify-center items-center">
         <div
-          className={`z-50 fixed top-3 left-1/2 -translate-x-1/2 sm:w-8/12 w-11/12 rounded-2xl transition-all duration-300 ${
+          className={`z-50 fixed top-3 left-1/2 -translate-x-1/2 sm:w-5/12 w-11/12 rounded-2xl transition-all duration-300 ${
             isScrolled
               ? "dark:backdrop-blur-2xl backdrop-blur-sm dark:bg-black/10 bg-white shadow-md"
               : "bg-transparent"
@@ -62,6 +64,8 @@ export const Navbar = () => {
               </div>
 
               <div className="items-center space-x-4 hidden md:flex">
+                <CartDropdown />
+                <LanguageSwitch />
                 {user ? (
                   <Image
                     alt="User Avatar"
@@ -79,65 +83,46 @@ export const Navbar = () => {
                     width={40}
                   />
                 )}
-                <div className="items-center space-x-4 hidden md:flex">
-                  <CartDropdown />
-                </div>
+                
               </div>
-              <LanguageSwitch />
+              <div className="items-center space-x-4 hidden md:flex">
+              </div>
             </div>
           </div>
         </div>
       </nav>
 
-      <div
-        className={`md:hidden fixed bottom-1  left-1/2 right-0 -translate-x-1/2 md:w-8/12 w-11/12 rounded-2xl dark:backdrop-blur-2xl backdrop-blur-sm dark:bg-black/10 bg-white shadow-md 
-        }`}
-      >
-        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between">
-            <div className="flex flex-1 items-stretch justify-between">
-              <div className="flex flex-shrink-0 items-center">
-                <Link href={`/${lng}`}>
-                  <HeartFilledIcon />
-                </Link>
-                <Link
-                  className={`font-bold text-inherit ml-2 ${
-                    isScrolled
-                      ? "dark:text-white text-black"
-                      : "dark:text-white text-white"
-                  }`}
-                  href={`/${lng}`}
-                >
-                  Test
-                </Link>
-              </div>
-              <div className="block">
-                <div className="flex space-x-6">
-                  <Link
-                    className={`p-0 bg-transparent data-[hover=true]:bg-transparent transition-colors font-bold text-md ${
-                      isScrolled
-                        ? "dark:text-blue-500 text-blue-800"
-                        : "dark:text-blue-500 text-blue-400"
-                    }`}
-                    href={`/${lng}/social`}
-                  >
-                    {lng === "en" ? "Category" : "სოციალური"}
-                  </Link>
-                  {user ? (
-                    <Image
-                      alt="User Avatar"
-                      className="rounded-full"
-                      height={40}
-                      src={"/img1.jpg"}
-                      width={40}
-                    />
-                  ) : (
-                    <></>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="md:hidden fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
+        <div className="flex justify-around items-center py-2">
+          <Link href={`/${lng}`} className="flex flex-col items-center">
+            <HomeIcon className="text-green-500 w-6 h-6" />
+            <span className="text-xs">{lng === "en" ? "Home" : "მთავარი"}</span>
+          </Link>
+
+          <SearchModal />
+
+          <Cartlink />
+
+          <Link href={`/${lng}/chat`} className="flex flex-col items-center">
+            <ProfileIcon className="w-6 h-6" />
+            <span className="text-xs">{lng === "en" ? "Chat" : "ჩათი"}</span>
+          </Link>
+
+          {user ? (
+            <Link href={`/${lng}/profile`} className="relative flex flex-col items-center">
+              <Image
+                alt="User Avatar"
+                className="rounded-full w-6 h-6"
+                src="/img1.jpg"
+              />
+              <span className="text-xs">{lng === "en" ? "Profile" : "პროფილი"}</span>
+            </Link>
+          ) : (
+            <Link href={`/${lng}/login`} className="flex flex-col items-center">
+              <ProfileIcon className="w-6 h-6" />
+              <span className="text-xs">{lng === "en" ? "Login" : "შესვლა"}</span>
+            </Link>
+          )}
         </div>
       </div>
     </>

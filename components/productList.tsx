@@ -7,8 +7,9 @@ import { useTranslation } from '@/hooks/useTranslation'
 
 
 const products = [
-  { id: 1, name: "Product 1", price: 29.99, image: "/img1.jpg", quantity: 1 },
-  { id: 2, name: "Product 2", price: 49.99, image: "/img2.jpg", quantity: 1 },
+  { id: 1, name: "Product 1", price: 29.99, image: "/img1.jpg", quantity: 1, discount: 0, originalPrice: 29.99 },
+  { id: 2, name: "Product 2", price: 49.99, image: "/img2.jpg", quantity: 1, discount: 0, originalPrice: 49.99 },
+  { id: 3, name: "Product 3", price: 49.99, image: "/img1.jpg", quantity: 1, discount: 0, originalPrice: 49.99 },
 ];
 
 export default function ProductList() {

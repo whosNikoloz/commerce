@@ -106,9 +106,9 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({
         })}
       >
         {isSelected || isSSR ? (
-          <GeorgiaIcon size={25} />
+          <GeorgiaIcon  size={30}/>
         ) : (
-          <EnglishIcon size={25} />
+          <EnglishIcon  size={30}/>
         )}
       </div>
     </Component>

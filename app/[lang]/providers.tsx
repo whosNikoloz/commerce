@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { CartProvider } from "@/app/context/cartContext";
 import { TranslationProvider } from "@/hooks/useTranslation";
-
+import { Toaster, toast } from 'sonner';
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -31,6 +31,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
       <NextThemesProvider {...themeProps}>
         <TranslationProvider>
           <CartProvider>{children}</CartProvider>
+          <Toaster richColors position="top-right"/>
         </TranslationProvider>
       </NextThemesProvider>
     </HeroUIProvider>

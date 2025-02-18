@@ -8,9 +8,10 @@ import {
   ReactNode,
 } from "react";
 import CryptoJS from "crypto-js";
-import { toast } from 'sonner'
+import { toast } from "sonner";
 
 type CartItem = {
+  darkImage: string;
   discount: any;
   originalPrice: ReactNode;
   id: number;
@@ -92,11 +93,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return [...prevCart, { ...item, quantity: 1 }];
     });
     toast.success(`${item.name} added to cart`);
- };
+  };
 
   const removeFromCart = (id: number) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
-    toast.success("Item removed from cart")
+    toast.success("Item removed from cart");
   };
 
   const updateCartItem = (id: number, quantity: number) => {

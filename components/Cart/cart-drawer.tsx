@@ -3,9 +3,10 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { useCart } from "@/app/context/cartContext";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
+
+import { useCart } from "@/app/context/cartContext";
 
 export default function CartDrawer() {
   const { cart, removeFromCart, updateCartItem } = useCart();
@@ -13,6 +14,7 @@ export default function CartDrawer() {
   const quantityRef = useRef(cart?.length);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
+
   useEffect(() => {
     if (
       cart?.length &&
@@ -27,21 +29,19 @@ export default function CartDrawer() {
     0
   );
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
+
   return (
     <>
-      <Badge 
-            color="danger"
-            content={totalQuantity}
-          >
-          <Button
-            variant="solid"
-            isIconOnly
-            className="relative rounded-full bg-transparent"
-            onPress={() => setIsOpen(!isOpen)}
-          >
-            <ShoppingCartIcon  />
-          </Button>
-        </Badge>
+      <Badge color="danger" content={totalQuantity}>
+        <Button
+          isIconOnly
+          className="relative rounded-full bg-transparent"
+          variant="solid"
+          onPress={() => setIsOpen(!isOpen)}
+        >
+          <ShoppingCartIcon />
+        </Button>
+      </Badge>
       <Transition show={isOpen}>
         <Dialog className="relative z-50" onClose={closeCart}>
           <Transition.Child

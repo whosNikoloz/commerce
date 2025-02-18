@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useCart } from "@/app/context/cartContext";
 import { Button } from "@heroui/button";
-import { HeartFilledIcon, ShoppingCartIcon } from "../icons";
 import { Badge } from "@heroui/badge";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
+
+import { ShoppingCartIcon } from "../icons";
+
+import { useCart } from "@/app/context/cartContext";
 
 export default function CartDropdown() {
   const { cart, removeFromCart, updateCartItem } = useCart();
@@ -12,47 +14,51 @@ export default function CartDropdown() {
   const quantityRef = useRef(cart?.length);
 
   useEffect(() => {
-    if (cart?.length && cart.length !== quantityRef.current && cart.length > 0) {
+    if (
+      cart?.length &&
+      cart.length !== quantityRef.current &&
+      cart.length > 0
+    ) {
       quantityRef.current = cart.length;
     }
   }, [cart?.length, isOpen]);
 
   useEffect(() => {
-    const handleClickOutside = (event: { target: any; }) => {
+    const handleClickOutside = (event: { target: any }) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
+  const totalPrice = cart
+    .reduce((acc, item) => acc + item.price * item.quantity, 0)
+    .toFixed(2);
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div ref={dropdownRef} className="relative">
+      <Badge
+        className="border-0 absolute top-2 right-2"
+        color="danger"
+        content={totalQuantity}
+        size="sm"
+        variant="shadow"
+      >
+        <Button
+          isIconOnly
+          className="relative rounded-full bg-transparent"
+          variant="solid"
+          onPress={() => setIsOpen(!isOpen)}
+        >
+          <ShoppingCartIcon size={25} />
+        </Button>
+      </Badge>
 
-        <Badge 
-            color="danger"
-            size="sm"
-            variant="shadow"
-            content={totalQuantity}
-            className="border-0 absolute top-2 right-2"
-          >
-          <Button
-            variant="solid"
-            isIconOnly
-            className="relative rounded-full bg-transparent"
-            onPress={() => setIsOpen(!isOpen)}
-          >
-            <ShoppingCartIcon  size={25}/>
-          </Button>
-        </Badge>
-      
-      
-        
       <div
         className={`absolute right-0 top-14  w-96 transform transition-all duration-200 ${
           isOpen
@@ -77,20 +83,22 @@ export default function CartDropdown() {
                   <div key={item.id}>
                     <div className="flex py-4 px-2">
                       <img
-                        src={item.image}
                         alt={item.name}
                         className="h-20 w-20 rounded-lg object-cover"
+                        src={item.image}
                       />
                       <div className="ml-4 flex-1">
                         <h4 className="font-medium">{item.name}</h4>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="text-lg font-bold">{item.price} ₾</span>
+                          <span className="text-lg font-bold">
+                            {item.price} ₾
+                          </span>
                           {item.discount && (
                             <>
                               <span className="text-sm line-through text-muted-foreground">
                                 {item.originalPrice} ₾
                               </span>
-                              <Badge  className="text-xs">
+                              <Badge className="text-xs">
                                 -{item.discount}%
                               </Badge>
                             </>
@@ -98,37 +106,42 @@ export default function CartDropdown() {
                         </div>
                         <div className="mt-2 flex items-center gap-2">
                           <Button
-                            variant="solid"
                             isIconOnly
                             className="h-8 w-8"
-                            onPress={() => updateCartItem(item.id, item.quantity - 1)}
+                            variant="solid"
+                            onPress={() =>
+                              updateCartItem(item.id, item.quantity - 1)
+                            }
                           >
-                            {/* <Minus className="h-4 w-4" /> */}
-                            -
+                            {/* <Minus className="h-4 w-4" /> */}-
                           </Button>
-                          <span className="w-8 text-center">{item.quantity}</span>
+                          <span className="w-8 text-center">
+                            {item.quantity}
+                          </span>
                           <Button
-                             variant="solid"
-                             isIconOnly
-                             className="h-8 w-8"
-                             onPress={() => updateCartItem(item.id, item.quantity + 1)}
+                            isIconOnly
+                            className="h-8 w-8"
+                            variant="solid"
+                            onPress={() =>
+                              updateCartItem(item.id, item.quantity + 1)
+                            }
                           >
-                            +
-                            {/* <Plus className="h-4 w-4" /> */}
+                            +{/* <Plus className="h-4 w-4" /> */}
                           </Button>
                           <Button
-                            variant="ghost"
                             isIconOnly
                             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            variant="ghost"
                             onPress={() => removeFromCart(item.id)}
                           >
-                            {/* <X className="h-4 w-4" /> */}
-                            X
+                            {/* <X className="h-4 w-4" /> */}X
                           </Button>
                         </div>
                       </div>
                     </div>
-                    {index < cart.length - 1 && <hr className="border-gray-200 dark:border-gray-700" />}
+                    {index < cart.length - 1 && (
+                      <hr className="border-gray-200 dark:border-gray-700" />
+                    )}
                   </div>
                 ))}
               </CardBody>

@@ -6,10 +6,12 @@ import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { ShoppingCartIcon } from "../icons";
 
 import { useCart } from "@/app/context/cartContext";
+import Link from "next/link";
+import { useDisclosure } from "@heroui/modal";
 
 export default function CartDropdown() {
   const { cart, removeFromCart, updateCartItem } = useCart();
-  const [isOpen, setIsOpen] = useState(false);
+  const {isOpen, onOpen,onClose, onOpenChange} = useDisclosure();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const quantityRef = useRef(cart?.length);
 
@@ -26,7 +28,7 @@ export default function CartDropdown() {
   useEffect(() => {
     const handleClickOutside = (event: { target: any }) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+        onClose();
       }
     };
 
@@ -39,6 +41,14 @@ export default function CartDropdown() {
     .reduce((acc, item) => acc + item.price * item.quantity, 0)
     .toFixed(2);
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  const handleClickCart = () => {
+    if(isOpen){
+      onClose();
+      return;
+    }
+    onOpen();
+  }
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -53,7 +63,7 @@ export default function CartDropdown() {
           isIconOnly
           className="relative rounded-full bg-transparent"
           variant="solid"
-          onPress={() => setIsOpen(!isOpen)}
+          onPress={() => handleClickCart()}
         >
           <ShoppingCartIcon size={25} />
         </Button>
@@ -93,7 +103,7 @@ export default function CartDropdown() {
                           <span className="text-lg font-bold">
                             {item.price} ₾
                           </span>
-                          {item.discount && (
+                          {item.discount > 0 && (
                             <>
                               <span className="text-sm line-through text-muted-foreground">
                                 {item.originalPrice} ₾
@@ -149,14 +159,19 @@ export default function CartDropdown() {
           </div>
 
           {cart.length > 0 && (
-            <CardFooter className="flex flex-col gap-4 pt-6">
+            <CardFooter className="flex flex-col gap-4">
               <div className="flex w-full items-center justify-between">
-                <span className="text-lg font-medium">Total</span>
+                <span className="text-lg font-medium">სულ:</span>
                 <span className="text-xl font-bold">{totalPrice} ₾</span>
               </div>
-              <Button className="w-full" size="lg">
-                Checkout
-              </Button>
+              <div className="flex gap-2 w-full">
+                <Button as={Link} variant="ghost" onPress={() => onClose()} className="flex-1" href="/cart">
+                  ნახვა ({totalQuantity})
+                </Button>
+                <Button className="flex-1">
+                  ყიდვა
+                </Button>
+              </div>
             </CardFooter>
           )}
         </Card>

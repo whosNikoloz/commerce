@@ -8,7 +8,10 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 
-import { SearchIcon } from "../icons";
+import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
+import { user } from "@heroui/theme";
+import Link from "next/link";
+import Cartlink from "../Cart/cart-link";
 
 export default function SearchModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -55,12 +58,27 @@ export default function SearchModal() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
-                </Button>
+              <div className="md:hidden fixed bottom-1 left-1/2 z-50 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
+                <div className="flex justify-around items-center py-2">
+                  <Link href={`/${"lng"}`} className="flex flex-col items-center">
+                    <HomeIcon className="text-green-500 w-6 h-6" />
+                    <span className="text-xs">{"en" === "en" ? "Home" : "მთავარი"}</span>
+                  </Link>
+
+                  <SearchModal />
+
+                  <Cartlink />
+
+                  <Link href={`/${"lng"}/chat`} className="flex flex-col items-center">
+                    <ProfileIcon className="w-6 h-6" />
+                    <span className="text-xs">{"en" === "en" ? "Chat" : "ჩათი"}</span>
+                  </Link>
+                    <Link href={`/${"lng"}/login`} className="flex flex-col items-center">
+                      <ProfileIcon className="w-6 h-6" />
+                      <span className="text-xs">{"en" === "en" ? "Login" : "შესვლა"}</span>
+                    </Link>
+                </div>
+              </div>
               </ModalFooter>
             </>
           )}

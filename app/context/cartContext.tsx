@@ -10,7 +10,7 @@ import {
 import CryptoJS from "crypto-js";
 import { toast } from "sonner";
 
-type CartItem = {
+export type CartItem = {
   darkImage: string;
   discount: any;
   originalPrice: ReactNode;

@@ -1,11 +1,10 @@
+import FixedCardCarousel from "@/components/Categories/fixed-carousel";
 import ProductList from "@/components/productList";
-import { useTranslation } from "@/hooks/useTranslation";
 
 export default function HomePage() {
-  
-
   return (
-    <div>
+    <div className="py-16">
+      <FixedCardCarousel />
       <ProductList />
       <ProductList />
       <ProductList />

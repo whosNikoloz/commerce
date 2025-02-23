@@ -51,7 +51,7 @@ export default async function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col  ">
             <Navbar />
-            <main className="container  mx-auto max-w-7xl py-16 px-6 flex-grow">
+            <main className="container  mx-auto max-w-7xl  px-6 flex-grow">
               {children}
             </main>
           </div>

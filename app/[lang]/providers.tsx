@@ -31,7 +31,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
       <NextThemesProvider {...themeProps}>
         <TranslationProvider>
           <CartProvider>{children}</CartProvider>
-          <Toaster richColors position="top-right"/>
+          <Toaster richColors position="bottom-right" />
         </TranslationProvider>
       </NextThemesProvider>
     </HeroUIProvider>

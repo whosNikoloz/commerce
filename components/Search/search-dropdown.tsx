@@ -41,7 +41,7 @@ const Search = () => {
 
   return (
     <div className="relative w-full max-w-xl">
-      <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer sm:w-full w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
+      <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12  mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
         <SearchIcon className="text-gray-500" />
         <Input
           aria-controls="search-results"

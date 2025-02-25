@@ -4,24 +4,21 @@ import { Badge } from "@heroui/badge";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 
 import { ShoppingCartIcon } from "../icons";
-
 import { useCart } from "@/app/context/cartContext";
 import Link from "next/link";
 import { useDisclosure } from "@heroui/modal";
 
 export default function CartDropdown() {
   const { cart, removeFromCart, updateCartItem } = useCart();
-  const {isOpen, onOpen,onClose, onOpenChange} = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const quantityRef = useRef(cart?.length);
+  const [cartChanged, setCartChanged] = useState(false);  // State for animation trigger
 
   useEffect(() => {
-    if (
-      cart?.length &&
-      cart.length !== quantityRef.current &&
-      cart.length > 0
-    ) {
+    if (cart?.length && cart.length !== quantityRef.current && cart.length > 0) {
       quantityRef.current = cart.length;
+      setCartChanged(true);  // Trigger animation when cart changes
     }
   }, [cart?.length, isOpen]);
 
@@ -43,17 +40,26 @@ export default function CartDropdown() {
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleClickCart = () => {
-    if(isOpen){
+    if (isOpen) {
       onClose();
       return;
     }
     onOpen();
-  }
+  };
+
+  useEffect(() => {
+    if (cartChanged) {
+      const timer = setTimeout(() => setCartChanged(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [cartChanged]);
 
   return (
     <div ref={dropdownRef} className="relative">
       <Badge
-        className="border-0 absolute top-2 right-2"
+        className={`border-0 absolute top-2 right-2 ${
+          cartChanged ? "hidden" : ""
+        }`} 
         color="danger"
         content={totalQuantity}
         size="sm"
@@ -61,7 +67,9 @@ export default function CartDropdown() {
       >
         <Button
           isIconOnly
-          className="relative rounded-full bg-transparent"
+          className={`relative rounded-full bg-transparent ${
+            cartChanged ? "animate-ping" : ""
+          }`} // Apply bounce animation when cart changes
           variant="solid"
           onPress={() => handleClickCart()}
         >
@@ -70,7 +78,7 @@ export default function CartDropdown() {
       </Badge>
 
       <div
-        className={`absolute right-0 top-14  w-96 transform transition-all duration-200 ${
+        className={`absolute right-0 top-14 w-96 transform transition-all duration-200 ${
           isOpen
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
@@ -81,7 +89,7 @@ export default function CartDropdown() {
             <h1 className="text-lg font-semibold">Shopping Cart</h1>
           </CardHeader>
 
-          <div className="h-min ">
+          <div className="h-min">
             {cart.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
                 <ShoppingCartIcon className="h-12 w-12 mb-2 opacity-20" />
@@ -100,9 +108,7 @@ export default function CartDropdown() {
                       <div className="ml-4 flex-1">
                         <h4 className="font-medium">{item.name}</h4>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="text-lg font-bold">
-                            {item.price} ₾
-                          </span>
+                          <span className="text-lg font-bold">{item.price} ₾</span>
                           {item.discount > 0 && (
                             <>
                               <span className="text-sm line-through text-muted-foreground">
@@ -123,11 +129,9 @@ export default function CartDropdown() {
                               updateCartItem(item.id, item.quantity - 1)
                             }
                           >
-                            {/* <Minus className="h-4 w-4" /> */}-
+                            -
                           </Button>
-                          <span className="w-8 text-center">
-                            {item.quantity}
-                          </span>
+                          <span className="w-8 text-center">{item.quantity}</span>
                           <Button
                             isIconOnly
                             className="h-8 w-8"
@@ -136,7 +140,7 @@ export default function CartDropdown() {
                               updateCartItem(item.id, item.quantity + 1)
                             }
                           >
-                            +{/* <Plus className="h-4 w-4" /> */}
+                            +
                           </Button>
                           <Button
                             isIconOnly
@@ -144,7 +148,7 @@ export default function CartDropdown() {
                             variant="ghost"
                             onPress={() => removeFromCart(item.id)}
                           >
-                            {/* <X className="h-4 w-4" /> */}X
+                            X
                           </Button>
                         </div>
                       </div>
@@ -168,9 +172,7 @@ export default function CartDropdown() {
                 <Button as={Link} variant="ghost" onPress={() => onClose()} className="flex-1" href="/cart">
                   ნახვა ({totalQuantity})
                 </Button>
-                <Button className="flex-1">
-                  ყიდვა
-                </Button>
+                <Button className="flex-1">ყიდვა</Button>
               </div>
             </CardFooter>
           )}

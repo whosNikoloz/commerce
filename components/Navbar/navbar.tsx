@@ -113,7 +113,7 @@ export const Navbar = () => {
           </button>
         </div>
       )}
-      <div className="md:hidden fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
+      <div className="md:hidden z-50 fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
         <div className="flex justify-around items-center py-2">
           <Link className="flex flex-col items-center" href={`/${lng}`}>
             <HomeIcon className="text-green-500 w-6 h-6" />

@@ -46,50 +46,48 @@ const decryptData = (encrypted: string): object | null => {
     return JSON.parse(decrypted);
   } catch (error) {
     console.error("Failed to decrypt cart data:", error);
-
     return null;
   }
 };
 
 export const useCart = () => {
   const context = useContext(CartContext);
-
   if (!context) {
     throw new Error("useCart must be used within a CartProvider");
   }
-
   return context;
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = sessionStorage.getItem("cart");
-
-    if (savedCart) {
-      const decryptedCart = decryptData(savedCart);
-
-      if (decryptedCart) setCart(decryptedCart as CartItem[]);
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        const decryptedCart = decryptData(savedCart);
+        if (decryptedCart) setCart(decryptedCart as CartItem[]);
+      }
     }
   }, []);
 
+  // Save cart to localStorage when cart changes
   useEffect(() => {
-    const encryptedCart = encryptData(cart);
-
-    sessionStorage.setItem("cart", encryptedCart);
+    if (typeof window !== "undefined" && cart.length > 0) {
+      const encryptedCart = encryptData(cart);
+      localStorage.setItem("cart", encryptedCart);
+    }
   }, [cart]);
 
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((i) => i.id === item.id);
-
       if (existingItem) {
         return prevCart.map((i) =>
           i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-
       return [...prevCart, { ...item, quantity: 1 }];
     });
     toast.success(`${item.name} added to cart`);
@@ -108,7 +106,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart"); // Clear localStorage when the cart is emptied
+  };
 
   return (
     <CartContext.Provider

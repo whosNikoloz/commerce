@@ -5,9 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { SearchIcon } from "../icons";
 
-const Search = () => {
+interface SearchForMobileProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}
+
+const Search = ({ searchQuery, setSearchQuery }: SearchForMobileProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   interface SearchResult {
     id: string;

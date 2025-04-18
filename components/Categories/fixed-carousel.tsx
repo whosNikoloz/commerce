@@ -8,14 +8,34 @@ import Link from "next/link";
 
 const FixedCardCarousel = () => {
   const items = [
-    { id: 1, title: "ყველა კატეგორია",fomated_name : "all", image: "/img1.jpg" },
-    { id: 2, title: "საჩუქრები",fomated_name : "presents", image: "/img2.jpg" },
-    { id: 3, title: "ტექნიკა",fomated_name : "tec", image: "/img1.jpg" },
-    { id: 4, title: "სილამაზე & მოვლა",fomated_name : "beuty", image: "/img1.jpg" },
-    { id: 5, title: "სახლი & ეზო",fomated_name : "house", image: "/img2.jpg" },
-    { id: 6, title: "ბარი & მეტი",fomated_name : "bar", image: "/img1.jpg" },
-    { id: 7, title: "სახლის მოვლა",fomated_name : "houses", image: "/img2.jpg" },
-    { id: 8, title: "სახლის სარემონტო",fomated_name : "all", image: "/img1.jpg" },
+    {
+      id: 1,
+      title: "ყველა კატეგორია",
+      fomated_name: "all",
+      image: "/img1.jpg",
+    },
+    { id: 2, title: "საჩუქრები", fomated_name: "presents", image: "/img2.jpg" },
+    { id: 3, title: "ტექნიკა", fomated_name: "tec", image: "/img1.jpg" },
+    {
+      id: 4,
+      title: "სილამაზე & მოვლა",
+      fomated_name: "beuty",
+      image: "/img1.jpg",
+    },
+    { id: 5, title: "სახლი & ეზო", fomated_name: "house", image: "/img2.jpg" },
+    { id: 6, title: "ბარი & მეტი", fomated_name: "bar", image: "/img1.jpg" },
+    {
+      id: 7,
+      title: "სახლის მოვლა",
+      fomated_name: "houses",
+      image: "/img2.jpg",
+    },
+    {
+      id: 8,
+      title: "სახლის სარემონტო",
+      fomated_name: "all",
+      image: "/img1.jpg",
+    },
   ];
 
   return (
@@ -44,8 +64,11 @@ const FixedCardCarousel = () => {
       >
         {items.slice(1).map((item) => (
           <SplideSlide key={item.id}>
-            <Card className="w-full md:w-36 h-36 flex flex-col items-center justify-center p-3 bg-gray-100 hover:bg-gray-200 transition-colors"
-             as={Link} href={`/category/${item.fomated_name}`}>
+            <Card
+              as={Link}
+              className="w-full md:w-36 h-36 flex flex-col items-center justify-center p-3 bg-gray-100 hover:bg-gray-200 transition-colors"
+              href={`/category/${item.fomated_name}`}
+            >
               <img
                 alt={item.title}
                 className="w-16 h-16 md:w-24 md:h-24 object-cover mb-1"

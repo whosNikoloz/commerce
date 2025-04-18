@@ -12,7 +12,6 @@ export default function CartDrawer() {
   const { cart, removeFromCart, updateCartItem } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const quantityRef = useRef(cart?.length);
-  const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export default function CartDrawer() {
   }, [cart?.length, isOpen]);
   const totalPrice = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
 

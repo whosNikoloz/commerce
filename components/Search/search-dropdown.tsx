@@ -33,7 +33,7 @@ const Search = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     const filteredResults = staticSearchResults.filter((result) =>
-      result.name.toLowerCase().includes(e.target.value.toLowerCase())
+      result.name.toLowerCase().includes(e.target.value.toLowerCase()),
     );
 
     setSearchResults(filteredResults);

@@ -4,6 +4,7 @@ import { Link } from "@heroui/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { Button } from "@heroui/button";
 
 import { HeartFilledIcon, HomeIcon, ProfileIcon } from "../icons";
 import { LanguageSwitch } from "../Switch/language";
@@ -12,6 +13,7 @@ import Cartlink from "../Cart/cart-link";
 import SearchModal from "../Search/search-modal";
 import Search from "../Search/search-dropdown";
 import SearchForMobile from "../Search/search-for-mobile";
+import AuthForMobile from "../AuthModal/auth-for-mobile";
 
 export const Navbar = () => {
   const user = null;
@@ -77,13 +79,17 @@ export const Navbar = () => {
                 <div className="items-center space-x-4 hidden md:flex">
                   <CartDropdown />
                   <LanguageSwitch />
-                  <Image
-                    alt="User Avatar"
-                    className="rounded-full border border-gray-300"
-                    height={40}
-                    src={"/img1.jpg"}
-                    width={40}
-                  />
+                  {user ? (
+                    <Image
+                      alt="User Avatar"
+                      className="rounded-full border border-gray-300"
+                      height={40}
+                      src={"/img1.jpg"}
+                      width={40}
+                    />
+                  ) : (
+                    <AuthForMobile />
+                  )}
                 </div>
               </div>
             </div>
@@ -144,12 +150,7 @@ export const Navbar = () => {
               </span>
             </Link>
           ) : (
-            <Link className="flex flex-col items-center" href={`/${lng}/login`}>
-              <ProfileIcon className="w-6 h-6" />
-              <span className="text-xs">
-                {lng === "en" ? "Login" : "შესვლა"}
-              </span>
-            </Link>
+            <AuthForMobile />
           )}
         </div>
       </div>

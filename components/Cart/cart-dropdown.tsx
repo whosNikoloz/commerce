@@ -2,23 +2,28 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@heroui/button";
 import { Badge } from "@heroui/badge";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
-
-import { ShoppingCartIcon } from "../icons";
-import { useCart } from "@/app/context/cartContext";
 import Link from "next/link";
 import { useDisclosure } from "@heroui/modal";
 
+import { ShoppingCartIcon } from "../icons";
+
+import { useCart } from "@/app/context/cartContext";
+
 export default function CartDropdown() {
   const { cart, removeFromCart, updateCartItem } = useCart();
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const quantityRef = useRef(cart?.length);
-  const [cartChanged, setCartChanged] = useState(false);  // State for animation trigger
+  const [cartChanged, setCartChanged] = useState(false); // State for animation trigger
 
   useEffect(() => {
-    if (cart?.length && cart.length !== quantityRef.current && cart.length > 0) {
+    if (
+      cart?.length &&
+      cart.length !== quantityRef.current &&
+      cart.length > 0
+    ) {
       quantityRef.current = cart.length;
-      setCartChanged(true);  // Trigger animation when cart changes
+      setCartChanged(true); // Trigger animation when cart changes
     }
   }, [cart?.length, isOpen]);
 
@@ -42,6 +47,7 @@ export default function CartDropdown() {
   const handleClickCart = () => {
     if (isOpen) {
       onClose();
+
       return;
     }
     onOpen();
@@ -50,6 +56,7 @@ export default function CartDropdown() {
   useEffect(() => {
     if (cartChanged) {
       const timer = setTimeout(() => setCartChanged(false), 500);
+
       return () => clearTimeout(timer);
     }
   }, [cartChanged]);
@@ -59,7 +66,7 @@ export default function CartDropdown() {
       <Badge
         className={`border-0 absolute top-2 right-2 ${
           cartChanged ? "hidden" : ""
-        }`} 
+        }`}
         color="danger"
         content={totalQuantity}
         size="sm"
@@ -108,7 +115,9 @@ export default function CartDropdown() {
                       <div className="ml-4 flex-1">
                         <h4 className="font-medium">{item.name}</h4>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="text-lg font-bold">{item.price} ₾</span>
+                          <span className="text-lg font-bold">
+                            {item.price} ₾
+                          </span>
                           {item.discount > 0 && (
                             <>
                               <span className="text-sm line-through text-muted-foreground">
@@ -131,7 +140,9 @@ export default function CartDropdown() {
                           >
                             -
                           </Button>
-                          <span className="w-8 text-center">{item.quantity}</span>
+                          <span className="w-8 text-center">
+                            {item.quantity}
+                          </span>
                           <Button
                             isIconOnly
                             className="h-8 w-8"
@@ -169,7 +180,13 @@ export default function CartDropdown() {
                 <span className="text-xl font-bold">{totalPrice} ₾</span>
               </div>
               <div className="flex gap-2 w-full">
-                <Button as={Link} variant="ghost" onPress={() => onClose()} className="flex-1" href="/cart">
+                <Button
+                  as={Link}
+                  className="flex-1"
+                  href="/cart"
+                  variant="ghost"
+                  onPress={() => onClose()}
+                >
                   ნახვა ({totalQuantity})
                 </Button>
                 <Button className="flex-1">ყიდვა</Button>

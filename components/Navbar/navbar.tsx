@@ -46,7 +46,7 @@ export const Navbar = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+  const [searchQuery, setSearchQuery] = useState("");
   const lng = "en";
 
   return (
@@ -74,7 +74,7 @@ export const Navbar = () => {
                     </span>
                   </Link>
                 </div>
-                {isMobile ? <SearchForMobile /> : <Search />}
+                {isMobile ? <SearchForMobile setSearchQuery={setSearchQuery} searchQuery={searchQuery}/> : <Search setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>}
 
                 <div className="items-center space-x-4 hidden md:flex">
                   <CartDropdown />
@@ -126,7 +126,7 @@ export const Navbar = () => {
             <span className="text-xs">{lng === "en" ? "Home" : "მთავარი"}</span>
           </Link>
 
-          <SearchModal />
+          <SearchModal setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>
 
           <Cartlink />
 

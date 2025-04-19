@@ -72,7 +72,11 @@ const AuthData = {
   },
 };
 
-export default function AuthForMobile() {
+interface AuthModalProps {
+  IsMobile: boolean;
+}
+
+export default function AuthModal({ IsMobile }: AuthModalProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loginMode, setLoginMode] = useState(true); // Default to login mode
   const lng = "ka";
@@ -455,8 +459,8 @@ export default function AuthForMobile() {
             },
           },
         }}
-        placement="top"
-        size="full"
+        placement={IsMobile ? "top" : "center"}
+        size={IsMobile ? "full" : "sm"}
         onClose={onClose}
       >
         <ModalContent>

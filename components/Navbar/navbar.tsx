@@ -4,22 +4,21 @@ import { Link } from "@heroui/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Button } from "@heroui/button";
 
 import { HeartFilledIcon, HomeIcon, ProfileIcon } from "../icons";
 import { LanguageSwitch } from "../Switch/language";
 import CartDropdown from "../Cart/cart-dropdown";
 import Cartlink from "../Cart/cart-link";
-import SearchModal from "../Search/search-modal";
 import Search from "../Search/search-dropdown";
 import SearchForMobile from "../Search/search-for-mobile";
-import AuthForMobile from "../AuthModal/auth-for-mobile";
+import AuthModal from "../AuthModal/auth-modal";
 
 export const Navbar = () => {
   const user = null;
   const [isScrolled, setIsScrolled] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [searchModalIsOpen, setSearchModalIsOpen] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -61,7 +60,7 @@ export const Navbar = () => {
             }`}
           >
             <div className="mx-auto px-4">
-              <div className="flex items-center justify-between h-16">
+              <div className="flex items-center justify-between h-16 ">
                 {/* Logo */}
                 <div className="flex items-center space-x-2">
                   <Link
@@ -74,7 +73,21 @@ export const Navbar = () => {
                     </span>
                   </Link>
                 </div>
-                {isMobile ? <SearchForMobile setSearchQuery={setSearchQuery} searchQuery={searchQuery}/> : <Search setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>}
+                {isMobile ? (
+                  <SearchForMobile
+                    isModalOpen={searchModalIsOpen}
+                    searchQuery={searchQuery}
+                    setSearchModalOpen={setSearchModalIsOpen}
+                    setSearchQuery={setSearchQuery}
+                  />
+                ) : (
+                  <Search
+                    isModalOpen={searchModalIsOpen}
+                    searchQuery={searchQuery}
+                    setSearchModalOpen={setSearchModalIsOpen}
+                    setSearchQuery={setSearchQuery}
+                  />
+                )}
 
                 <div className="items-center space-x-4 hidden md:flex">
                   <CartDropdown />
@@ -88,7 +101,7 @@ export const Navbar = () => {
                       width={40}
                     />
                   ) : (
-                    <AuthForMobile />
+                    <AuthModal IsMobile={isMobile} />
                   )}
                 </div>
               </div>
@@ -120,21 +133,27 @@ export const Navbar = () => {
         </div>
       )}
       <div className="md:hidden z-50 fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
-        <div className="flex justify-around items-center py-2">
+        <div className="flex justify-around items-center py-2 space-x-3">
           <Link className="flex flex-col items-center" href={`/${lng}`}>
             <HomeIcon className="text-green-500 w-6 h-6" />
             <span className="text-xs">{lng === "en" ? "Home" : "მთავარი"}</span>
           </Link>
-
-          <SearchModal setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>
-
+          {isMobile ? (
+            <SearchForMobile
+              forBottomNav={true}
+              isModalOpen={searchModalIsOpen}
+              searchQuery={searchQuery}
+              setSearchModalOpen={setSearchModalIsOpen}
+              setSearchQuery={setSearchQuery}
+            />
+          ) : (
+            <></>
+          )}
           <Cartlink />
-
           <Link className="flex flex-col items-center" href={`/${lng}/chat`}>
             <ProfileIcon className="w-6 h-6" />
             <span className="text-xs">{lng === "en" ? "Chat" : "ჩათი"}</span>
           </Link>
-
           {user ? (
             <Link
               className="relative flex flex-col items-center"
@@ -150,7 +169,7 @@ export const Navbar = () => {
               </span>
             </Link>
           ) : (
-            <AuthForMobile />
+            <AuthModal IsMobile={isMobile} />
           )}
         </div>
       </div>

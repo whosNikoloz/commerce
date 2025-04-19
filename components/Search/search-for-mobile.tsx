@@ -4,51 +4,81 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure,
 } from "@heroui/modal";
 import Link from "next/link";
 import { Input } from "@headlessui/react";
+
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
 
 interface SearchForMobileProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  setSearchModalOpen: (isOpen: boolean) => void;
+  isModalOpen: boolean;
+  forBottomNav?: boolean;
 }
 
-export default function SearchForMobile({ searchQuery, setSearchQuery }: SearchForMobileProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export default function SearchForMobile({
+  searchQuery,
+  setSearchQuery,
+  isModalOpen,
+  setSearchModalOpen,
+  forBottomNav = false,
+}: SearchForMobileProps) {
+  const handleOpen = () => {
+    setSearchModalOpen(true);
+  };
+  const handleClose = () => {
+    setSearchModalOpen(false);
+  };
 
   return (
     <>
-      <button
-        className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer sm:w-full w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
-        onClick={onOpen}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            onOpen();
-          }
-        }}
-      >
-        <SearchIcon className="text-gray-500" />
-        <Input
-          readOnly
-          aria-controls="search-results"
-          aria-expanded={isOpen}
-          aria-label="Search"
-          className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
-          id="search-input"
-          placeholder="What are you looking for?"
-          type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </button>
+      {forBottomNav ? (
+        <div
+          className="flex flex-col items-center bg-transparent"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleOpen()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleOpen();
+            }
+          }}
+        >
+          <SearchIcon />
+          <span className="text-xs">ძებნა</span>
+        </div>
+      ) : (
+        <button
+          className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer sm:w-full w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
+          onClick={handleOpen}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleOpen();
+            }
+          }}
+        >
+          <SearchIcon className="text-gray-500" />
+          <Input
+            readOnly
+            aria-controls="search-results"
+            aria-expanded={isModalOpen}
+            aria-label="Search"
+            className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
+            id="search-input"
+            placeholder="What are you looking for?"
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </button>
+      )}
 
       <Modal
-        isOpen={isOpen}
+        hideCloseButton
+        isOpen={isModalOpen}
         motionProps={{
           variants: {
             enter: {
@@ -70,8 +100,7 @@ export default function SearchForMobile({ searchQuery, setSearchQuery }: SearchF
           },
         }}
         size="full"
-        onClose={onClose}
-        hideCloseButton
+        onClose={handleClose}
       >
         <ModalContent>
           {() => (
@@ -80,7 +109,7 @@ export default function SearchForMobile({ searchQuery, setSearchQuery }: SearchF
                 <div className="flex items-center z-50">
                   <button
                     className=" shadow-md rounded-full  flex items-center space-x-2"
-                    onClick={onClose}
+                    onClick={handleClose}
                   >
                     <svg
                       className="w-6 h-6 text-gray-700 dark:text-white"
@@ -100,18 +129,18 @@ export default function SearchForMobile({ searchQuery, setSearchQuery }: SearchF
                 </div>
 
                 <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12  mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
-                <SearchIcon className="text-gray-500" />
+                  <SearchIcon className="text-gray-500" />
                   <Input
-                      aria-controls="search-results"
-                      aria-expanded={isOpen}
-                      aria-label="Search"
-                      className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
-                      id="search-input"
-                      placeholder="What are you looking for?"
-                      type="search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                  />           
+                    aria-controls="search-results"
+                    aria-expanded={isModalOpen}
+                    aria-label="Search"
+                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
+                    id="search-input"
+                    placeholder="What are you looking for?"
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </ModalHeader>
 
@@ -131,10 +160,10 @@ export default function SearchForMobile({ searchQuery, setSearchQuery }: SearchF
                       className="flex flex-col items-center bg-transparent"
                       role="button"
                       tabIndex={0}
-                      onClick={onClose}
+                      onClick={handleOpen}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
-                          onClose();
+                          handleClose();
                         }
                       }}
                     >

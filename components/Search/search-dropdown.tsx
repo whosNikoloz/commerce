@@ -8,10 +8,17 @@ import { SearchIcon } from "../icons";
 interface SearchForMobileProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  setSearchModalOpen: (isOpen: boolean) => void;
+  isModalOpen: boolean;
 }
 
-const Search = ({ searchQuery, setSearchQuery }: SearchForMobileProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+const Search = ({
+  searchQuery,
+  setSearchQuery,
+  isModalOpen,
+  setSearchModalOpen,
+}: SearchForMobileProps) => {
+  const [isOpen, setIsOpen] = useState(isModalOpen);
 
   interface SearchResult {
     id: string;
@@ -22,6 +29,7 @@ const Search = ({ searchQuery, setSearchQuery }: SearchForMobileProps) => {
 
   const handleSearchFocus = () => {
     setIsOpen(true);
+    setSearchModalOpen(true);
   };
 
   const staticSearchResults: SearchResult[] = [
@@ -44,7 +52,7 @@ const Search = ({ searchQuery, setSearchQuery }: SearchForMobileProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-xl">
+    <div className="relative w-full">
       <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12  mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
         <SearchIcon className="text-gray-500" />
         <Input

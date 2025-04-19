@@ -10,6 +10,7 @@ import { Input } from "@headlessui/react";
 
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
+import { GoBackButton } from "../go-back-button";
 
 interface SearchForMobileProps {
   searchQuery: string;
@@ -52,7 +53,7 @@ export default function SearchForMobile({
         </div>
       ) : (
         <button
-          className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer sm:w-full w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
+          className="flex items-center ml-2 bg-white rounded-full shadow-md border border-gray-300 cursor-pointer sm:w-full w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
           onClick={handleOpen}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -105,29 +106,8 @@ export default function SearchForMobile({
         <ModalContent>
           {() => (
             <>
-              <ModalHeader className="flex items-center gap-2  px-4 pt-6 mx-4 z-50">
-                <div className="flex items-center z-50">
-                  <button
-                    className=" shadow-md rounded-full  flex items-center space-x-2"
-                    onClick={handleClose}
-                  >
-                    <svg
-                      className="w-6 h-6 text-gray-700 dark:text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 19l-7-7 7-7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
+              <ModalHeader className="flex items-center gap-2  px-1 pt-6 mx-4 z-50">
+                <GoBackButton onClick={handleClose} />
                 <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12  mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
                   <SearchIcon className="text-gray-500" />
                   <Input

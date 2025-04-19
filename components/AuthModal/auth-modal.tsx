@@ -438,6 +438,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
             "bg-gradient-to-b from-gray-900/60 to-gray-900/80 backdrop-blur-sm",
           base: "rounded-t-xl",
         }}
+        hideCloseButton={IsMobile}
         isOpen={isOpen}
         motionProps={{
           variants: {
@@ -466,11 +467,37 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         <ModalContent>
           {() => (
             <>
-              <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                <h2 className="text-2xl font-bold text-white">
-                  {loginMode ? loginData.title : regData.title}
-                </h2>
-              </ModalHeader>
+              {IsMobile ? (
+                <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
+                  <div className="flex-2 items-center z-50">
+                    <button
+                      className="shadow-md rounded-full p-2 flex items-center justify-center"
+                      onClick={onClose}
+                    >
+                      <svg
+                        className="w-6 h-6 text-gray-700 dark:text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M15 19l-7-7 7-7"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex flex-col items-center gap-1 pb-4">
+                  <h2 className="text-2xl font-bold text-white">
+                    {loginMode ? loginData.title : regData.title}
+                  </h2>
+                </ModalHeader>
+              )}
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 <div className="space-y-3">
                   {loginMode ? (
@@ -710,7 +737,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         <i className="fas fa-user-plus mr-2" />
                       )
                     }
-                    onClickCapture={handleNext}
+                    onPress={handleNext}
                   >
                     {loginMode ? loginData.button : regData.button}
                   </Button>
@@ -726,7 +753,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                   <Button
                     className="w-full bg-[#4267B2] hover:bg-[#365899] text-white font-bold py-3 rounded-lg shadow-md transition-colors mb-3"
                     startContent={<i className="fab fa-facebook-f mr-2" />}
-                    onClickCapture={() => handleOAuth("facebook")}
+                    onPress={() => handleOAuth("facebook")}
                   >
                     {loginMode ? loginData.facebookAuth : regData.facebookAuth}
                   </Button>
@@ -736,7 +763,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                     startContent={
                       <i className="fab fa-google mr-2 text-[#4285F4]" />
                     }
-                    onClickCapture={() => handleOAuth("google")}
+                    onPress={() => handleOAuth("google")}
                   >
                     {loginMode ? loginData.googleAuth : regData.googleAuth}
                   </Button>

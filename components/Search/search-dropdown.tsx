@@ -39,7 +39,8 @@ const Search = ({
   ];
 
   const handleSearchBlur = () => {
-    setTimeout(() => setIsOpen(false), 200);
+    setTimeout(() => setIsOpen(false), 2);
+    setTimeout(() => setSearchModalOpen(false), 2);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

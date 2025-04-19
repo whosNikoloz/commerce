@@ -43,7 +43,6 @@ export function TranslationProvider({
 export function useTranslation() {
   const context = useContext(TranslationContext);
 
-  console.log(context);
   if (context === undefined) {
     throw new Error("useTranslation must be used within a TranslationProvider");
   }

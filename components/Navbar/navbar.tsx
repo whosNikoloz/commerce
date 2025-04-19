@@ -12,6 +12,7 @@ import Cartlink from "../Cart/cart-link";
 import Search from "../Search/search-dropdown";
 import SearchForMobile from "../Search/search-for-mobile";
 import AuthModal from "../AuthModal/auth-modal";
+import { GoBackButton } from "../go-back-button";
 
 export const Navbar = () => {
   const user = null;
@@ -109,27 +110,8 @@ export const Navbar = () => {
           </div>
         </nav>
       ) : (
-        <div className="p-3 flex items-center space-x-2 z-50">
-          <button
-            className="bg-white dark:bg-gray-800 shadow-md rounded-full p-2 flex items-center space-x-2"
-            onClick={() => window.history.back()}
-          >
-            <svg
-              className="w-6 h-6 text-gray-700 dark:text-white"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15 19l-7-7 7-7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="text-sm text-gray-700 dark:text-white">Back</span>
-          </button>
+        <div className="mt-6 ml-5">
+          <GoBackButton onClick={() => window.history.back()} />
         </div>
       )}
       <div className="md:hidden z-50 fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">

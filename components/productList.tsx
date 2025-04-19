@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import { CartItem, useCart } from "@/app/context/cartContext";
 import { useTranslation } from "@/hooks/useTranslation";
+import { link } from "fs";
 
 const products: CartItem[] = [
   {
@@ -81,6 +82,12 @@ export default function ProductList() {
             >
               {dictionary.addToCart}
             </button>
+            <a
+              className="mt-4 w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition"
+              href={`/en/product/${product.id}`}
+            >
+              preview
+            </a>
           </div>
         </div>
       ))}

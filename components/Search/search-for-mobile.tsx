@@ -153,7 +153,10 @@ export default function SearchForMobile({
 
                     <Cartlink />
 
-                    <Link className="flex flex-col items-center" href="/chat">
+                    <Link
+                      className="flex flex-col items-center"
+                      href={`/en/contact`}
+                    >
                       <ProfileIcon className="w-6 h-6" />
                       <span className="text-xs">Chat</span>
                     </Link>

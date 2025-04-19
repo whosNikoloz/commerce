@@ -16,6 +16,7 @@ import { Button } from "@heroui/button";
 
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
+import { GoBackButton } from "../go-back-button";
 
 import { InputLoadingBtn } from "./input-loading-button";
 
@@ -469,27 +470,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
             <>
               {IsMobile ? (
                 <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
-                  <div className="flex-2 items-center z-50">
-                    <button
-                      className="shadow-md rounded-full p-2 flex items-center justify-center"
-                      onClick={onClose}
-                    >
-                      <svg
-                        className="w-6 h-6 text-gray-700 dark:text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M15 19l-7-7 7-7"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
+                  <GoBackButton onClick={onClose} />
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-1 pb-4">
@@ -812,7 +793,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
                     <Link
                       className="flex flex-col items-center"
-                      href={`/${lng}/chat`}
+                      href={`/${lng}/contact`}
                     >
                       <ProfileIcon className="w-6 h-6" />
                       <span className="text-xs">

@@ -132,7 +132,7 @@ export const Navbar = () => {
             <></>
           )}
           <Cartlink />
-          <Link className="flex flex-col items-center" href={`/${lng}/chat`}>
+          <Link className="flex flex-col items-center" href={`/${lng}/contact`}>
             <ProfileIcon className="w-6 h-6" />
             <span className="text-xs">{lng === "en" ? "Chat" : "ჩათი"}</span>
           </Link>

@@ -3,13 +3,13 @@ import { Button } from "@heroui/button";
 
 interface GoBackButtonProps {
   className?: string;
-  size?: 30;
+  size?: number;
   onClick: () => void;
 }
 
 export const GoBackButton: React.FC<GoBackButtonProps> = ({
   className,
-  size,
+  size = 40,
   onClick,
 }) => {
   return (

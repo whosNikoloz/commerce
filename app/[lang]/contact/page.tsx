@@ -289,9 +289,16 @@ export default function ContactPage() {
       {/* Map Section */}
       <div className="mt-12">
         <h2 className="text-2xl font-semibold mb-6">Find Us</h2>
-        <div className="h-[400px] bg-muted rounded-lg overflow-hidden relative">
+        <div className="h-[600px] bg-muted rounded-lg overflow-hidden relative">
           <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-muted-foreground">Map would be displayed here</p>
+            <iframe
+              height="450"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d95386.17832913631!2d44.93926244394529!3d41.65967257660184!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40440dfbd5689933%3A0x67954a817f2651b5!2sIsani-Samgori%2C%20Tbilisi!5e0!3m2!1sen!2sge!4v1745068729580!5m2!1sen!2sge"
+              title="location"
+              width="600"
+            />
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@ export const Navbar = () => {
       {!isMobile || !isNotHome ? (
         <nav className="justify-center items-center">
           <div
-            className={`z-50 fixed top-3 left-1/2 -translate-x-1/2 sm:w-6/12 w-11/12 rounded-2xl transition-all duration-300 ${
+            className={`z-50 fixed top-3 left-1/2 -translate-x-1/2 w-11/12 md:w-10/12 lg:w-6/12  rounded-2xl transition-all duration-300 ${
               isScrolled
                 ? "dark:backdrop-blur-2xl backdrop-blur-sm dark:bg-black/10 bg-white shadow-md"
                 : "bg-transparent"

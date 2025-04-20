@@ -19,6 +19,7 @@ const Search = ({
   setSearchModalOpen,
 }: SearchForMobileProps) => {
   const [isOpen, setIsOpen] = useState(isModalOpen);
+  const [isLoading, setIsLoading] = useState(false);
 
   interface SearchResult {
     id: string;
@@ -27,34 +28,61 @@ const Search = ({
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
+  const staticSearchResults: SearchResult[] = [
+    { id: "1", name: "Logitech Driving Force Shifter For X|S Xbox One..." },
+    {
+      id: "2",
+      name: "Logitech G923 Racing Wheel and Pedals Xbox Series X|S...",
+    },
+    {
+      id: "3",
+      name: "Logitech G432 7.1 Surround Sound Wired Gaming Headset...",
+    },
+    { id: "4", name: "Xbox Wireless Controller Electric Volt" },
+    { id: "5", name: "Xbox Wireless Controller Deep Pink" },
+    { id: "6", name: "Razer Thresher Xbox One WL Gaming Over-Ear Headset..." },
+    {
+      id: "7",
+      name: "Razer Nari Ultimate For Xbox One Wireless 7.1 Headset...",
+    },
+    { id: "8", name: "Razer Kaira Pro for Xbox Over-Ear Headset Black" },
+    { id: "9", name: "Razer Thresher XboxOne Gears of War 5 WL Headset..." },
+    { id: "10", name: "Flashfire Monza WH6301V Racing Wheel For PS4..." },
+  ];
+
   const handleSearchFocus = () => {
     setIsOpen(true);
     setSearchModalOpen(true);
   };
 
-  const staticSearchResults: SearchResult[] = [
-    { id: "1", name: "Product 1" },
-    { id: "2", name: "kroduct 2" },
-    { id: "3", name: "roduct 3" },
-  ];
-
   const handleSearchBlur = () => {
-    setTimeout(() => setIsOpen(false), 2);
-    setTimeout(() => setSearchModalOpen(false), 2);
+    setTimeout(() => {
+      setIsOpen(false);
+      setSearchModalOpen(false);
+    }, 200);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    const filteredResults = staticSearchResults.filter((result) =>
-      result.name.toLowerCase().includes(e.target.value.toLowerCase()),
-    );
+    const value = e.target.value;
 
-    setSearchResults(filteredResults);
+    setSearchQuery(value);
+    setIsLoading(true);
+    setSearchResults([]);
+
+    // Simulate API call
+    setTimeout(() => {
+      const filteredResults = staticSearchResults.filter((result) =>
+        result.name.toLowerCase().includes(value.toLowerCase()),
+      );
+
+      setSearchResults(filteredResults);
+      setIsLoading(false);
+    }, 2000); // simulate 1 second API call
   };
 
   return (
     <div className="relative w-full">
-      <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12  mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
+      <div className="flex items-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
         <SearchIcon className="text-gray-500" />
         <Input
           aria-controls="search-results"
@@ -75,15 +103,20 @@ const Search = ({
         {isOpen && (
           <motion.div
             animate={{ opacity: 1, y: 0 }}
-            className="absolute left-0 right-0 mt-5 z-50 "
+            className="absolute left-0 right-0 mt-5 z-50"
             exit={{ opacity: 0, y: -10 }}
             id="search-results"
             initial={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
             <Card>
-              <CardBody className="p-2">
-                {searchResults.length === 0 ? (
+              <CardBody className="p-5">
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-gray-400 animate-pulse">
+                    <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
+                    <p className="text-sm">Searching...</p>
+                  </div>
+                ) : searchResults.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
                     <p className="text-sm">No results found</p>
@@ -99,12 +132,15 @@ const Search = ({
                       <motion.li
                         key={result.id}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                        className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
                         exit={{ opacity: 0, y: -5 }}
                         initial={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.1 }}
                       >
-                        {result.name}
+                        <div className="flex items-center gap-3">
+                          <SearchIcon className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                          <span className="text-sm">{result.name}</span>
+                        </div>
                       </motion.li>
                     ))}
                   </ul>

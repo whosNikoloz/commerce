@@ -396,8 +396,8 @@ export default function ImageModal({
 
         {/* Description Panel (conditional) - desktop only */}
         {description && !isMobile && (
-          <div className="bg-white px-6 py-3 border-b border-gray-100">
-            <p className="text-gray-600 text-sm leading-relaxed">
+          <div className="bg-white dark:bg-neutral-900 px-6 py-3 border-b border-gray-100 dark:border-neutral-800">
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
               {description}
             </p>
           </div>
@@ -405,15 +405,15 @@ export default function ImageModal({
 
         {/* Mobile Footer Bar with Image Counter */}
         {isMobile && (
-          <div className="bg-white py-2 px-4 border-t border-gray-200 flex justify-between items-center">
-            <div className="text-xs font-medium text-gray-700">
+          <div className="bg-white dark:bg-neutral-900 py-2 px-4 border-t border-gray-200 dark:border-neutral-800 flex justify-between items-center">
+            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
               {currentIndex + 1} / {images.length}
             </div>
             <div className="flex gap-3">
               {onFavorite && (
                 <button
                   aria-label="Favorite"
-                  className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                  className="rounded-full p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
                   onClick={onFavorite}
                 >
                   <Heart className="h-5 w-5" />
@@ -422,7 +422,7 @@ export default function ImageModal({
               {onShare && (
                 <button
                   aria-label="Share"
-                  className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                  className="rounded-full p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
                   onClick={onShare}
                 >
                   <Share2 className="h-5 w-5" />
@@ -436,16 +436,16 @@ export default function ImageModal({
         {!isMobile && (
           <div className="bg-white px-6 py-4">
             <div className="flex justify-between items-center mb-3">
-              <div className="text-sm font-medium text-gray-700">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Image {currentIndex + 1} of {images.length}
               </div>
-              <div className="flex space-x-2 text-xs text-gray-500">
+              <div className="flex space-x-2 text-xs text-gray-500 dark:text-gray-400">
                 <span>Z to zoom</span>
                 <span>ESC to close</span>
               </div>
             </div>
 
-            <div className="flex space-x-3 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-2">
+            <div className="flex space-x-3 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-800 scrollbar-track-gray-100 dark:scrollbar-track-neutral-900 pb-2">
               {images.map((image, index) => (
                 <button
                   key={index}

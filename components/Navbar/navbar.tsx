@@ -11,8 +11,8 @@ import CartDropdown from "../Cart/cart-dropdown";
 import Cartlink from "../Cart/cart-link";
 import Search from "../Search/search-dropdown";
 import SearchForMobile from "../Search/search-for-mobile";
-import AuthModal from "../AuthModal/auth-modal";
 import { GoBackButton } from "../go-back-button";
+import AuthModal from "../AuthModal/auth-modal";
 
 export const Navbar = () => {
   const user = null;

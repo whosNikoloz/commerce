@@ -118,7 +118,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
         <div className="w-full">
           <Card
             ref={imageContainerRef}
-            className="relative rounded-lg overflow-hidden bg-transparent aspect-square cursor-crosshair"
+            className="relative rounded-lg overflow-hidden bg-white dark:bg-neutral-900 aspect-square cursor-crosshair"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onMouseMove={handleMouseMove}
@@ -135,7 +135,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
             {/* Zoom lens/box that appears when hovering */}
             {isHovering && !isMobile && (
               <div
-                className="absolute border-2 rounded-md border-primary pointer-events-none z-50 bg-primary/10"
+                className="absolute border-2 rounded-md border-primary pointer-events-none z-50 bg-primary/10 dark:bg-primary/20"
                 style={{
                   left: `${lensPosition.x}px`,
                   top: `${lensPosition.y}px`,
@@ -162,14 +162,14 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
             </button>
 
             {/* Zoom indicator */}
-            <div className="absolute top-3 right-3 bg-white/80 text-black  rounded-full p-1.5 shadow-sm z-10">
+            <div className="absolute top-3 right-3 bg-white/80 dark:bg-neutral-800/80 text-black dark:text-white rounded-full p-1.5 shadow-sm z-10">
               <ZoomIn className="h-5 w-5 text-muted-foreground" />
             </div>
 
             {/* Fullscreen button */}
             <button
               aria-label="View fullscreen"
-              className="absolute top-3 right-12 bg-white/80 rounded-full p-1.5 text-black shadow-sm hover:bg-white z-10"
+              className="absolute top-3 right-12 bg-white/80 dark:bg-neutral-800/80 rounded-full p-1.5 text-black shadow-sm hover:bg-white z-10"
               onClick={() => setIsModalOpen(true)}
             >
               <Maximize2 className="h-5 w-5 text-muted-foreground" />
@@ -181,7 +181,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
         {isHovering && !isMobile && (
           <div
             ref={zoomResultRef}
-            className="absolute top-36 left-full mx-5 w-1/2  border rounded-lg overflow-hidden bg-transparent aspect-square shadow-lg z-30 transition-opacity duration-200"
+            className="absolute top-36 left-full mx-5 w-1/2 border rounded-lg overflow-hidden bg-white dark:bg-neutral-900 aspect-square shadow-lg z-30 transition-opacity duration-200"
           >
             <div
               className="absolute inset-0 bg-no-repeat"

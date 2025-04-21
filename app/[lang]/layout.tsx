@@ -9,6 +9,7 @@ import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/Navbar/navbar";
 import { Locale } from "@/i18n.config";
 import { getTranslations } from "@/lib/get-dictionary";
+import AnimatedFooter from "@/components/animated-footer";
 
 export const metadata: Metadata = {
   title: {
@@ -53,11 +54,12 @@ export default async function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col  ">
+          <div className="relative flex flex-col  min-h-screen">
             <Navbar />
             <main className="container  mx-auto max-w-7xl  px-6 flex-grow">
               {children}
             </main>
+            <AnimatedFooter />
           </div>
         </Providers>
       </body>

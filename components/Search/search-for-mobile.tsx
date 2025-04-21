@@ -202,7 +202,7 @@ export default function SearchForMobile({
                     aria-controls="search-results"
                     aria-expanded={isModalOpen}
                     aria-label="Search"
-                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
+                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[15px]"
                     id="search-input"
                     placeholder="What are you looking for?"
                     type="search"

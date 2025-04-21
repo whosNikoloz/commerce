@@ -1,14 +1,37 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import { Breadcrumb } from "./breadcrumb";
 import { ImageGallery } from "./image-gallery";
 import { ProductInfo } from "./product-info";
+import { ProductInfoBottom } from "./product-info-bottom";
 import { Specifications } from "./specifications";
 import { Description } from "./description";
 import { SimilarProducts } from "./similar-products";
 import { ReviewsSection } from "./reviews-section";
 
 export default function ProductDetail() {
+  const [isPriceVisible, setIsPriceVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isMobile = window.innerWidth < 768;
+      const scrollThreshold = isMobile ? 900 : 700;
+
+      setIsPriceVisible(window.scrollY < scrollThreshold);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, []);
   // Product data
   const productImages = ["/img2.jpg", "/img1.jpg", "/img2.jpg"];
 
@@ -151,6 +174,16 @@ export default function ProductDetail() {
         ratingDistribution={ratingDistribution}
         reviews={reviews}
         totalReviews={256}
+      />
+
+      {/* Bottom Price Info - Shows when main price is hidden */}
+      <ProductInfoBottom
+        discount={25}
+        isVisible={!isPriceVisible}
+        name="Professional Cordless Drill Set"
+        originalPrice={199.99}
+        price={149.99}
+        stock={24}
       />
     </div>
   );

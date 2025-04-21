@@ -52,7 +52,6 @@ export function ProductInfo({
         </div>
       </div>
 
-      {/* Sticky price section */}
       <div className="md:sticky relative md:top-20 bg-white dark:bg-neutral-900 p-4 border rounded-lg shadow-sm">
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-3xl font-bold">${price.toFixed(2)}</span>

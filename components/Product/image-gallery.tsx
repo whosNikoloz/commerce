@@ -2,16 +2,19 @@
 
 import type React from "react";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ZoomIn, Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@heroui/theme";
 import { Card } from "@heroui/card";
+import useEmblaCarousel from "embla-carousel-react";
 
 import ImageModal from "./image-modal";
 
+import { ProductImage } from "@/types/Product";
+
 interface ImageGalleryProps {
-  images: string[];
+  images: ProductImage[];
   productName: string;
 }
 
@@ -26,8 +29,9 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const zoomResultRef = useRef<HTMLDivElement>(null);
+  const thumbnailsContainerRef = useRef<HTMLDivElement>(null);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
-  // Zoom magnification factor
   const zoomLevel = 3;
 
   useEffect(() => {
@@ -42,12 +46,9 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
   }, []);
 
   useEffect(() => {
-    // Calculate lens size based on zoom level and container size
     if (imageContainerRef.current && zoomResultRef.current) {
-      const containerRect = imageContainerRef.current.getBoundingClientRect();
       const zoomRect = zoomResultRef.current.getBoundingClientRect();
 
-      // Calculate lens size based on the ratio of container to zoom area
       const lensWidth = zoomRect.width / zoomLevel;
       const lensHeight = zoomRect.height / zoomLevel;
 
@@ -58,16 +59,62 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     }
   }, [zoomLevel]);
 
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.scrollTo(selectedImage);
+    }
+  }, [selectedImage, emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedImage(emblaApi.selectedScrollSnap());
+    scrollSelectedThumbnailIntoView();
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
   const nextImage = () => {
-    setSelectedImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    if (emblaApi) {
+      emblaApi.scrollNext();
+    }
+    scrollSelectedThumbnailIntoView();
   };
 
   const prevImage = () => {
-    setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+    }
+    scrollSelectedThumbnailIntoView();
+  };
+
+  useEffect(() => {
+    scrollSelectedThumbnailIntoView();
+  }, [selectedImage]);
+
+  const scrollSelectedThumbnailIntoView = () => {
+    if (thumbnailsContainerRef.current) {
+      const container = thumbnailsContainerRef.current;
+      const selectedThumbnail = container.children[
+        selectedImage
+      ] as HTMLElement;
+
+      if (selectedThumbnail) {
+        selectedThumbnail.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }
+    }
   };
 
   const handleProductClick = () => {
-    console.log("sdad");
     setIsModalOpen(true);
   };
 
@@ -77,15 +124,12 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     const { left, top, width, height } =
       imageContainerRef.current.getBoundingClientRect();
 
-    // Calculate cursor position relative to the image container
     const mouseX = e.clientX - left;
     const mouseY = e.clientY - top;
 
-    // Calculate lens position (centered on cursor)
     let lensLeft = mouseX - lensSize.width / 2;
     let lensTop = mouseY - lensSize.height / 2;
 
-    // Prevent lens from going outside the image
     if (lensLeft < 0) lensLeft = 0;
     if (lensTop < 0) lensTop = 0;
     if (lensLeft > width - lensSize.width) lensLeft = width - lensSize.width;
@@ -97,7 +141,6 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
       y: lensTop,
     });
 
-    // Calculate zoom position as percentage for the background position
     const zoomX = (lensLeft / (width - lensSize.width)) * 100;
     const zoomY = (lensTop / (height - lensSize.height)) * 100;
 
@@ -112,114 +155,213 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     setIsHovering(false);
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="relative">
-        <div className="w-full">
-          <Card
-            ref={imageContainerRef}
-            className="relative rounded-lg overflow-hidden bg-white dark:bg-neutral-900 aspect-square cursor-crosshair"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
-          >
-            {/* Main product image */}
-            <Image
-              fill
-              alt={productName}
-              className="object-contain p-4"
-              src={images[selectedImage] || "/placeholder.svg"}
-              onClick={handleProductClick}
-            />
+  if (!images || images.length === 0) {
+    return (
+      <div className="space-y-4">
+        <Card className="relative rounded-lg overflow-hidden bg-white dark:bg-neutral-900 aspect-square">
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500">No images available</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
-            {/* Zoom lens/box that appears when hovering */}
-            {isHovering && !isMobile && (
-              <div
-                className="absolute border-2 rounded-md border-primary pointer-events-none z-50 bg-primary/10 dark:bg-primary/20"
-                style={{
-                  left: `${lensPosition.x}px`,
-                  top: `${lensPosition.y}px`,
-                  width: `${lensSize.width}px`,
-                  height: `${lensSize.height}px`,
-                }}
-              />
-            )}
+  const ImageIndicator = () => (
+    <div className="absolute bottom-3 md:mb-20 mb-0 left-3 bg-black/60 text-white text-xs font-medium px-2 py-1 rounded-full z-20">
+      {selectedImage + 1} / {images.length}
+    </div>
+  );
 
-            {/* Navigation buttons */}
-            <button
-              aria-label="Previous image"
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
-              onClick={prevImage}
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              aria-label="Next image"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
-              onClick={nextImage}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-
-            {/* Zoom indicator */}
-            <div className="absolute top-3 right-3 bg-white/80 dark:bg-neutral-800/80 text-black dark:text-white rounded-full p-1.5 shadow-sm z-10">
-              <ZoomIn className="h-5 w-5 text-muted-foreground" />
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        <div className="relative">
+          <div ref={emblaRef} className="w-full overflow-hidden">
+            <div className="flex gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="flex-[0_0_100%]">
+                  <Card
+                    ref={index === selectedImage ? imageContainerRef : null}
+                    className="relative rounded-lg overflow-hidden aspect-square cursor-crosshair"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onMouseMove={handleMouseMove}
+                  >
+                    <Image
+                      fill
+                      alt={`${productName} view ${index + 1}`}
+                      className="object-contain"
+                      src={image.fullSize || "/placeholder.svg"}
+                      onClick={handleProductClick}
+                    />
+                    {isHovering && index === selectedImage && (
+                      <div
+                        className="absolute border-2 rounded-md border-primary pointer-events-none z-50 bg-primary/10 dark:bg-primary/20"
+                        style={{
+                          left: `${lensPosition.x}px`,
+                          top: `${lensPosition.y}px`,
+                          width: `${lensSize.width}px`,
+                          height: `${lensSize.height}px`,
+                        }}
+                      />
+                    )}
+                  </Card>
+                </div>
+              ))}
             </div>
-
-            {/* Fullscreen button */}
-            <button
-              aria-label="View fullscreen"
-              className="absolute top-3 right-12 bg-white/80 dark:bg-neutral-800/80 rounded-full p-1.5 text-black shadow-sm hover:bg-white z-10"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Maximize2 className="h-5 w-5 text-muted-foreground" />
-            </button>
-          </Card>
+          </div>
+          <ImageIndicator />
+          {/* Navigation buttons */}
+          <button
+            aria-label="Previous image"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              prevImage();
+            }}
+          >
+            <ChevronLeft className="h-5 w-5 text-white" />
+          </button>
+          <button
+            aria-label="Next image"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              nextImage();
+            }}
+          >
+            <ChevronRight className="h-5 w-5 text-white" />
+          </button>
         </div>
 
-        {/* Zoom result panel (visible when hovering) - Positioned as overlay */}
-        {isHovering && !isMobile && (
+        {/* Image Modal */}
+        <ImageModal
+          images={images}
+          initialIndex={selectedImage}
+          isOpen={isModalOpen}
+          productName={productName}
+          onClose={() => setIsModalOpen(false)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-4">
+        <div className="w-24 h-[480px] flex-shrink-0">
           <div
-            ref={zoomResultRef}
-            className="absolute top-36 left-full mx-5 w-1/2 border rounded-lg overflow-hidden bg-white dark:bg-neutral-900 aspect-square shadow-lg z-30 transition-opacity duration-200"
+            ref={thumbnailsContainerRef}
+            className="h-full flex flex-col space-y-3 overflow-y-auto scrollbar-thin pr-2
+            [&::-webkit-scrollbar]:w-2
+            [&::-webkit-scrollbar-track]:rounded-full
+            [&::-webkit-scrollbar-track]:bg-gray-100
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-gray-300
+            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
           >
-            <div
-              className="absolute inset-0 bg-no-repeat"
-              style={{
-                backgroundImage: `url(${images[selectedImage] || "/placeholder.svg"})`,
-                backgroundSize: `${zoomLevel * 100}%`,
-                backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-              }}
-            />
+            {images.map((image, index) => (
+              <button
+                key={index}
+                className={cn(
+                  "flex-shrink-0 border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ease-in-out",
+                  selectedImage === index
+                    ? "border-primary ring-2 ring-primary/30 shadow-md"
+                    : "border-transparent hover:border-gray-200 dark:hover:border-gray-600",
+                )}
+                onClick={() => setSelectedImage(index)}
+              >
+                <div className="relative aspect-square">
+                  <Image
+                    fill
+                    alt={`Product view ${index + 1}`}
+                    className="object-cover"
+                    src={image.medium || "/placeholder.svg"}
+                  />
+                </div>
+              </button>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Thumbnails */}
-      <div className="flex overflow-x-auto space-x-2 pb-2 scrollbar-thin">
-        {images.map((image, index) => (
+        <div className="relative flex-1">
+          <div ref={emblaRef} className="overflow-hidden">
+            <div className="flex gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="flex-[0_0_100%]">
+                  <Card
+                    ref={index === selectedImage ? imageContainerRef : null}
+                    className="relative rounded-lg overflow-hidden aspect-square cursor-crosshair"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onMouseMove={handleMouseMove}
+                  >
+                    <Image
+                      fill
+                      alt={`${productName} view ${index + 1}`}
+                      className="object-contain"
+                      src={image.fullSize || "/placeholder.svg"}
+                      onClick={handleProductClick}
+                    />
+                    {isHovering && index === selectedImage && (
+                      <div
+                        className="absolute border-2 rounded-md border-primary pointer-events-none z-50 bg-primary/10 dark:bg-primary/20"
+                        style={{
+                          left: `${lensPosition.x}px`,
+                          top: `${lensPosition.y}px`,
+                          width: `${lensSize.width}px`,
+                          height: `${lensSize.height}px`,
+                        }}
+                      />
+                    )}
+                  </Card>
+                </div>
+              ))}
+            </div>
+            <ImageIndicator />
+          </div>
+
           <button
-            key={index}
-            className={cn(
-              "flex-shrink-0 border rounded-md overflow-hidden cursor-pointer transition-all",
-              selectedImage === index
-                ? "border-primary ring-2 ring-primary/20"
-                : "hover:border-gray-300",
-            )}
-            onClick={() => setSelectedImage(index)}
+            aria-label="Previous image"
+            className="absolute left-2 top-[200px] -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              prevImage();
+            }}
           >
-            <Image
-              alt={`Product view ${index + 1}`}
-              className="w-20 h-20 object-cover"
-              height={80}
-              src={image || "/placeholder.svg"}
-              width={80}
-            />
+            <ChevronLeft className="h-5 w-5 text-white" />
           </button>
-        ))}
+          <button
+            aria-label="Next image"
+            className="absolute right-2 top-[200px] -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              nextImage();
+            }}
+          >
+            <ChevronRight className="h-5 w-5 text-white" />
+          </button>
+
+          {isHovering && (
+            <div
+              ref={zoomResultRef}
+              className="absolute top-0 left-full ml-4 w-96 h-96 border rounded-lg overflow-hidden bg-white dark:bg-neutral-900 shadow-lg z-30 transition-opacity duration-200"
+            >
+              <div
+                className="absolute inset-0 bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${images[selectedImage]?.fullSize || "/placeholder.svg"})`,
+                  backgroundSize: `${zoomLevel * 100}%`,
+                  backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Image Modal */}
       <ImageModal
         images={images}
         initialIndex={selectedImage}

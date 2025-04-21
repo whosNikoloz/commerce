@@ -79,7 +79,7 @@ export default function AnimatedFooter() {
   // Dynamic styles based on theme
   const themeStyles = {
     footer: isDarkMode
-      ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white"
+      ? "bg-black text-white"
       : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800",
     subtitle: isDarkMode ? "text-gray-300" : "text-gray-600",
     borderColor: isDarkMode ? "border-gray-700" : "border-gray-300",
@@ -118,7 +118,7 @@ export default function AnimatedFooter() {
           whileInView="show"
         >
           {/* Company Info */}
-          <motion.div className="space-y-4 z-50" variants={item}>
+          <motion.div className="space-y-4" variants={item}>
             <motion.div
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center space-x-2"
@@ -257,7 +257,7 @@ export default function AnimatedFooter() {
                 <p>Thank you for subscribing!</p>
               </motion.div>
             ) : (
-              <form className="mt-4 space-y-3" onSubmit={handleSubscribe}>
+              <form className="mt-4 space-y-3 z-10" onSubmit={handleSubscribe}>
                 <div className="relative group overflow-hidden rounded-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-purple-500">
                   <Input
                     required

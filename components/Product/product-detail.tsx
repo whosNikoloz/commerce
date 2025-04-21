@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from "react";
 
-import { Breadcrumb } from "./breadcrumb";
 import { ImageGallery } from "./image-gallery";
-import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
-import { Specifications } from "./specifications";
-import { Description } from "./description";
+import { ProductInfo } from "./product-info";
 import { SimilarProducts } from "./similar-products";
-import { ReviewsSection } from "./reviews-section";
+import { Specifications } from "./specifications";
+
+import { Product } from "@/types/Product";
 
 export default function ProductDetail() {
   const [isPriceVisible, setIsPriceVisible] = useState(true);
@@ -32,36 +31,6 @@ export default function ProductDetail() {
       window.removeEventListener("resize", handleScroll);
     };
   }, []);
-  // Product data
-  const productImages = ["/img2.jpg", "/img1.jpg", "/img2.jpg"];
-
-  const productFeatures = [
-    "20V MAX lithium-ion battery for extended runtime",
-    "2-speed transmission (0-450 & 0-1,500 RPM) for a variety of applications",
-    "1/2-inch single-sleeve ratcheting chuck for tight bit gripping",
-    "Ergonomic handle design for comfort and control",
-  ];
-
-  const productSpecs = [
-    { label: "Brand", value: "PowerPro Tools" },
-    { label: "Model", value: "DCD780B" },
-    { label: "Power Source", value: "Battery Powered" },
-    { label: "Voltage", value: "20V" },
-    { label: "Battery Included", value: "Yes (2 batteries)" },
-    { label: "Chuck Size", value: "1/2 inch" },
-    { label: "Maximum Speed", value: "1,500 RPM" },
-    { label: "Weight", value: "3.5 lbs" },
-    { label: "Dimensions", value: "8.5 x 3 x 7.5 inches" },
-    { label: "Warranty", value: "3 years limited" },
-  ];
-
-  const productDescription = [
-    "The Professional Cordless Drill Set is designed for both professional contractors and DIY enthusiasts who demand power, precision, and reliability. This high-performance drill features a powerful 20V MAX lithium-ion battery system that provides extended runtime and overall life.",
-    "The drill's 2-speed transmission (0-450 & 0-1,500 RPM) allows users to match the appropriate speed to the application for optimized performance. Its 1/2-inch single-sleeve ratcheting chuck provides tight bit gripping strength, and the ergonomic handle delivers comfort and control.",
-    "This complete set includes the drill/driver, two 20V MAX lithium-ion batteries, a fast charger, a belt hook, a carrying case, and a comprehensive 30-piece accessory kit with drill bits, driver bits, and more. The LED work light illuminates dark work areas, and the battery fuel gauge allows users to check the charge level at any time.",
-    "Whether you're drilling into wood, metal, or plastic, or driving screws for your latest project, this drill set provides the versatility and power you need. Its compact and lightweight design reduces user fatigue while allowing access to tight spaces.",
-  ];
-
   const similarProducts = [
     {
       id: 1,
@@ -92,91 +61,242 @@ export default function ProductDetail() {
       image: "/img2.jpg",
     },
   ];
+  // Product data
+  const sampleProduct: Product = {
+    id: 32529,
+    brand: "Deerma",
+    name: "Deerma DX1000W Handheld Vacuum Cleaner Blue",
+    name_ka: "ხელის მტვერსასრუტი Deerma DX1000W Blue",
+    headline: "Deerma DX1000W Handheld Vacuum Cleaner Blue",
+    headline_ka:
+      "ხელის მტვერსასრუტი Deerma DX1000W Handheld Vacuum Cleaner Blue",
+    headlineAlt:
+      "khelis mTversasruTi deerma dx1000w handheld vacuum cleaner blue",
+    shortDescription:
+      '<h3><strong><a href="https://veli.store/category/teqnika/sony/6875/"><span style="color:#3498db">Sony</span></a> </strong></h3>\r\n\r\n<h3>&nbsp;</h3>\r\n\r\n<h3><strong>Sony WF-C700 უსადენო ყურსასმენი</strong></h3>\r\n\r\n<h3>&nbsp;</h3>\r\n\r\n<ul>\r\n\t<li>უსადენო ყურსასმენები&nbsp;ხმაურის შემცირების ტექნოლოგიით</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>Bluetooth 5.0 შეუფერხებელი, უწყვეტი კავშირი</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>15 საათი&nbsp;მუშაობის დრო და სწრაფი დატენვის ფუნქცია&nbsp;</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>IPX4&nbsp;რეიტინგი, კორპუსი უძლებს წყალსა და ნესტს</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>თანამედროვე, ერგონომიული და კომპაქტური დიზაინი</li>\r\n</ul>',
+    shortDescription_ka:
+      '<h3><strong><a href="https://veli.store/category/teqnika/sony/6875/"><span style="color:#3498db">Sony</span></a> </strong></h3>\r\n\r\n<h3>&nbsp;</h3>\r\n\r\n<h3><strong>Sony WF-C700 უსადენო ყურსასმენი</strong></h3>\r\n\r\n<h3>&nbsp;</h3>\r\n\r\n<ul>\r\n\t<li>უსადენო ყურსასმენები&nbsp;ხმაურის შემცირების ტექნოლოგიით</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>Bluetooth 5.0 შეუფერხებელი, უწყვეტი კავშირი</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>15 საათი&nbsp;მუშაობის დრო და სწრაფი დატენვის ფუნქცია&nbsp;</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>IPX4&nbsp;რეიტინგი, კორპუსი უძლებს წყალსა და ნესტს</li>\r\n</ul>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<ul>\r\n\t<li>თანამედროვე, ერგონომიული და კომპაქტური დიზაინი</li>\r\n</ul>',
+    metaDescription:
+      "Buy online at veli.store: Deerma DX1000W Handheld Vacuum Cleaner with high suction power and multi-functional design.",
+    metaDescription_ka:
+      "შეიძინე ონლაინ, veli.store-ზე: Deerma DX1000W ხელის მტვერსასრუტი მაღალი შესრუტვის სიმძლავრით და მრავალფუნქციური დიზაინით.",
+    startPrice: 269,
+    price: 201,
+    inStock: 34,
 
-  const reviews = [
-    {
-      name: "Michael T.",
-      rating: 5,
-      date: "2 weeks ago",
-      title: "Excellent power and battery life",
-      comment:
-        "I've been using this drill for various home projects and it has exceeded my expectations. The battery lasts much longer than my previous drill and it has plenty of power for all my needs. The case and accessories are a great bonus.",
-    },
-    {
-      name: "Sarah J.",
-      rating: 4,
-      date: "1 month ago",
-      title: "Great value for the price",
-      comment:
-        "This drill set offers excellent value. The drill itself is powerful and the included bits cover most needs. My only complaint is that the carrying case could be more durable, but that's a minor issue.",
-    },
-    {
-      name: "Robert K.",
-      rating: 5,
-      date: "2 months ago",
-      title: "Professional quality at a reasonable price",
-      comment:
-        "As a contractor, I need reliable tools that can handle daily use. This drill has been perfect - powerful, comfortable to use, and the batteries charge quickly. Highly recommended for both pros and DIYers.",
-    },
-  ];
+    images: [
+      {
+        fullSize:
+          "https://media.veli.store/media/product/deerma_DX1000_vacuum_cleaner_blue1.png",
+        medium:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue1-thumbnail-200x200.png",
+        thumbnail:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue1-thumbnail-50x50.png",
+      },
+      {
+        fullSize:
+          "https://media.veli.store/media/product/deerma_DX1000_vacuum_cleaner_blue2.png",
+        medium:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue2-thumbnail-200x200.png",
+        thumbnail:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue2-thumbnail-50x50.png",
+      },
+      {
+        fullSize:
+          "https://media.veli.store/media/product/deerma_DX1000_vacuum_cleaner_blue3.png",
+        medium:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-200x200.png",
+        thumbnail:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-50x50.png",
+      },
+      {
+        fullSize:
+          "https://media.veli.store/media/product/deerma_DX1000_vacuum_cleaner_blue3.png",
+        medium:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-200x200.png",
+        thumbnail:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-50x50.png",
+      },
+      {
+        fullSize:
+          "https://media.veli.store/media/product/deerma_DX1000_vacuum_cleaner_blue3.png",
+        medium:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-200x200.png",
+        thumbnail:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-50x50.png",
+      },
+      {
+        fullSize:
+          "https://media.veli.store/media/product/deerma_DX1000_vacuum_cleaner_blue3.png",
+        medium:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-200x200.png",
+        thumbnail:
+          "https://media.veli.store/media/__sized__/product/deerma_DX1000_vacuum_cleaner_blue3-thumbnail-50x50.png",
+      },
+    ],
+    descriptions: [
+      {
+        title: "Deerma DX1000W Handheld Vacuum Cleaner",
+        title_ka: "Deerma DX1000W ხელის მტვერსასრუტი",
+        descriptionHtml: `Deerma DX1000W offers a portable and handheld vertical vacuum cleaner with high suction power. It's ideal for quick cleaning and hard-to-reach places. Equipped with an effective filtration system and sterilization function, providing a clean and healthy environment.`,
+        descriptionHtml_ka: `Deerma DX1000W გთავაზობთ პორტატულ და ხელის, ვერტიკალურ მტვერსასრუტს მაღალი შესრუტვის სიმძლავრით. იდეალურია სწრაფი დასუფთავებისთვის და რთულად მისაწვდომი ადგილების დასალაგებლად. აღჭურვილია ეფექტური ფილტრაციის სისტემით და სტერილიზაციის ფუნქციით, რაც უზრუნველყოფს სუფთა და ჯანსაღ გარემოს.`,
+      },
+      {
+        title: "ბრენდის ისტორია",
+        title_ka: "ბრენდის ისტორია",
+        descriptionHtml: `<p>დროთა განმავლობაში და რამდენიმე ათწლეულის კვლევის შემდეგ ნიკოლას კატენამ აღმოაჩინა ბრწყინვალების საიდუმლო: სწორი ჯიშის დარგვა სწორ ადგილას, ტერუარისა და ნიადაგის კომპონენტების მიხედვით. ამ მეთოდოლოგიისა და ფილოსოფიის წყალობით, რომელიც დღესაც გამოიყენება, მალბეკის ქვეყანაში არის ადგილი სხვა ყურძნისთვის, როგორიცაა შარდონე. სწორედ ამ ტექნოლოგიით მზადდება ღვინის ქარხანა Catena-ში შარდონე, ძალიან საინტერესო ჯიშის ღვინო, მენდოზას რეგიონში, არგენტინაში, ალპების ძირში, სადაც ოჯახი ამუშავებს თავის ვენახებს. მაღალ ფერდობებზე, რაც იწვევს დიდ კონტრასტებს დღესა და ღამეს შორის. ამის წყალობით ყურძენი ნელა და სწორად მწიფდება.</p>`,
+        descriptionHtml_ka:
+          "<p>დროთა განმავლობაში და რამდენიმე ათწლეულის კვლევის შემდეგ ნიკოლას კატენამ აღმოაჩინა ბრწყინვალების საიდუმლო: სწორი ჯიშის დარგვა სწორ ადგილას, ტერუარისა და ნიადაგის კომპონენტების მიხედვით. ამ მეთოდოლოგიისა და ფილოსოფიის წყალობით, რომელიც დღესაც გამოიყენება, მალბეკის ქვეყანაში არის ადგილი სხვა ყურძნისთვის, როგორიცაა შარდონე. სწორედ ამ ტექნოლოგიით მზადდება ღვინის ქარხანა Catena-ში შარდონე, ძალიან საინტერესო ჯიშის ღვინო, მენდოზას რეგიონში, არგენტინაში, ალპების ძირში, სადაც ოჯახი ამუშავებს თავის ვენახებს. მაღალ ფერდობებზე, რაც იწვევს დიდ კონტრასტებს დღესა და ღამეს შორის. ამის წყალობით ყურძენი ნელა და სწორად მწიფდება.</p>",
+      },
+    ],
 
-  const breadcrumbItems = [
-    { label: "Home", href: "#" },
-    { label: "Tools", href: "#" },
-    { label: "Power Tools", href: "#" },
-    { label: "Professional Cordless Drill Set" },
-  ];
+    specificationGroups: [
+      {
+        headline: "General Information",
+        headline_ka: "ზოგადი ინფორმაცია",
+        specifications: [
+          {
+            key: "Brand",
+            key_ka: "ბრენდი",
+            value: "Deerma",
+            value_ka: "Deerma",
+          },
+          {
+            key: "Model",
+            key_ka: "მოდელი",
+            value: "DX1000W",
+            value_ka: "DX1000W",
+          },
+          {
+            key: "Type",
+            key_ka: "ტიპი",
+            value: "Handheld Vacuum Cleaner",
+            value_ka: "ხელის მტვერსასრუტები",
+          },
+        ],
+      },
+      {
+        headline: "Technical Specifications",
+        headline_ka: "ტექნიკური მახასიათებლები",
+        specifications: [
+          {
+            key: "Power",
+            key_ka: "სიმძლავრე",
+            value: "600 W",
+            value_ka: "600 W",
+          },
+          {
+            key: "Dust Container Size",
+            key_ka: "მტვრის კონტეინერის ზომა",
+            value: "0.5 L",
+            value_ka: "0.5 ლ",
+          },
+          {
+            key: "Cleaning Type",
+            key_ka: "წმენდის ტიპი",
+            value: "Dry",
+            value_ka: "მშრალი",
+          },
+          {
+            key: "Suction Power",
+            key_ka: "შესრუტვის სიმძლავრე",
+            value: "16000 Pa",
+            value_ka: "16000 Pa",
+          },
+          {
+            key: "Weight",
+            key_ka: "წონა",
+            value: "3.5 kg",
+            value_ka: "3.5 კგ",
+          },
+        ],
+      },
+      {
+        headline: "Warranty",
+        headline_ka: "გარანტია",
+        specifications: [
+          {
+            key: "Warranty Period",
+            key_ka: "გარანტიის ვადა",
+            value: "12 months",
+            value_ka: "12 თვე",
+          },
+        ],
+      },
+    ],
 
-  const ratingDistribution = {
-    5: 70,
-    4: 20,
-    3: 7,
-    2: 2,
-    1: 1,
+    badges: [
+      {
+        headline: "ველი გირჩევს",
+        icon: "https://media.veli.store/media/product_badge/veli-advice.svg",
+        type: { id: 2, headline: "რჩეული" },
+      },
+      {
+        headline: "მოთხოვნადი",
+        icon: "https://media.veli.store/media/product_badge/popular.svg",
+        type: { id: 7, headline: "მოთხოვნადი" },
+      },
+    ],
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Breadcrumb items={breadcrumbItems} />
+      <h1 className="text-3xl font-bold mb-2 md:block  hidden p-4">
+        {sampleProduct.name_ka}
+      </h1>
+      <div className="flex flex-col lg:flex-row gap-12 mb-16">
+        <div className="flex-1">
+          <ImageGallery
+            images={sampleProduct.images}
+            productName="Professional Cordless Drill Set"
+          />
+        </div>
+        <h1 className="text-3xl md:hidden block font-bold">
+          {sampleProduct.name_ka}
+        </h1>
 
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        {/* Left side - Image Gallery with square zoom */}
-        <ImageGallery
-          images={productImages}
-          productName="Professional Cordless Drill Set"
-        />
-
-        {/* Right side - Product Info */}
+        <div className="flex md:items-top place-items-start">
+          <ul
+            dangerouslySetInnerHTML={{
+              __html: sampleProduct.shortDescription_ka,
+            }}
+            className="rich-content  text-sm list-disc max-w-xs ml-5"
+          />
+        </div>
         <ProductInfo
-          discount={25}
-          features={productFeatures}
-          originalPrice={199.99}
-          price={149.99}
-          rating={4}
-          reviewCount={256}
-          stock={24}
-          title="Professional Cordless Drill Set"
+          discount={45}
+          inStock={3}
+          originalPrice={sampleProduct.startPrice}
+          points={10}
+          price={sampleProduct.price}
+          onAddToCart={() => console.log("Added to cart")}
+          onBuyNow={() => console.log("Buy now clicked")}
+          onWishlist={() => console.log("Added to wishlist")}
         />
       </div>
-
-      {/* Specifications */}
-      <Specifications specs={productSpecs} />
-
-      {/* Description */}
-      <Description paragraphs={productDescription} />
-
-      {/* Similar Products */}
       <SimilarProducts products={similarProducts} />
 
-      {/* Reviews */}
-      <ReviewsSection
-        averageRating={4.7}
-        ratingDistribution={ratingDistribution}
-        reviews={reviews}
-        totalReviews={256}
-      />
+      <div className="flex space-y-5 flex-col max-w-4xl">
+        {sampleProduct.descriptions.map((desc, index) => (
+          <div key={index}>
+            <h1 className="font-bold mb-6 text-xl">{desc.title}</h1>
+            <ul
+              dangerouslySetInnerHTML={{
+                __html: desc.descriptionHtml_ka || desc.descriptionHtml,
+              }}
+              className="rich-content text-sm font-mono list-disc "
+            />
+          </div>
+        ))}
+      </div>
 
-      {/* Bottom Price Info - Shows when main price is hidden */}
+      {sampleProduct.specificationGroups.map((spec, index) => (
+        <div key={index} className="my-12">
+          <h1 className="font-bold mb-6 text-2xl">{spec.headline}</h1>
+          <Specifications specs={spec.specifications} />
+        </div>
+      ))}
+
       <ProductInfoBottom
         discount={25}
         isVisible={!isPriceVisible}

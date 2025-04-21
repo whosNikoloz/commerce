@@ -36,7 +36,7 @@ export function ProductInfoBottom({
 
   return (
     <div
-      className={`fixed bottom-14 md:bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 shadow-lg px-4 py-3 transform transition-all duration-300 z-50 ease-in-out ${
+      className={`fixed bottom-14 md:bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 shadow-lg px-4 py-3 transform transition-all duration-300 z-50  ease-in-out ${
         isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
       }`}
     >
@@ -49,10 +49,12 @@ export function ProductInfoBottom({
             src="/img1.jpg"
             width={64}
           />
-          <div className="flex-col md:block hidden">
-            <span className="text-sm md:text-lg font-semibold truncate max-w-[120px] md:max-w-xs">
-              {name}
-            </span>
+          <div className="flex-row md:block hidden">
+            <div>
+              <span className="text-sm md:text-lg font-semibold truncate max-w-[120px] md:max-w-xs">
+                {name}
+              </span>
+            </div>
             {freeShipping && (
               <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
                 უფასო მიწოდება

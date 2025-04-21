@@ -2,28 +2,20 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import {
-  ChevronLeft,
-  ChevronRight,
-  X,
-  ZoomIn,
-  ZoomOut,
-  Heart,
-  Share2,
-} from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal, ModalContent, ModalBody } from "@heroui/modal";
 import { cn } from "@heroui/theme";
-import { AnimatePresence, motion } from "framer-motion";
+import useEmblaCarousel from "embla-carousel-react";
+
+import { ProductImage } from "@/types/Product";
 
 interface ImageModalProps {
-  images: string[];
+  images: ProductImage[];
   productName: string;
   initialIndex?: number;
   isOpen: boolean;
   onClose: () => void;
   description?: string;
-  onFavorite?: () => void;
-  onShare?: () => void;
 }
 
 export default function ImageModal({
@@ -33,14 +25,18 @@ export default function ImageModal({
   isOpen,
   onClose,
   description,
-  onFavorite,
-  onShare,
 }: ImageModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [loadedImages, setLoadedImages] = useState<boolean[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize Embla Carousel with options
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "center",
+    startIndex: initialIndex,
+  });
 
   // Detect mobile device on mount
   useEffect(() => {
@@ -64,28 +60,47 @@ export default function ImageModal({
   // Initialize loaded state for all images
   useEffect(() => {
     if (isOpen) {
-      setLoadedImages(new Array(images.length).fill(false));
       setCurrentIndex(initialIndex);
     }
   }, [isOpen, images.length, initialIndex]);
 
-  const handleImageLoaded = (index: number) => {
-    setLoadedImages((prev) => {
-      const newState = [...prev];
+  // Initialize Embla Carousel when it's ready
+  useEffect(() => {
+    if (emblaApi) {
+      // Make sure we start at the initial index
+      emblaApi.scrollTo(initialIndex);
 
-      newState[index] = true;
+      // Set up an event listener to update the current index
+      const onSelect = () => {
+        setCurrentIndex(emblaApi.selectedScrollSnap());
+      };
 
-      return newState;
-    });
-  };
+      emblaApi.on("select", onSelect);
+
+      return () => {
+        emblaApi.off("select", onSelect);
+      };
+    }
+  }, [emblaApi, initialIndex]);
+
+  // When current index changes from thumbnail click, scroll carousel
+  useEffect(() => {
+    if (emblaApi && emblaApi.selectedScrollSnap() !== currentIndex) {
+      emblaApi.scrollTo(currentIndex);
+    }
+  }, [currentIndex, emblaApi]);
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  }, [images.length]);
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+    }
+  }, [emblaApi]);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  }, [images.length]);
+    if (emblaApi) {
+      emblaApi.scrollNext();
+    }
+  }, [emblaApi]);
 
   const toggleZoom = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
@@ -118,37 +133,40 @@ export default function ImageModal({
   });
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (e.touches.length === 1) {
-      // Single touch - track for swipe
-      touchRef.current.startX = e.touches[0].clientX;
-      touchRef.current.startY = e.touches[0].clientY;
-      touchRef.current.startTime = Date.now();
+    if (isZoomed) {
+      // Let Embla handle normal touch events when not zoomed
+      if (e.touches.length === 1) {
+        // Single touch - track for swipe
+        touchRef.current.startX = e.touches[0].clientX;
+        touchRef.current.startY = e.touches[0].clientY;
+        touchRef.current.startTime = Date.now();
 
-      // Detect double tap (300ms window)
-      const now = new Date().getTime();
-      const timeSince = now - touchRef.current.lastTapTime;
+        // Detect double tap (300ms window)
+        const now = new Date().getTime();
+        const timeSince = now - touchRef.current.lastTapTime;
 
-      if (timeSince < 300 && timeSince > 0) {
-        toggleZoom();
+        if (timeSince < 300 && timeSince > 0) {
+          toggleZoom();
+        }
+
+        touchRef.current.lastTapTime = now;
+      } else if (e.touches.length === 2 && isMobile) {
+        // Pinch to zoom gesture detected
+        touchRef.current.isZooming = true;
+
+        // Calculate initial distance between two fingers
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const distance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY,
+        );
+
+        touchRef.current.initialDistance = distance;
+        touchRef.current.initialZoom = isZoomed ? 1.5 : 1;
+
+        setIsZoomed(true);
       }
-
-      touchRef.current.lastTapTime = now;
-    } else if (e.touches.length === 2 && isMobile) {
-      // Pinch to zoom gesture detected
-      touchRef.current.isZooming = true;
-
-      // Calculate initial distance between two fingers
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY,
-      );
-
-      touchRef.current.initialDistance = distance;
-      touchRef.current.initialZoom = isZoomed ? 1.5 : 1;
-
-      setIsZoomed(true);
     }
   };
 
@@ -186,35 +204,12 @@ export default function ImageModal({
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+  const handleTouchEnd = () => {
     // If was zooming (two fingers), reset state
     if (touchRef.current.isZooming) {
       touchRef.current.isZooming = false;
 
       return;
-    }
-
-    // Handle swipe navigation
-    if (isZoomed) return; // Don't navigate when zoomed
-
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
-
-    const deltaX = touchRef.current.startX - endX;
-    const deltaY = Math.abs(touchRef.current.startY - endY);
-
-    // Check if horizontal swipe (deltaY small enough)
-    if (deltaY < 50) {
-      const timeElapsed = Date.now() - touchRef.current.startTime;
-
-      // Speed-sensitive swipe detection
-      const threshold = timeElapsed < 250 ? 30 : 50;
-
-      if (deltaX > threshold) {
-        handleNext(); // Swipe left = next
-      } else if (deltaX < -threshold) {
-        handlePrevious(); // Swipe right = previous
-      }
     }
   };
 
@@ -228,6 +223,8 @@ export default function ImageModal({
           : "max-w-7xl rounded-2xl shadow-2xl",
       }}
       isOpen={isOpen}
+      scrollBehavior="inside"
+      size={isMobile ? "xs" : "xs"}
       onClose={onClose}
     >
       <ModalContent
@@ -238,40 +235,13 @@ export default function ImageModal({
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
-        {/* Top Control Bar */}
         <div
           className={cn(
-            "sticky top-0 left-0 right-0 z-50 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/70 to-transparent",
-            isMobile ? "py-2" : "px-6 py-4",
+            "sticky top-0 left-0 right-0 z-50 flex justify-end items-center px-4 py-3 to-transparent",
+            isMobile ? "py-5" : "px-6 py-4",
           )}
         >
-          <h2
-            className={cn(
-              "text-white font-medium truncate max-w-[70%]",
-              isMobile ? "text-base" : "text-xl",
-            )}
-          >
-            {productName}
-          </h2>
           <div className="flex space-x-2">
-            {onFavorite && !isMobile && (
-              <button
-                aria-label="Favorite"
-                className="rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/50"
-                onClick={onFavorite}
-              >
-                <Heart className="h-5 w-5" />
-              </button>
-            )}
-            {onShare && !isMobile && (
-              <button
-                aria-label="Share"
-                className="rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/50"
-                onClick={onShare}
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-            )}
             <button
               aria-label="Close modal"
               className="rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/50"
@@ -284,118 +254,90 @@ export default function ImageModal({
 
         {/* Main Image */}
         <ModalBody className="p-0 bg-neutral-900 relative flex-grow flex items-center justify-center">
-          <div
-            ref={imageContainerRef}
-            aria-label={isZoomed ? "Zoom out of image" : "Zoom in to image"}
-            className={cn(
-              "relative w-full h-full overflow-hidden",
-              isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
-            )}
-            role="button"
-            tabIndex={0}
-            onClick={() => toggleZoom()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                toggleZoom();
-              }
-            }}
-            onTouchEnd={handleTouchEnd}
-            onTouchMove={handleTouchMove}
-            onTouchStart={handleTouchStart}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                animate={{ opacity: 1 }}
-                className="h-full w-full relative flex items-center justify-center"
-                exit={{ opacity: 0 }}
-                initial={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Image
-                  fill
-                  priority
-                  alt={`${productName} - Image ${currentIndex + 1}`}
-                  className={cn(
-                    "object-contain p-4 transition-all duration-300",
-                    !touchRef.current.isZooming &&
-                      (isZoomed ? "scale-150" : "scale-100"),
-                    isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
-                  )}
-                  sizes={isMobile ? "100vw" : "80vw"}
-                  src={images[currentIndex] || "/placeholder.svg"}
-                  onLoad={() => handleImageLoaded(currentIndex)}
-                />
-
-                {/* Loading state */}
-                {!loadedImages[currentIndex] && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-12 w-12 rounded-full border-4 border-t-transparent border-primary animate-spin" />
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Zoom button - only on desktop */}
-            {!isMobile && (
+          <div className="w-full h-full flex flex-col md:flex-row">
+            {/* Main Image with Embla Carousel */}
+            <div className="flex-1 flex items-center justify-center bg-black relative">
+              {/* Navigation Buttons */}
               <button
-                aria-label={isZoomed ? "Zoom out" : "Zoom in"}
-                className="absolute right-6 bottom-6 z-20 rounded-full bg-black/40 p-3 text-white shadow-lg backdrop-blur-sm hover:bg-black/60 transition"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleZoom();
-                }}
+                className="absolute left-4 z-10 bg-black/40 rounded-full p-2 text-white hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/20"
+                onClick={handlePrevious}
               >
-                {isZoomed ? (
-                  <ZoomOut className="h-5 w-5" />
-                ) : (
-                  <ZoomIn className="h-5 w-5" />
-                )}
+                <ChevronLeft className="h-6 w-6" />
               </button>
-            )}
 
-            {/* Navigation Buttons - only show when not zoomed and not on small mobile */}
-            {!isZoomed && (
-              <>
-                <button
-                  aria-label="Previous image"
-                  className={cn(
-                    "absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/40 text-white shadow-lg backdrop-blur-sm hover:bg-black/60 hover:scale-110 transition transform",
-                    isMobile ? "p-2" : "p-3",
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePrevious();
-                  }}
-                >
-                  <ChevronLeft
-                    className={cn(isMobile ? "h-5 w-5" : "h-6 w-6")}
-                  />
-                </button>
+              <button
+                className="absolute right-4 z-10 bg-black/40 rounded-full p-2 text-white hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/20"
+                onClick={handleNext}
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
 
-                <button
-                  aria-label="Next image"
-                  className={cn(
-                    "absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/40 text-white shadow-lg backdrop-blur-sm hover:bg-black/60 hover:scale-110 transition transform",
-                    isMobile ? "p-2" : "p-3",
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleNext();
-                  }}
-                >
-                  <ChevronRight
-                    className={cn(isMobile ? "h-5 w-5" : "h-6 w-6")}
-                  />
-                </button>
-              </>
-            )}
+              {/* Embla Carousel */}
+              <div ref={emblaRef} className="overflow-hidden w-full h-full">
+                <div className="flex h-full">
+                  {images.map((image, idx) => (
+                    <div
+                      key={idx}
+                      ref={idx === currentIndex ? imageContainerRef : undefined}
+                      className="relative flex-grow-0 flex-shrink-0 w-full h-full"
+                      onTouchEnd={handleTouchEnd}
+                      onTouchMove={handleTouchMove}
+                      onTouchStart={handleTouchStart}
+                    >
+                      <Image
+                        fill
+                        unoptimized
+                        alt={`${productName} image ${idx + 1}`}
+                        className={cn(
+                          "object-contain transition-transform duration-300 ease-in-out",
+                          isZoomed && currentIndex === idx
+                            ? "scale-150"
+                            : "scale-100",
+                        )}
+                        src={image.fullSize || ""}
+                        onClick={toggleZoom}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Thumbnails and Description */}
+            <div className="w-full md:w-[350px] p-4 flex flex-col gap-4 text-white bg-neutral-800 overflow-y-auto">
+              {!isMobile && (
+                <>
+                  <div className="text-lg font-semibold">{productName}</div>
+                  <div className="text-sm text-neutral-300">{description}</div>
+                </>
+              )}
+
+              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[60vh] w-full mt-4">
+                {images.map((image, idx) => (
+                  <button
+                    key={idx}
+                    className={cn(
+                      "border rounded-md transition hover:ring-2 hover:ring-white focus:outline-none",
+                      currentIndex === idx ? "ring-2 ring-white" : "opacity-70",
+                    )}
+                    onClick={() => setCurrentIndex(idx)}
+                  >
+                    <div className="relative w-16 h-16 md:w-24 md:h-24">
+                      <Image
+                        fill
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="object-cover rounded-md"
+                        src={image.fullSize}
+                      />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </ModalBody>
 
-        {/* Description Panel (conditional) - desktop only */}
-        {description && !isMobile && (
+        {description && isMobile && (
           <div className="bg-white dark:bg-neutral-900 px-6 py-3 border-b border-gray-100 dark:border-neutral-800">
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
               {description}
@@ -403,69 +345,10 @@ export default function ImageModal({
           </div>
         )}
 
-        {/* Mobile Footer Bar with Image Counter */}
         {isMobile && (
           <div className="bg-white dark:bg-neutral-900 py-2 px-4 border-t border-gray-200 dark:border-neutral-800 flex justify-between items-center">
             <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
               {currentIndex + 1} / {images.length}
-            </div>
-            <div className="flex gap-3">
-              {onFavorite && (
-                <button
-                  aria-label="Favorite"
-                  className="rounded-full p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
-                  onClick={onFavorite}
-                >
-                  <Heart className="h-5 w-5" />
-                </button>
-              )}
-              {onShare && (
-                <button
-                  aria-label="Share"
-                  className="rounded-full p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
-                  onClick={onShare}
-                >
-                  <Share2 className="h-5 w-5" />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Thumbnails - only show on larger screens */}
-        {!isMobile && (
-          <div className="bg-white px-6 py-4">
-            <div className="flex justify-between items-center mb-3">
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Image {currentIndex + 1} of {images.length}
-              </div>
-              <div className="flex space-x-2 text-xs text-gray-500 dark:text-gray-400">
-                <span>Z to zoom</span>
-                <span>ESC to close</span>
-              </div>
-            </div>
-
-            <div className="flex space-x-3 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-800 scrollbar-track-gray-100 dark:scrollbar-track-neutral-900 pb-2">
-              {images.map((image, index) => (
-                <button
-                  key={index}
-                  aria-label={`View image ${index + 1}`}
-                  className={cn(
-                    "relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg transition-all duration-200 shadow",
-                    currentIndex === index
-                      ? "ring-2 ring-primary scale-105 shadow-md"
-                      : "ring-1 ring-gray-200 opacity-80 hover:opacity-100 hover:scale-105",
-                  )}
-                  onClick={() => setCurrentIndex(index)}
-                >
-                  <Image
-                    fill
-                    alt={`${productName} thumbnail ${index + 1}`}
-                    className="object-cover"
-                    src={image}
-                  />
-                </button>
-              ))}
             </div>
           </div>
         )}

@@ -3,5 +3,5 @@ export default function DetailLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <section className="md:mt-10 mt-0">{children}</section>;
+  return <section className="mt-20">{children}</section>;
 }

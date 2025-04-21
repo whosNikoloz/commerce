@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Star } from "lucide-react";
 
 interface Product {
   id: number;
@@ -21,38 +20,49 @@ export function SimilarProducts({ products }: SimilarProductsProps) {
         {products.map((product) => (
           <div
             key={product.id}
-            className="border rounded-lg overflow-hidden group hover:shadow-md transition-shadow bg-white dark:bg-neutral-900"
+            className="group rounded-lg border border-gray-200 bg-white dark:bg-neutral-900 overflow-hidden hover:shadow-md transition-shadow"
           >
-            <div className="relative aspect-square bg-white dark:bg-neutral-900">
+            <div className="relative w-full h-60">
               <Image
-                src={product.image}
                 alt={product.name}
-                width={200}
-                height={200}
-                className="object-contain p-4"
+                className="rounded-t-lg"
+                layout="fill"
+                objectFit="cover"
+                src={product.image}
               />
-              {/* {product.isNew && (
-                <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-semibold px-2 py-1 rounded-full">
-                  New
-                </span>
-              )} */}
+              <span className="absolute top-2 left-2 rounded-full bg-black px-2 text-sm font-medium text-white">
+                39% OFF
+              </span>
             </div>
             <div className="p-4">
-              <h3 className="font-medium mb-1 line-clamp-2">{product.name}</h3>
-              <div className="flex items-center gap-1 mb-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`h-4 w-4 ${star <= product.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`}
-                    />
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white truncate">
+                {product.name}
+              </h3>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-xl font-bold text-slate-900 dark:text-white">
+                  ${product.price}
+                </p>
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg
+                      key={i}
+                      aria-hidden="true"
+                      className={`h-5 w-5 ${
+                        i < Math.round(product.rating)
+                          ? "text-yellow-300"
+                          : "text-gray-300"
+                      }`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
                   ))}
+                  <span className="ml-2 text-xs bg-yellow-200 px-2 py-0.5 rounded font-semibold">
+                    {product.rating.toFixed(1)}
+                  </span>
                 </div>
-                {/* <span className="text-xs text-muted-foreground">
-                  ({product.reviewsCount})
-                </span> */}
               </div>
-              <p className="font-bold">${product.price.toFixed(2)}</p>
             </div>
           </div>
         ))}

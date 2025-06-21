@@ -1,3 +1,4 @@
+import EcommerceCategory from "@/components/Categories/ecommerce-category";
 import { title } from "@/components/primitives";
 
 interface CategoryPageProps {
@@ -14,10 +15,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <div>
-      <h1 className={title()}>
+      {/* <h1 className={title()}>
         {subcategory ? `${category} / ${subcategory}` : category}
       </h1>
-      <pre>{JSON.stringify(slug, null, 2)}</pre>
+      <pre>{JSON.stringify(slug, null, 2)}</pre> */}
+      <EcommerceCategory />
     </div>
   );
 }
+ 

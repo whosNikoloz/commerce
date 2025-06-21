@@ -4,8 +4,8 @@ export default function CategoryLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-4 md:py-20">
-      <div className="inline-block max-w-lg text-center justify-center">
+    <section className="mt-16">
+      <div className="">
         {children}
       </div>
     </section>

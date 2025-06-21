@@ -1,4 +1,4 @@
-import EcommerceCategory from "@/components/Categories/ecommerce-category";
+import CategoryPage from "@/components/Categories/CategoriesPage/category-page";
 import { title } from "@/components/primitives";
 
 interface CategoryPageProps {
@@ -7,7 +7,7 @@ interface CategoryPageProps {
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPageRoute({ params }: CategoryPageProps) {
   const { slug = [] } = await params; 
 
   const category = slug[0] || "Unknown Category";
@@ -19,7 +19,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         {subcategory ? `${category} / ${subcategory}` : category}
       </h1>
       <pre>{JSON.stringify(slug, null, 2)}</pre> */}
-      <EcommerceCategory />
+      <CategoryPage />
     </div>
   );
 }

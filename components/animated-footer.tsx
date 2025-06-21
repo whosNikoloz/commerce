@@ -12,31 +12,25 @@ import {
   Truck,
   Headphones,
   ShieldCheck,
-  Moon,
-  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@heroui/input";
+import { useTheme } from "next-themes";
+import { useIsSSR } from "@react-aria/ssr";
+import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
 
 export default function AnimatedFooter() {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { theme, setTheme } = useTheme();
+  const isSSR = useIsSSR();
 
-  // Check system preference for dark/light mode on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-
-      setIsDarkMode(prefersDark);
-    }
-  }, []);
+  // Check if we're in dark mode
+  const isDarkMode = theme === "dark" || (!theme && !isSSR);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   const handleSubscribe = (e: { preventDefault: () => void }) => {
@@ -101,12 +95,17 @@ export default function AnimatedFooter() {
       <div className="container mx-auto px-4 pb-12 pt-6">
         <div className="flex justify-end mb-4">
           <motion.button
-            className={`p-2 rounded-full ${themeStyles.iconBg}`}
+            className={`p-2 rounded-full ${themeStyles.iconBg} transition-colors hover:opacity-80`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleTheme}
+            aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
           >
-            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            {!isSSR && isDarkMode ? (
+              <SunFilledIcon size={18} />
+            ) : (
+              <MoonFilledIcon size={18} />
+            )}
           </motion.button>
         </div>
 

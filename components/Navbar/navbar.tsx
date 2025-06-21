@@ -63,9 +63,9 @@ export const Navbar = () => {
           <div
             className={`z-50 fixed top-3 left-1/2 -translate-x-1/2  w-11/12 rounded-2xl transition-all duration-300 ${
               isScrolled && searchModalIsOpen
-                ? "dark:backdrop-blur-2xl backdrop-blur-sm w-11/12 md:w-10/12 lg:w-6/12 dark:bg-black/10 bg-white shadow-md"
+                ? "dark:backdrop-blur-2xl backdrop-blur-sm w-11/12 md:w-10/12 lg:w-6/12 bg-black/50 shadow-md"
                 : isScrolled
-                  ? "dark:backdrop-blur-2xl backdrop-blur-sm  md:w-6/12 lg:w-3/12 dark:bg-black/10 bg-white shadow-md"
+                  ? "dark:backdrop-blur-2xl backdrop-blur-sm  md:w-6/12 lg:w-3/12  bg-black/50 shadow-md"
                   : "bg-transparent w-11/12 md:w-10/12 lg:w-6/12"
             }`}
           >

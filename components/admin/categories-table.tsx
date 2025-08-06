@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Edit, Trash2, Plus, Tag } from "lucide-react"
+import { Edit, Trash2, Plus, Tag, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -36,7 +36,7 @@ interface Category {
   name: string
   description: string
   productCount: number
-  status: "active" | "inactive"
+  visible: boolean
   parentCategory?: string
 }
 
@@ -46,14 +46,14 @@ const initialCategories: Category[] = [
     name: "Electronics",
     description: "Electronic devices and gadgets",
     productCount: 45,
-    status: "active",
+    visible: true,
   },
   {
     id: "2",
     name: "Smartphones",
     description: "Mobile phones and accessories",
     productCount: 23,
-    status: "active",
+    visible: true,
     parentCategory: "Electronics",
   },
   {
@@ -61,34 +61,35 @@ const initialCategories: Category[] = [
     name: "Home & Kitchen",
     description: "Home appliances and kitchen items",
     productCount: 67,
-    status: "active",
+    visible: true,
   },
   {
     id: "4",
     name: "Sports & Outdoors",
     description: "Sports equipment and outdoor gear",
     productCount: 34,
-    status: "active",
+    visible: true,
   },
   {
     id: "5",
     name: "Books",
     description: "Physical and digital books",
     productCount: 12,
-    status: "inactive",
+    visible: true,
   },
   {
     id: "6",
     name: "Clothing",
     description: "Fashion and apparel",
     productCount: 89,
-    status: "active",
+    visible: true,
   },
 ]
 
 export function CategoriesTable() {
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState<string>("")
   const [newCategory, setNewCategory] = useState({
     name: "",
     description: "",
@@ -99,102 +100,55 @@ export function CategoriesTable() {
     setCategories(
       categories.map((category) =>
         category.id === categoryId
-          ? { ...category, status: category.status === "active" ? "inactive" : "active" }
+          ? { ...category, visible: !category.visible }
           : category,
       ),
     )
   }
 
+  const filteredCategories = categories.filter(
+    (categorie) =>
+      categorie.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (categorie.parentCategory && categorie.parentCategory.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
+
   const deleteCategory = (categoryId: string) => {
     setCategories(categories.filter((category) => category.id !== categoryId))
   }
 
-  const addCategory = () => {
-    if (newCategory.name.trim()) {
-      const category: Category = {
-        id: (categories.length + 1).toString(),
-        name: newCategory.name,
-        description: newCategory.description,
-        productCount: 0,
-        status: "active",
-        parentCategory: newCategory.parentCategory || undefined,
-      }
-      setCategories([...categories, category])
-      setNewCategory({ name: "", description: "", parentCategory: "" })
-      setIsAddDialogOpen(false)
-    }
-  }
+  // const addCategory = () => {
+  //   if (newCategory.name.trim()) {
+  //     const category: Category = {
+  //       id: (categories.length + 1).toString(),
+  //       name: newCategory.name,
+  //       description: newCategory.description,
+  //       productCount: 0,
+  //       visible: false,
+  //       parentCategory: newCategory.parentCategory || undefined,
+  //     }
+  //     setCategories([...categories, category])
+  //     setNewCategory({ name: "", description: "", parentCategory: "" })
+  //     setIsAddDialogOpen(false)
+  //   }
+  // }
 
   return (
     <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Categories</CardTitle>
-            <CardDescription>Manage your product categories and subcategories</CardDescription>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
+            <input
+              type="text"
+              placeholder="Search by name or category..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
+            />
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Category
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Category</DialogTitle>
-                <DialogDescription>Create a new product category for your store.</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    value={newCategory.name}
-                    onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={newCategory.description}
-                    onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="parent" className="text-right">
-                    Parent
-                  </Label>
-                  <Input
-                    id="parent"
-                    placeholder="Optional parent category"
-                    value={newCategory.parentCategory}
-                    onChange={(e) => setNewCategory({ ...newCategory, parentCategory: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  onClick={addCategory}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25"
-                >
-                  Add Category
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-auto max-h-[calc(100vh-240px)]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -207,7 +161,7 @@ export function CategoriesTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((category) => (
+            {filteredCategories.map((category) => (
               <TableRow key={category.id}>
                 <TableCell>
                   <div className="flex items-center space-x-2">
@@ -239,20 +193,15 @@ export function CategoriesTable() {
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <Switch
-                      checked={category.status === "active"}
+                      checked={category.visible}
                       onCheckedChange={() => toggleCategoryStatus(category.id)}
                       className="data-[state=checked]:bg-blue-600"
                     />
-                    <Badge
-                      variant={category.status === "active" ? "default" : "secondary"}
-                      className={
-                        category.status === "active"
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
-                      }
-                    >
-                      {category.status}
-                    </Badge>
+                    {category.visible ? (
+                      <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-slate-400" />
+                    )}
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
@@ -262,7 +211,11 @@ export function CategoriesTable() {
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>

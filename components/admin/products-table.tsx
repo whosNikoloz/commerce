@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { input } from "@heroui/theme"
 
 interface Product {
   id: string
@@ -82,6 +83,26 @@ const initialProducts: Product[] = [
     image: "/placeholder.svg?height=64&width=64",
     visible: true,
   },
+  {
+    id: "6",
+    name: "Laptop Stand",
+    price: 39.99,
+    category: "Office",
+    stock: 0,
+    status: "active",
+    image: "/placeholder.svg?height=64&width=64",
+    visible: true,
+  },
+  {
+    id: "7",
+    name: "Laptop Stand",
+    price: 39.99,
+    category: "Office",
+    stock: 0,
+    status: "active",
+    image: "/placeholder.svg?height=64&width=64",
+    visible: true,
+  },
 ]
 
 export function ProductsTable() {
@@ -112,13 +133,9 @@ export function ProductsTable() {
   }
 
   return (
-    <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+    <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur ">
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <CardTitle className="text-text-light">Product List</CardTitle>
-            <CardDescription>Manage your product inventory here</CardDescription>
-          </div>
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
             <input
               type="text"
@@ -127,14 +144,10 @@ export function ProductsTable() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
             />
-            <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Product
-            </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-auto max-h-[calc(100vh-240px)]">
         <Table>
           <TableHeader>
             <TableRow className="">
@@ -152,7 +165,7 @@ export function ProductsTable() {
             {filteredProducts.map((product) => {
               const stockStatus = getStockStatus(product.stock)
               return (
-                <TableRow key={product.id} className="">
+                <TableRow key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                   <TableCell>
                     <div className="relative">
                       <Image
@@ -245,15 +258,13 @@ export function ProductsTable() {
                               from your inventory.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteProduct(product.id)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteProduct(product.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Delete
+                          </AlertDialogAction>
                         </AlertDialogContent>
                       </AlertDialog>
                     </div>

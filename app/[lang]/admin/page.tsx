@@ -112,5 +112,13 @@ export default function AdminPage() {
     );
   }
 
-  return <AdminDashboard />;
+  return (
+    <div className="space-y-6 ">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">Dashboard</h1>
+      </div>
+      <AdminDashboard />
+    </div>
+  )
+
 }

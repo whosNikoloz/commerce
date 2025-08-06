@@ -5,10 +5,8 @@ import clsx from "clsx";
 import { Providers } from "../providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
 import { Locale } from "@/i18n.config";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { AdminHeader } from "@/components/admin/admin-header";
 
 export const metadata: Metadata = {
   title: {
@@ -39,8 +37,8 @@ export default async function AdminLayout({
 
   const Dashboard = () => {
     return (
-      <div className="flex flex-1">
-        <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border   p-2 md:p-10 dark:border-neutral-700  bg-brand-surfacedark dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark">
+      <div className="flex flex-1 ">
+        <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border dark:bg-brand-surfacedark bg-brand-surface   p-2 md:p-10 dark:border-neutral-700 text-text-light dark:text-text-lightdark">
           {children}
         </div>
       </div>
@@ -48,10 +46,8 @@ export default async function AdminLayout({
   };
 
   return (
-    <div className="flex h-screen">
-      <AdminSidebar >
-        <Dashboard />
-      </AdminSidebar>
-    </div>
+    <AdminSidebar >
+      <Dashboard />
+    </AdminSidebar>
   );
 } 

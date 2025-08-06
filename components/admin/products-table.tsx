@@ -86,12 +86,20 @@ const initialProducts: Product[] = [
 
 export function ProductsTable() {
   const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [searchTerm, setSearchTerm] = useState<string>("")
+
 
   const toggleProductVisibility = (productId: string) => {
     setProducts(
       products.map((product) => (product.id === productId ? { ...product, visible: !product.visible } : product)),
     )
   }
+
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const deleteProduct = (productId: string) => {
     setProducts(products.filter((product) => product.id !== productId))
@@ -104,23 +112,32 @@ export function ProductsTable() {
   }
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
+    <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <CardTitle className="text-slate-900 dark:text-slate-100">Products</CardTitle>
-            <CardDescription>Manage your product inventory and visibility</CardDescription>
+            <CardTitle className="text-text-light">Product List</CardTitle>
+            <CardDescription>Manage your product inventory here</CardDescription>
           </div>
-          <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </Button>
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
+            <input
+              type="text"
+              placeholder="Search by name or category..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
+            />
+            <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow className="border-slate-200 dark:border-slate-700">
+            <TableRow className="">
               <TableHead className="w-[80px]">Image</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Category</TableHead>
@@ -132,10 +149,10 @@ export function ProductsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => {
+            {filteredProducts.map((product) => {
               const stockStatus = getStockStatus(product.stock)
               return (
-                <TableRow key={product.id} className="border-slate-200 dark:border-slate-700">
+                <TableRow key={product.id} className="">
                   <TableCell>
                     <div className="relative">
                       <Image

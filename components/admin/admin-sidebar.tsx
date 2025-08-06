@@ -1,100 +1,145 @@
 "use client"
 
-import { BarChart3, Package, ShoppingCart, Users, Home, Tag, Truck, CreditCard } from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import React, { useState } from "react"
 import { cn } from "@/lib/utils"
+import {
+  Sidebar,
+  SidebarBody,
+  SidebarLink,
+} from "@/components/ui/sidebar"
 
-const sidebarItems = [
+import {
+  IconArrowLeft,
+  IconBrandTabler,
+  IconSettings,
+  IconUserBolt,
+  IconHome,
+  IconBox,
+  IconCreditCard,
+  IconChartBar,
+  IconTags,
+  IconTruck,
+  IconUsers,
+} from "@tabler/icons-react"
+
+import { motion } from "framer-motion"
+
+const links = [
   {
-    title: "Dashboard",
+    label: "Dashboard",
     href: "/admin",
-    icon: Home,
+    icon: <IconHome className="h-5 w-5 text-muted-foreground" />,
   },
   {
-    title: "Products",
+    label: "Products",
     href: "/admin/products",
-    icon: Package,
+    icon: <IconBox className="h-5 w-5 text-muted-foreground" />,
   },
   {
-    title: "Orders",
-    href: "/admin/orders",
-    icon: ShoppingCart,
-  },
-  {
-    title: "Customers",
+    label: "Customers",
     href: "/admin/customers",
-    icon: Users,
+    icon: <IconUsers className="h-5 w-5 text-muted-foreground" />,
   },
   {
-    title: "Categories",
+    label: "Categories",
     href: "/admin/categories",
-    icon: Tag,
+    icon: <IconTags className="h-5 w-5 text-muted-foreground" />,
   },
   {
-    title: "Shipping",
+    label: "Shipping",
     href: "/admin/shipping",
-    icon: Truck,
+    icon: <IconTruck className="h-5 w-5 text-muted-foreground" />,
   },
   {
-    title: "Payments",
+    label: "Payments",
     href: "/admin/payments",
-    icon: CreditCard,
+    icon: <IconCreditCard className="h-5 w-5 text-muted-foreground" />,
   },
   {
-    title: "Analytics",
+    label: "Analytics",
     href: "/admin/analytics",
-    icon: BarChart3,
+    icon: <IconChartBar className="h-5 w-5 text-muted-foreground" />,
+  },
+  {
+    label: "Settings",
+    href: "#",
+    icon: <IconSettings className="h-5 w-5 text-muted-foreground" />,
+  },
+  {
+    label: "Logout",
+    href: "#",
+    icon: <IconArrowLeft className="h-5 w-5 text-muted-foreground" />,
   },
 ]
 
-export function AdminSidebar() {
-  const pathname = usePathname()
+export function AdminSidebar({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(true)
 
   return (
-    <div className="flex h-full w-64 flex-col bg-slate-950 dark:bg-slate-900 text-white border-r border-slate-800">
-      <div className="flex h-16 items-center justify-center border-b border-slate-800">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-            <Package className="w-4 h-4 text-white" />
+    <div
+      className={cn(
+        "mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 bg-gray-100 md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
+        "h-screen",
+      )}
+    >
+      <Sidebar open={open} setOpen={setOpen}>
+        <SidebarBody className="justify-between gap-10">
+          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+            {open ? <Logo /> : <LogoIcon />}
+            <div className="mt-8 flex flex-col gap-2">
+              {links.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
+            </div>
           </div>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent">
-            Admin Panel
-          </h1>
-        </div>
-      </div>
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {sidebarItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
-                isActive
-                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/25"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white",
-              )}
-            >
-              <Icon className={cn("mr-3 h-5 w-5", isActive ? "text-white" : "text-slate-400 group-hover:text-white")} />
-              {item.title}
-            </Link>
-          )
-        })}
-      </nav>
-      <div className="p-3 border-t border-slate-800">
-        <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-800/50">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-xs font-medium text-white">AD</span>
+          <div>
+            <SidebarLink
+              link={{
+                label: "Manu Arora",
+                href: "#",
+                icon: (
+                  <img
+                    src="https://assets.aceternity.com/manu.png"
+                    className="h-7 w-7 shrink-0 rounded-full"
+                    width={50}
+                    height={50}
+                    alt="Avatar"
+                  />
+                ),
+              }}
+            />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Admin User</p>
-            <p className="text-xs text-slate-400 truncate">admin@example.com</p>
-          </div>
-        </div>
-      </div>
+        </SidebarBody>
+      </Sidebar>
+      {children}
     </div>
-  )
+  );
 }
+
+export const Logo = () => {
+  return (
+    <a
+      href="#"
+      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+    >
+      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-medium whitespace-pre text-black dark:text-white"
+      >
+        Acet Labs
+      </motion.span>
+    </a>
+  );
+};
+export const LogoIcon = () => {
+  return (
+    <a
+      href="#"
+      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+    >
+      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
+    </a>
+  );
+};

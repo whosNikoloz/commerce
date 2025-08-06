@@ -37,13 +37,21 @@ export default async function AdminLayout({
 }) {
   const { lang } = await params;
 
-  return (
-    <div className="flex h-screen bg-gray-100">
-      <AdminSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <AdminHeader />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+  const Dashboard = () => {
+    return (
+      <div className="flex flex-1">
+        <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border   p-2 md:p-10 dark:border-neutral-700  bg-brand-surfacedark dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark">
+          {children}
+        </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="flex h-screen">
+      <AdminSidebar >
+        <Dashboard />
+      </AdminSidebar>
     </div>
   );
 } 

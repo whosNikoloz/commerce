@@ -10,13 +10,13 @@ interface LayoutWrapperProps {
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname()
-  
+
   const isAdminPage = pathname?.includes("/admin")
-  
+
   return (
-    <div className= {`${isAdminPage ? "" : "relative flex flex-col  min-h-screen "}`}>
+    <div className={`${isAdminPage ? "" : "relative flex flex-col  min-h-screen"}`}>
       {!isAdminPage && <Navbar />}
-      <main className={`${isAdminPage ? "" : "container  mx-auto max-w-7xl px-6 flex-grow"}`}>
+      <main className={`${isAdminPage ? "" : "   "}`}>
         {children}
       </main>
       {!isAdminPage && <AnimatedFooter />}

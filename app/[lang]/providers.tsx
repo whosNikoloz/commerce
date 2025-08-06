@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 
 import { CartProvider } from "@/app/context/cartContext";
 import { TranslationProvider } from "@/hooks/useTranslation";
+import { TenantProvider } from "../context/tenantContext";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -29,12 +30,14 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
   return (
     <HeroUIProvider navigate={router.push}>
-      <NextThemesProvider {...themeProps}>
-        <TranslationProvider>
-          <CartProvider>{children}</CartProvider>
-          <Toaster richColors position="bottom-right" />
-        </TranslationProvider>
-      </NextThemesProvider>
+      <TenantProvider>
+        <NextThemesProvider {...themeProps}>
+          <TranslationProvider>
+            <CartProvider>{children}</CartProvider>
+            <Toaster richColors position="bottom-right" />
+          </TranslationProvider>
+        </NextThemesProvider>
+      </TenantProvider>
     </HeroUIProvider>
   );
 }

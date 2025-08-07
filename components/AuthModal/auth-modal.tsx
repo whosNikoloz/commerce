@@ -132,7 +132,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
       <Modal
         classNames={{
           backdrop:
-            "bg-gradient-to-b from-gray-900/60 to-gray-900/80 backdrop-blur-sm",
+            " backdrop-blur-sm",
           base: "rounded-t-xl",
         }}
         hideCloseButton={IsMobile}
@@ -140,28 +140,38 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         motionProps={{
           variants: {
             enter: {
+              y: IsMobile ? 0 : 40,
+              opacity: 0,
+              scale: IsMobile ? 1 : 0.96,
+              transition: { duration: 0 },
+            },
+            center: {
               y: 0,
               opacity: 1,
+              scale: 1,
               transition: {
-                duration: 0.2,
-                ease: "easeOut",
+                type: "spring",
+                stiffness: 400,
+                damping: 32,
+                mass: 0.8,
               },
             },
             exit: {
-              y: 0,
+              y: IsMobile ? 0 : 40,
               opacity: 0,
-              transition: {
-                duration: 0.2,
-                ease: "easeIn",
-              },
+              scale: IsMobile ? 1 : 0.96,
+              transition: { duration: 0.18, ease: "easeIn" },
             },
           },
+          initial: "enter",
+          animate: "center",
+          exit: "exit",
         }}
         placement={IsMobile ? "top" : "center"}
         size={IsMobile ? "full" : "sm"}
         onClose={handleCloseModal}
       >
-        <ModalContent>
+        <ModalContent className="dark:bg-brand-muteddark bg-brand-surface">
           {() => (
             <>
               {IsMobile ? (

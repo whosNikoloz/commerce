@@ -190,6 +190,7 @@ export default function SearchForMobile({
         scrollBehavior="inside"
         size="full"
         onClose={handleClose}
+        className="dark:bg-brand-muteddark bg-brand-surface"
       >
         <ModalContent>
           {() => (

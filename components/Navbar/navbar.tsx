@@ -47,6 +47,9 @@ export const Navbar = () => {
 
   const pathname = usePathname();
   const isCategory = pathname.includes("category");
+  const slugParts = pathname.split("/").filter(Boolean);
+  const category = slugParts[2] || "";
+  const subcategory = slugParts[3] || null;
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -61,13 +64,12 @@ export const Navbar = () => {
       {!isMobile || !isCategory ? (
         <nav className="justify-center items-center">
           <div
-            className={`z-50 fixed top-3 left-1/2 -translate-x-1/2  w-11/12 rounded-2xl transition-all duration-300 ${
-              isScrolled && searchModalIsOpen
-                ? "dark:backdrop-blur-2xl backdrop-blur-sm w-11/12 md:w-10/12 lg:w-6/12 bg-black/50 shadow-md"
-                : isScrolled
-                  ? "dark:backdrop-blur-2xl backdrop-blur-sm  md:w-6/12 lg:w-3/12  bg-black/50 shadow-md"
-                  : "bg-transparent w-11/12 md:w-10/12 lg:w-6/12"
-            }`}
+            className={`z-50 fixed top-3 left-1/2 -translate-x-1/2  w-11/12 rounded-2xl transition-all duration-300 ${isScrolled && searchModalIsOpen
+              ? "dark:backdrop-blur-2xl backdrop-blur-sm w-11/12 md:w-10/12 lg:w-6/12 bg-black/50 shadow-md"
+              : isScrolled
+                ? "dark:backdrop-blur-2xl backdrop-blur-sm  md:w-6/12 lg:w-3/12  bg-black/50 shadow-md"
+                : "bg-transparent w-11/12 md:w-10/12 lg:w-6/12"
+              }`}
           >
             <div className="mx-auto px-4">
               <div className="flex items-center justify-between h-16 ">
@@ -119,9 +121,18 @@ export const Navbar = () => {
           </div>
         </nav>
       ) : (
-        <div className="mt-6 ml-5">
-          <GoBackButton onClick={() => window.history.back()} />
+        <div className="mt-6 relative flex items-center justify-between px-4">
+          <div className="z-10">
+            <GoBackButton onClick={() => window.history.back()} />
+          </div>
+
+          <div className="absolute left-1/2 -translate-x-1/2 text-white text-lg font-semibold text-center">
+            {subcategory
+              ? `${decodeURIComponent(category)} / ${decodeURIComponent(subcategory)}`
+              : decodeURIComponent(category)}
+          </div>
         </div>
+
       )}
       <div className="md:hidden z-50 fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
         <div className="flex justify-around items-center py-2 space-x-3">

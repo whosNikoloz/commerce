@@ -31,6 +31,11 @@ const links = [
     icon: <IconHome className="h-5 w-5 text-muted-foreground" />,
   },
   {
+    label: "Brands",
+    href: "/admin/brands",
+    icon: <IconUserBolt className="h-5 w-5 text-muted-foreground" />,
+  },
+  {
     label: "Products",
     href: "/admin/products",
     icon: <IconBox className="h-5 w-5 text-muted-foreground" />,
@@ -73,7 +78,7 @@ const links = [
 ]
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   return (
     <div

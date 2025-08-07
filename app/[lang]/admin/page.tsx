@@ -40,13 +40,25 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdmin");
-    if (isAdmin === "true") {
-      setIsAuthorized(true);
-    } else {
-      onOpen();
-    }
+    // const checkAuth = async () => {
+    //   try {
+    //     const res = await fetch("/api/auth/check", { method: "GET" });
+    //     const data = await res.json();
+
+    //     if (data.authorized) {
+    //       setIsAuthorized(true);
+    //     } else {
+    //       onOpen();
+    //     }
+    //   } catch {
+    //     onOpen();
+    //   }
+    // };
+
+    // checkAuth();
+    setIsAuthorized(true);
   }, []);
+
 
   useEffect(() => {
     const updateScreenSize = () => setIsMobile(window.innerWidth < 768);
@@ -67,22 +79,46 @@ export default function AdminPage() {
     return (
       <Modal
         classNames={{
-          backdrop: "bg-gradient-to-b from-gray-900/60 to-gray-900/80 backdrop-blur-3xl",
+          backdrop: "backdrop-blur-3xl",
           base: "rounded-t-xl",
         }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
         motionProps={{
           variants: {
-            enter: { y: 0, opacity: 1, transition: { duration: 0.2, ease: "easeOut" } },
-            exit: { y: 0, opacity: 0, transition: { duration: 0.2, ease: "easeIn" } },
+            enter: {
+              y: 40,
+              opacity: 0,
+              scale: 0.96,
+              transition: { duration: 0 },
+            },
+            center: {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 400,
+                damping: 32,
+                mass: 0.8,
+              },
+            },
+            exit: {
+              y: 40,
+              opacity: 0,
+              scale: 0.96,
+              transition: { duration: 0.18, ease: "easeIn" },
+            },
           },
+          initial: "enter",
+          animate: "center",
+          exit: "exit",
         }}
         placement={isMobile ? "top" : "center"}
         size={isMobile ? "full" : "sm"}
         onClose={handleCloseModal}
       >
-        <ModalContent>
+        <ModalContent className="bg-brand-muteddark">
           {() => (
             <>
               {isMobile ? (

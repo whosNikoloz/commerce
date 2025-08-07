@@ -27,7 +27,7 @@ export function ProductInfo({
 }: ProductInfoProps) {
   return (
     <div className="space-y-6">
-      <div className="md:sticky relative md:top-20 bg-white w-full dark:bg-neutral-900 p-6  rounded-lg shadow-sm">
+      <div className="md:sticky relative md:top-20 bg-brand-muted  w-full dark:bg-brand-muteddark p-6  rounded-lg shadow-sm">
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-2xl font-bold">{price.toFixed(2)} ₾</span>
           {originalPrice && (

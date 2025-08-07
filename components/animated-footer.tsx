@@ -73,7 +73,7 @@ export default function AnimatedFooter() {
   // Dynamic styles based on theme
   const themeStyles = {
     footer: isDarkMode
-      ? "bg-black text-white"
+      ? "bg-brand-muted dark:bg-brand-muteddark text-white"
       : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800",
     subtitle: isDarkMode ? "text-gray-300" : "text-gray-600",
     borderColor: isDarkMode ? "border-gray-700" : "border-gray-300",

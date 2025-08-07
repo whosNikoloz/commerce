@@ -24,13 +24,13 @@ interface ProductFiltersProps {
 }
 
 // Sidebar content component
-const SidebarContent = ({ 
-  filters, 
-  handleFilterChange, 
-  clearFilters, 
-  subcategories, 
-  brands, 
-  colors 
+const SidebarContent = ({
+  filters,
+  handleFilterChange,
+  clearFilters,
+  subcategories,
+  brands,
+  colors
 }: {
   filters: Filters
   handleFilterChange: (filterType: string, value: string | number | boolean | number[]) => void
@@ -47,9 +47,8 @@ const SidebarContent = ({
           <button
             key={sub.name}
             onClick={() => handleFilterChange("subcategory", filters.subcategory === sub.name ? "" : sub.name)}
-            className={`flex items-center justify-between w-full p-2 text-left rounded-md hover:bg-muted transition-colors ${
-              filters.subcategory === sub.name ? "bg-muted" : ""
-            }`}
+            className={`flex items-center justify-between w-full p-2 text-left rounded-md hover:bg-muted transition-colors ${filters.subcategory === sub.name ? "bg-muted" : ""
+              }`}
           >
             <span className="text-sm">{sub.name}</span>
             <span className="text-xs text-muted-foreground">({sub.count})</span>
@@ -111,7 +110,7 @@ const SidebarContent = ({
       <AccordionItem value="brands">
         <AccordionTrigger>Brands</AccordionTrigger>
         <AccordionContent>
-          <div 
+          <div
             className="space-y-3"
             onPointerDown={(e) => e.stopPropagation()}
             onFocusCapture={(e) => e.stopPropagation()}
@@ -127,8 +126,8 @@ const SidebarContent = ({
                     handleFilterChange("brands", brand)
                   }}
                 />
-                <label 
-                  htmlFor={brand} 
+                <label
+                  htmlFor={brand}
                   className="text-sm font-normal cursor-pointer"
                 >
                   {brand}
@@ -142,7 +141,7 @@ const SidebarContent = ({
       <AccordionItem value="colors">
         <AccordionTrigger>Colors</AccordionTrigger>
         <AccordionContent>
-          <div 
+          <div
             className="space-y-3"
             onPointerDown={(e) => e.stopPropagation()}
             onFocusCapture={(e) => e.stopPropagation()}
@@ -158,8 +157,8 @@ const SidebarContent = ({
                     handleFilterChange("colors", color)
                   }}
                 />
-                <label 
-                  htmlFor={color} 
+                <label
+                  htmlFor={color}
                   className="text-sm font-normal cursor-pointer"
                 >
                   {color}
@@ -173,7 +172,7 @@ const SidebarContent = ({
       <AccordionItem value="rating">
         <AccordionTrigger>Rating</AccordionTrigger>
         <AccordionContent>
-          <div 
+          <div
             className="space-y-3"
             onPointerDown={(e) => e.stopPropagation()}
             onFocusCapture={(e) => e.stopPropagation()}
@@ -187,9 +186,8 @@ const SidebarContent = ({
                   e.stopPropagation()
                   handleFilterChange("rating", rating)
                 }}
-                className={`flex items-center space-x-2 w-full p-2 rounded-md hover:bg-muted transition-colors ${
-                  filters.rating === rating ? "bg-muted" : ""
-                }`}
+                className={`flex items-center space-x-2 w-full p-2 rounded-md hover:bg-muted transition-colors ${filters.rating === rating ? "bg-muted" : ""
+                  }`}
               >
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
@@ -207,7 +205,7 @@ const SidebarContent = ({
       </AccordionItem>
     </Accordion>
 
-    <div 
+    <div
       className="space-y-3"
       onPointerDown={(e) => e.stopPropagation()}
       onFocusCapture={(e) => e.stopPropagation()}
@@ -220,8 +218,8 @@ const SidebarContent = ({
           checked={filters.inStockOnly}
           onCheckedChange={(checked: any) => handleFilterChange("inStockOnly", checked)}
         />
-        <label 
-          htmlFor="inStock" 
+        <label
+          htmlFor="inStock"
           className="text-sm font-normal cursor-pointer"
         >
           In Stock Only
@@ -247,8 +245,8 @@ export default function ProductFilters({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg bg-card p-6 shadow-sm">
-        <SidebarContent 
+      <div className="hidden lg:block bg-brand-muted dark:bg-brand-muteddark sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg bg-card p-6 shadow-sm">
+        <SidebarContent
           filters={filters}
           handleFilterChange={handleFilterChange}
           clearFilters={clearFilters}
@@ -260,7 +258,7 @@ export default function ProductFilters({
 
       {/* Mobile Filters */}
       <Sheet>
-        <SheetTrigger asChild>
+        <SheetTrigger asChild className="bg-brand-muted dark:bg-brand-muteddark">
           <Button variant="outline" className="lg:hidden relative">
             <Filter className="h-4 w-4 mr-2" />
             Filters
@@ -269,12 +267,12 @@ export default function ProductFilters({
             )}
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[300px] p-0">
+        <SheetContent side="left" className="w-[300px] p-0 bg-brand-muted dark:bg-brand-muteddark">
           <SheetHeader className="p-6 pb-4">
             <SheetTitle>Filters</SheetTitle>
           </SheetHeader>
           <div className="px-6 pb-6 overflow-y-auto max-h-[calc(100vh-80px)]">
-            <SidebarContent 
+            <SidebarContent
               filters={filters}
               handleFilterChange={handleFilterChange}
               clearFilters={clearFilters}

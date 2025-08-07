@@ -36,9 +36,8 @@ export function ProductInfoBottom({
 
   return (
     <div
-      className={`fixed bottom-14 md:bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 shadow-lg px-4 py-3 transform transition-all duration-300 z-50  ease-in-out ${
-        isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-      }`}
+      className={`fixed bottom-14 md:bottom-0 left-0 right-0 bg-brand-muted   dark:bg-brand-muteddark  shadow-lg px-4 py-3 transform transition-all duration-300 z-50  ease-in-out ${isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+        }`}
     >
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">

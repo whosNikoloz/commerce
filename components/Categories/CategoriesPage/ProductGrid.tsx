@@ -15,11 +15,11 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
   return (
     <div
       className={
-        viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6" : "space-y-4"
+        viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 bg-brand-muted dark:bg-brand-muteddark" : "space-y-4 bg-brand-muted dark:bg-brand-muteddark"
       }
     >
       {products.map((product) => (
-        <Card key={product.id} className="group hover:shadow-lg transition-shadow">
+        <Card key={product.id} className="group hover:shadow-lg transition-shadow ">
           <CardBody className={viewMode === "grid" ? "p-3 lg:p-4" : "p-3 lg:p-4 flex gap-4"}>
             <div className={viewMode === "grid" ? "space-y-3" : "flex-shrink-0"}>
               <div className="relative">
@@ -28,9 +28,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   alt={product.name}
                   width={viewMode === "grid" ? 300 : 120}
                   height={viewMode === "grid" ? 300 : 120}
-                  className={`object-cover rounded-md ${
-                    viewMode === "grid" ? "w-full aspect-square" : "w-20 h-20 sm:w-30 sm:h-30"
-                  }`}
+                  className={`object-cover rounded-md ${viewMode === "grid" ? "w-full aspect-square" : "w-20 h-20 sm:w-30 sm:h-30"
+                    }`}
                 />
                 <Button
                   size="icon"
@@ -57,9 +56,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-3 h-3 ${
-                        i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                      }`}
+                      className={`w-3 h-3 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                        }`}
                     />
                   ))}
                 </div>

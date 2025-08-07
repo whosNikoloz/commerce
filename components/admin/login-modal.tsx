@@ -44,31 +44,34 @@ export default function LoginModal({
         setLoginError("");
 
         if (loginState.email.trim() === "") {
-            setLoginEmailError(
-                lng === "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field"
-            );
+            setLoginEmailError(lng === "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
             setIsLoading(false);
             return;
         }
 
         if (loginState.password.trim() === "") {
-            setLoginPasswordError(
-                lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field"
-            );
+            setLoginPasswordError(lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
             setIsLoading(false);
             return;
         }
 
-        const validEmail = "Admin@gmail.com";
-        const validPassword = "Admin1.";
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: loginState.email,
+                    password: loginState.password,
+                }),
+            });
 
-        if (
-            loginState.email.toLowerCase() === validEmail.toLowerCase() &&
-            loginState.password === validPassword
-        ) {
-            localStorage.setItem("isAdmin", "true");
+            const result = await res.json();
+
+            if (!res.ok || !result.success) {
+                throw new Error(result.message || "Unauthorized");
+            }
             onSuccess?.();
-        } else {
+        } catch (err: any) {
             setLoginError(
                 lng === "ka" ? "მომხმარებელი ან პაროლი არასწორია" : "Invalid email or password"
             );
@@ -76,7 +79,6 @@ export default function LoginModal({
 
         setIsLoading(false);
     };
-
 
     const handleLoginEmailExists = async () => {
         setLoginEmailError("");

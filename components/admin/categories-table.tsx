@@ -1,12 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Edit, Trash2, Plus, Tag, Eye, EyeOff } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
+import { useEffect, useState } from "react";
+import { Edit, Trash2, Tag, Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,135 +24,58 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-
-interface Category {
-  id: string
-  name: string
-  description: string
-  productCount: number
-  visible: boolean
-  parentCategory?: string
-}
-
-const initialCategories: Category[] = [
-  {
-    id: "1",
-    name: "Electronics",
-    description: "Electronic devices and gadgets",
-    productCount: 45,
-    visible: true,
-  },
-  {
-    id: "2",
-    name: "Smartphones",
-    description: "Mobile phones and accessories",
-    productCount: 23,
-    visible: true,
-    parentCategory: "Electronics",
-  },
-  {
-    id: "3",
-    name: "Home & Kitchen",
-    description: "Home appliances and kitchen items",
-    productCount: 67,
-    visible: true,
-  },
-  {
-    id: "4",
-    name: "Sports & Outdoors",
-    description: "Sports equipment and outdoor gear",
-    productCount: 34,
-    visible: true,
-  },
-  {
-    id: "5",
-    name: "Books",
-    description: "Physical and digital books",
-    productCount: 12,
-    visible: true,
-  },
-  {
-    id: "6",
-    name: "Clothing",
-    description: "Fashion and apparel",
-    productCount: 89,
-    visible: true,
-  },
-]
+} from "@/components/ui/alert-dialog";
+import { getAllCategories } from "@/app/api/services/categoryService";
+import { CategoryModel } from "@/types/category";
 
 export function CategoriesTable() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState<string>("")
-  const [newCategory, setNewCategory] = useState({
-    name: "",
-    description: "",
-    parentCategory: "",
-  })
+  const [categories, setCategories] = useState<CategoryModel[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getAllCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error("❌ Error loading categories", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const toggleCategoryStatus = (categoryId: string) => {
-    setCategories(
-      categories.map((category) =>
+    setCategories((prev) =>
+      prev.map((category) =>
         category.id === categoryId
-          ? { ...category, visible: !category.visible }
-          : category,
-      ),
-    )
-  }
-
-  const filteredCategories = categories.filter(
-    (categorie) =>
-      categorie.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (categorie.parentCategory && categorie.parentCategory.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
-
+          ? { ...category, visible: !(category as any).visible }
+          : category
+      )
+    );
+  };
 
   const deleteCategory = (categoryId: string) => {
-    setCategories(categories.filter((category) => category.id !== categoryId))
-  }
+    setCategories((prev) => prev.filter((c) => c.id !== categoryId));
+  };
 
-  // const addCategory = () => {
-  //   if (newCategory.name.trim()) {
-  //     const category: Category = {
-  //       id: (categories.length + 1).toString(),
-  //       name: newCategory.name,
-  //       description: newCategory.description,
-  //       productCount: 0,
-  //       visible: false,
-  //       parentCategory: newCategory.parentCategory || undefined,
-  //     }
-  //     setCategories([...categories, category])
-  //     setNewCategory({ name: "", description: "", parentCategory: "" })
-  //     setIsAddDialogOpen(false)
-  //   }
-  // }
+  const filteredCategories = categories.filter(
+    (category) =>
+      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
-            <input
-              type="text"
-              placeholder="Search by name or category..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search by name or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
+          />
         </div>
       </CardHeader>
       <CardContent className="overflow-auto max-h-[calc(100vh-240px)]">
@@ -154,10 +84,10 @@ export function CategoriesTable() {
             <TableRow>
               <TableHead>Category</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Parent Category</TableHead>
-              <TableHead>Products</TableHead>
+              <TableHead>Parent</TableHead>
+              <TableHead>Facets</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {/* <TableHead className="text-right">Actions</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -176,35 +106,38 @@ export function CategoriesTable() {
                   <p className="truncate">{category.description}</p>
                 </TableCell>
                 <TableCell>
-                  {category.parentCategory ? (
+                  {category.parentId ? (
                     <Badge
                       variant="outline"
                       className="border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300"
                     >
-                      {category.parentCategory}
+                      {categories.find((c) => c.id === category.parentId)?.name || "|"}
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
+
                 <TableCell>
-                  <Badge variant="secondary">{category.productCount} products</Badge>
+                  <Badge variant="secondary">
+                    {category.facets?.length ?? 0} facets
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <Switch
-                      checked={category.visible}
+                      checked={(category as any).visible}
                       onCheckedChange={() => toggleCategoryStatus(category.id)}
                       className="data-[state=checked]:bg-blue-600"
                     />
-                    {category.visible ? (
+                    {(category as any).visible ? (
                       <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     ) : (
                       <EyeOff className="h-4 w-4 text-slate-400" />
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
+                {/* <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" size="sm">
                       <Edit className="h-4 w-4" />
@@ -223,8 +156,7 @@ export function CategoriesTable() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the category "{category.name}"
-                            and may affect {category.productCount} products.
+                            This will delete category "{category.name}".
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -239,12 +171,12 @@ export function CategoriesTable() {
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

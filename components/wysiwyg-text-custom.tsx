@@ -29,13 +29,8 @@ const CustomFontSize = Extension.create({
                 attributes: {
                     fontSize: {
                         default: null,
-                        parseHTML: (element) => element.style.fontSize || null,
-                        renderHTML: (attributes) => {
-                            if (!attributes.fontSize) return {};
-                            return {
-                                style: `font-size: ${attributes.fontSize}`,
-                            };
-                        },
+                        parseHTML: (el) => el.style.fontSize || null,
+                        renderHTML: (attrs) => (!attrs.fontSize ? {} : { style: `font-size: ${attrs.fontSize}` }),
                     },
                 },
             },
@@ -50,23 +45,27 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
                 heading: { levels: [1, 2, 3] },
                 bulletList: { keepMarks: true },
                 orderedList: { keepMarks: true },
+                // HardBreak is included; Shift+Enter inserts <br/>
             }),
             TextStyle,
             CustomFontSize,
             Color,
-            TextAlign.configure({
-                types: ["heading", "paragraph"],
-            }),
-            Link.configure({
-                openOnClick: false,
-            }),
+            TextAlign.configure({ types: ["heading", "paragraph"] }),
+            Link.configure({ openOnClick: false }),
         ],
         content: value,
         immediatelyRender: false,
+        // 👇 preserve whitespace when parsing HTML into the doc
+        parseOptions: { preserveWhitespace: "full" },
         editorProps: {
             attributes: {
                 class:
-                    "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-2 py-2",
+                    [
+                        "prose prose-sm dark:prose-invert max-w-none",
+                        "focus:outline-none min-h-[300px] px-2 py-2",
+                        "whitespace-pre-wrap break-words",
+                        "prose-p:my-2 prose-li:my-1",
+                    ].join(" "),
             },
         },
         onUpdate({ editor }) {
@@ -76,9 +75,10 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
 
     useEffect(() => {
         if (editor && value !== editor.getHTML()) {
+            // keep the same parse option when setting external content
             editor.commands.setContent(value);
         }
-    }, [value]);
+    }, [value, editor]);
 
     return (
         <div className="space-y-2">
@@ -121,9 +121,7 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
 
                                 <div className="flex items-center gap-2">
                                     <Type className="w-4 h-4 text-muted-foreground" />
-                                    <Select
-                                        onValueChange={(val) => editor.chain().focus().setMark("textStyle", { fontSize: val }).run()}
-                                    >
+                                    <Select onValueChange={(val) => editor.chain().focus().setMark("textStyle", { fontSize: val }).run()}>
                                         <SelectTrigger className="w-[130px] h-9">
                                             <SelectValue placeholder="Font Size" />
                                         </SelectTrigger>
@@ -160,10 +158,14 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
                                         <LinkIcon className="w-4 h-4" />
                                     </Button>
                                 </div>
+
+                                {/* Optional: quick “line break” button (Shift+Enter) */}
+                                <Button size="sm" variant="outline" onClick={() => editor.chain().focus().setHardBreak().run()}>
+                                    Insert line break
+                                </Button>
                             </div>
                         </div>
                     )}
-
 
                     <EditorContent editor={editor} />
                 </CardContent>

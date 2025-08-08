@@ -97,13 +97,13 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         {product.description && (
           <div className="flex md:items-start place-items-start">
             <div
-              className="
-                rich-content
-                max-w-md ml-5
-                prose prose-sm dark:prose-invert
-                prose-ul:list-disc prose-ol:list-decimal
-                prose-li:my-1
-              "
+              className={[
+                "rich-content max-w-md ml-5",
+                "prose prose-sm dark:prose-invert",
+                "prose-ul:list-disc prose-ol:list-decimal",
+                "prose-li:my-1 prose-p:my-2",
+                "whitespace-pre-wrap break-words"
+              ].join(" ")}
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
           </div>

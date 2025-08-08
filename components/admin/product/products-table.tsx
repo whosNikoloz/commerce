@@ -16,10 +16,11 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { ProductResponseModel } from "@/types/product";
-import { deleteProductById, getAllProducts } from "@/app/api/services/productService";
+import { ProductRequestModel, ProductResponseModel } from "@/types/product";
+import { deleteProductById, getAllProducts, updateProduct } from "@/app/api/services/productService";
 import UpdateProductModal from "./update-product-modal";
 import ReviewImagesModal from "./review-images-modal";
+import { toast } from "sonner";
 
 export function ProductsTable() {
   const [products, setProducts] = useState<ProductResponseModel[]>([]);
@@ -50,6 +51,57 @@ export function ProductsTable() {
     } catch (err) {
       console.error("Failed to delete product", err);
       alert("Error deleting product.");
+    }
+  };
+
+  const handleUpdateProduct = async (
+    productId: string,
+    description: string,
+    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean }
+  ) => {
+    const current = products.find(p => p.id === productId);
+    if (!current) return;
+
+    const prevProducts = products;
+
+    const patched = {
+      ...current,
+      description,
+      isLiquidated: flags.isLiquidated,
+      isComingSoon: flags.isComingSoon,
+      isNewArrival: flags.isNewArrival,
+    };
+
+    setProducts(prev =>
+      prev.map(p => (p.id === productId ? patched : p))
+    );
+
+    const payload: ProductRequestModel = {
+      id: current.id,
+      name: current.name ?? "",
+      price: current.price,
+      discountPrice: current.discountPrice ?? undefined,
+      categoryId: current.category?.id ?? "",
+      status: current.status,
+      condition: current.condition,
+      isActive: current.isActive,
+      description,
+      isLiquidated: flags.isLiquidated,
+      isComingSoon: flags.isComingSoon,
+      isNewArrival: flags.isNewArrival,
+      images: current.images ?? [],
+      brandId: current.brand?.id ?? "",
+      productFacetValues: [],
+    };
+
+    try {
+      await updateProduct(payload);
+      setProducts(prev => prev.map(p => (p.id === productId ? patched : p)));
+      toast.success("პროდუქტი წარმატებით განახლდა.");
+    } catch (err) {
+      console.error("Failed to update product", err);
+      toast.error("პროდუქტის განახლება ვერ მოხერხდა.");
+      setProducts(prevProducts);
     }
   };
 
@@ -225,7 +277,7 @@ export function ProductsTable() {
                             initialIsComingSoon={product.isComingSoon}
                             initialIsNewArrival={product.isNewArrival}
                             onSave={(id, desc, flags) => {
-                              console.log("Updated product:", id, desc, flags);
+                              handleUpdateProduct(id, desc, flags);
                             }}
                           />
                         </div>

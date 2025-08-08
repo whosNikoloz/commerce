@@ -1,29 +1,46 @@
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-    try {
-        const res = await fetch(url, {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                ...(options.headers || {}),
-            },
-            next: { revalidate: 60 },
-        });
+    const isServer = typeof window === "undefined";
 
-        const contentType = res.headers.get("content-type") || "";
+    const headers = new Headers({
+        "Content-Type": "application/json",
+        ...(options.headers as Record<string, string> | undefined),
+    });
 
-        if (!res.ok) {
-            const message = contentType.includes("application/json")
-                ? JSON.stringify(await res.json())
-                : await res.text();
-            throw new Error(`Error ${res.status}: ${message}`);
+    let token: string | null = null;
+
+    if (isServer) {
+        const { cookies } = await import("next/headers");
+        token = (await cookies()).get("admin_token")?.value ?? null;
+    } else {
+        try {
+            const res = await fetch("/api/auth/token", {
+                credentials: "same-origin",
+                cache: "no-store",
+            });
+            if (res.ok) {
+                const json = await res.json();
+                token = json?.token ?? null;
+            }
+        } catch {
         }
-
-        if (contentType.includes("application/json")) {
-            return (await res.json()) as T;
-        } else {
-            return (await res.text()) as T;
-        }
-    } catch (err: any) {
-        throw new Error(err.message || "Something went wrong");
     }
+
+    if (token) {
+        headers.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
+    }
+
+    const res = await fetch(url, {
+        ...options,
+        headers,
+        credentials: isServer ? "include" : "same-origin",
+        next: { revalidate: 60, ...(options as any).next },
+    });
+
+    const ct = res.headers.get("content-type") || "";
+    if (!res.ok) {
+        const msg = ct.includes("application/json") ? JSON.stringify(await res.json()) : await res.text();
+        throw new Error(`Error ${res.status}: ${msg}`);
+    }
+
+    return (ct.includes("application/json") ? await res.json() : await res.text()) as T;
 }

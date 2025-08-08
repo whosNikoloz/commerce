@@ -40,23 +40,23 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // const checkAuth = async () => {
-    //   try {
-    //     const res = await fetch("/api/auth/check", { method: "GET" });
-    //     const data = await res.json();
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/check", { method: "GET" });
+        const data = await res.json();
 
-    //     if (data.authorized) {
-    //       setIsAuthorized(true);
-    //     } else {
-    //       onOpen();
-    //     }
-    //   } catch {
-    //     onOpen();
-    //   }
-    // };
+        if (data.authorized) {
+          setIsAuthorized(true);
+        } else {
+          onOpen();
+        }
+      } catch {
+        onOpen();
+      }
+    };
 
-    // checkAuth();
-    setIsAuthorized(true);
+    checkAuth();
+    //setIsAuthorized(true);
   }, []);
 
 

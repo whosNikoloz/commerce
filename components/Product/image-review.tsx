@@ -31,7 +31,6 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
     const thumbnailsContainerRef = useRef<HTMLDivElement>(null);
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
-    console.log("ImageGallery rendered", images);
     const zoomLevel = 3;
     const placeholder = "/placeholder.svg"; // make sure it exists in /public
 

@@ -4,7 +4,7 @@ import { FilterModel } from "@/types/filter";
 import { PagedList } from "@/types/pagination";
 import { CategoryModel } from "@/types/category";
 
-const API_BASE = "https://localhost:7204/Category";
+const API_BASE = "http://localhost:5007/Category";
 
 export async function getAllCategories(): Promise<CategoryModel[]> {
     return apiFetch<CategoryModel[]>(`${API_BASE}/get-all-categories`);

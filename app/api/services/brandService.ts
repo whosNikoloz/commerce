@@ -1,7 +1,7 @@
 import { apiFetch } from "../client/fetcher";
 import { BrandModel } from "@/types/brand";
 
-const API_BASE = "https://localhost:7204/Brand";
+const API_BASE = "http://localhost:5007/Brand";
 
 export async function getAllBrands(): Promise<BrandModel[]> {
     return apiFetch<BrandModel[]>(`${API_BASE}/get-all-brands`);

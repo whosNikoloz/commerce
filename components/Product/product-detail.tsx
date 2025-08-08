@@ -59,8 +59,8 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       {
         headline: "Specifications",
         specifications: product.productFacetValues.map((f) => ({
-          key: f.facetName ?? "",
-          value: f.facetValue ?? "",
+          facetName: f.facetName ?? "",
+          facetValue: f.facetValue ?? "",
         })),
       },
     ];
@@ -80,8 +80,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   const price = product.discountPrice ?? product.price;
   const originalPrice = product.discountPrice ? product.price : undefined;
-  const inStock =
-    product.status === 0 /* StockStatus.InStock */ ? 10 : 0; // replace with real stock qty if your API provides it
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -113,9 +111,9 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
         <ProductInfo
           discount={originalPrice ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100)) : 0}
-          inStock={inStock}
           originalPrice={originalPrice ?? null}
-          points={0}
+          status={product.status}
+          condition={product.condition}
           price={price}
           onAddToCart={() => console.log("Added to cart")}
           onBuyNow={() => console.log("Buy now clicked")}
@@ -123,7 +121,16 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         />
       </div>
 
-      <SimilarProducts products={similarProducts} />
+      {/* <SimilarProducts products={similarProducts} /> */}
+
+      {product.brand && (
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold mb-4">ბრენდის ისტორია : {product.brand.name}</h2>
+          <div className="prose prose-sm dark:prose-invert">
+            <p>{product.brand.description}</p>
+          </div>
+        </div>
+      )}
 
       {specs.map((g, i) => (
         <div key={i} className="my-12">
@@ -138,7 +145,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         name={product.name ?? ""}
         originalPrice={originalPrice}
         price={price}
-        stock={inStock}
+        stock={product.status}
       />
     </div>
   );

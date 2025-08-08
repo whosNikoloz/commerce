@@ -271,10 +271,12 @@ export default function ReviewImagesModal({
                                 </ModalHeader>
                             ) : (
                                 <ModalHeader className="flex flex-col gap-1">
-                                    <h2 className="text-2xl font-bold dark:text-text-lightdark text-text-light ">Add photos to your review</h2>
-                                    <p className="text-sm text-text-subtle dark:text-text-subtledark">Upload up to {maxFiles} images. Max size {maxSizeMB} MB each.
-                                        <Badge variant="secondary" className="ml-auto">{images.length} / {maxFiles}</Badge></p>
-
+                                    <p className="text-sm text-text-subtle dark:text-text-subtledark">
+                                        Upload up to {maxFiles} images. Max size {maxSizeMB} MB each.
+                                    </p>
+                                    <Badge variant="secondary" className="ml-auto">
+                                        {images.length} / {maxFiles}
+                                    </Badge>
                                 </ModalHeader>
                             )}
 

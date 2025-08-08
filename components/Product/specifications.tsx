@@ -1,7 +1,7 @@
-import { ProductSpecification } from "@/types/Product";
+import { ProductFacetValueResponseModel } from "@/types/facet";
 
 interface SpecificationsProps {
-  specs: ProductSpecification[];
+  specs: ProductFacetValueResponseModel[];
 }
 
 export function Specifications({ specs }: SpecificationsProps) {
@@ -11,8 +11,8 @@ export function Specifications({ specs }: SpecificationsProps) {
         <div className="space-y-3">
           {specs.map((spec, index) => (
             <div key={index} className="grid grid-cols-2 border-b pb-2">
-              <span className="font-medium">{spec.key}</span>
-              <span>{spec.value}</span>
+              <span className="font-medium">{spec.facetName}</span>
+              <span>{spec.facetValue}</span>
             </div>
           ))}
         </div>

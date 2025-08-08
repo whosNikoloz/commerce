@@ -30,14 +30,14 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setIsLoading(false);
         } else {
             const host = window.location.host;
-            fetch(`https://api.yourdomain.com/api/tenant-config?host=${host}`)
-                .then(res => res.json())
-                .then(data => {
-                    setConfig(data);
-                    localStorage.setItem("tenantConfig", JSON.stringify(data));
-                    setIsLoading(false);
-                })
-                .catch(() => setIsLoading(false));
+            // fetch(`https://api.yourdomain.com/api/tenant-config?host=${host}`)
+            //     .then(res => res.json())
+            //     .then(data => {
+            //         setConfig(data);
+            //         localStorage.setItem("tenantConfig", JSON.stringify(data));
+            //         setIsLoading(false);
+            //     })
+            //     .catch(() => setIsLoading(false));
         }
     }, []);
 

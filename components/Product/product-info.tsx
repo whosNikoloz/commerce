@@ -6,7 +6,7 @@ import { Button } from "@heroui/button";
 
 interface ProductInfoProps {
   price: number;
-  originalPrice: number;
+  originalPrice: number | null;
   discount?: number;
   inStock: number;
   points: number;

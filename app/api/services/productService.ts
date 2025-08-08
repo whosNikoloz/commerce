@@ -3,7 +3,7 @@ import { ProductResponseModel, ProductRequestModel } from "@/types/product";
 import { FilterModel } from "@/types/filter";
 import { PagedList } from "@/types/pagination";
 
-const API_BASE = "https://localhost:7204/Product";
+const API_BASE = "http://localhost:5007/Product";
 
 export async function getAllProducts(): Promise<ProductResponseModel[]> {
     return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-all-products`);

@@ -16,6 +16,18 @@
   padding-left: 1.5rem;
 }
 
+.rich-content [style*="text-align"] {
+  text-align: inherit;
+}
+
+.rich-content [style*="text-align:center"] {
+  text-align: center;
+}
+
+.rich-content [style*="text-align:right"] {
+  text-align: right;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

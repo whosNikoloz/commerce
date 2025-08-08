@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { ProductResponseModel } from "@/types/product";
 import { deleteProductById, getAllProducts } from "@/app/api/services/productService";
 import UpdateProductModal from "./update-product-modal";
+import ReviewImagesModal from "./review-images-modal";
 
 export function ProductsTable() {
   const [products, setProducts] = useState<ProductResponseModel[]>([]);
@@ -150,13 +151,20 @@ export function ProductsTable() {
                 return (
                   <TableRow key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                     <TableCell>
-                      <Image
-                        src={product.images?.[0] || "/placeholder.svg"}
-                        alt={product.name ?? "Product"}
-                        width={64}
-                        height={64}
-                        className="rounded-xl object-cover ring-2 ring-slate-200 dark:ring-slate-700"
-                      />
+                      <div className="relative w-16 h-16">
+                        <Image
+                          src={product.images?.[0] || "/placeholder.svg"}
+                          alt={product.name ?? "Product"}
+                          width={64}
+                          height={64}
+                          className="rounded-xl object-cover ring-2 ring-slate-200 dark:ring-slate-700"
+                        />
+                        {product.images && product.images.length > 1 && (
+                          <span className="absolute top-1 right-1 bg-slate-800 text-white text-xs px-2 py-0.5 rounded-full opacity-90">
+                            +{product.images.length}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-slate-900 dark:text-slate-100">{product.name}</div>
@@ -220,6 +228,9 @@ export function ProductsTable() {
                               console.log("Updated product:", id, desc, flags);
                             }}
                           />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <ReviewImagesModal />
                         </div>
                         {/* <AlertDialog>
                           <AlertDialogTrigger asChild>

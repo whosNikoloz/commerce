@@ -66,7 +66,7 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
         editorProps: {
             attributes: {
                 class:
-                    "prose dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-2 py-2",
+                    "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-2 py-2",
             },
         },
         onUpdate({ editor }) {

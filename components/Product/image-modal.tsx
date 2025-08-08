@@ -7,10 +7,9 @@ import { Modal, ModalContent, ModalBody } from "@heroui/modal";
 import { cn } from "@heroui/theme";
 import useEmblaCarousel from "embla-carousel-react";
 
-import { ProductImage } from "@/types/Product";
 
 interface ImageModalProps {
-  images: ProductImage[];
+  images: string[];
   productName: string;
   initialIndex?: number;
   isOpen: boolean;
@@ -294,7 +293,7 @@ export default function ImageModal({
                             ? "scale-150"
                             : "scale-100",
                         )}
-                        src={image.fullSize || ""}
+                        src={image || ""}
                         onClick={toggleZoom}
                       />
                     </div>
@@ -327,7 +326,7 @@ export default function ImageModal({
                         fill
                         alt={`Thumbnail ${idx + 1}`}
                         className="object-cover rounded-md"
-                        src={image.fullSize}
+                        src={image}
                       />
                     </div>
                   </button>

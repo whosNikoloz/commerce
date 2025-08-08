@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Box, Clock3, Edit, Sparkles } from "lucide-react";
-import { CustomEditor } from "../wysiwyg-text-custom";
+import { CustomEditor } from "../../wysiwyg-text-custom";
 import { Switch } from "@/components/ui/switch";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/modal";
-import { GoBackButton } from "../go-back-button";
+import { GoBackButton } from "../../go-back-button";
 
 interface UpdateProductModalProps {
     productId: string;

@@ -5,6 +5,21 @@ import { PagedList } from "@/types/pagination";
 
 const API_BASE = "http://localhost:5007/Product";
 
+type SortOrder = "asc" | "desc"
+
+function mapSort(sortBy: string): { sortColumn: string; sortOrder: "asc" | "desc" } {
+  switch (sortBy) {
+    case "price-low":  return { sortColumn: "price", sortOrder: "asc" }
+    case "price-high": return { sortColumn: "price", sortOrder: "desc" }
+    case "newest":     return { sortColumn: "date",  sortOrder: "desc" }
+    case "rating":     return { sortColumn: "date",  sortOrder: "desc" }
+    case "name":       return { sortColumn: "name",  sortOrder: "asc" }
+    case "featured":
+    default:           return { sortColumn: "name",  sortOrder: "asc" }
+  }
+}
+
+
 export async function getAllProducts(): Promise<ProductResponseModel[]> {
     return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-all-products`);
 }
@@ -35,15 +50,42 @@ export async function searchProducts(
     return apiFetch<PagedList<ProductResponseModel>>(`${API_BASE}/get-product-by-searching?${params.toString()}`);
 }
 
-export async function filterProducts(
-    filter: FilterModel,
-    page: number = 1,
-    pageSize: number = 10
-): Promise<PagedList<ProductResponseModel>> {
-    return apiFetch<PagedList<ProductResponseModel>>(`${API_BASE}/get-products-by-filtering?page=${page}&pageSize=${pageSize}`, {
-        method: "POST",
-        body: JSON.stringify(filter),
-    });
+export function isFilterEmpty(f: FilterModel): boolean {
+  return !f ||
+    (f.brandIds?.length ?? 0) === 0 &&
+    (f.categoryIds?.length ?? 0) === 0 &&
+    (f.condition?.length ?? 0) === 0 &&
+    f.stockStatus === undefined &&
+    f.minPrice === undefined &&
+    f.maxPrice === undefined &&
+    (f.facetFilters?.length ?? 0) === 0
+}
+
+export async function searchProductsByFilter(params: {
+  filter: FilterModel
+  sortBy?: string
+  page?: number
+  pageSize?: number
+}): Promise<PagedList<ProductResponseModel>> {
+  const { sortColumn, sortOrder } = mapSort(params.sortBy ?? "name")
+  const page = params.page ?? 1
+  const pageSize = params.pageSize ?? 24
+
+  const qs = new URLSearchParams({
+    sortColumn,
+    sortOrder,
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  return apiFetch<PagedList<ProductResponseModel>>(
+    `${API_BASE}/search-products-by-filter?${qs.toString()}`,
+    {
+      method: "POST",
+      body: JSON.stringify(params.filter),
+      headers: { "Content-Type": "application/json" },
+    }
+  )
 }
 
 export async function createProduct(data: ProductRequestModel): Promise<string> {

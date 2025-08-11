@@ -1,313 +1,249 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
+
 import ProductFilters from "./ProductFilters"
+import ProductHeader from "./ProductHeader"
 import ProductGrid from "./ProductGrid"
 import ProductPagination from "./ProductPagination"
-import ProductHeader from "./ProductHeader"
-import { Product, Filters, Subcategory } from "../types"
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Wireless Bluetooth Headphones",
-    price: 79.99,
-    originalPrice: 99.99,
-    rating: 4.5,
-    reviews: 128,
-    brand: "TechSound",
-    category: "Audio",
-    subcategory: "Headphones",
-    color: "Black",
-    size: "One Size",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 2,
-    name: "Smart Fitness Watch",
-    price: 199.99,
-    originalPrice: 249.99,
-    rating: 4.8,
-    reviews: 89,
-    brand: "FitTech",
-    category: "Electronics",
-    subcategory: "Wearables",
-    color: "Silver",
-    size: "42mm",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 3,
-    name: "Organic Cotton T-Shirt",
-    price: 24.99,
-    originalPrice: 34.99,
-    rating: 4.2,
-    reviews: 256,
-    brand: "EcoWear",
-    category: "Clothing",
-    subcategory: "T-Shirts",
-    color: "White",
-    size: "M",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 4,
-    name: "Professional Camera Lens",
-    price: 599.99,
-    originalPrice: 699.99,
-    rating: 4.9,
-    reviews: 45,
-    brand: "PhotoPro",
-    category: "Photography",
-    subcategory: "Lenses",
-    color: "Black",
-    size: "85mm",
-    inStock: false,
-    image: "/img1.jpg",
-  },
-  {
-    id: 5,
-    name: "Gaming Mechanical Keyboard",
-    price: 129.99,
-    originalPrice: 159.99,
-    rating: 4.6,
-    reviews: 312,
-    brand: "GameTech",
-    category: "Gaming",
-    subcategory: "Keyboards",
-    color: "RGB",
-    size: "Full Size",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 6,
-    name: "Yoga Mat Premium",
-    price: 39.99,
-    originalPrice: 49.99,
-    rating: 4.4,
-    reviews: 178,
-    brand: "ZenFit",
-    category: "Sports",
-    subcategory: "Yoga",
-    color: "Purple",
-    size: "6mm",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 7,
-    name: "Stainless Steel Water Bottle",
-    price: 19.99,
-    originalPrice: 29.99,
-    rating: 4.3,
-    reviews: 445,
-    brand: "HydroLife",
-    category: "Sports",
-    subcategory: "Bottles",
-    color: "Blue",
-    size: "750ml",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 8,
-    name: "LED Desk Lamp",
-    price: 49.99,
-    originalPrice: 69.99,
-    rating: 4.1,
-    reviews: 92,
-    brand: "BrightHome",
-    category: "Home",
-    subcategory: "Lighting",
-    color: "White",
-    size: "Adjustable",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-  {
-    id: 9,
-    name: "Wireless Phone Charger",
-    price: 29.99,
-    originalPrice: 39.99,
-    rating: 4.0,
-    reviews: 167,
-    brand: "ChargeFast",
-    category: "Electronics",
-    subcategory: "Chargers",
-    color: "Black",
-    size: "10W",
-    inStock: true,
-    image: "/img1.jpg",
-  },
-]
+import { CategoryModel } from "@/types/category"
+import { BrandModel } from "@/types/brand"
+import { FacetModel, FacetFilterModel } from "@/types/facet"
+import { FilterModel } from "@/types/filter"
+import { ProductResponseModel } from "@/types/product"
+import { getAllBrands } from "@/app/api/services/brandService"
+import { getCategoryWithSubCategoriesById } from "@/app/api/services/categoryService"
+import { Condition, StockStatus } from "@/types/enums"
+import {
+  // searchProducts,                 // not used for bootstrap
+  searchProductsByFilter,
+  isFilterEmpty,
+  getProductsByCategory,            // ✅ use on page load
+} from "@/app/api/services/productService"
 
-const subcategories: Subcategory[] = [
-  { name: "Headphones", count: 24 },
-  { name: "Wearables", count: 18 },
-  { name: "T-Shirts", count: 156 },
-  { name: "Lenses", count: 12 },
-  { name: "Keyboards", count: 34 },
-  { name: "Yoga", count: 28 },
-  { name: "Bottles", count: 45 },
-  { name: "Lighting", count: 67 },
-  { name: "Chargers", count: 89 },
-]
+type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] }
+type CatOrArray = CategoryWithSubs | CategoryModel[]
 
-const brands = [
-  "TechSound",
-  "FitTech",
-  "EcoWear",
-  "PhotoPro",
-  "GameTech",
-  "ZenFit",
-  "HydroLife",
-  "BrightHome",
-  "ChargeFast",
-]
+const toggleInArray = <T,>(arr: T[] | undefined, val: T) => {
+  const a = arr ?? []
+  return a.includes(val) ? a.filter(x => x !== val) : [...a, val]
+}
 
-const colors = ["Black", "White", "Silver", "Blue", "Purple", "RGB", "Red", "Green"]
+const toggleFacetValue = (arr: FacetFilterModel[] | undefined, facetValueId: string) => {
+  const a = arr ?? []
+  return a.some(f => f.facetValueId === facetValueId)
+    ? a.filter(f => f.facetValueId !== facetValueId)
+    : [...a, { facetValueId }]
+}
 
-export default function CategoryPage() {
-  const [filters, setFilters] = useState<Filters>({
-    priceRange: [0, 1000],
-    brands: [],
-    colors: [],
-    rating: 0,
-    inStockOnly: false,
-    subcategory: "",
+export default function CategoryPage({ categoryId }: { categoryId: string }) {
+  const [category, setCategory] = useState<CategoryWithSubs | null>(null)
+  const [brands, setBrands] = useState<BrandModel[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const [filter, setFilter] = useState<FilterModel>({
+    brandIds: [],
+    categoryIds: [],  // we keep UI clean; category is injected at fetch time
+    condition: [],
+    stockStatus: undefined,
+    minPrice: undefined,
+    maxPrice: undefined,
+    facetFilters: [],
   })
 
+  // data
+  const [products, setProducts] = useState<ProductResponseModel[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [loadingProducts, setLoadingProducts] = useState(false)
+
+  // bootstrap cache (category endpoint)
+  const [categoryProducts, setCategoryProducts] = useState<ProductResponseModel[] | null>(null)
+
+  // header / paging
   const [sortBy, setSortBy] = useState("featured")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 6
+  const itemsPerPage = 24
 
-  const handleFilterChange = (filterType: string, value: string | number | boolean | number[]) => {
-    setFilters((prev) => {
-      if (filterType === "brands" || filterType === "colors") {
-        const currentValues = prev[filterType] as string[]
-        const newValues = currentValues.includes(value as string)
-          ? currentValues.filter((item) => item !== value)
-          : [...currentValues, value as string]
-        return { ...prev, [filterType]: newValues }
+  // load category + brands + ✅ category products (bootstrap)
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        setLoading(true); setError(null)
+
+        const [raw, allBrands, catProducts] = await Promise.all([
+          getCategoryWithSubCategoriesById(categoryId) as unknown as Promise<CatOrArray>,
+          getAllBrands(),
+          getProductsByCategory(categoryId),                 // ✅ initial category products
+        ])
+        if (!alive) return
+
+        let parent: CategoryWithSubs
+        if (Array.isArray(raw)) {
+          const root = raw.find(c => c.id === categoryId) ?? raw.find(c => c.parentId == null) ?? raw[0]
+          const subs = raw.filter(c => c.parentId === root.id)
+          parent = { ...root, subcategories: subs }
+        } else {
+          parent = raw
+        }
+
+        setCategory(parent)
+        setBrands(allBrands)
+        setCategoryProducts(catProducts)                     // ✅ cache the whole list
+
+        // first page slice from cached category products
+        const start = 0
+        const end = itemsPerPage
+        setProducts(catProducts.slice(start, end))
+        setTotalCount(catProducts.length)
+        setCurrentPage(1)
+      } catch (e: any) {
+        if (!alive) return
+        setError(e?.message ?? "Failed to load category")
+      } finally {
+        if (alive) setLoading(false)
       }
-      return { ...prev, [filterType]: value }
-    })
-    setCurrentPage(1) // Reset to first page when filters change
-  }
+    })()
+    return () => { alive = false }
+  }, [categoryId])
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      // Price filter
-      if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) {
-        return false
-      }
+  // facets only from main category
+  const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category])
 
-      // Brand filter
-      if (filters.brands.length > 0 && !filters.brands.includes(product.brand)) {
-        return false
-      }
+  // inject current category into server filter when needed
+  const effectiveFilter: FilterModel | null = useMemo(() => {
+    if (!category) return null
+    // include just this category; switch to include subs if you prefer
+    return { ...filter, categoryIds: [category.id] }
+  }, [category, filter])
 
-      // Color filter
-      if (filters.colors.length > 0 && !filters.colors.includes(product.color)) {
-        return false
-      }
-
-      // Rating filter
-      if (product.rating < filters.rating) {
-        return false
-      }
-
-      // Stock filter
-      if (filters.inStockOnly && !product.inStock) {
-        return false
-      }
-
-      // Subcategory filter
-      if (filters.subcategory && product.subcategory !== filters.subcategory) {
-        return false
-      }
-
-      return true
-    })
-  }, [filters])
-
-  const sortedProducts = useMemo(() => {
-    const sorted = [...filteredProducts]
-    switch (sortBy) {
-      case "price-low":
-        return sorted.sort((a, b) => a.price - b.price)
-      case "price-high":
-        return sorted.sort((a, b) => b.price - a.price)
-      case "rating":
-        return sorted.sort((a, b) => b.rating - a.rating)
-      case "newest":
-        return sorted.sort((a, b) => b.id - a.id)
-      default:
-        return sorted
-    }
-  }, [filteredProducts, sortBy])
-
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage)
-  const paginatedProducts = sortedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-
-  const clearFilters = () => {
-    setFilters({
-      priceRange: [0, 1000],
-      brands: [],
-      colors: [],
-      rating: 0,
-      inStockOnly: false,
-      subcategory: "",
+  // handlers
+  const onBrandToggle = (brandId: string) => { setFilter(prev => ({ ...prev, brandIds: toggleInArray(prev.brandIds, brandId) })); setCurrentPage(1) }
+  const onConditionToggle = (cond: Condition) => { setFilter(prev => ({ ...prev, condition: toggleInArray(prev.condition, cond) })); setCurrentPage(1) }
+  const onStockChange = (status?: StockStatus) => { setFilter(prev => ({ ...prev, stockStatus: status })); setCurrentPage(1) }
+  const onPriceChange = (min?: number, max?: number) => { setFilter(prev => ({ ...prev, minPrice: min, maxPrice: max })); setCurrentPage(1) }
+  const onFacetToggle = (facetValueId: string) => { setFilter(prev => ({ ...prev, facetFilters: toggleFacetValue(prev.facetFilters, facetValueId) })); setCurrentPage(1) }
+  const onFacetRadioChange = (facetId: string, facetValueId: string) => {
+    setFilter(prev => {
+      const current = prev.facetFilters ?? []
+      const target = facets.find(f => f.id === facetId)
+      const removeIds = new Set((target?.facetValues ?? []).map(v => v.id).filter(Boolean) as string[])
+      const cleaned = current.filter(ff => !removeIds.has(ff.facetValueId))
+      return { ...prev, facetFilters: [...cleaned, { facetValueId }] }
     })
     setCurrentPage(1)
   }
 
+  const clearFilters = () => {
+    setFilter({ brandIds: [], categoryIds: [], condition: [], stockStatus: undefined, minPrice: undefined, maxPrice: undefined, facetFilters: [] })
+    setCurrentPage(1)
+  }
+
   const activeFiltersCount =
-    filters.brands.length +
-    filters.colors.length +
-    (filters.subcategory ? 1 : 0) +
-    (filters.rating > 0 ? 1 : 0) +
-    (filters.inStockOnly ? 1 : 0)
+    (filter.brandIds?.length ?? 0) +
+    (filter.condition?.length ?? 0) +
+    (filter.stockStatus !== undefined ? 1 : 0) +
+    (filter.minPrice !== undefined || filter.maxPrice !== undefined ? 1 : 0) +
+    (filter.facetFilters?.length ?? 0)
+
+  // ✅ paginate the cached category products while no filters and default sort
+  useEffect(() => {
+    if (!categoryProducts) return
+    if (!isFilterEmpty(filter)) return
+    if (sortBy !== "featured") return
+    const start = (currentPage - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    setProducts(categoryProducts.slice(start, end))
+    setTotalCount(categoryProducts.length)
+  }, [categoryProducts, currentPage, itemsPerPage, filter, sortBy])
+
+  // When filters/sort change away from the bootstrap mode, switch to server search
+  useEffect(() => {
+    if (!effectiveFilter) return
+    // stay on bootstrap if empty filter + default sort
+    if (isFilterEmpty(filter) && sortBy === "featured") return
+
+    let alive = true
+    ;(async () => {
+      try {
+        setLoadingProducts(true)
+        const res = await searchProductsByFilter({
+          filter: effectiveFilter,
+          sortBy,
+          page: currentPage,
+          pageSize: itemsPerPage,
+        })
+        if (!alive) return
+        setProducts(res.items)
+        setTotalCount((res as any).totalCount ?? (res as any).total ?? 0)
+      } catch {
+        if (!alive) return
+        setProducts([])
+        setTotalCount(0)
+      } finally {
+        if (alive) setLoadingProducts(false)
+      }
+    })()
+    return () => { alive = false }
+  }, [effectiveFilter, sortBy, currentPage, itemsPerPage])
+
+  if (loading) return <div className="p-6">იტვირტება…</div>
+  if (error) return <div className="p-6 text-red-500">{error}</div>
+  if (!category) return null
+
+  const subcategories = category.subcategories ?? []
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage))
+  const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`
 
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-4 lg:py-6">
         <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
-          {/* Filters */}
           <ProductFilters
-            filters={filters}
-            handleFilterChange={handleFilterChange}
+            filter={filter}
+            onBrandToggle={onBrandToggle}
+            onConditionToggle={onConditionToggle}
+            onStockChange={onStockChange}
+            onPriceChange={onPriceChange}
+            onFacetToggle={onFacetToggle}
+            onFacetRadioChange={onFacetRadioChange}
             clearFilters={clearFilters}
-            subcategories={subcategories}
-            brands={brands}
-            colors={colors}
             activeFiltersCount={activeFiltersCount}
+            brands={brands}
+            subcategories={subcategories}
+            facets={facets}
+            buildSubHref={buildSubHref}
           />
 
-          {/* Main Content */}
           <div className="space-y-4 lg:space-y-6">
-            {/* Header */}
             <ProductHeader
-              title="Electronics & Gadgets"
-              productCount={sortedProducts.length}
+              title={category.name ?? ""}
+              productCount={totalCount}
               sortBy={sortBy}
-              onSortChange={setSortBy}
+              onSortChange={(v) => { setSortBy(v); setCurrentPage(1) }}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-              filters={filters}
-              onFilterChange={handleFilterChange}
+              filter={filter}
               activeFiltersCount={activeFiltersCount}
+              brandLookup={Object.fromEntries(brands.map(b => [b.id, b.name ?? b.id]))}
+              onRemoveBrand={(id) => setFilter(f => ({ ...f, brandIds: (f.brandIds ?? []).filter(x => x !== id) }))}
+              onRemoveCategory={(id) => setFilter(f => ({ ...f, categoryIds: (f.categoryIds ?? []).filter(x => x !== id) }))}
+              onRemoveCondition={(c) => setFilter(f => ({ ...f, condition: (f.condition ?? []).filter(x => x !== c) }))}
+              onClearStockStatus={() => setFilter(f => ({ ...f, stockStatus: undefined }))}
+              onClearPrice={() => setFilter(f => ({ ...f, minPrice: undefined, maxPrice: undefined }))}
+              onRemoveFacet={(vid) => setFilter(f => ({ ...f, facetFilters: (f.facetFilters ?? []).filter(x => x.facetValueId !== vid) }))}
+              onClearAll={clearFilters}
             />
 
-            {/* Products Grid */}
-            <ProductGrid products={paginatedProducts} viewMode={viewMode} />
+            {loadingProducts && !(isFilterEmpty(filter) && sortBy === "featured") ? (
+              <div className="p-6 text-sm text-muted-foreground">პროდუქტები იტვირთება…</div>
+            ) : (
+              <ProductGrid products={products} viewMode={viewMode} />
+            )}
 
-            {/* Pagination */}
             <ProductPagination
               currentPage={currentPage}
               totalPages={totalPages}

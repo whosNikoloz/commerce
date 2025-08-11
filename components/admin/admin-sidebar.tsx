@@ -23,6 +23,9 @@ import {
 } from "@tabler/icons-react"
 
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation";
+import { Button } from "@heroui/button"
+
 
 const links = [
   {
@@ -70,15 +73,25 @@ const links = [
   //   href: "#",
   //   icon: <IconSettings className="h-5 w-5 text-muted-foreground" />,
   // },
-  {
-    label: "Logout",
-    href: "#",
-    icon: <IconArrowLeft className="h-5 w-5 text-muted-foreground" />,
-  },
 ]
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const res = await fetch("/api/auth/logout", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      throw new Error(result.message || "Unauthorized");
+    }
+    router.push("/");
+  }
 
   return (
     <div
@@ -95,6 +108,23 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
               {links.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
+              <Button
+                className={cn(
+                  "flex items-center justify-start gap-2  group/sidebar py-2 p-0 bg-transparent",
+                )}
+                onPress={handleLogout}
+              >
+                <IconArrowLeft className="h-5 w-5 text-muted-foreground" />
+                <motion.span
+                  animate={{
+                    display: true ? (open ? "inline-block" : "none") : "inline-block",
+                    opacity: true ? (open ? 1 : 0) : 1,
+                  }}
+                  className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+                >
+                  Logout
+                </motion.span>
+              </Button>
             </div>
           </div>
           <div>

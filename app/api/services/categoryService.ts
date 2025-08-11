@@ -14,6 +14,18 @@ export async function getCategoryById(id: string): Promise<CategoryModel> {
     return apiFetch<CategoryModel>(`${API_BASE}/get-category-by-${id}`);
 }
 
+export async function getCategoryWithSubCategoriesById(id: string): Promise<CategoryModel> {
+    return apiFetch<CategoryModel>(`${API_BASE}/get-category-with-subcategories?id=${id}`);
+}
+
+export async function updateCategory(data: CategoryModel): Promise<string> {
+    return apiFetch<string>(`${API_BASE}/update-category`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+}
+
+
 // export async function getProductsByCategory(id: string): Promise<ProductResponseModel[]> {
 //     return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
 // }

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Edit, Trash2, Tag, Eye, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -14,19 +13,9 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { getAllCategories } from "@/app/api/services/categoryService";
+import { getAllCategories, updateCategory } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
+import { toast } from "sonner";
 
 export function CategoriesTable() {
   const [categories, setCategories] = useState<CategoryModel[]>([]);
@@ -45,14 +34,37 @@ export function CategoriesTable() {
     fetchCategories();
   }, []);
 
-  const toggleCategoryStatus = (categoryId: string) => {
+  const toggleCategoryVisibility = async (categoryId: string) => {
+    const current = categories.find(p => p.id === categoryId);
+    if (!current) return;
+
+    const prevCategories = categories;
+
     setCategories((prev) =>
       prev.map((category) =>
-        category.id === categoryId
-          ? { ...category, visible: !(category as any).visible }
-          : category
+        category.id === categoryId ? { ...category, isActive: !category.isActive } : category
       )
     );
+
+    const payload: CategoryModel = {
+      id: current.id,
+      name: current.name,
+      description: current.description,
+      parentId: current.parentId,
+      isActive: !current.isActive,
+      facets: current.facets
+    };
+
+    try {
+      await updateCategory(payload);
+      toast.success("პროდუქტი წარმატებით განახლდა.");
+    } catch (err) {
+      console.error("Failed to update product", err);
+      toast.error("პროდუქტის განახლება ვერ მოხერხდა.");
+      setCategories(prevCategories);
+    }
+
+
   };
 
   const deleteCategory = (categoryId: string) => {
@@ -127,7 +139,7 @@ export function CategoriesTable() {
                   <div className="flex items-center space-x-2">
                     <Switch
                       checked={(category as any).visible}
-                      onCheckedChange={() => toggleCategoryStatus(category.id)}
+                      onCheckedChange={() => toggleCategoryVisibility(category.id)}
                       className="data-[state=checked]:bg-blue-600"
                     />
                     {(category as any).visible ? (

@@ -57,7 +57,7 @@ export function ProductsTable() {
   const handleUpdateProduct = async (
     productId: string,
     description: string,
-    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean }
+    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean, IsActive?: boolean }
   ) => {
     const current = products.find(p => p.id === productId);
     if (!current) return;
@@ -105,12 +105,46 @@ export function ProductsTable() {
     }
   };
 
-  const toggleProductVisibility = (productId: string) => {
+  const toggleProductVisibility = async (productId: string) => {
+    const current = products.find(p => p.id === productId);
+    if (!current) return;
+
+    const prevProducts = products;
+
     setProducts((prev) =>
       prev.map((product) =>
         product.id === productId ? { ...product, isActive: !product.isActive } : product
       )
     );
+
+    const payload: ProductRequestModel = {
+      id: current.id,
+      name: current.name ?? "",
+      price: current.price,
+      discountPrice: current.discountPrice ?? undefined,
+      categoryId: current.category?.id ?? "",
+      status: current.status,
+      condition: current.condition,
+      isActive: !current.isActive,
+      description: current.description,
+      isLiquidated: current.isLiquidated,
+      isComingSoon: current.isComingSoon,
+      isNewArrival: current.isNewArrival,
+      images: current.images ?? [],
+      brandId: current.brand?.id ?? "",
+      productFacetValues: [],
+    };
+
+    try {
+      await updateProduct(payload);
+      toast.success("პროდუქტი წარმატებით განახლდა.");
+    } catch (err) {
+      console.error("Failed to update product", err);
+      toast.error("პროდუქტის განახლება ვერ მოხერხდა.");
+      setProducts(prevProducts);
+    }
+
+
   };
 
   const filteredProducts = products.filter(

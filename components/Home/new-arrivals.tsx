@@ -1,0 +1,79 @@
+"use client"
+
+import { useEffect, useMemo, useState } from "react"
+import NextLink from "next/link"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { getAllProducts } from "@/app/api/services/productService"
+import { ProductResponseModel } from "@/types/product"
+
+export function NewArrivals() {
+    const [items, setItems] = useState<ProductResponseModel[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        ; (async () => {
+            try {
+                const all = await getAllProducts()
+                // show the most recent 8 flagged as new
+                const filtered = all.filter(p => p.isNewArrival).slice(0, 8)
+                setItems(filtered)
+            } catch (e) {
+                console.error(e)
+                setError("Failed to load new arrivals")
+            } finally {
+                setLoading(false)
+            }
+        })()
+    }, [])
+
+    if (loading) return <section className="px-4"><div className="max-w-7xl mx-auto py-10">Loading new arrivals…</div></section>
+    if (error) return <section className="px-4"><div className="max-w-7xl mx-auto py-10 text-red-500">{error}</div></section>
+    if (!items.length) return null
+
+    return (
+        <section className="px-4">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 className="font-serif text-3xl font-bold text-slate-700 mb-2">New Arrivals</h2>
+                        <p className="font-sans text-slate-600">Fresh styles just landed</p>
+                    </div>
+                    <Button asChild variant="outline" className="hidden md:flex bg-transparent">
+                        <NextLink href="/products?tab=new">View All New Items</NextLink>
+                    </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {items.map(p => (
+                        <NextLink key={p.id} href={`/product/${p.id}`} className="group cursor-pointer block">
+                            <div className="relative overflow-hidden rounded-lg bg-slate-50 mb-4">
+                                <Badge className="absolute top-3 left-3 z-10 bg-blue-600 text-white">New</Badge>
+                                <img
+                                    src={p.images?.[0] || "/placeholder.svg"}
+                                    alt={p.name ?? "Product"}
+                                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                            </div>
+                            <h3 className="font-sans font-medium text-slate-700 mb-1">{p.name ?? "Unnamed"}</h3>
+                            <p className="font-sans text-lg font-semibold text-slate-900">
+                                {(p.discountPrice ?? p.price)}
+                                {p.discountPrice && (
+                                    <span className="ml-2 text-sm text-slate-500 line-through">{p.price}</span>
+                                )}
+                            </p>
+                        </NextLink>
+                    ))}
+                </div>
+
+                <div className="text-center mt-8 md:hidden">
+                    <Button asChild variant="outline">
+                        <NextLink href="/products?tab=new">View All New Items</NextLink>
+                    </Button>
+                </div>
+            </div>
+        </section>
+    )
+}

@@ -1,42 +1,51 @@
-import FixedCardCarousel from "@/components/Categories/fixed-carousel";
+import { CategoryCarousel } from "@/components/Home/category-carousel";
+import { ComingSoon } from "@/components/Home/coming-soon";
 import Hero from "@/components/Home/hero";
-import ProductList from "@/components/productList";
+import { InStockProducts } from "@/components/Home/in-stock-products";
+import { NewArrivals } from "@/components/Home/new-arrivals";
+import { PromotionalBanner } from "@/components/Home/promotional-banner";
 
 export default function HomePage() {
   return (
-    <main className="relative">
-      {/* Background Video */}
-      <div className="absolute inset-0 z-0">
-        <video
-          className="w-full h-[100vh] object-cover"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-        >
-          <source src="/Nike.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-      </div>
+    <div className="min-h-screen  ">
+      <main className="space-y-16">
+        <section className="relative h-[100vh] px-6">
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+          >
+            <source src="/Nike.mp4" type="video/mp4" />
+          </video>
 
-      <section className="relative z-10 flex items-center justify-center h-[100vh] px-6">
-        <Hero lng="ka" />
-      </section>
+          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
 
-      <section className="mx-auto items-center justify-center">
-        <div className="mb-10 mx-auto">
-          <FixedCardCarousel />
-        </div>
-      </section>
+          <div className="relative z-10 flex items-center justify-center h-full">
+            <Hero lng="ka" />
+          </div>
+        </section>
 
+        <section id="shop-by-category" className="px-4">
+          <div className="text-center mb-8">
+            <h2 className="font-serif text-3xl font-bold text-slate-700 mb-2">
+              Shop by Category
+            </h2>
+            <p className="font-sans text-slate-600">
+              Find exactly what you're looking for
+            </p>
+          </div>
+          <CategoryCarousel />
+        </section>
 
-      <section className="relative z-10 bg-gray-50 pt-10 pb-20">
-        <div className="container mx-auto px-4">
-          <ProductList />
-        </div>
-      </section>
-    </main>
-  );
+        <NewArrivals />
+
+        <ComingSoon />
+
+        <InStockProducts />
+      </main>
+    </div>
+  )
 }

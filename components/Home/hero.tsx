@@ -13,9 +13,10 @@ export default function Hero({ lng }: HeroProps) {
     const scrollRef = useRef<HTMLDivElement | null>(null);
 
     const handleScroll = () => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: "smooth" });
-        }
+        window.scrollBy({
+            top: window.innerHeight - 100,
+            behavior: "smooth"
+        });
     };
 
     const languageData: Record<LanguageKey, {

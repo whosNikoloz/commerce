@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { Navbar } from "@/components/Navbar/navbar"
 import AnimatedFooter from "@/components/animated-footer"
+import { Footer } from "@/components/footer"
 
 interface LayoutWrapperProps {
   children: React.ReactNode
@@ -19,7 +20,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <main className={`${isAdminPage ? "" : "   "}`}>
         {children}
       </main>
-      {!isAdminPage && <AnimatedFooter />}
+      {!isAdminPage && <Footer />}
     </div>
   )
 } 

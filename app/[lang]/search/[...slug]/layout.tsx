@@ -1,4 +1,4 @@
-export default function CategoryLayout({
+export default function SearchLayout({
   children,
 }: {
   children: React.ReactNode;

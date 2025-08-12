@@ -164,7 +164,6 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
           setLoadingProducts(true)
           const res = await searchProductsByFilter({
             filter: effectiveFilter,
-            sortBy,
             page: currentPage,
             pageSize: itemsPerPage,
           })
@@ -190,7 +189,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
 
   const subcategories = category.subcategories ?? []
   const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage))
-  const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`
+  const buildSubHref = (sub: CategoryModel) => `/search/${sub.id}`
 
   return (
     <div className="min-h-screen">

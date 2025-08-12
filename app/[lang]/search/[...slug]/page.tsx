@@ -1,5 +1,4 @@
 import CategoryPage from "@/components/Categories/CategoriesPage/category-page";
-import { title } from "@/components/primitives";
 
 interface CategoryPageProps {
   params: {
@@ -7,7 +6,7 @@ interface CategoryPageProps {
   };
 }
 
-export default async function CategoryPageRoute({ params }: CategoryPageProps) {
+export default async function SearchPage({ params }: CategoryPageProps) {
   const { slug = [] } = await params;
 
   const category = slug[0] || "Unknown Category";
@@ -15,9 +14,6 @@ export default async function CategoryPageRoute({ params }: CategoryPageProps) {
 
   return (
     <div>
-      {/* <h1 className={title()}>
-        {subcategory ? `${category} / ${subcategory}` : category}
-      </h1> */}
       <CategoryPage categoryId={subcategory ? subcategory : category} />
     </div>
   );

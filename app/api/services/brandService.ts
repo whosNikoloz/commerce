@@ -11,7 +11,12 @@ export async function getBrandById(id: string): Promise<BrandModel> {
     return apiFetch<BrandModel>(`${API_BASE}/get-brand-by-${id}`);
 }
 
-
+export async function updateBrand(brand: BrandModel): Promise<string> {
+    return apiFetch<string>(`${API_BASE}/update-brand`, {
+        method: "PUT",
+        body: JSON.stringify(brand),
+    });
+}
 
 // export async function searchProducts(
 //     searchTerm: string = "",

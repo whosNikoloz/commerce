@@ -8,15 +8,15 @@ const API_BASE = "http://localhost:5007/Product";
 type SortOrder = "asc" | "desc"
 
 function mapSort(sortBy: string): { sortColumn: string; sortOrder: "asc" | "desc" } {
-  switch (sortBy) {
-    case "price-low":  return { sortColumn: "price", sortOrder: "asc" }
-    case "price-high": return { sortColumn: "price", sortOrder: "desc" }
-    case "newest":     return { sortColumn: "date",  sortOrder: "desc" }
-    case "rating":     return { sortColumn: "date",  sortOrder: "desc" }
-    case "name":       return { sortColumn: "name",  sortOrder: "asc" }
-    case "featured":
-    default:           return { sortColumn: "name",  sortOrder: "asc" }
-  }
+    switch (sortBy) {
+        case "price-low": return { sortColumn: "price", sortOrder: "asc" }
+        case "price-high": return { sortColumn: "price", sortOrder: "desc" }
+        case "newest": return { sortColumn: "date", sortOrder: "desc" }
+        case "rating": return { sortColumn: "date", sortOrder: "desc" }
+        case "name": return { sortColumn: "name", sortOrder: "asc" }
+        case "featured":
+        default: return { sortColumn: "name", sortOrder: "asc" }
+    }
 }
 
 
@@ -51,41 +51,37 @@ export async function searchProducts(
 }
 
 export function isFilterEmpty(f: FilterModel): boolean {
-  return !f ||
-    (f.brandIds?.length ?? 0) === 0 &&
-    (f.categoryIds?.length ?? 0) === 0 &&
-    (f.condition?.length ?? 0) === 0 &&
-    f.stockStatus === undefined &&
-    f.minPrice === undefined &&
-    f.maxPrice === undefined &&
-    (f.facetFilters?.length ?? 0) === 0
+    return !f ||
+        (f.brandIds?.length ?? 0) === 0 &&
+        (f.categoryIds?.length ?? 0) === 0 &&
+        (f.condition?.length ?? 0) === 0 &&
+        f.stockStatus === undefined &&
+        f.minPrice === undefined &&
+        f.maxPrice === undefined &&
+        (f.facetFilters?.length ?? 0) === 0
 }
 
 export async function searchProductsByFilter(params: {
-  filter: FilterModel
-  sortBy?: string
-  page?: number
-  pageSize?: number
+    filter: FilterModel;
+    page?: number;
+    pageSize?: number;
 }): Promise<PagedList<ProductResponseModel>> {
-  const { sortColumn, sortOrder } = mapSort(params.sortBy ?? "name")
-  const page = params.page ?? 1
-  const pageSize = params.pageSize ?? 24
+    const page = params.page ?? 1;
+    const pageSize = params.pageSize ?? 24;
 
-  const qs = new URLSearchParams({
-    sortColumn,
-    sortOrder,
-    page: String(page),
-    pageSize: String(pageSize),
-  })
+    const qs = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+    });
 
-  return apiFetch<PagedList<ProductResponseModel>>(
-    `${API_BASE}/search-products-by-filter?${qs.toString()}`,
-    {
-      method: "POST",
-      body: JSON.stringify(params.filter),
-      headers: { "Content-Type": "application/json" },
-    }
-  )
+    return apiFetch<PagedList<ProductResponseModel>>(
+        `${API_BASE}/get-products-by-filtering?${qs.toString()}`,
+        {
+            method: "POST",
+            body: JSON.stringify(params.filter),
+            headers: { "Content-Type": "application/json" },
+        }
+    );
 }
 
 export async function createProduct(data: ProductRequestModel): Promise<string> {

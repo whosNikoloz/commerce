@@ -1,4 +1,4 @@
-import { BrandsTable } from "@/components/admin/brands-table";
+import { BrandsTable } from "@/components/admin/brand/brands-table";
 
 export default function BrandsPage() {
   return (

@@ -117,7 +117,10 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           price={price}
           onAddToCart={() => console.log("Added to cart")}
           onBuyNow={() => console.log("Buy now clicked")}
-          onWishlist={() => console.log("Added to wishlist")}
+          brand={product.brand?.name ?? ""}
+          isComingSoon={product.isComingSoon}
+          isNewArrival={product.isNewArrival}
+          isLiquidated={product.isLiquidated}
         />
       </div>
 
@@ -127,9 +130,21 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4">ბრენდის ისტორია : {product.brand.name}</h2>
           <div className="prose prose-sm dark:prose-invert">
-            <p>{product.brand.description}</p>
+            <div className="flex md:items-start place-items-start">
+              <div
+                className={[
+                  "rich-content max-w-md",
+                  "prose prose-sm dark:prose-invert",
+                  "prose-ul:list-disc prose-ol:list-decimal",
+                  "prose-li:my-1 prose-p:my-2",
+                  "whitespace-pre-wrap break-words"
+                ].join(" ")}
+                dangerouslySetInnerHTML={{ __html: product.brand.description ?? "" }}
+              />
+            </div>
           </div>
         </div>
+
       )}
 
       {specs.map((g, i) => (
@@ -146,6 +161,15 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         originalPrice={originalPrice}
         price={price}
         stock={product.status}
+        status={product.status}
+        condition={product.condition}
+        image={product.images?.[0] ?? "/placeholder.png"}
+        brand={product.brand?.name ?? ""}
+        isComingSoon={product.isComingSoon}
+        isNewArrival={product.isNewArrival}
+        isLiquidated={product.isLiquidated}
+        onAddToCart={() => console.log("Added to cart")}
+        onBuyNow={() => console.log("Buy now clicked")}
       />
     </div>
   );

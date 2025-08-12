@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardBody } from "@heroui/card"
 import { ProductResponseModel } from "@/types/product"
 import { StockStatus, Condition } from "@/types/enums"
+import Link from "next/link"
 
 interface ProductGridProps {
   products: ProductResponseModel[]
@@ -66,9 +67,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                     alt={product.name ?? "Product image"}
                     width={viewMode === "grid" ? 300 : 120}
                     height={viewMode === "grid" ? 300 : 120}
-                    className={`object-cover rounded-md ${
-                      viewMode === "grid" ? "w-full aspect-square" : "w-20 h-20 sm:w-30 sm:h-30"
-                    }`}
+                    className={`object-cover rounded-md ${viewMode === "grid" ? "w-full aspect-square" : "w-20 h-20 sm:w-30 sm:h-30"
+                      }`}
                   />
                   <Button
                     size="icon"
@@ -104,7 +104,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   )}
                 </div>
 
-                {/* ბრენდი / ფეისეტები / მდგომარეობა */}
                 {metaLine && (
                   <div className="text-xs text-muted-foreground">
                     {metaLine}
@@ -118,6 +117,16 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                 >
                   {inStock ? "Add to Cart" : "Out of Stock"}
                 </Button>
+
+                <Link href={`/product/${product.id}#reviews`} className="w-full">
+                  <Button
+                    className="w-full mt-2"
+                    variant="outline"
+                    size={viewMode === "grid" ? "default" : "sm"}
+                  >
+                    Review
+                  </Button>
+                </Link>
               </div>
             </CardBody>
           </Card>

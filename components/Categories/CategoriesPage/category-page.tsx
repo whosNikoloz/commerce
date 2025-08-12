@@ -21,6 +21,7 @@ import {
   isFilterEmpty,
   getProductsByCategory,            // ✅ use on page load
 } from "@/app/api/services/productService"
+import Loading from "./loading"
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] }
 type CatOrArray = CategoryWithSubs | CategoryModel[]
@@ -45,7 +46,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
 
   const [filter, setFilter] = useState<FilterModel>({
     brandIds: [],
-    categoryIds: [],  // we keep UI clean; category is injected at fetch time
+    categoryIds: [],
     condition: [],
     stockStatus: undefined,
     minPrice: undefined,
@@ -53,74 +54,68 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     facetFilters: [],
   })
 
-  // data
   const [products, setProducts] = useState<ProductResponseModel[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [loadingProducts, setLoadingProducts] = useState(false)
 
-  // bootstrap cache (category endpoint)
   const [categoryProducts, setCategoryProducts] = useState<ProductResponseModel[] | null>(null)
 
-  // header / paging
+  const cards = Array.from({ length: 12 });
+
+
   const [sortBy, setSortBy] = useState("featured")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 24
 
-  // load category + brands + ✅ category products (bootstrap)
   useEffect(() => {
     let alive = true
-    ;(async () => {
-      try {
-        setLoading(true); setError(null)
+      ; (async () => {
+        try {
+          setLoading(true); setError(null)
 
-        const [raw, allBrands, catProducts] = await Promise.all([
-          getCategoryWithSubCategoriesById(categoryId) as unknown as Promise<CatOrArray>,
-          getAllBrands(),
-          getProductsByCategory(categoryId),                 // ✅ initial category products
-        ])
-        if (!alive) return
+          const [raw, allBrands, catProducts] = await Promise.all([
+            getCategoryWithSubCategoriesById(categoryId) as unknown as Promise<CatOrArray>,
+            getAllBrands(),
+            getProductsByCategory(categoryId),
+          ])
+          if (!alive) return
 
-        let parent: CategoryWithSubs
-        if (Array.isArray(raw)) {
-          const root = raw.find(c => c.id === categoryId) ?? raw.find(c => c.parentId == null) ?? raw[0]
-          const subs = raw.filter(c => c.parentId === root.id)
-          parent = { ...root, subcategories: subs }
-        } else {
-          parent = raw
+          let parent: CategoryWithSubs
+          if (Array.isArray(raw)) {
+            const root = raw.find(c => c.id === categoryId) ?? raw.find(c => c.parentId == null) ?? raw[0]
+            const subs = raw.filter(c => c.parentId === root.id)
+            parent = { ...root, subcategories: subs }
+          } else {
+            parent = raw
+          }
+
+          setCategory(parent)
+          setBrands(allBrands)
+          setCategoryProducts(catProducts)
+
+          const start = 0
+          const end = itemsPerPage
+          setProducts(catProducts.slice(start, end))
+          setTotalCount(catProducts.length)
+          setCurrentPage(1)
+        } catch (e: any) {
+          if (!alive) return
+          setError(e?.message ?? "Failed to load category")
+        } finally {
+          if (alive) setLoading(false)
         }
-
-        setCategory(parent)
-        setBrands(allBrands)
-        setCategoryProducts(catProducts)                     // ✅ cache the whole list
-
-        // first page slice from cached category products
-        const start = 0
-        const end = itemsPerPage
-        setProducts(catProducts.slice(start, end))
-        setTotalCount(catProducts.length)
-        setCurrentPage(1)
-      } catch (e: any) {
-        if (!alive) return
-        setError(e?.message ?? "Failed to load category")
-      } finally {
-        if (alive) setLoading(false)
-      }
-    })()
+      })()
     return () => { alive = false }
   }, [categoryId])
 
-  // facets only from main category
   const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category])
 
-  // inject current category into server filter when needed
   const effectiveFilter: FilterModel | null = useMemo(() => {
     if (!category) return null
-    // include just this category; switch to include subs if you prefer
     return { ...filter, categoryIds: [category.id] }
   }, [category, filter])
 
-  // handlers
   const onBrandToggle = (brandId: string) => { setFilter(prev => ({ ...prev, brandIds: toggleInArray(prev.brandIds, brandId) })); setCurrentPage(1) }
   const onConditionToggle = (cond: Condition) => { setFilter(prev => ({ ...prev, condition: toggleInArray(prev.condition, cond) })); setCurrentPage(1) }
   const onStockChange = (status?: StockStatus) => { setFilter(prev => ({ ...prev, stockStatus: status })); setCurrentPage(1) }
@@ -149,7 +144,6 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     (filter.minPrice !== undefined || filter.maxPrice !== undefined ? 1 : 0) +
     (filter.facetFilters?.length ?? 0)
 
-  // ✅ paginate the cached category products while no filters and default sort
   useEffect(() => {
     if (!categoryProducts) return
     if (!isFilterEmpty(filter)) return
@@ -160,37 +154,37 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     setTotalCount(categoryProducts.length)
   }, [categoryProducts, currentPage, itemsPerPage, filter, sortBy])
 
-  // When filters/sort change away from the bootstrap mode, switch to server search
   useEffect(() => {
     if (!effectiveFilter) return
-    // stay on bootstrap if empty filter + default sort
     if (isFilterEmpty(filter) && sortBy === "featured") return
 
     let alive = true
-    ;(async () => {
-      try {
-        setLoadingProducts(true)
-        const res = await searchProductsByFilter({
-          filter: effectiveFilter,
-          sortBy,
-          page: currentPage,
-          pageSize: itemsPerPage,
-        })
-        if (!alive) return
-        setProducts(res.items)
-        setTotalCount((res as any).totalCount ?? (res as any).total ?? 0)
-      } catch {
-        if (!alive) return
-        setProducts([])
-        setTotalCount(0)
-      } finally {
-        if (alive) setLoadingProducts(false)
-      }
-    })()
+      ; (async () => {
+        try {
+          setLoadingProducts(true)
+          const res = await searchProductsByFilter({
+            filter: effectiveFilter,
+            sortBy,
+            page: currentPage,
+            pageSize: itemsPerPage,
+          })
+          if (!alive) return
+          setProducts(res.items)
+          setTotalCount((res as any).totalCount ?? (res as any).total ?? 0)
+        } catch {
+          if (!alive) return
+          setProducts([])
+          setTotalCount(0)
+        } finally {
+          if (alive) setLoadingProducts(false)
+        }
+      })()
     return () => { alive = false }
   }, [effectiveFilter, sortBy, currentPage, itemsPerPage])
 
-  if (loading) return <div className="p-6">იტვირტება…</div>
+  if (loading) return (
+    <Loading />
+  )
   if (error) return <div className="p-6 text-red-500">{error}</div>
   if (!category) return null
 
@@ -239,7 +233,30 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
             />
 
             {loadingProducts && !(isFilterEmpty(filter) && sortBy === "featured") ? (
-              <div className="p-6 text-sm text-muted-foreground">პროდუქტები იტვირთება…</div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                {cards.map((_, i) => (
+                  <div
+                    key={i}
+                    className="group bg-brand-muted dark:bg-brand-muteddark border rounded-lg shadow-sm p-3 lg:p-4"
+                  >
+                    <div className="animate-pulse">
+                      <div className="w-full aspect-square rounded-md bg-gray-300/40 dark:bg-gray-600/40" />
+
+                      <div className="mt-3 space-y-2">
+                        <div className="h-4 w-3/4 rounded bg-gray-300/40 dark:bg-gray-600/40" />
+                        <div className="flex items-center gap-2">
+                          <div className="h-5 w-20 rounded bg-gray-300/40 dark:bg-gray-600/40" />
+                          <div className="h-4 w-12 rounded bg-gray-300/30 dark:bg-gray-600/30" />
+                        </div>
+                        <div className="h-3 w-32 rounded bg-gray-300/30 dark:bg-gray-600/30" />
+                        <div className="h-9 w-full rounded bg-gray-300/40 dark:bg-gray-600/40" />
+                        <div className="h-9 w-full rounded bg-gray-300/30 dark:bg-gray-600/30" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <ProductGrid products={products} viewMode={viewMode} />
             )}

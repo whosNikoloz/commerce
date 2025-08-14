@@ -56,7 +56,7 @@ const FixedCardCarousel = () => {
             <SplideSlide key={item.id}>
               <Card
                 as={Link}
-                href={`/category/${item.fomated_name}`}
+                href={`/search/${item.fomated_name}`}
                 className="h-64 w-full max-w-[170px] md:max-w-[180px] flex flex-col items-center justify-center rounded-2xl p-4 bg-white hover:bg-gray-100 shadow-sm hover:shadow-md transition"
               >
                 <img

@@ -1,39 +1,51 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
-
 import { i18n } from "@/i18n.config";
 
 function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {};
-
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
   const locales: readonly string[] = i18n.locales;
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-
   const locale = matchLocale(languages, locales, i18n.defaultLocale);
-
   return locale || i18n.defaultLocale;
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
-  // Allow media files (mp4, mp3, png, avi, ico) to bypass middleware
+  // 1) Let media files bypass
   if (/\.(mp4|mp3|avi|png|ico|jpg|jpeg|gif|webp)$/i.test(pathname)) {
     return NextResponse.next();
   }
 
+  // 2) Ensure locale prefix
   const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) =>
-      !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
+    return NextResponse.redirect(new URL(`/${locale}${pathname}${search}`, request.url));
+  }
 
-    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+  // 3) Admin auth guard
+  //    - If no admin_token cookie AND path is an admin sub-route,
+  //      redirect to /{locale}/admin (inline login) with ?next=...
+  //    - If already at /{locale}/admin, let it render the inline login.
+  const adminToken = request.cookies.get("admin_token")?.value;
+  const localeFromPath = i18n.locales.find((loc) => pathname.startsWith(`/${loc}/`)) || i18n.defaultLocale;
+
+  const isAdminRoot = pathname === `/${localeFromPath}/admin`;
+  const isAdminSubRoute =
+    pathname.startsWith(`/${localeFromPath}/admin/`) && !isAdminRoot;
+
+  if (!adminToken && isAdminSubRoute) {
+    const nextParam = encodeURIComponent(`${pathname}${search || ""}`);
+    const url = new URL(`/${localeFromPath}/admin?next=${nextParam}`, request.url);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

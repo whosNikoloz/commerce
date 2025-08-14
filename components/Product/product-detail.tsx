@@ -8,6 +8,7 @@ import { ProductInfoBottom } from "./product-info-bottom";
 import { SimilarProducts } from "./similar-products";
 import { Specifications } from "./specifications";
 import { ImageReview } from "./image-review";
+import { CartItem, useCart } from "@/app/context/cartContext";
 
 type Props = {
   initialProduct: ProductResponseModel;
@@ -16,6 +17,8 @@ type Props = {
 
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
+  const { addToCart } = useCart();
+
   const [similar, setSimilar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
@@ -32,6 +35,20 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     const iv = setInterval(tick, 30_000);
     return () => clearInterval(iv);
   }, [product.id]);
+
+  const handleAddToCart = () => {
+    const item: CartItem = {
+      id: product.id,
+      name: product.name ?? "Unnamed Product",
+      price: product.discountPrice ?? product.price,
+      image: product.images?.[0] ?? "/placeholder.png",
+      quantity: 1,
+      discount: product.discountPrice ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100)) : 0,
+      originalPrice: product.price,
+    };
+
+    addToCart(item);
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -115,7 +132,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           status={product.status}
           condition={product.condition}
           price={price}
-          onAddToCart={() => console.log("Added to cart")}
+          onAddToCart={handleAddToCart}
           onBuyNow={() => console.log("Buy now clicked")}
           brand={product.brand?.name ?? ""}
           isComingSoon={product.isComingSoon}
@@ -168,7 +185,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         isComingSoon={product.isComingSoon}
         isNewArrival={product.isNewArrival}
         isLiquidated={product.isLiquidated}
-        onAddToCart={() => console.log("Added to cart")}
+        onAddToCart={handleAddToCart}
         onBuyNow={() => console.log("Buy now clicked")}
       />
     </div>

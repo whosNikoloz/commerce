@@ -31,19 +31,39 @@ export function InStockProducts() {
         })()
     }, [])
 
-    if (loading) return <section className="px-4 pb-16"><div className="max-w-7xl mx-auto py-10">Loading products…</div></section>
-    if (error) return <section className="px-4 pb-16"><div className="max-w-7xl mx-auto py-10 text-red-500">{error}</div></section>
+    if (loading) return (
+        <section className="px-4 pb-16">
+            <div className="max-w-7xl mx-auto py-10 text-text-subtle dark:text-text-subtledark">
+                Loading products…
+            </div>
+        </section>
+    )
+
+    if (error) return (
+        <section className="px-4 pb-16">
+            <div className="max-w-7xl mx-auto py-10 text-red-500">{error}</div>
+        </section>
+    )
+
     if (!items.length) return null
 
     return (
-        <section className="px-4 pb-16">
+        <section className="px-4 pb-16 bg-surface dark:bg-surfacedark">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h2 className="font-serif text-3xl font-bold text-slate-700 mb-2">In Stock Now</h2>
-                        <p className="font-sans text-slate-600">Ready to ship immediately</p>
+                        <h2 className="font-serif text-3xl font-bold text-text-light dark:text-text-lightdark mb-2">
+                            In Stock Now
+                        </h2>
+                        <p className="font-sans text-text-subtle dark:text-text-subtledark">
+                            Ready to ship immediately
+                        </p>
                     </div>
-                    <Button asChild variant="outline" className="hidden md:flex bg-transparent">
+                    <Button
+                        asChild
+                        variant="outline"
+                        className="hidden md:flex border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+                    >
                         <NextLink href="/products?stock=instock">View All Products</NextLink>
                     </Button>
                 </div>
@@ -55,8 +75,12 @@ export function InStockProducts() {
                             ? Math.round((1 - (p.discountPrice! / p.price)) * 100)
                             : null
                         return (
-                            <NextLink key={p.id} href={`/product/${p.id}`} className="group cursor-pointer block">
-                                <div className="relative overflow-hidden rounded-lg bg-slate-50 mb-4">
+                            <NextLink
+                                key={p.id}
+                                href={`/product/${p.id}`}
+                                className="group cursor-pointer block"
+                            >
+                                <div className="relative overflow-hidden rounded-lg bg-muted dark:bg-muteddark mb-4">
                                     {discounted && (
                                         <Badge className="absolute top-3 left-3 z-10 bg-red-500 text-white">
                                             {discountPct}% OFF
@@ -64,7 +88,7 @@ export function InStockProducts() {
                                     )}
                                     <Badge
                                         variant="secondary"
-                                        className="absolute top-3 right-3 z-10 bg-green-100 text-green-700"
+                                        className="absolute top-3 right-3 z-10 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                                     >
                                         In Stock
                                     </Badge>
@@ -75,14 +99,16 @@ export function InStockProducts() {
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                                 </div>
-                                <h3 className="font-sans font-medium text-slate-700 mb-1">{p.name ?? "Unnamed"}</h3>
+                                <h3 className="font-sans font-medium text-text-light dark:text-text-lightdark mb-1">
+                                    {p.name ?? "Unnamed"}
+                                </h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-sans text-lg font-semibold text-slate-900">
-                                        {(p.discountPrice ?? p.price)}
+                                    <span className="font-sans text-lg font-semibold text-text-light dark:text-text-lightdark">
+                                        {p.discountPrice ?? p.price}
                                     </span>
                                     {discounted && (
-                                        <span className="font-sans text-sm text-slate-500 line-through">
-                                            {(p.price)}
+                                        <span className="font-sans text-sm text-text-subtle dark:text-text-subtledark line-through">
+                                            {p.price}
                                         </span>
                                     )}
                                 </div>
@@ -92,7 +118,11 @@ export function InStockProducts() {
                 </div>
 
                 <div className="text-center mt-8 md:hidden">
-                    <Button asChild variant="outline">
+                    <Button
+                        asChild
+                        variant="outline"
+                        className="border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+                    >
                         <NextLink href="/products?stock=instock">View All Products</NextLink>
                     </Button>
                 </div>

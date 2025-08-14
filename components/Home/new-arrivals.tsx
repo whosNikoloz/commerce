@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import NextLink from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -28,19 +28,39 @@ export function NewArrivals() {
         })()
     }, [])
 
-    if (loading) return <section className="px-4"><div className="max-w-7xl mx-auto py-10">Loading new arrivals…</div></section>
-    if (error) return <section className="px-4"><div className="max-w-7xl mx-auto py-10 text-red-500">{error}</div></section>
+    if (loading) return (
+        <section className="px-4">
+            <div className="max-w-7xl mx-auto py-10 text-text-subtle dark:text-text-subtledark">
+                Loading new arrivals…
+            </div>
+        </section>
+    )
+
+    if (error) return (
+        <section className="px-4">
+            <div className="max-w-7xl mx-auto py-10 text-red-500">{error}</div>
+        </section>
+    )
+
     if (!items.length) return null
 
     return (
-        <section className="px-4">
+        <section className="px-4 bg-surface dark:bg-surfacedark">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h2 className="font-serif text-3xl font-bold text-slate-700 mb-2">New Arrivals</h2>
-                        <p className="font-sans text-slate-600">Fresh styles just landed</p>
+                        <h2 className="font-serif text-3xl font-bold text-text-light dark:text-text-lightdark mb-2">
+                            New Arrivals
+                        </h2>
+                        <p className="font-sans text-text-subtle dark:text-text-subtledark">
+                            Fresh styles just landed
+                        </p>
                     </div>
-                    <Button asChild variant="outline" className="hidden md:flex bg-transparent">
+                    <Button
+                        asChild
+                        variant="outline"
+                        className="hidden md:flex border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+                    >
                         <NextLink href="/products?tab=new">View All New Items</NextLink>
                     </Button>
                 </div>
@@ -48,8 +68,10 @@ export function NewArrivals() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {items.map(p => (
                         <NextLink key={p.id} href={`/product/${p.id}`} className="group cursor-pointer block">
-                            <div className="relative overflow-hidden rounded-lg bg-slate-50 mb-4">
-                                <Badge className="absolute top-3 left-3 z-10 bg-blue-600 text-white">New</Badge>
+                            <div className="relative overflow-hidden rounded-lg bg-muted dark:bg-muteddark mb-4">
+                                <Badge className="absolute top-3 left-3 z-10 bg-primary dark:bg-brand-primarydark text-white">
+                                    New
+                                </Badge>
                                 <img
                                     src={p.images?.[0] || "/placeholder.svg"}
                                     alt={p.name ?? "Product"}
@@ -57,11 +79,15 @@ export function NewArrivals() {
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                             </div>
-                            <h3 className="font-sans font-medium text-slate-700 mb-1">{p.name ?? "Unnamed"}</h3>
-                            <p className="font-sans text-lg font-semibold text-slate-900">
-                                {(p.discountPrice ?? p.price)}
+                            <h3 className="font-sans font-medium text-text-light dark:text-text-lightdark mb-1">
+                                {p.name ?? "Unnamed"}
+                            </h3>
+                            <p className="font-sans text-lg font-semibold text-text-light dark:text-text-lightdark">
+                                {p.discountPrice ?? p.price}
                                 {p.discountPrice && (
-                                    <span className="ml-2 text-sm text-slate-500 line-through">{p.price}</span>
+                                    <span className="ml-2 text-sm text-text-subtle dark:text-text-subtledark line-through">
+                                        {p.price}
+                                    </span>
                                 )}
                             </p>
                         </NextLink>
@@ -69,7 +95,11 @@ export function NewArrivals() {
                 </div>
 
                 <div className="text-center mt-8 md:hidden">
-                    <Button asChild variant="outline">
+                    <Button
+                        asChild
+                        variant="outline"
+                        className="border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+                    >
                         <NextLink href="/products?tab=new">View All New Items</NextLink>
                     </Button>
                 </div>

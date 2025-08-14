@@ -30,10 +30,10 @@ export default function HomePage() {
 
         <section id="shop-by-category" className="px-4">
           <div className="text-center mb-8">
-            <h2 className="font-serif text-3xl font-bold text-slate-700 mb-2">
+            <h2 className="font-serif text-3xl font-bold dark:text-text-lightdark text-text-light mb-2">
               Shop by Category
             </h2>
-            <p className="font-sans text-slate-600">
+            <p className="font-sans dark:text-text-subtledark text-text-subtle">
               Find exactly what you're looking for
             </p>
           </div>

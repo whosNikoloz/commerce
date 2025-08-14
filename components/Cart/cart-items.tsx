@@ -21,7 +21,6 @@ export default function CartItems() {
 
   const handleQuantityChange = (
     item: {
-      darkImage?: string;
       discount?: any;
       originalPrice?: React.ReactNode;
       id: any;

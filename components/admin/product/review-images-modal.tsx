@@ -19,6 +19,7 @@ import { GoBackButton } from "@/components/go-back-button"
 import { CustomEditor } from "@/components/wysiwyg-text-custom"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal"
 import { Switch } from "@heroui/switch"
+import { useIsMobile } from "@/hooks/use-mobile"
 //import { useToast } from "@/hooks/use-toast"
 
 type ReviewImagesModalProps = {
@@ -53,7 +54,6 @@ export default function ReviewImagesModal({
     //const { toast } = useToast()
     const [isDragging, setIsDragging] = useState(false)
     const [saving, setSaving] = useState(false)
-    const [isMobile, setIsMobile] = useState(false);
 
     const [images, setImages] = useState<SelectedImage[]>(() => {
         return (defaultFiles ?? []).slice(0, maxFiles).map((file) => ({
@@ -63,12 +63,8 @@ export default function ReviewImagesModal({
         }))
     })
 
-    useEffect(() => {
-        const updateScreenSize = () => setIsMobile(window.innerWidth < 768);
-        updateScreenSize();
-        window.addEventListener("resize", updateScreenSize);
-        return () => window.removeEventListener("resize", updateScreenSize);
-    }, []);
+    const isMobile = useIsMobile();
+
 
     useEffect(() => {
         if (!isOpen) return

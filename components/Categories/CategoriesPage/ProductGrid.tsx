@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Sparkles, Clock3, Tag, ShoppingCart, Eye } from "lucide-react";
+import { Heart, Sparkles, Clock3, Tag, ShoppingCart, Eye, RefreshCcw, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@heroui/card";
@@ -114,11 +114,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
           >
             <CardBody className={viewMode === "grid" ? "p-0" : "p-4 flex gap-4"}>
               {viewMode === "grid" ? (
-                // Grid Layout
                 <div className="relative">
-                  {/* Image Container */}
                   <div className="relative overflow-hidden rounded-t-2xl">
-                    {/* Status Badges */}
                     <div className="absolute left-3 top-3 z-20 flex flex-col gap-2">
                       {showComingSoon && (
                         <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg backdrop-blur-sm">
@@ -142,7 +139,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                       )}
                     </div>
 
-                    {/* Wishlist Button */}
                     <Button
                       size="icon"
                       variant="ghost"
@@ -152,8 +148,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                       <Heart className="h-4 w-4 text-gray-600 group-hover:text-red-500 transition-colors" />
                     </Button>
 
-                    {/* Product Image */}
-                    {/* Product Image Carousel */}
                     <div className="relative group/image rounded-t-2xl overflow-hidden">
                       <Image
                         src={currentImage}
@@ -179,7 +173,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                         </button>
                       )}
 
-                      {/* Right Arrow */}
                       {images.length > 1 && (
                         <button
                           onClick={(e) => {
@@ -198,9 +191,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
 
                   </div>
 
-                  {/* Content */}
                   <div className="p-4 space-y-3">
-                    {/* Product Title */}
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {product.name ?? "Unnamed Product"}
@@ -212,7 +203,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                       )}
                     </div>
 
-                    {/* Price */}
                     <div className="flex items-center gap-3">
                       <span className="font-bold text-2xl text-gray-900 dark:text-white">
                         {formatPrice(displayPrice)}
@@ -224,7 +214,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                       )}
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex gap-2 pt-2">
                       <Button
                         className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
@@ -235,7 +224,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                         {ctaLabel}
                       </Button>
 
-                      <Link href={`/product/${product.id}#reviews`}>
+                      <Link href={`/product/${product.id}`}>
                         <Button
                           variant="outline"
                           className="px-4 border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 rounded-xl transition-all duration-200"
@@ -247,148 +236,54 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   </div>
                 </div>
               ) : (
-                // List Layout - Horizontal Card like the image
-                <div className="flex gap-4 w-full items-stretch p-4">
-                  {/* Image Section */}
-                  <div className="flex-shrink-0 relative">
-                    {/* Status Badges */}
-                    <div className="absolute left-2 top-2 z-20 flex flex-col gap-1">
-                      {showComingSoon && (
-                        <Badge className="bg-yellow-500 text-black border-0 text-xs font-bold px-2 py-1">
-                          Coming Soon
-                        </Badge>
-                      )}
-                      {showNew && (
-                        <Badge className="bg-green-600 text-white border-0 text-xs font-bold px-2 py-1">
-                          <Sparkles className="h-3 w-3 mr-1" />
-                          New
-                        </Badge>
-                      )}
-                      {showClearance && (
-                        <Badge className="bg-red-600 text-white border-0 text-xs font-bold px-2 py-1">
-                          <Tag className="h-3 w-3 mr-1" />
-                          Clearance
-                        </Badge>
-                      )}
-                      {discountPct > 0 && (
-                        <Badge className="bg-orange-500 text-white border-0 text-xs font-bold px-2 py-1">
-                          -{discountPct}%
-                        </Badge>
-                      )}
-                    </div>
-                    <Image
-                      src={currentImage}
-                      alt={product.name ?? "Product image"}
-                      width={400}
-                      height={400}
-                      className="w-48 h-36 sm:w-52 sm:h-40 object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
-                    />
-
-                    {/* Left Arrow */}
-                    {images.length > 1 && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleImageSelect(
-                            product.id,
-                            (selectedImageIndex - 1 + images.length) % images.length
-                          );
-                        }}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
-                      >
-                        &#8592;
-                      </button>
-                    )}
-
-                    {/* Right Arrow */}
-                    {images.length > 1 && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleImageSelect(
-                            product.id,
-                            (selectedImageIndex + 1) % images.length
-                          );
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
-                      >
-                        &#8594;
-                      </button>
-                    )}
-
-
-                    {!inStock && !showComingSoon && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg backdrop-blur-sm">
-                        <span className="text-white font-semibold text-sm text-center">
-                          Out of Stock
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content Section */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      {/* Title */}
-                      <h3 className="font-bold text-gray-900 dark:text-white text-lg sm:text-xl line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
-                        {product.name ?? "Unnamed Product"}
-                      </h3>
-
-                      {/* Description/Meta */}
-                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
-                        {metaLine || "High-quality product with excellent features and specifications designed for your needs."}
-                      </p>
+                <div
+                  className="w-full rounded-2xl bg-white dark:bg-gray-900 p-3 sm:p-4 shadow-sm hover:shadow-md transition"
+                  role="listitem"
+                >
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="relative shrink-0">
+                      <Image
+                        src={currentImage}
+                        alt={product.name ?? "Product image"}
+                        width={112}
+                        height={84}
+                        className="w-[88px] h-[66px] sm:w-[112px] sm:h-[84px] object-contain rounded-md bg-white"
+                      />
                     </div>
 
-                    {/* Bottom section with price and actions */}
-                    <div className="flex items-end justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                      {/* Price Section */}
-                      <div className="flex flex-col">
-                        <div className="flex items-baseline gap-2">
-                          <span className="font-bold text-2xl text-gray-900 dark:text-white">
-                            {formatPrice(displayPrice)}
-                          </span>
-                          {typeof originalPrice === "number" && (
-                            <span className="text-lg text-gray-400 line-through">
-                              {formatPrice(originalPrice)}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500 mt-1">
-                          Free shipping available
-                        </span>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="bg-gray-100 hover:bg-gray-200 h-10 w-10 rounded-full transition-all duration-200"
-                          aria-label="Add to wishlist"
+                    <div className="min-w-0 flex-1">
+                      <div className="space-y-1">
+                        <Link
+                          href={`/product/${product.id}`}
+                          className="block text-[15px] sm:text-[16px] font-semibold text-text-light dark:text-text-lightdark leading-tight line-clamp-1 hover:text-brand-primary transition-colors"
                         >
-                          <Heart className="h-4 w-4 text-gray-600" />
-                        </Button>
-
-                        <Link href={`/product/${product.id}`}>
-                          <Button
-                            variant="outline"
-                            className="border-2 border-gray-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg px-4 transition-all duration-200"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Quick View
-                          </Button>
+                          {product.name ?? "Unnamed Product"}
                         </Link>
 
-                        <Button
-                          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 rounded-lg px-6 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
-                          disabled={ctaDisabled}
-                          onClick={() => handleAddToCart(product.id)}
-                        >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
-                          {ctaLabel}
-                        </Button>
+                        <p className="text-[13px] sm:text-[13px] text-text-subtle dark:text-text-subtledark leading-snug line-clamp-1">
+                          {metaLine || "No additional information available"}
+                        </p>
                       </div>
+
+                      <div className="mt-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-[20px] sm:text-[22px] font-extrabold text-text-light dark:text-text-lightdark">
+                            {displayPrice} <span className="align-top text-[14px]">₾</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative self-stretch flex flex-col items-end justify-between">
+                      <button
+                        onClick={() => handleAddToCart(product.id)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#7ECF63]
+                          text-white shadow-sm hover:brightness-95 transition"
+                        aria-label="Add to cart"
+                        title="დამატება კალათაში"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 </div>

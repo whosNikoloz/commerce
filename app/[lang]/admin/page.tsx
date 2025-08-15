@@ -12,6 +12,7 @@ import {
 } from "@heroui/modal";
 import LoginModal from "@/components/admin/login-modal";
 import { GoBackButton } from "@/components/go-back-button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AuthData = {
   ka: {
@@ -35,7 +36,6 @@ const AuthData = {
 export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isMobile, setIsMobile] = useState(false);
   const { lang } = useParams();
   const router = useRouter();
 
@@ -59,13 +59,8 @@ export default function AdminPage() {
     //setIsAuthorized(true);
   }, []);
 
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const updateScreenSize = () => setIsMobile(window.innerWidth < 768);
-    updateScreenSize();
-    window.addEventListener("resize", updateScreenSize);
-    return () => window.removeEventListener("resize", updateScreenSize);
-  }, []);
 
   const handleCloseModal = () => {
     onClose();

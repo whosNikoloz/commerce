@@ -16,10 +16,10 @@ export default async function ProductPage({ params }: DetailPageProps) {
   const similar: ProductResponseModel[] = [];
 
   return (
-    <div>
+    <>
       {/* <h1 className={title()}>{id}</h1> */}
       <ProductDetail initialProduct={product}
         initialSimilar={similar} />
-    </div>
+    </>
   );
 }

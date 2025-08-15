@@ -1,8 +1,14 @@
+'use client';
+
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+
 export default function Loading() {
     const cards = Array.from({ length: 12 });
+    const isMobile = useIsMobile();
 
     return (
-        <div className="min-h-screen">
+        <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
                     <div className="hidden lg:block bg-brand-muted dark:bg-brand-muteddark sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg p-6 shadow-sm">

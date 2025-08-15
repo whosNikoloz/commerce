@@ -14,6 +14,8 @@ import ProductGrid from "../CategoriesPage/ProductGrid";
 import ProductHeader from "./ProductHeader";
 import ProductPagination from "./ProductPagination";
 import SideBarCategories from "./SideBarCategories";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
@@ -29,6 +31,8 @@ export default function SearchPage({ query = "" }: { query?: string }) {
     const [products, setProducts] = useState<ProductResponseModel[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(false);
+
+    const isMobile = useIsMobile();
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 24;
@@ -92,7 +96,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
 
 
     return (
-        <div className="min-h-screen">
+        <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
                     <SideBarCategories

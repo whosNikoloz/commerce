@@ -247,41 +247,47 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   </div>
                 </div>
               ) : (
-                // List Layout - Horizontal Card like the image
-                <div className="flex gap-4 w-full items-stretch p-4">
+                <div className="group flex w-full items-stretch p-3 sm:p-4 gap-3 sm:gap-4 flex-col sm:flex-row">
                   {/* Image Section */}
-                  <div className="flex-shrink-0 relative">
+                  <div className="relative w-full sm:w-52 lg:w-64">
                     {/* Status Badges */}
                     <div className="absolute left-2 top-2 z-20 flex flex-col gap-1">
                       {showComingSoon && (
-                        <Badge className="bg-yellow-500 text-black border-0 text-xs font-bold px-2 py-1">
+                        <Badge className="bg-yellow-500 text-black border-0 text-[10px] sm:text-xs font-bold px-2 py-1">
                           Coming Soon
                         </Badge>
                       )}
                       {showNew && (
-                        <Badge className="bg-green-600 text-white border-0 text-xs font-bold px-2 py-1">
+                        <Badge className="bg-green-600 text-white border-0 text-[10px] sm:text-xs font-bold px-2 py-1 flex items-center">
                           <Sparkles className="h-3 w-3 mr-1" />
                           New
                         </Badge>
                       )}
                       {showClearance && (
-                        <Badge className="bg-red-600 text-white border-0 text-xs font-bold px-2 py-1">
+                        <Badge className="bg-red-600 text-white border-0 text-[10px] sm:text-xs font-bold px-2 py-1 flex items-center">
                           <Tag className="h-3 w-3 mr-1" />
                           Clearance
                         </Badge>
                       )}
                       {discountPct > 0 && (
-                        <Badge className="bg-orange-500 text-white border-0 text-xs font-bold px-2 py-1">
+                        <Badge className="bg-orange-500 text-white border-0 text-[10px] sm:text-xs font-bold px-2 py-1">
                           -{discountPct}%
                         </Badge>
                       )}
                     </div>
+
+                    {/* Product Image */}
                     <Image
                       src={currentImage}
                       alt={product.name ?? "Product image"}
-                      width={400}
-                      height={400}
-                      className="w-48 h-36 sm:w-52 sm:h-40 object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
+                      width={800}
+                      height={600}
+                      className="
+                        w-full 
+                        h-44 xs:h-48 sm:h-40 lg:h-44 
+                        object-cover rounded-lg shadow-md 
+                        transition-transform duration-300 group-hover:scale-[1.02]
+                      "
                     />
 
                     {/* Left Arrow */}
@@ -294,7 +300,12 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                             (selectedImageIndex - 1 + images.length) % images.length
                           );
                         }}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
+                        className="
+                          absolute left-2 top-1/2 -translate-y-1/2 
+                          bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg 
+                          transition-colors
+                        "
+                        aria-label="Previous image"
                       >
                         &#8592;
                       </button>
@@ -305,18 +316,20 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleImageSelect(
-                            product.id,
-                            (selectedImageIndex + 1) % images.length
-                          );
+                          handleImageSelect(product.id, (selectedImageIndex + 1) % images.length);
                         }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
+                        className="
+                          absolute right-2 top-1/2 -translate-y-1/2 
+                          bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg 
+                          transition-colors
+                        "
+                        aria-label="Next image"
                       >
                         &#8594;
                       </button>
                     )}
 
-
+                    {/* Out of stock overlay */}
                     {!inStock && !showComingSoon && (
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg backdrop-blur-sm">
                         <span className="text-white font-semibold text-sm text-center">
@@ -327,66 +340,98 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   </div>
 
                   {/* Content Section */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  <div className="flex-1 min-w-0 flex flex-col justify-between mt-2 sm:mt-0">
                     <div className="space-y-2">
                       {/* Title */}
-                      <h3 className="font-bold text-gray-900 dark:text-white text-lg sm:text-xl line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+                      <h3
+                        className="
+                          font-bold text-gray-900 dark:text-white 
+                          text-base sm:text-lg lg:text-xl 
+                          line-clamp-2 
+                          group-hover:text-blue-600 dark:group-hover:text-blue-400 
+                          transition-colors leading-tight
+                        "
+                      >
                         {product.name ?? "Unnamed Product"}
                       </h3>
 
                       {/* Description/Meta */}
-                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
-                        {metaLine || "High-quality product with excellent features and specifications designed for your needs."}
+                      <p className="text-[13px] sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2 sm:line-clamp-3 leading-relaxed">
+                        {metaLine ||
+                          "High-quality product with excellent features and specifications designed for your needs."}
                       </p>
                     </div>
 
                     {/* Bottom section with price and actions */}
-                    <div className="flex items-end justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div
+                      className="
+                        flex flex-col sm:flex-row sm:items-end sm:justify-between 
+                        gap-3 sm:gap-4 
+                        mt-3 sm:mt-4 pt-3 
+                        border-t border-gray-100 dark:border-gray-700
+                      "
+                    >
                       {/* Price Section */}
                       <div className="flex flex-col">
                         <div className="flex items-baseline gap-2">
-                          <span className="font-bold text-2xl text-gray-900 dark:text-white">
+                          <span className="font-bold text-xl sm:text-2xl text-gray-900 dark:text-white">
                             {formatPrice(displayPrice)}
                           </span>
                           {typeof originalPrice === "number" && (
-                            <span className="text-lg text-gray-400 line-through">
+                            <span className="text-sm sm:text-lg text-gray-400 line-through">
                               {formatPrice(originalPrice)}
                             </span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-500 mt-1">
+                        <span className="text-[11px] sm:text-xs text-gray-500 mt-1">
                           Free shipping available
                         </span>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="bg-gray-100 hover:bg-gray-200 h-10 w-10 rounded-full transition-all duration-200"
+                          className="
+                            h-9 w-9 sm:h-10 sm:w-10 
+                            bg-gray-100 hover:bg-gray-200 rounded-full 
+                            transition-all duration-200
+                          "
                           aria-label="Add to wishlist"
                         >
                           <Heart className="h-4 w-4 text-gray-600" />
                         </Button>
 
-                        <Link href={`/product/${product.id}`}>
+                        <Link href={`/product/${product.id}`} className="shrink-0">
                           <Button
                             variant="outline"
-                            className="border-2 border-gray-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg px-4 transition-all duration-200"
+                            className="
+                              h-9 sm:h-10 px-3 sm:px-4 
+                              border-2 border-gray-300 
+                              hover:border-blue-500 hover:text-blue-600 
+                              hover:bg-blue-50 dark:hover:bg-blue-950 
+                              rounded-lg transition-all duration-200
+                            "
                           >
                             <Eye className="h-4 w-4 mr-2" />
-                            Quick View
+                            <span className="text-sm sm:text-[15px]">Quick View</span>
                           </Button>
                         </Link>
 
                         <Button
-                          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 rounded-lg px-6 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                          className="
+                            h-10 sm:h-10 px-4 sm:px-6 
+                            bg-gradient-to-r from-blue-600 to-blue-700 
+                            hover:from-blue-700 hover:to-blue-800 
+                            text-white border-0 rounded-lg font-medium 
+                            shadow-lg hover:shadow-xl transition-all duration-200
+                          "
                           disabled={ctaDisabled}
                           onClick={() => handleAddToCart(product.id)}
                         >
                           <ShoppingCart className="h-4 w-4 mr-2" />
-                          {ctaLabel}
+                          <span className="text-sm sm:text-[15px]">{ctaLabel}</span>
                         </Button>
                       </div>
                     </div>

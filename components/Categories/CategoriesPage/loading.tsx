@@ -1,8 +1,14 @@
+'use client';
+
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+
 export default function Loading() {
     const cards = Array.from({ length: 12 });
+    const isMobile = useIsMobile();
 
     return (
-        <div className="min-h-screen">
+        <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
                     <div className="hidden lg:block bg-brand-muted dark:bg-brand-muteddark sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg p-6 shadow-sm">
@@ -10,7 +16,7 @@ export default function Loading() {
                             <div>
                                 <div className="h-5 w-32 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                                 <div className="mt-4 space-y-2">
-                                    {Array.from({ length: 2 }).map((_, i) => (
+                                    {Array.from({ length: 6 }).map((_, i) => (
                                         <div key={i} className="flex items-center justify-between">
                                             <div className="h-4 w-40 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                                             <div className="h-4 w-10 rounded bg-gray-300/30 dark:bg-gray-600/30" />
@@ -19,7 +25,7 @@ export default function Loading() {
                                 </div>
                             </div>
 
-                            {Array.from({ length: 2 }).map((_, i) => (
+                            {Array.from({ length: 4 }).map((_, i) => (
                                 <div key={i} className="space-y-3">
                                     <div className="h-5 w-28 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                                     <div className="space-y-2">

@@ -6,6 +6,7 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal, ModalContent, ModalBody } from "@heroui/modal";
 import { cn } from "@heroui/theme";
 import useEmblaCarousel from "embla-carousel-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 interface ImageModalProps {
@@ -27,7 +28,6 @@ export default function ImageModal({
 }: ImageModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
   // Initialize Embla Carousel with options
@@ -37,19 +37,8 @@ export default function ImageModal({
     startIndex: initialIndex,
   });
 
-  // Detect mobile device on mount
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  const isMobile = useIsMobile();
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-    };
-  }, []);
 
   // Reset zoom state when changing images
   useEffect(() => {

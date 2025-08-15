@@ -7,6 +7,7 @@ import { CustomEditor } from "../../wysiwyg-text-custom";
 import { Switch } from "@/components/ui/switch";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/modal";
 import { GoBackButton } from "../../go-back-button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UpdateProductModalProps {
     productId: string;
@@ -40,7 +41,6 @@ export default function UpdateProductModal({
     const [isComingSoon, setIsComingSoon] = useState(initialIsComingSoon);
     const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
 
-    const [isMobile, setIsMobile] = useState(false);
 
     const handleSave = () => {
         onSave(productId, description, {
@@ -51,12 +51,8 @@ export default function UpdateProductModal({
         onClose();
     };
 
-    useEffect(() => {
-        const updateScreenSize = () => setIsMobile(window.innerWidth < 768);
-        updateScreenSize();
-        window.addEventListener("resize", updateScreenSize);
-        return () => window.removeEventListener("resize", updateScreenSize);
-    }, []);
+    const isMobile = useIsMobile();
+
 
 
     function handleCloseModal(): void {

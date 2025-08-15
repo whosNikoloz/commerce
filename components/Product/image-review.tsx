@@ -10,6 +10,7 @@ import { Card } from "@heroui/card";
 import useEmblaCarousel from "embla-carousel-react";
 
 import ImageModal from "./image-modal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 interface ImageReviewProps {
@@ -18,7 +19,6 @@ interface ImageReviewProps {
 }
 
 export function ImageReview({ images, productName }: ImageReviewProps) {
-    const [isMobile, setIsMobile] = useState(false);
     const [selectedImage, setSelectedImage] = useState(0);
     const [isHovering, setIsHovering] = useState(false);
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
@@ -34,16 +34,8 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
     const zoomLevel = 3;
     const placeholder = "/placeholder.svg"; // make sure it exists in /public
 
-    useEffect(() => {
-        const checkScreenSize = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
+    const isMobile = useIsMobile();
 
-        checkScreenSize();
-        window.addEventListener("resize", checkScreenSize);
-
-        return () => window.removeEventListener("resize", checkScreenSize);
-    }, []);
 
     useEffect(() => {
         if (imageContainerRef.current && zoomResultRef.current) {

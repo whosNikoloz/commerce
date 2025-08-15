@@ -15,12 +15,12 @@ import Cartlink from "../Cart/cart-link";
 import { GoBackButton } from "../go-back-button";
 
 import { searchProducts } from "@/app/api/services/productService";
-import { getAllCategories } from "@/app/api/services/categoryService"; // NEW
-import type { CategoryModel } from "@/types/category"; // NEW
+import { getAllCategories } from "@/app/api/services/categoryService";
+import type { CategoryModel } from "@/types/category";
 import type { ProductResponseModel } from "@/types/product";
 import type { PagedList } from "@/types/pagination";
+import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
 
-// ---- NEW: helper type, same जैसा SearchPage ----
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
 interface SearchForMobileProps {
@@ -43,7 +43,11 @@ export default function SearchForMobile({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ---- NEW: categories state ----
+  // ✅ history hook
+  const { items: historyItems, add: addHistory, remove: removeHistory, clear: clearHistory } =
+    useSearchHistory({ namespace: "global", max: 15 });
+
+  // categories state
   const [root, setRoot] = useState<CategoryWithSubs | null>(null);
   const [loadingCats, setLoadingCats] = useState(false);
 
@@ -52,22 +56,19 @@ export default function SearchForMobile({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const debounceRef = useRef<number | null>(null);
 
-  // Config consistent with desktop
   const minLen = 2;
   const pageSize = 8;
 
-  // Open/close helpers
   const handleOpen = () => setSearchModalOpen(true);
   const handleClose = () => setSearchModalOpen(false);
 
-  // ---- NEW: fetch categories once (just like SearchPage) ----
+  // fetch categories once
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
         setLoadingCats(true);
         const raw = (await getAllCategories()) as unknown as CategoryModel[] | CategoryWithSubs;
-
         if (!alive) return;
 
         if (Array.isArray(raw)) {
@@ -86,25 +87,22 @@ export default function SearchForMobile({
     };
   }, []);
 
-  // ---- NEW: derive subcategories ----
   const categories = useMemo(() => root?.subcategories ?? [], [root]);
 
-  // Read q from URL on first mount / when URL changes
+  // read q from URL
   useEffect(() => {
     const q = searchParams.get("q") || "";
     if (q) {
       setSearchQuery(q);
       doSearch(q);
     } else {
-      // clear results when URL has no q
       setSearchResults([]);
       setError(null);
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]); // depend only on URL params
+  }, [searchParams]);
 
-  // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
       if (debounceRef.current) window.clearTimeout(debounceRef.current);
@@ -154,19 +152,25 @@ export default function SearchForMobile({
   const goToResultsPage = (q: string) => {
     const term = q.trim();
     if (!term) return;
+    addHistory(term); // ✅ save to history on navigate
     router.push(`/en/category?q=${encodeURIComponent(term)}`);
     handleClose();
   };
 
   const hasQuery = useMemo(() => (searchQuery?.trim().length ?? 0) >= minLen, [searchQuery]);
 
-  // ---- helper: category thumb / fallback ----
+  const selectHistoryTerm = (term: string) => {
+    setSearchQuery(term);
+    addHistory(term); // bump to top
+    router.push(`/en/category?q=${encodeURIComponent(term)}`);
+    handleClose();
+  };
+
   const renderCatThumb = (c: CategoryModel) => {
-    // თუ API-ს არ აქვს image ველი, ჩავსვათ ფოლბექი
     const img =
-      // @ts-ignore optional field if you have it
+      // @ts-ignore optional field if present
       (c.image as string | undefined) ||
-      // @ts-ignore optional field
+      // @ts-ignore optional field if present
       (c.imageUrl as string | undefined) ||
       "https://picsum.photos/seed/category/128/128";
 
@@ -256,7 +260,7 @@ export default function SearchForMobile({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        goToResultsPage(searchQuery);
+                        goToResultsPage(searchQuery); // ✅ saves history inside
                       }
                     }}
                   />
@@ -264,28 +268,56 @@ export default function SearchForMobile({
               </ModalHeader>
 
               <ModalBody id="search-results">
-                {isLoading ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-gray-400 animate-pulse">
-                    <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
-                    <p className="text-sm">Searching...</p>
-                  </div>
-                ) : error ? (
-                  <div className="flex flex-col items-center justify-center py-6 text-red-500">
-                    <p className="text-sm">Error: {error}</p>
-                    <p className="text-xs text-gray-500 mt-1">Please try again.</p>
-                  </div>
-                ) : searchResults.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-                    <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
-                    <p className="text-sm">
-                      {hasQuery ? "No results found" : `Type at least ${minLen} characters`}
-                    </p>
+                {/* === NO / SHORT QUERY VIEW === */}
+                {!hasQuery && (
+                  <div className="space-y-6">
+                    {/* History: present or empty state */}
+                    {historyItems.length > 0 ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-500">Recent searches</span>
+                          <button
+                            onClick={clearHistory}
+                            className="text-xs text-gray-500 underline hover:text-gray-700"
+                          >
+                            Clear all
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {historyItems.map(({ term }) => (
+                            <div
+                              key={term}
+                              className="group flex items-center gap-2 px-3 py-1 rounded-full border text-sm hover:bg-gray-50"
+                            >
+                              <button className="hover:underline" onClick={() => selectHistoryTerm(term)}>
+                                {term}
+                              </button>
+                              <button
+                                aria-label={`Remove ${term}`}
+                                onClick={() => removeHistory(term)}
+                                className="opacity-60 group-hover:opacity-100"
+                                title="Remove"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                        <SearchIcon className="h-12 w-12 mb-3 opacity-30" />
+                        <p className="text-sm">You don’t have any search history yet</p>
+                        <p className="text-xs text-gray-500 mt-1">Start typing to search products</p>
+                      </div>
+                    )}
 
-                    {/* ---- NEW: categories grid from API when no query ---- */}
-                    {!hasQuery && (
-                      <div className="grid grid-cols-3 gap-4 mt-6 w-full">
-                        {loadingCats ? (
-                          Array.from({ length: 6 }).map((_, i) => (
+                    {/* Categories grid below history */}
+                    <div>
+                      <h3 className="text-sm text-gray-500 mb-3">Browse categories</h3>
+                      <div className="grid grid-cols-3 gap-4 w-full">
+                        {loadingCats
+                          ? Array.from({ length: 6 }).map((_, i) => (
                             <Card key={i} className="p-4">
                               <div className="animate-pulse flex flex-col items-center">
                                 <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
@@ -293,8 +325,7 @@ export default function SearchForMobile({
                               </div>
                             </Card>
                           ))
-                        ) : (
-                          categories.map((category) => (
+                          : categories.map((category) => (
                             <Card
                               key={category.id}
                               className="cursor-pointer hover:shadow-md transition-shadow"
@@ -307,12 +338,35 @@ export default function SearchForMobile({
                                 </span>
                               </CardBody>
                             </Card>
-                          ))
-                        )}
+                          ))}
                       </div>
-                    )}
+                    </div>
                   </div>
-                ) : (
+                )}
+
+                {/* === LIVE SEARCH VIEW === */}
+                {hasQuery && isLoading && (
+                  <div className="flex flex-col items-center justify-center py-8 text-gray-400 animate-pulse">
+                    <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
+                    <p className="text-sm">Searching...</p>
+                  </div>
+                )}
+
+                {hasQuery && !!error && (
+                  <div className="flex flex-col items-center justify-center py-6 text-red-500">
+                    <p className="text-sm">Error: {error}</p>
+                    <p className="text-xs text-gray-500 mt-1">Please try again.</p>
+                  </div>
+                )}
+
+                {hasQuery && !isLoading && !error && searchResults.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                    <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
+                    <p className="text-sm">No results found</p>
+                  </div>
+                )}
+
+                {hasQuery && !isLoading && !error && searchResults.length > 0 && (
                   <ul className="space-y-1">
                     {searchResults.map((result) => (
                       <motion.li
@@ -323,7 +377,7 @@ export default function SearchForMobile({
                         transition={{ duration: 0.1 }}
                         className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => goToResultsPage(result.name ?? "")}
+                        onClick={() => goToResultsPage(result.name ?? "")} // ✅ saves history via goToResultsPage
                       >
                         <div className="flex items-center gap-3">
                           {result.images?.[0] ? (
@@ -353,7 +407,7 @@ export default function SearchForMobile({
                     <li className="mt-2">
                       <button
                         className="w-full text-center text-sm text-blue-600 underline py-2"
-                        onClick={() => goToResultsPage(searchQuery)}
+                        onClick={() => goToResultsPage(searchQuery)} // ✅ saves history
                       >
                         See all results for “{searchQuery.trim()}”
                       </button>

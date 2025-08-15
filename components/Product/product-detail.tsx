@@ -9,6 +9,7 @@ import { SimilarProducts } from "./similar-products";
 import { Specifications } from "./specifications";
 import { ImageReview } from "./image-review";
 import { CartItem, useCart } from "@/app/context/cartContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
   initialProduct: ProductResponseModel;
@@ -18,6 +19,8 @@ type Props = {
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
   const { addToCart } = useCart();
+  const isMobile = useIsMobile();
+
 
   const [similar, setSimilar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
@@ -52,7 +55,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   useEffect(() => {
     const handleScroll = () => {
-      const isMobile = window.innerWidth < 768;
       const scrollThreshold = isMobile ? 900 : 700;
       setIsPriceVisible(window.scrollY < scrollThreshold);
     };

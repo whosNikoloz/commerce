@@ -22,6 +22,8 @@ import {
   getProductsByCategory,            // ✅ use on page load
 } from "@/app/api/services/productService"
 import Loading from "./loading"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] }
 type CatOrArray = CategoryWithSubs | CategoryModel[]
@@ -43,6 +45,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
   const [brands, setBrands] = useState<BrandModel[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const isMobile = useIsMobile()
 
   const [filter, setFilter] = useState<FilterModel>({
     brandIds: [],
@@ -192,7 +195,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
   const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`
 
   return (
-    <div className="min-h-screen">
+    <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
       <div className="container mx-auto px-4 py-4 lg:py-6">
         <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
           <ProductFilters

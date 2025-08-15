@@ -14,6 +14,7 @@ import {
 } from "@heroui/modal";
 import { GoBackButton } from "../../go-back-button";
 import { Input } from "@heroui/input";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UpdateBrandModalProps {
     brandId: string;
@@ -39,7 +40,8 @@ export default function UpdateBrandModal({
     const [description, setDescription] = useState(initialDescription);
     const [origin, setOrigin] = useState(initialOrigin);
     const [name, setName] = useState(initialName);
-    const [isMobile, setIsMobile] = useState(false);
+    const isMobile = useIsMobile();
+
 
     useEffect(() => {
         setDescription(initialDescription);
@@ -53,12 +55,9 @@ export default function UpdateBrandModal({
         setName(initialName);
     }, [initialName]);
 
-    useEffect(() => {
-        const updateScreenSize = () => setIsMobile(window.innerWidth < 768);
-        updateScreenSize();
-        window.addEventListener("resize", updateScreenSize);
-        return () => window.removeEventListener("resize", updateScreenSize);
-    }, []);
+
+
+
 
     const handleSave = () => {
         // ✅ keep param order: (id, name, description, origin)

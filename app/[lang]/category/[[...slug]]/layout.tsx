@@ -4,10 +4,8 @@ export default function CategoryLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-16">
-      <div className="">
-        {children}
-      </div>
+    <section className="">
+      {children}
     </section>
   );
 }

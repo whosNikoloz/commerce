@@ -189,7 +189,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
 
   const subcategories = category.subcategories ?? []
   const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage))
-  const buildSubHref = (sub: CategoryModel) => `/search/${sub.id}`
+  const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`
 
   return (
     <div className="min-h-screen">

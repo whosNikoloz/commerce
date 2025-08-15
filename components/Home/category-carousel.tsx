@@ -53,7 +53,7 @@ export function CategoryCarousel() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {parentCategories.map((parent) => {
                     const children = childrenByParent.get(parent.id) ?? []
-                    const go = () => router.push(`/search/${parent.id}`)
+                    const go = () => router.push(`/category/${parent.id}`)
                     const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
                         if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault()
@@ -100,7 +100,7 @@ export function CategoryCarousel() {
                                         {children.map(child => (
                                             <Link
                                                 key={child.id}
-                                                href={`/search/${child.id}`}
+                                                href={`/category/${child.id}`}
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="m-1 inline-flex items-center rounded-full border border-muted dark:border-muteddark px-3 py-1 text-xs text-text-subtle dark:text-text-subtledark hover:bg-muted dark:hover:bg-muteddark transition-colors"
                                             >

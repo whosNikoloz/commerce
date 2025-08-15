@@ -1,9 +1,14 @@
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; // ✅ for reading URL query params
 import { Input } from "@headlessui/react";
 import { Card, CardBody } from "@heroui/card";
-import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { SearchIcon } from "../icons";
+import { searchProducts } from "@/app/api/services/productService";
+import type { ProductResponseModel } from "@/types/product";
+import type { PagedList } from "@/types/pagination";
+import Image from "next/image";
 
 interface SearchForMobileProps {
   searchQuery: string;
@@ -11,6 +16,8 @@ interface SearchForMobileProps {
   setSearchModalOpen: (isOpen: boolean) => void;
   isModalOpen: boolean;
 }
+
+type SearchResult = Pick<ProductResponseModel, "id" | "name" | "images" | "price">;
 
 const Search = ({
   searchQuery,
@@ -20,35 +27,27 @@ const Search = ({
 }: SearchForMobileProps) => {
   const [isOpen, setIsOpen] = useState(isModalOpen);
   const [isLoading, setIsLoading] = useState(false);
-
-  interface SearchResult {
-    id: string;
-    name: string;
-  }
-
+  const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const debounceRef = useRef<number | null>(null);
 
-  const staticSearchResults: SearchResult[] = [
-    { id: "1", name: "Logitech Driving Force Shifter For X|S Xbox One..." },
-    {
-      id: "2",
-      name: "Logitech G923 Racing Wheel and Pedals Xbox Series X|S...",
-    },
-    {
-      id: "3",
-      name: "Logitech G432 7.1 Surround Sound Wired Gaming Headset...",
-    },
-    { id: "4", name: "Xbox Wireless Controller Electric Volt" },
-    { id: "5", name: "Xbox Wireless Controller Deep Pink" },
-    { id: "6", name: "Razer Thresher Xbox One WL Gaming Over-Ear Headset..." },
-    {
-      id: "7",
-      name: "Razer Nari Ultimate For Xbox One Wireless 7.1 Headset...",
-    },
-    { id: "8", name: "Razer Kaira Pro for Xbox Over-Ear Headset Black" },
-    { id: "9", name: "Razer Thresher XboxOne Gears of War 5 WL Headset..." },
-    { id: "10", name: "Flashfire Monza WH6301V Racing Wheel For PS4..." },
-  ];
+  const searchParams = useSearchParams(); // ✅
+  const router = useRouter(); // ✅
+
+
+  // keep internal open state synced with parent
+  useEffect(() => {
+    setIsOpen(isModalOpen);
+  }, [isModalOpen]);
+
+  // ✅ Read "q" from URL and trigger search on first load
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    if (q) {
+      setSearchQuery(q);
+      doSearch(q); // optional: search immediately
+    }
+  }, [searchParams]);
 
   const handleSearchFocus = () => {
     setIsOpen(true);
@@ -62,23 +61,47 @@ const Search = ({
     }, 200);
   };
 
+  const minLen = 2;
+  const pageSize = 8;
+
+  const doSearch = async (value: string) => {
+    if (!value || value.trim().length < minLen) {
+      setSearchResults([]);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError(null);
+      const resp = await searchProducts(value.trim(), "name", "asc", 1, pageSize);
+      const items = (resp as PagedList<ProductResponseModel>).items ?? [];
+      setSearchResults(
+        items.map((p) => ({
+          id: p.id,
+          name: p.name ?? "Unnamed product",
+          images: p.images,
+          price: p.price,
+        }))
+      );
+    } catch (e: any) {
+      setError(e?.message ?? "Search failed");
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
     setSearchQuery(value);
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
     setIsLoading(true);
     setSearchResults([]);
-
-    // Simulate API call
-    setTimeout(() => {
-      const filteredResults = staticSearchResults.filter((result) =>
-        result.name.toLowerCase().includes(value.toLowerCase()),
-      );
-
-      setSearchResults(filteredResults);
-      setIsLoading(false);
-    }, 2000); // simulate 1 second API call
+    debounceRef.current = window.setTimeout(() => doSearch(value), 300);
   };
+
+  const hasQuery = useMemo(() => (searchQuery?.trim().length ?? 0) >= minLen, [searchQuery]);
 
   return (
     <div className="relative w-full">
@@ -96,18 +119,27 @@ const Search = ({
           onBlur={handleSearchBlur}
           onChange={handleSearchChange}
           onFocus={handleSearchFocus}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (searchQuery.trim().length > 0) {
+                router.push(`/en/category?q=${encodeURIComponent(searchQuery)}`);
+              }
+            }
+          }}
         />
       </div>
 
+      {/* Results */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             animate={{ opacity: 1, y: 0 }}
-            className="absolute left-0 right-0 mt-5 z-50"
             exit={{ opacity: 0, y: -10 }}
-            id="search-results"
             initial={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
+            className="absolute left-0 right-0 mt-5 z-50"
+            id="search-results"
           >
             <Card>
               <CardBody className="p-5">
@@ -116,15 +148,17 @@ const Search = ({
                     <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
                     <p className="text-sm">Searching...</p>
                   </div>
+                ) : error ? (
+                  <div className="flex flex-col items-center justify-center py-6 text-red-500">
+                    <p className="text-sm">Error: {error}</p>
+                    <p className="text-xs text-gray-500 mt-1">Please try again.</p>
+                  </div>
                 ) : searchResults.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
-                    <p className="text-sm">No results found</p>
-                    {searchQuery && (
-                      <p className="text-xs mt-1">
-                        Try adjusting your search terms
-                      </p>
-                    )}
+                    <p className="text-sm">
+                      {hasQuery ? "No results found" : `Type at least ${minLen} characters`}
+                    </p>
                   </div>
                 ) : (
                   <ul className="space-y-1">
@@ -132,14 +166,34 @@ const Search = ({
                       <motion.li
                         key={result.id}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
                         exit={{ opacity: 0, y: -5 }}
                         initial={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.1 }}
+                        className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
+                        onMouseDown={(e) => e.preventDefault()}
                       >
                         <div className="flex items-center gap-3">
-                          <SearchIcon className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                          <span className="text-sm">{result.name}</span>
+                          {result.images?.[0] ? (
+                            <div className="relative h-10 w-10 flex-shrink-0 rounded-md overflow-hidden border">
+                              <Image
+                                src={result.images[0]}
+                                alt={result.name ?? "Product"}
+                                fill
+                                sizes="40px"
+                                className="object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="h-10 w-10 rounded-md flex items-center justify-center bg-gray-100 text-gray-500">
+                              <SearchIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                          <div className="flex flex-col">
+                            <span className="text-sm line-clamp-1">{result.name}</span>
+                            <span className="text-xs text-gray-500">
+                              {typeof result.price === "number" ? `₾${result.price}` : ""}
+                            </span>
+                          </div>
                         </div>
                       </motion.li>
                     ))}

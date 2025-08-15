@@ -1,4 +1,3 @@
-// app/(shop)/category/[id]/loading.tsx
 export default function Loading() {
     const cards = Array.from({ length: 12 });
 

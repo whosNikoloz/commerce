@@ -21,7 +21,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2) Ensure locale prefix
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
@@ -31,10 +30,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}${pathname}${search}`, request.url));
   }
 
-  // 3) Admin auth guard
-  //    - If no admin_token cookie AND path is an admin sub-route,
-  //      redirect to /{locale}/admin (inline login) with ?next=...
-  //    - If already at /{locale}/admin, let it render the inline login.
   const adminToken = request.cookies.get("admin_token")?.value;
   const localeFromPath = i18n.locales.find((loc) => pathname.startsWith(`/${loc}/`)) || i18n.defaultLocale;
 

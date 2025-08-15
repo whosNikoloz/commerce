@@ -112,7 +112,7 @@ function FacetBlock({
           )) : <em>ამ ტიპის ფეისეტისთვის სერვერმა უნდა მოაწოდოს მნიშვნელობები.</em>}
         </div>
       )
-    }
+  }
 }
 
 function SidebarContent({

@@ -11,9 +11,9 @@ import type { PagedList } from "@/types/pagination";
 import { getAllCategories, getCategoryWithSubCategoriesById } from "@/app/api/services/categoryService";
 import { searchProducts } from "@/app/api/services/productService";
 import ProductGrid from "../CategoriesPage/ProductGrid";
-import SidebarContent from "./SidebarContent";
 import ProductHeader from "./ProductHeader";
 import ProductPagination from "./ProductPagination";
+import SideBarCategories from "./SideBarCategories";
 
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
@@ -95,7 +95,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
         <div className="min-h-screen">
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
-                    <SidebarContent
+                    <SideBarCategories
                         categorys={categories}
                         buildSubHref={buildSubHref}
                     />

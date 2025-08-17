@@ -1,32 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-
 import type { CategoryModel } from "@/types/category";
 import type { ProductResponseModel } from "@/types/product";
 import type { PagedList } from "@/types/pagination";
 
-import { getAllCategories, getCategoryWithSubCategoriesById } from "@/app/api/services/categoryService";
-import { searchProducts } from "@/app/api/services/productService";
+import { getAllCategories } from "@/app/api/services/categoryService";
+import { searchProducts, mapSort } from "@/app/api/services/productService";
 import ProductGrid from "../CategoriesPage/ProductGrid";
 import ProductHeader from "./ProductHeader";
 import ProductPagination from "./ProductPagination";
 import SideBarCategories from "./SideBarCategories";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-
+import { useRouter, useSearchParams } from "next/navigation";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
 export default function SearchPage({ query = "" }: { query?: string }) {
     const [root, setRoot] = useState<CategoryWithSubs | null>(null);
     const [loadingCats, setLoadingCats] = useState(false);
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-    const cards = Array.from({ length: 12 });
-    const [sortBy, setSortBy] = useState("featured")
 
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [sortBy, setSortBy] = useState("featured");
 
     const [products, setProducts] = useState<ProductResponseModel[]>([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -37,14 +33,17 @@ export default function SearchPage({ query = "" }: { query?: string }) {
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 24;
 
+    // (optional) keep page/sort in URL
+    const router = useRouter();
+    const params = useSearchParams();
+
+    // bootstrap categories sidebar
     useEffect(() => {
         let alive = true;
         (async () => {
             try {
                 setLoadingCats(true);
-                const raw = (await getAllCategories(
-                )) as unknown as CategoryModel[] | CategoryWithSubs;
-
+                const raw = (await getAllCategories()) as unknown as CategoryModel[] | CategoryWithSubs;
                 if (!alive) return;
 
                 if (Array.isArray(raw)) {
@@ -54,27 +53,43 @@ export default function SearchPage({ query = "" }: { query?: string }) {
                 } else {
                     setRoot(raw);
                 }
+
+                // seed from URL (?page=&sort=)
+                const pageFromUrl = Number(params.get("page") ?? 1);
+                const sortFromUrl = params.get("sort") ?? "featured";
+                setCurrentPage(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1);
+                setSortBy(sortFromUrl);
             } finally {
                 if (alive) setLoadingCats(false);
             }
         })();
-        return () => {
-            alive = false;
-        };
+        return () => { alive = false; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // fetch products (server-side paging + sorting)
     useEffect(() => {
         let alive = true;
         (async () => {
             try {
                 setLoading(true);
+
+                // (optional) keep URL in sync
+                const next = new URLSearchParams(params);
+                next.set("page", String(currentPage));
+                next.set("sort", sortBy);
+                if (query?.trim()) next.set("q", query.trim()); else next.delete("q");
+                router.replace(`?${next.toString()}`, { scroll: false });
+
+                const { sortColumn, sortOrder } = mapSort(sortBy);
                 const resp = await searchProducts(
                     query?.trim() ?? "",
-                    "name",
-                    "asc",
+                    sortColumn,
+                    sortOrder,
                     currentPage,
                     pageSize
                 );
+
                 if (!alive) return;
                 const r = resp as PagedList<ProductResponseModel>;
                 setProducts(r.items ?? []);
@@ -85,45 +100,37 @@ export default function SearchPage({ query = "" }: { query?: string }) {
                 if (alive) setLoading(false);
             }
         })();
-        return () => {
-            alive = false;
-        };
-    }, [query, currentPage]);
+        return () => { alive = false; };
+        // include sortBy + currentPage + query
+    }, [query, currentPage, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const categories = useMemo(() => root?.subcategories ?? [], [root]);
     const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-    const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`
+    const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`;
 
+    const cards = Array.from({ length: 12 });
 
     return (
         <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
-                    <SideBarCategories
-                        categorys={categories}
-                        buildSubHref={buildSubHref}
-                    />
+                    <SideBarCategories categorys={categories} buildSubHref={buildSubHref} />
 
                     <div className="space-y-4 lg:space-y-6">
                         <ProductHeader
                             productCount={totalCount}
                             sortBy={sortBy}
-                            onSortChange={(v) => { setSortBy(v); setCurrentPage(1) }}
+                            onSortChange={(v) => { setSortBy(v); setCurrentPage(1); }} // ← reset page on sort
                             viewMode={viewMode}
                             onViewModeChange={setViewMode}
                         />
 
                         {loading ? (
-
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                                 {cards.map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className="group bg-brand-muted dark:bg-brand-muteddark border rounded-lg shadow-sm p-3 lg:p-4"
-                                    >
+                                    <div key={i} className="group bg-brand-muted dark:bg-brand-muteddark border rounded-lg shadow-sm p-3 lg:p-4">
                                         <div className="animate-pulse">
                                             <div className="w-full aspect-square rounded-md bg-gray-300/40 dark:bg-gray-600/40" />
-
                                             <div className="mt-3 space-y-2">
                                                 <div className="h-4 w-3/4 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                                                 <div className="flex items-center gap-2">
@@ -151,5 +158,5 @@ export default function SearchPage({ query = "" }: { query?: string }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -9,7 +9,7 @@ interface GoBackButtonProps {
 
 export const GoBackButton: React.FC<GoBackButtonProps> = ({
   className,
-  size = 40,
+  size = 25,
   onClick,
 }) => {
   return (

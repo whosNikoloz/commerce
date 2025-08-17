@@ -7,7 +7,7 @@ const API_BASE = "http://localhost:5007/Product";
 
 type SortOrder = "asc" | "desc"
 
-function mapSort(sortBy: string): { sortColumn: string; sortOrder: "asc" | "desc" } {
+export function mapSort(sortBy: string): { sortColumn: string; sortOrder: "asc" | "desc" } {
     switch (sortBy) {
         case "price-low": return { sortColumn: "price", sortOrder: "asc" }
         case "price-high": return { sortColumn: "price", sortOrder: "desc" }
@@ -65,13 +65,18 @@ export async function searchProductsByFilter(params: {
     filter: FilterModel;
     page?: number;
     pageSize?: number;
+    sortBy?: string;
 }): Promise<PagedList<ProductResponseModel>> {
     const page = params.page ?? 1;
     const pageSize = params.pageSize ?? 24;
+    const { sortColumn, sortOrder } = mapSort(params.sortBy ?? "featured");
+
 
     const qs = new URLSearchParams({
         page: String(page),
         pageSize: String(pageSize),
+        sortColumn,
+        sortOrder,
     });
 
     return apiFetch<PagedList<ProductResponseModel>>(

@@ -142,7 +142,7 @@ export const Navbar = () => {
           </div>
         </nav>
       ) : (
-        <div className="mt-6 relative flex items-center justify-between px-4">
+        <div className="mt-2 relative flex items-center justify-between px-1">
           <div className="z-10">
             <GoBackButton onClick={() => window.history.back()} />
           </div>

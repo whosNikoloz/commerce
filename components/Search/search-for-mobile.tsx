@@ -242,9 +242,9 @@ export default function SearchForMobile({
         <ModalContent>
           {() => (
             <>
-              <ModalHeader className="flex items-center gap-2 px-1 pt-6 mx-4 z-50">
+              <ModalHeader className="flex items-center gap-2  pt-6 z-50">
                 <GoBackButton onClick={handleClose} />
-                <div className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 w-11/12 mx-auto px-4 py-2 focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
+                <div className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 w-full mx-auto px-4 py-2 focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
                   <SearchIcon className="text-gray-500" />
                   <Input
                     aria-controls="search-results"
@@ -404,14 +404,14 @@ export default function SearchForMobile({
                         </div>
                       </motion.li>
                     ))}
-                    <li className="mt-2">
+                    {/* <li className="mt-2">
                       <button
                         className="w-full text-center text-sm text-blue-600 underline py-2"
                         onClick={() => goToResultsPage(searchQuery)} // ✅ saves history
                       >
                         See all results for “{searchQuery.trim()}”
                       </button>
-                    </li>
+                    </li> */}
                   </ul>
                 )}
               </ModalBody>

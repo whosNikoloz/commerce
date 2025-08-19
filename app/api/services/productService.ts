@@ -28,8 +28,8 @@ export async function getProductById(id: string): Promise<ProductResponseModel> 
     return apiFetch<ProductResponseModel>(`${API_BASE}/get-products-by-${id}`);
 }
 
-export async function getProductsByCategory(id: string): Promise<ProductResponseModel[]> {
-    return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
+export async function getProductsByCategory(id: string): Promise<ProductRequestModel[]> {
+    return apiFetch<ProductRequestModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
 }
 
 export async function searchProducts(

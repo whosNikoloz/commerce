@@ -61,7 +61,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
   const [sortBy, setSortBy] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
 
   const router = useRouter();
   const params = useSearchParams();

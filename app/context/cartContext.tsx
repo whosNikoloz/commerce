@@ -14,18 +14,21 @@ import { toast } from "sonner";
 export type CartItem = {
   discount: any;
   originalPrice: ReactNode;
-  id: string;            // ✅ string everywhere
+  id: string;
   name: string;
   price: number;
   image: string;
   quantity: number;
+
+  selectedFacets?: Record<string, string>;
+  variantKey?: string;
 };
 
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string) => void;              // ✅ string
-  updateCartItem: (id: string, quantity: number) => void; // ✅ string
+  removeFromCart: (id: string, variantKey?: string) => void;
+  updateCartItem: (id: string, quantity: number, variantKey?: string) => void;
   clearCart: () => void;
 };
 
@@ -78,29 +81,57 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(CART_KEY, encryptData(cart));
   }, [cart]);
 
+  const buildVariantKey = (selected?: Record<string, string>) => {
+    if (!selected) return "";
+    const entries = Object.entries(selected).sort(([a], [b]) => a.localeCompare(b));
+    return JSON.stringify(entries);
+  };
+
   const addToCart = (item: CartItem) => {
     setCart(prev => {
       const id = String(item.id);
-      const existing = prev.find(i => i.id === id);
+      const variantKey = buildVariantKey(item.selectedFacets);
+      const existing = prev.find(i => i.id === id && (i.variantKey ?? "") === variantKey);
+
       if (existing) {
         return prev.map(i =>
-          i.id === id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === id && (i.variantKey ?? "") === variantKey
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
         );
       }
-      return [...prev, { ...item, id, quantity: Math.max(1, item.quantity || 1) }];
+
+      return [
+        ...prev,
+        {
+          ...item,
+          id,
+          quantity: Math.max(1, item.quantity || 1),
+          variantKey,
+        },
+      ];
     });
-    toast.success(`${item.name} added to cart`);
+
+    const pretty = item.selectedFacets && Object.keys(item.selectedFacets).length
+      ? " (" + Object.entries(item.selectedFacets).map(([k, v]) => `${k}: ${v}`).join(", ") + ")"
+      : "";
+
+    toast.success(`${item.name}${pretty} დაემატა კალათაში`);
   };
 
-  const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(item => item.id === String(id) ? false : true));
-    toast.success("Item removed from cart");
+  const removeFromCart = (id: string, variantKey?: string) => {
+    setCart(prev =>
+      prev.filter(item =>
+        !(item.id === String(id) && ((item.variantKey ?? "") === (variantKey ?? "")))
+      )
+    );
+    toast.success("საქონელი წაიშალა კალათიდან");
   };
 
-  const updateCartItem = (id: string, quantity: number) => {
+  const updateCartItem = (id: string, quantity: number, variantKey?: string) => {
     setCart(prev =>
       prev.map(item =>
-        item.id === String(id)
+        item.id === String(id) && ((item.variantKey ?? "") === (variantKey ?? ""))
           ? { ...item, quantity: Math.max(1, quantity) }
           : item
       )

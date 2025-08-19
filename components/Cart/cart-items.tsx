@@ -22,9 +22,13 @@ export default function CartItems() {
     }
   }, [cart?.length]);
 
-  const handleQuantityChange = (id: string, currentQty: number, delta: number) => {
+  const handleQuantityChange = (id: string, currentQty: number, delta: number /*, variantKey?: string */) => {
     const newQuantity = currentQty + delta;
-    if (newQuantity >= 1) updateCartItem(id, newQuantity);
+    if (newQuantity >= 1) {
+      // თუ კონტექსტში გაქვს მესამე არგუმენტი (variantKey), გადააწოდე აქაც:
+      // updateCartItem(id, newQuantity, variantKey)
+      updateCartItem(id, newQuantity);
+    }
   };
 
   return (
@@ -32,12 +36,12 @@ export default function CartItems() {
       <div className="space-y-6">
         {cart.map((item) => (
           <div
-            key={item.id}
+            key={`${item.id}-${(item as any).variantKey ?? ""}`}
             className="grid grid-cols-[auto,1fr,auto] gap-4 md:gap-6 items-center border-b last:border-none border-brand-muted/50 dark:border-text-subtledark/40 pb-6"
           >
-            {/* image */}
+            {/* სურათი */}
             <Link className="shrink-0" href="#">
-              <div className="relative h-20 w-20 overflow-hidden rounded-lg ring-1 ring-brand-muted/60">
+              <div className="relative h-20 w-20 overflow-hidden rounded-lg ring-1 ring-brand-muted/60 bg-white">
                 <Image
                   alt={item.name}
                   height={80}
@@ -48,7 +52,7 @@ export default function CartItems() {
               </div>
             </Link>
 
-            {/* title + actions */}
+            {/* შუა სვეტი: სახელი + არჩეული ფასეტები + ქმედებები */}
             <div className="min-w-0">
               <Link
                 className="block text-base font-medium text-text-light hover:underline"
@@ -58,7 +62,23 @@ export default function CartItems() {
                 <span className="line-clamp-2">{item.name}</span>
               </Link>
 
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-sm">
+              {/* არჩეული ფასეტები */}
+              {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {Object.entries(item.selectedFacets).map(([k, v]) => (
+                    <span
+                      key={k}
+                      className="text-[11px] rounded-full border px-2 py-0.5 bg-gray-50 text-gray-700
+                                 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
+                    >
+                      {k}: {v}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* ქმედებები */}
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
                 <button
                   type="button"
                   className="inline-flex items-center text-text-subtle hover:text-text-light transition"
@@ -77,12 +97,15 @@ export default function CartItems() {
                       strokeWidth="2"
                     />
                   </svg>
-                  Add to Favorites
+                  ჩანიშვნა
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => {
+                    // removeFromCart(item.id, (item as any).variantKey)
+                    removeFromCart(item.id);
+                  }}
                   className="inline-flex items-center text-red-600 hover:text-red-700 transition"
                 >
                   <svg
@@ -99,19 +122,19 @@ export default function CartItems() {
                       strokeWidth="2"
                     />
                   </svg>
-                  Remove
+                  წაშლა
                 </button>
               </div>
             </div>
 
-            {/* qty + price */}
+            {/* მარჯვენა სვეტი: რაოდენობა + ფასი */}
             <div className="flex items-center gap-6 justify-end">
               <div className="flex items-center rounded-lg border border-brand-muted/70 dark:border-text-subtledark/40 bg-brand-surface dark:bg-brand-muteddark/50">
                 <button
                   className="inline-flex h-8 w-8 items-center justify-center rounded-l-md hover:bg-brand-muted/80 dark:hover:bg-brand-muteddark/70 focus:outline-none"
                   type="button"
-                  aria-label="Decrease quantity"
-                  onClick={() => handleQuantityChange(item.id, item.quantity, -1)}
+                  aria-label="რაოდენობის შემცირება"
+                  onClick={() => handleQuantityChange(item.id, item.quantity, -1 /*, (item as any).variantKey */)}
                 >
                   <svg
                     aria-hidden="true"
@@ -122,16 +145,14 @@ export default function CartItems() {
                     <path d="M1 1h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
                   </svg>
                 </button>
-                <input
-                  readOnly
-                  className="w-10 text-center text-sm font-medium text-text-light dark:text-text-lightdark bg-transparent"
-                  value={item.quantity}
-                />
+                <span className="w-10 text-center text-sm font-medium text-text-light dark:text-text-lightdark bg-transparent">
+                  {item.quantity}
+                </span>
                 <button
                   className="inline-flex h-8 w-8 items-center justify-center rounded-r-md hover:bg-brand-muted/80 dark:hover:bg-brand-muteddark/70 focus:outline-none"
                   type="button"
-                  aria-label="Increase quantity"
-                  onClick={() => handleQuantityChange(item.id, item.quantity, 1)}
+                  aria-label="რაოდენობის გაზრდა"
+                  onClick={() => handleQuantityChange(item.id, item.quantity, 1 /*, (item as any).variantKey */)}
                 >
                   <svg
                     aria-hidden="true"

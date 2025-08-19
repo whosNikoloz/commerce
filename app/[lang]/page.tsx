@@ -2,6 +2,7 @@ import { CategoryCarousel } from "@/components/Home/category-carousel";
 import { ComingSoon } from "@/components/Home/coming-soon";
 import Hero from "@/components/Home/hero";
 import { InStockProducts } from "@/components/Home/in-stock-products";
+import { Liquidated } from "@/components/Home/liquidated-products";
 import { NewArrivals } from "@/components/Home/new-arrivals";
 import { PromotionalBanner } from "@/components/Home/promotional-banner";
 
@@ -40,9 +41,13 @@ export default function HomePage() {
           <CategoryCarousel />
         </section>
 
+
+
         <NewArrivals />
 
         <ComingSoon />
+
+        <Liquidated />
 
         <InStockProducts />
       </main>

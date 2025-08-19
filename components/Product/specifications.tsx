@@ -5,9 +5,10 @@ interface SpecificationsProps {
     facetName: string;
     facetValues: string[];
   }[];
+  onChange?: (selected: Record<string, string>) => void;
 }
 
-export function Specifications({ specs }: SpecificationsProps) {
+export function Specifications({ specs, onChange }: SpecificationsProps) {
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -19,11 +20,16 @@ export function Specifications({ specs }: SpecificationsProps) {
         }
       });
       setSelectedValues(defaults);
+      onChange?.(defaults);
     }
-  }, [specs]);
+  }, [specs, onChange]);
 
   const handleSelect = (facetName: string, value: string) => {
-    setSelectedValues((prev) => ({ ...prev, [facetName]: value }));
+    setSelectedValues((prev) => {
+      const next = { ...prev, [facetName]: value };
+      onChange?.(next);
+      return next;
+    });
   };
 
   return (

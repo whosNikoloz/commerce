@@ -12,8 +12,8 @@ export interface ProductResponseModel {
     condition: Condition;
     description?: string;
     images?: string[];
-    brand?: BrandModel;
-    category?: CategoryModel;
+    brand: BrandModel;
+    category: CategoryModel;
     isActive?: boolean;
     isLiquidated?: boolean;
     isComingSoon?: boolean;

@@ -18,6 +18,7 @@ type Props = {
 
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
+  const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const { addToCart } = useCart();
   const isMobile = useIsMobile();
 
@@ -48,10 +49,12 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       quantity: 1,
       discount: product.discountPrice ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100)) : 0,
       originalPrice: product.price,
+
+      selectedFacets,
     };
 
     addToCart(item);
-  }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -179,7 +182,10 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       {specs.map((g, i) => (
         <div key={i} className="my-12">
           <h1 className="font-bold mb-6 text-2xl">{g.headline}</h1>
-          <Specifications specs={g.specifications} />
+          <Specifications
+            specs={g.specifications}
+            onChange={setSelectedFacets}
+          />
         </div>
       ))}
 

@@ -74,16 +74,26 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const specs = useMemo(() => {
     if (!product.productFacetValues?.length) return [];
 
+    const grouped = product.productFacetValues.reduce((acc, f) => {
+      const name = f.facetName ?? "";
+      if (!acc[name]) {
+        acc[name] = [];
+      }
+      acc[name].push(f.facetValue ?? "");
+      return acc;
+    }, {} as Record<string, string[]>);
+
     return [
       {
         headline: "Specifications",
-        specifications: product.productFacetValues.map((f) => ({
-          facetName: f.facetName ?? "",
-          facetValue: f.facetValue ?? "",
+        specifications: Object.entries(grouped).map(([facetName, facetValues]) => ({
+          facetName,
+          facetValues,
         })),
       },
     ];
   }, [product.productFacetValues]);
+
 
   const similarProducts = useMemo(
     () =>

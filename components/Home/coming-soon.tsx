@@ -59,7 +59,7 @@ export function ComingSoon() {
                         >
                             <div className="relative">
                                 {/* Optional: replace Soon with formatted date */}
-                                <Badge className="absolute top-3 right-3 z-10 bg-primary dark:bg-primarydark text-white">
+                                <Badge className="absolute top-3 right-3 z-10 bg-primary dark:bg-brand-primarydark text-white">
                                     Soon
                                 </Badge>
                                 <img
@@ -83,7 +83,7 @@ export function ComingSoon() {
                                     <Button
                                         size="sm"
                                         variant="outline"
-                                        className="border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white"
+                                        className="border-primary dark:border-brand-primarydark text-primary dark:text-brand-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white"
                                     >
                                         Notify Me
                                     </Button>

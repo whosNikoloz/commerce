@@ -21,6 +21,7 @@ function SidebarContent({
   return (
     <div className="space-y-6">
       <div>
+        <h2 className="text-lg font-semibold mb-4">კატეგორიები</h2>
         <div className="space-y-2">
           {categorys.map(sub => (
             <Link

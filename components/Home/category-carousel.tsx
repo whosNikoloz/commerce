@@ -72,7 +72,8 @@ export function CategoryCarousel() {
                         >
                             <div className="relative h-48 overflow-hidden">
                                 <img
-                                    src={`/images/categories/${parent.id}.png`}
+                                    // src={`/images/categories/${parent.id}.png`}
+                                    src={"/img2.jpg"}
                                     alt={parent.name || "Category"}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
@@ -81,7 +82,7 @@ export function CategoryCarousel() {
 
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-2">
-                                    <h3 className="font-serif text-xl font-bold text-text-light dark:text-text-lightdark group-hover:text-primary dark:group-hover:text-primarydark transition-colors">
+                                    <h3 className="font-serif text-xl font-bold text-text-light dark:text-text-lightdark group-hover:text-primary dark:group-hover:text-brand-primarydark transition-colors">
                                         {parent.name || "Unnamed"}
                                     </h3>
                                     {children.length > 0 && (
@@ -112,7 +113,7 @@ export function CategoryCarousel() {
 
                                 <Button
                                     onClick={(e) => { e.stopPropagation(); go() }}
-                                    className="w-full bg-primary dark:bg-primarydark hover:bg-primary/90 dark:hover:bg-primarydark/90 text-white font-sans font-medium transition-colors duration-300"
+                                    className="w-full bg-brand-primary dark:bg-brand-primarydark hover:bg-primary/90 dark:hover:bg-brand-primarydark/90 text-white font-sans font-medium transition-colors duration-300"
                                     size="sm"
                                 >
                                     Shop {parent.name ?? "Category"}

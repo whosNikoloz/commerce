@@ -62,7 +62,7 @@ export function InStockProducts() {
                     <Button
                         asChild
                         variant="outline"
-                        className="hidden md:flex border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+                        className="hidden md:flex border-brand-primary dark:border-brand-primarydark text-primary dark:text-brand-primarydark hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primarydark dark:hover:text-white transition-colors"
                     >
                         <NextLink href="/products?stock=instock">View All Products</NextLink>
                     </Button>

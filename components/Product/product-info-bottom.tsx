@@ -52,7 +52,6 @@ export function ProductInfoBottom({
   onBuyNow,
 }: ProductInfoBottomProps) {
   const [isAnimating, setIsAnimating] = useState(false);
-  console.log("name:", name, "price:", price, "originalPrice:", originalPrice, "isVisible:", isVisible);
 
   useEffect(() => {
     setIsAnimating(isVisible);

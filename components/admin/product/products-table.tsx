@@ -1,41 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Eye, EyeOff, Edit, Trash2, Search, Package, RefreshCw, MoreHorizontal, Filter, Grid, List, SortAsc } from "lucide-react";
+import {
+  Eye, EyeOff, Search, Package, RefreshCw, Grid, List, SortAsc, Filter,
+  Layers, // icon for mobile categories trigger
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { StockStatus, Condition } from "@/types/enums";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { ProductRequestModel, ProductResponseModel } from "@/types/product";
+import { ProductRequestModel } from "@/types/product";
 import { deleteProductById, getProductsByCategory, updateProduct } from "@/app/api/services/productService";
 import UpdateProductModal from "./update-product-modal";
 import ReviewImagesModal from "./review-images-modal";
 import { toast } from "sonner";
 import { CategoryTree } from "./category-tree";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-type ViewMode = 'table' | 'grid';
-type SortOption = 'name' | 'price' | 'created' | 'status';
+type ViewMode = "table" | "grid";
+type SortOption = "name" | "price" | "created" | "status";
 
 export function ProductsTable() {
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
@@ -43,9 +34,17 @@ export function ProductsTable() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
-  const [sortBy, setSortBy] = useState<SortOption>('name');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
+  const [sortBy, setSortBy] = useState<SortOption>("name");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+
+  // Prefer grid on small screens by default
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isSmall = window.matchMedia("(max-width: 1023px)").matches;
+      if (isSmall) setViewMode("grid");
+    }
+  }, []);
 
   useEffect(() => {
     if (!selectedCategoryId) {
@@ -86,7 +85,7 @@ export function ProductsTable() {
     description: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean }
   ) => {
-    const current = products.find(p => p.id === productId);
+    const current = products.find((p) => p.id === productId);
     if (!current) return;
 
     const prevProducts = products;
@@ -99,9 +98,7 @@ export function ProductsTable() {
       isNewArrival: flags.isNewArrival,
     };
 
-    setProducts(prev =>
-      prev.map(p => (p.id === productId ? patched : p))
-    );
+    setProducts((prev) => prev.map((p) => (p.id === productId ? patched : p)));
 
     const payload: ProductRequestModel = {
       id: current.id,
@@ -132,7 +129,7 @@ export function ProductsTable() {
   };
 
   const toggleProductVisibility = async (productId: string) => {
-    const current = products.find(p => p.id === productId);
+    const current = products.find((p) => p.id === productId);
     if (!current) return;
 
     const prevProducts = products;
@@ -171,28 +168,31 @@ export function ProductsTable() {
     }
   };
 
-  const filteredAndSortedProducts = products
-    .filter((product) => {
-      const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesStatus = statusFilter === 'all' ||
-        (statusFilter === 'active' && product.isActive) ||
-        (statusFilter === 'inactive' && !product.isActive);
-
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return (a.name || '').localeCompare(b.name || '');
-        case 'price':
-          return a.price - b.price;
-        case 'status':
-          return a.status - b.status;
-        default:
-          return 0;
-      }
-    });
+  const filteredAndSortedProducts = useMemo(
+    () =>
+      products
+        .filter((product) => {
+          const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesStatus =
+            statusFilter === "all" ||
+            (statusFilter === "active" && product.isActive) ||
+            (statusFilter === "inactive" && !product.isActive);
+          return matchesSearch && matchesStatus;
+        })
+        .sort((a, b) => {
+          switch (sortBy) {
+            case "name":
+              return (a.name || "").localeCompare(b.name || "");
+            case "price":
+              return a.price - b.price;
+            case "status":
+              return a.status - b.status;
+            default:
+              return 0;
+          }
+        }),
+    [products, searchTerm, statusFilter, sortBy]
+  );
 
   const getStatusClass = (status: StockStatus) => {
     switch (status) {
@@ -243,15 +243,16 @@ export function ProductsTable() {
   };
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
-    <Card className="group hover:shadow-lg transition-all duration-200">
+    <Card className="group hover:shadow-lg transition-all duration-200 bg-brand-surface dark:bg-brand-surfacedark">
       <CardContent className="p-4">
         <div className="relative mb-3">
-          <div className="relative w-full h-48">
+          <div className="relative w-full h-40 sm:h-48">
             <Image
               src={product.images?.[0] || "/placeholder.svg"}
               alt={product.name ?? "Product"}
               fill
               className="rounded-lg object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
             {product.images && product.images.length > 1 && (
               <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
@@ -270,13 +271,8 @@ export function ProductsTable() {
 
         <div className="space-y-2">
           <h3 className="font-semibold text-sm line-clamp-2">{product.name}</h3>
-          {/* <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">
-              {product.category?.name || "Uncategorized"}
-            </Badge>
-          </div> */}
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge className={`text-xs ${getStatusClass(product.status)}`}>
               {getStatusLabel(product.status)}
             </Badge>
@@ -285,7 +281,7 @@ export function ProductsTable() {
             </Badge>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="mt-1 flex items-center justify-between gap-2">
             <div className="font-medium">
               {product.discountPrice ? (
                 <div className="flex items-center gap-2">
@@ -298,23 +294,16 @@ export function ProductsTable() {
             </div>
 
             <div className="flex items-center gap-1">
-              <Switch
-                checked={product.isActive}
-                onCheckedChange={() => toggleProductVisibility(product.id)}
+              <Switch checked={product.isActive} onCheckedChange={() => toggleProductVisibility(product.id)} />
+              <UpdateProductModal
+                productId={product.id}
+                initialDescription={product.description}
+                initialIsLiquidated={product.isLiquidated}
+                initialIsComingSoon={product.isComingSoon}
+                initialIsNewArrival={product.isNewArrival}
+                onSave={(id, desc, flags) => handleUpdateProduct(id, desc, flags)}
               />
-              <div className="flex items-center gap-1">
-                <UpdateProductModal
-                  productId={product.id}
-                  initialDescription={product.description}
-                  initialIsLiquidated={product.isLiquidated}
-                  initialIsComingSoon={product.isComingSoon}
-                  initialIsNewArrival={product.isNewArrival}
-                  onSave={(id, desc, flags) => {
-                    handleUpdateProduct(id, desc, flags);
-                  }}
-                />
-                <ReviewImagesModal />
-              </div>
+              <ReviewImagesModal />
             </div>
           </div>
         </div>
@@ -324,29 +313,44 @@ export function ProductsTable() {
 
   return (
     <div className="space-y-6">
-      {/* <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
-      </div> */}
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar - Categories */}
-        <div className="lg:col-span-1">
+        {/* Sidebar (desktop/tablet) */}
+        <div className="hidden lg:block lg:col-span-1">
           <CategoryTree onSelectCategory={setSelectedCategoryId} />
         </div>
 
-        {/* Main Content */}
+        {/* Main */}
         <div className="lg:col-span-3">
-          <Card>
+          <Card className="dark:bg-brand-muteddark bg-brand-muted">
             <CardHeader className="pb-4">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              {/* Top controls */}
+              <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 flex-1">
-                  <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                  {/* Mobile: open categories */}
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="lg:hidden shrink-0"
+                        size="sm"
+                      >
+                        <Layers className="mr-2 h-4 w-4" />
+                        Categories
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="bottom" className="h-[85vh] p-0 bg-inherit">
+                      <SheetHeader className="px-6 pt-6 mb-6">
+                        <SheetTitle>Categories</SheetTitle>
+                      </SheetHeader>
+                      <div className="px-4 pb-4">
+                        <CategoryTree onSelectCategory={(id) => { setSelectedCategoryId(id); }} />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+
+                  {/* Search */}
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
                     <Input
                       placeholder="Search products..."
                       value={searchTerm}
@@ -356,11 +360,12 @@ export function ProductsTable() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Filters / sort / view */}
+                <div className="flex flex-wrap items-center gap-2">
                   <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
                     <SelectTrigger className="w-32">
                       <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue />
+                      <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
@@ -372,7 +377,7 @@ export function ProductsTable() {
                   <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
                     <SelectTrigger className="w-32">
                       <SortAsc className="h-4 w-4 mr-2" />
-                      <SelectValue />
+                      <SelectValue placeholder="Sort" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="name">Name</SelectItem>
@@ -381,22 +386,22 @@ export function ProductsTable() {
                     </SelectContent>
                   </Select>
 
-                  <Separator orientation="vertical" className="h-6" />
+                  <Separator orientation="vertical" className="h-6 hidden md:block" />
 
-                  <div className="flex items-center border rounded-md">
+                  <div className="flex items-center border rounded-md overflow-hidden">
                     <Button
-                      variant={viewMode === 'table' ? 'default' : 'ghost'}
+                      variant={viewMode === "table" ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => setViewMode('table')}
-                      className="rounded-r-none border-r-0"
+                      onClick={() => setViewMode("table")}
+                      className="rounded-none"
                     >
                       <List className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                      variant={viewMode === "grid" ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => setViewMode('grid')}
-                      className="rounded-l-none"
+                      onClick={() => setViewMode("grid")}
+                      className="rounded-none"
                     >
                       <Grid className="h-4 w-4" />
                     </Button>
@@ -405,7 +410,7 @@ export function ProductsTable() {
               </div>
 
               {selectedCategoryId && (
-                <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Package className="h-4 w-4" />
                   <span>{filteredAndSortedProducts.length} products found</span>
                 </div>
@@ -415,42 +420,42 @@ export function ProductsTable() {
             <CardContent className="p-0">
               <div className="max-h-[calc(100vh-280px)] overflow-auto">
                 {!selectedCategoryId ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center p-6">
-                    <Package className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                  <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
+                    <Package className="h-14 w-14 text-slate-300 dark:text-slate-600 mb-4" />
+                    <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
                       Select a Category
                     </h3>
                     <p className="text-slate-500 dark:text-slate-500 max-w-sm">
-                      Choose a category from the sidebar to view and manage products
+                      Choose a category from the sidebar (or button on mobile) to view and manage products.
                     </p>
                   </div>
                 ) : loading ? (
-                  <div className="flex items-center justify-center py-12 p-6">
+                  <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
                       <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
                       <span className="text-slate-600 dark:text-slate-400">Loading products...</span>
                     </div>
                   </div>
                 ) : error ? (
-                  <div className="text-center py-12 p-6">
+                  <div className="text-center py-12 px-6">
                     <div className="text-red-500 mb-2">{error}</div>
                     <Button variant="outline" onClick={() => window.location.reload()}>
                       Try Again
                     </Button>
                   </div>
                 ) : filteredAndSortedProducts.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center p-6">
-                    <Package className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                  <div className="flex flex-col items-center justify-center py-12 text-center px-6">
+                    <Package className="h-14 w-14 text-slate-300 dark:text-slate-600 mb-4" />
+                    <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
                       No Products Found
                     </h3>
                     <p className="text-slate-500 dark:text-slate-500 max-w-sm">
                       {searchTerm ? "Try adjusting your search terms" : "No products available in this category"}
                     </p>
                   </div>
-                ) : viewMode === 'grid' ? (
-                  <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                ) : viewMode === "grid" ? (
+                  <div className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4">
                       {filteredAndSortedProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                       ))}
@@ -461,12 +466,12 @@ export function ProductsTable() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="w-[80px]">Image</TableHead>
+                          <TableHead className="w-[72px] sm:w-[80px]">Image</TableHead>
                           <TableHead>Product</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Condition</TableHead>
-                          <TableHead>Visible</TableHead>
+                          <TableHead className="whitespace-nowrap">Price</TableHead>
+                          <TableHead className="hidden md:table-cell">Status</TableHead>
+                          <TableHead className="hidden lg:table-cell">Condition</TableHead>
+                          <TableHead className="hidden sm:table-cell">Visible</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -491,57 +496,66 @@ export function ProductsTable() {
                             </TableCell>
                             <TableCell>
                               <div className="space-y-1">
-                                <div className="font-medium text-slate-900 dark:text-slate-100">{product.name}</div>
+                                <div className="font-medium text-slate-900 dark:text-slate-100 line-clamp-2">
+                                  {product.name}
+                                </div>
                                 <div className="text-xs text-slate-500 dark:text-slate-400">ID: {product.id}</div>
+                                {/* Mobile badges inline under name */}
+                                <div className="mt-2 flex flex-wrap gap-1 md:hidden">
+                                  <Badge variant="default" className={getStatusClass(product.status)}>
+                                    {getStatusLabel(product.status)}
+                                  </Badge>
+                                  <Badge variant="default" className={getConditionClass(product.condition)}>
+                                    {getConditionLabel(product.condition)}
+                                  </Badge>
+                                </div>
                               </div>
                             </TableCell>
-                            <TableCell>
-                              <div className="font-medium">
-                                {product.discountPrice ? (
-                                  <div className="space-y-1">
-                                    <div className="text-red-500 line-through text-sm">{product.price} ₾</div>
-                                    <div className="text-green-600 font-bold">{product.discountPrice} ₾</div>
-                                  </div>
-                                ) : (
-                                  <div className="text-green-600 font-bold">{product.price} ₾</div>
-                                )}
-                              </div>
+                            <TableCell className="whitespace-nowrap">
+                              {product.discountPrice ? (
+                                <div className="space-y-1">
+                                  <div className="text-red-500 line-through text-sm">{product.price} ₾</div>
+                                  <div className="text-green-600 font-bold">{product.discountPrice} ₾</div>
+                                </div>
+                              ) : (
+                                <div className="text-green-600 font-bold">{product.price} ₾</div>
+                              )}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                               <Badge variant="default" className={getStatusClass(product.status)}>
                                 {getStatusLabel(product.status)}
                               </Badge>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden lg:table-cell">
                               <Badge variant="default" className={getConditionClass(product.condition)}>
                                 {getConditionLabel(product.condition)}
                               </Badge>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden sm:table-cell">
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={product.isActive}
                                   onCheckedChange={() => toggleProductVisibility(product.id)}
                                   className="data-[state=checked]:bg-green-600"
                                 />
-                                {product.isActive ? (
-                                  <Eye className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                ) : (
-                                  <EyeOff className="h-4 w-4 text-slate-400" />
-                                )}
                               </div>
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
+                                {/* For small screens, quick toggle here */}
+                                <div className="sm:hidden mr-1">
+                                  <Switch
+                                    checked={product.isActive}
+                                    onCheckedChange={() => toggleProductVisibility(product.id)}
+                                  />
+                                </div>
                                 <UpdateProductModal
                                   productId={product.id}
                                   initialDescription={product.description}
                                   initialIsLiquidated={product.isLiquidated}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsNewArrival={product.isNewArrival}
-                                  onSave={(id, desc, flags) => {
-                                    handleUpdateProduct(id, desc, flags);
-                                  }}
+                                  onSave={(id, desc, flags) => handleUpdateProduct(id, desc, flags)}
                                 />
                                 <ReviewImagesModal />
                               </div>

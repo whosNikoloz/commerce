@@ -152,8 +152,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                       <Image
                         src={currentImage}
                         alt={product.name ?? "Product image"}
-                        width={400}
-                        height={400}
+                        width={250}
+                        height={250}
                         className={`w-full ${viewMode === "grid" ? "aspect-square" : "h-40"} object-cover transition-transform duration-500 group-hover:scale-105`}
                       />
 
@@ -275,15 +275,14 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                     </div>
 
                     <div className="relative self-stretch flex flex-col items-end justify-between">
-                      <button
+                      <Button
+                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                        disabled={ctaDisabled}
                         onClick={() => handleAddToCart(product.id)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#7ECF63]
-                          text-white shadow-sm hover:brightness-95 transition"
-                        aria-label="Add to cart"
-                        title="დამატება კალათაში"
                       >
-                        <ShoppingCart className="h-4 w-4" />
-                      </button>
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        {ctaLabel}
+                      </Button>
                     </div>
                   </div>
                 </div>

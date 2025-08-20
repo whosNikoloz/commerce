@@ -24,6 +24,9 @@ export type CartItem = {
   variantKey?: string;
 };
 
+type Facets = Record<string, string | undefined | null> | undefined | null;
+
+
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
@@ -81,22 +84,34 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(CART_KEY, encryptData(cart));
   }, [cart]);
 
-  const buildVariantKey = (selected?: Record<string, string>) => {
-    if (!selected) return "";
-    const entries = Object.entries(selected).sort(([a], [b]) => a.localeCompare(b));
-    return JSON.stringify(entries);
+  const normalizeFacets = (facets: Facets) => {
+    if (!facets) return null;
+    const entries = Object.entries(facets)
+      .filter(([, v]) => v != null && String(v).trim() !== "");
+    if (entries.length === 0) return null;
+    entries.sort(([a], [b]) => a.localeCompare(b));
+    return Object.fromEntries(entries) as Record<string, string>;
+  };
+
+  const buildVariantKey = (facets: Facets): string => {
+    const norm = normalizeFacets(facets);
+    if (!norm) return "__BASE__";
+    return Object.entries(norm).map(([k, v]) => `${k}:${v}`).join("|");
   };
 
   const addToCart = (item: CartItem) => {
+    const id = String(item.id);
+    const variantKey = buildVariantKey(item.selectedFacets);
+
     setCart(prev => {
-      const id = String(item.id);
-      const variantKey = buildVariantKey(item.selectedFacets);
-      const existing = prev.find(i => i.id === id && (i.variantKey ?? "") === variantKey);
+      const existing = prev.find(i =>
+        String(i.id) === id && (i.variantKey ?? "__BASE__") === variantKey
+      );
 
       if (existing) {
         return prev.map(i =>
-          i.id === id && (i.variantKey ?? "") === variantKey
-            ? { ...i, quantity: i.quantity + 1 }
+          String(i.id) === id && (i.variantKey ?? "__BASE__") === variantKey
+            ? { ...i, quantity: i.quantity + Math.max(1, item.quantity || 1) }
             : i
         );
       }
@@ -108,16 +123,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           id,
           quantity: Math.max(1, item.quantity || 1),
           variantKey,
+          // Optional: persist normalized facets so UI/toasts are consistent
+          selectedFacets: normalizeFacets(item.selectedFacets) ?? undefined,
         },
       ];
     });
 
-    const pretty = item.selectedFacets && Object.keys(item.selectedFacets).length
-      ? " (" + Object.entries(item.selectedFacets).map(([k, v]) => `${k}: ${v}`).join(", ") + ")"
+    const norm = normalizeFacets(item.selectedFacets);
+    const pretty = norm
+      ? " (" + Object.entries(norm).map(([k, v]) => `${k}: ${v}`).join(", ") + ")"
       : "";
-
     toast.success(`${item.name}${pretty} დაემატა კალათაში`);
   };
+
 
   const removeFromCart = (id: string, variantKey?: string) => {
     setCart(prev =>

@@ -98,7 +98,6 @@ export default function CartDropdown() {
                       <div className="ml-4 flex-1 min-w-0">
                         <h4 className="font-medium line-clamp-2">{item.name}</h4>
 
-                        {/* ✅ არჩეული სპეციფიკაციები (ფასეტები) როგორც ბეჯები */}
                         {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
                             {Object.entries(item.selectedFacets).map(([k, v]) => (
@@ -121,7 +120,7 @@ export default function CartDropdown() {
                               <span className="text-sm line-through text-muted-foreground">
                                 {item.originalPrice} ₾
                               </span>
-                              <Badge className="text-[10px] py-0.5 px-1.5">-{item.discount}%</Badge>
+                              <Badge className="text-[10px]">-{item.discount}%</Badge>
                             </>
                           )}
                         </div>

@@ -184,6 +184,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           <h1 className="font-bold mb-6 text-2xl">{g.headline}</h1>
           <Specifications
             specs={g.specifications}
+            value={selectedFacets}
             onChange={setSelectedFacets}
           />
         </div>

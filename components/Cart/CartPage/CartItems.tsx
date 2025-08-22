@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Minus, Plus, Heart, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,14 @@ const toNumber = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0));
 const percent = (o: number, c: number) => Math.max(0, Math.round(((o - c) / o) * 100));
 const monthly = (price: number, months = 24) => Math.ceil(price / months);
 
+// 🔹 პატარა ჰელპერი specs-ის ლამაზი სტრიქონისთვის
+function formatSpecs(facets?: Record<string, string>) {
+  if (!facets) return "";
+  const entries = Object.entries(facets);
+  if (!entries.length) return "";
+  return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
+}
+
 export default function CartItems() {
   const { cart, updateCartItem, removeFromCart } = useCart();
   const items = cart as Array<CartItemType & { originalPrice?: number }>;
@@ -27,10 +35,15 @@ export default function CartItems() {
         const hasDiscount = !!originalPrice && originalPrice > price;
         const discount = hasDiscount ? percent(originalPrice!, price) : 0;
         const quantity = toNumber(item.quantity);
+        const specsLine = formatSpecs(item.selectedFacets); // <- აქ
 
         return (
-          <Card key={`${item.id}-${(item as any).variantKey ?? ""}`} className="p-3 sm:p-4 md:p-5 dark:bg-brand-muteddark bg-brand-muted">
+          <Card
+            key={`${item.id}-${(item as any).variantKey ?? ""}`}
+            className="p-3 sm:p-4 md:p-5 dark:bg-brand-muteddark bg-brand-muted"
+          >
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_160px_48px] md:items-center">
+              {/* მარცხენა ბლოკი */}
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="relative shrink-0">
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md overflow-hidden bg-muted">
@@ -49,6 +62,7 @@ export default function CartItems() {
                     {item.name}
                   </h3>
 
+                  {/* 🔹 არჩეული სპეციფიკაციები — როგორც ბეჟები */}
                   {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {Object.entries(item.selectedFacets).map(([k, v]) => (
@@ -59,11 +73,13 @@ export default function CartItems() {
                     </div>
                   )}
 
-                  <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted px-2.5 py-1 text-[11px] sm:text-xs text-muted-foreground">
-                    თვეში:{" "}
-                    <span className="text-foreground font-medium">{monthly(price)}₾</span>-დან
-                  </div>
 
+                  {/* თვეში გადასახადი */}
+                  {/* <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted px-2.5 py-1 text-[11px] sm:text-xs text-muted-foreground">
+                    თვეში: <span className="text-foreground font-medium">{monthly(price)}₾</span>-დან
+                  </div> */}
+
+                  {/* მობილურის ფასი */}
                   <div className="mt-2 md:hidden">
                     <div className="flex items-center gap-2">
                       <span className="text-base font-semibold">{formatPrice(price)}</span>
@@ -82,13 +98,14 @@ export default function CartItems() {
                 </div>
               </div>
 
+              {/* რაოდენობა */}
               <div className="order-3 md:order-none flex md:justify-center">
                 <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border">
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-9 w-10 sm:w-9 p-0"
-                    onClick={() => updateCartItem(item.id, Math.max(1, quantity - 1))}
+                    onClick={() => updateCartItem(item.id, Math.max(1, quantity - 1), item.variantKey)} // 🔹 variantKey
                     disabled={quantity <= 1}
                     aria-label="Decrease"
                   >
@@ -99,13 +116,15 @@ export default function CartItems() {
                     variant="ghost"
                     size="sm"
                     className="h-9 w-10 sm:w-9 p-0"
-                    onClick={() => updateCartItem(item.id, quantity + 1)}
+                    onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)} // 🔹 variantKey
                     aria-label="Increase"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
+
+              {/* დესკტოპის ფასი */}
               <div className="hidden md:flex flex-col items-end gap-1">
                 <div className="text-lg font-semibold">{formatPrice(price)}</div>
                 {hasDiscount && (
@@ -120,12 +139,13 @@ export default function CartItems() {
                 )}
               </div>
 
+              {/* წაშლა */}
               <div className="order-4 md:order-none flex justify-end">
                 <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeFromCart(item.id, item.variantKey)} // 🔹 variantKey
                     className="text-muted-foreground hover:text-destructive"
                     aria-label="Remove"
                   >

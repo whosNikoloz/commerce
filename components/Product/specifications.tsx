@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 interface SpecificationsProps {
   specs: { facetName: string; facetValues: string[] }[];
@@ -6,63 +6,72 @@ interface SpecificationsProps {
   onChange?: (selected: Record<string, string>) => void;
 }
 
-export function Specifications({ specs, value, onChange }: SpecificationsProps) {
+const shallowEqual = (a: Record<string, string>, b: Record<string, string>) => {
+  const ak = Object.keys(a), bk = Object.keys(b);
+  if (ak.length !== bk.length) return false;
+  for (const k of ak) if (a[k] !== b[k]) return false;
+  return true;
+};
+
+export function Specifications({ specs = [], value, onChange }: SpecificationsProps) {
   const multiFacetNames = useMemo(() => {
     const s = new Set<string>();
-    specs?.forEach(f => { if (f.facetValues.length > 1) s.add(f.facetName); });
+    specs.forEach(f => { if (f.facetValues.length > 1) s.add(f.facetName); });
     return s;
-  }, [specs]);
-
-  const facetMap = useMemo(() => {
-    const m = new Map<string, Set<string>>();
-    specs?.forEach(f => m.set(f.facetName, new Set(f.facetValues)));
-    return m;
   }, [specs]);
 
   const defaults = useMemo(() => {
     const d: Record<string, string> = {};
-    specs?.forEach(f => { if (f.facetValues.length) d[f.facetName] = f.facetValues[0]; });
+    specs.forEach(f => { if (f.facetValues.length) d[f.facetName] = f.facetValues[0]; });
     return d;
   }, [specs]);
 
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
-  const touchedRef = useRef<Set<string>>(new Set());
+  const userActionRef = useRef(false);                 // ✅ gate emits to user actions only
+  const lastEmittedRef = useRef<Record<string, string>>({}); // avoid duplicate emits
 
+  // Sync local state from props (no onChange here)
   useEffect(() => {
-    const base: Record<string, string> = { ...selectedValues, ...(value ?? {}) };
+    if (!specs.length) {
+      if (!shallowEqual(selectedValues, {})) setSelectedValues({});
+      return;
+    }
     const next: Record<string, string> = {};
-
     specs.forEach(({ facetName, facetValues }) => {
       const allowed = new Set(facetValues);
       const candidate =
-        (value && value[facetName] !== undefined ? value[facetName] : base[facetName]) ??
+        (value && value[facetName] !== undefined ? value[facetName] : selectedValues[facetName]) ??
         defaults[facetName];
-
-      next[facetName] = allowed.has(candidate!) ? candidate! : facetValues[0];
+      next[facetName] = allowed.has(String(candidate)) ? String(candidate) : facetValues[0];
     });
+    if (!shallowEqual(selectedValues, next)) {
+      setSelectedValues(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [specs, value]); // intentionally ignore selectedValues/defaults to avoid loops
 
-    setSelectedValues(next);
-    touchedRef.current.forEach(name => { if (!facetMap.has(name)) touchedRef.current.delete(name); });
-  }, [specs, value]);
-
-  const emitChanged = useCallback((nextValues: Record<string, string>) => {
+  // ✅ Emit AFTER commit, and only if triggered by a user click
+  useEffect(() => {
     if (!onChange) return;
-    const payload: Record<string, string> = {};
-    touchedRef.current.forEach((name) => {
-      if (multiFacetNames.has(name) && nextValues[name] !== undefined) {
-        payload[name] = nextValues[name];
-      }
-    });
-    onChange(payload);
-  }, [onChange, multiFacetNames]);
+    if (!userActionRef.current) return;
 
-  const handleSelect = (facetName: string, value: string) => {
+    const payload: Record<string, string> = {};
+    Object.keys(selectedValues).forEach((name) => {
+      if (multiFacetNames.has(name)) payload[name] = selectedValues[name];
+    });
+
+    if (!shallowEqual(lastEmittedRef.current, payload)) {
+      onChange(payload);
+      lastEmittedRef.current = payload;
+    }
+    userActionRef.current = false; // reset
+  }, [selectedValues, multiFacetNames, onChange]);
+
+  const handleSelect = (facetName: string, val: string) => {
     setSelectedValues(prev => {
-      if (prev[facetName] === value) return prev; // no-op
-      const next = { ...prev, [facetName]: value };
-      touchedRef.current.add(facetName);
-      emitChanged(next);
-      return next;
+      if (prev[facetName] === val) return prev; // no-op
+      userActionRef.current = true;             // mark as user-driven
+      return { ...prev, [facetName]: val };
     });
   };
 
@@ -73,7 +82,6 @@ export function Specifications({ specs, value, onChange }: SpecificationsProps) 
           {specs.map((spec) => {
             const isMulti = spec.facetValues.length > 1;
             const selected = selectedValues[spec.facetName];
-
             return (
               <div key={spec.facetName} className="grid grid-cols-2 border-b pb-2 items-center">
                 <span className="font-medium">{spec.facetName}</span>

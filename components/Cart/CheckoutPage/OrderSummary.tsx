@@ -44,17 +44,27 @@ export default function OrderSummary({ onSubmit, isProcessing }: OrderSummaryPro
                   {item.quantity}
                 </Badge>
               </div>
+              {/* 🔹 არჩეული სპეციფიკაციები — როგორც ბეჟები */}
+
               <div className="flex-1 space-y-1">
                 <h4 className="font-medium text-sm">{item.name}</h4>
+                {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {Object.entries(item.selectedFacets).map(([k, v]) => (
+                      <Badge key={k} variant="secondary" className="h-5 text-[11px] px-1.5">
+                        {k}: {v}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 <p className="text-sm text-muted-foreground">
                   {item.originalPrice && (
                     <span className="line-through text-xs mr-2">
                       ${typeof item.originalPrice === 'number' ? item.originalPrice.toFixed(2) : item.originalPrice}
                     </span>
                   )}
-                  ${item.price.toFixed(2)}
+                  <span className="font-medium text-text-light dark:text-text-lightdark">${item.price.toFixed(2)}</span>
                 </p>
-                <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
               </div>
             </div>
           ))}

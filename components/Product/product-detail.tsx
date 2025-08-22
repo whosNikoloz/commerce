@@ -24,6 +24,13 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
 
+  const setSelectedFacetsSafe = (next: Record<string, string>) =>
+    setSelectedFacets(prev => {
+      const pk = Object.keys(prev), nk = Object.keys(next);
+      if (pk.length === nk.length && pk.every(k => prev[k] === next[k])) return prev;
+      return next;
+    });
+
 
   const [similar, setSimilar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
@@ -190,7 +197,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           <Specifications
             specs={g.specifications}
             value={selectedFacets}
-            onChange={setSelectedFacets}
+            onChange={setSelectedFacetsSafe}
           />
         </div>
       ))}

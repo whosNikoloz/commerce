@@ -25,7 +25,7 @@ export function Footer() {
         <footer className="relative mt-24">
             <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-transparent via-slate-100/60 to-transparent dark:via-slate-800/60" />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto  px-4 sm:px-6 lg:px-8">
                 <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white/70 shadow-sm backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/60">
                     <div className="flex flex-col gap-6 border-b border-slate-200/70 p-6 md:flex-row md:items-center md:justify-between dark:border-slate-700/60">
                         <div className="flex items-center gap-3">

@@ -4,22 +4,20 @@ import clsx from "clsx";
 
 import { Providers } from "./providers";
 
-import { siteConfig } from "@/config/site";
+import { site } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Locale } from "@/i18n.config";
 import { getTranslations } from "@/lib/get-dictionary";
 import { LayoutWrapper } from "./LayoutWrapper";
 
 export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s - ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  icons: {
-    icon: "/favicon.ico",
-  },
+  metadataBase: new URL(site.url),
+  title: { default: site.name, template: `%s • ${site.shortName}` },
+  description: site.description,
+  openGraph: { siteName: site.name, images: [site.ogImage] },
+  twitter: { card: "summary_large_image", images: [site.ogImage] },
 };
+
 
 export const viewport: Viewport = {
   themeColor: [

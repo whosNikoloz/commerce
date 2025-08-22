@@ -10,6 +10,7 @@ import { Specifications } from "./specifications";
 import { ImageReview } from "./image-review";
 import { CartItem, useCart } from "@/app/context/cartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 
 type Props = {
   initialProduct: ProductResponseModel;
@@ -21,24 +22,28 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const { addToCart } = useCart();
   const isMobile = useIsMobile();
+  const [notFound, setNotFound] = useState(false);
 
 
   const [similar, setSimilar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
-  // --- live refresh every 30s (price/stock/etc) ---
   useEffect(() => {
     const tick = async () => {
       try {
         const fresh = await getProductById(product.id);
         setProduct(fresh);
       } catch (e) {
-        // silently ignore; keep last good data
+        setNotFound(true);
       }
     };
     const iv = setInterval(tick, 30_000);
     return () => clearInterval(iv);
   }, [product.id]);
+
+  if (notFound) {
+    return <ProductNotFound />;
+  }
 
   const handleAddToCart = () => {
     const item: CartItem = {

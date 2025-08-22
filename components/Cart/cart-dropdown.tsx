@@ -84,7 +84,6 @@ export default function CartDropdown() {
                 <p>Your cart is empty</p>
               </div>
             ) : (
-              // ✅ scrollable სხეული, თუ ნივთები ბევრია
               <CardBody className="px-2 max-h-[70vh] overflow-y-auto">
                 {cart.map((item, index) => (
                   <div key={`${item.id}-${(item as any).variantKey ?? ""}`}>

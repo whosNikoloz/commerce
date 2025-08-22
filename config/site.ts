@@ -1,29 +1,16 @@
-export type SiteConfig = typeof siteConfig;
-
-export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
-  navItems: [
-    {
-      label: "Home",
-      href: "/",
-    },
-    {
-      label: "About",
-      href: "/about",
-    },
-  ],
-  navMenuItems: [
-    {
-      label: "About",
-      href: "/about",
-    },
-  ],
+export const site = {
+  name: "ShopX",
+  shortName: "ShopX",
+  description: "ShopX — smart prices, fast delivery, and great support.",
+  url: "https://www.shopx.example",
+  ogImage: "/og.jpg",
+  logo: "/logo.png",
+  currency: "GEL",
+  localeDefault: "en",
+  locales: ["en", "ka"],
   links: {
-    github: "https://github.com/heroui-inc/heroui",
-    twitter: "https://twitter.com/hero_ui",
-    docs: "https://heroui.com",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
+    twitter: "https://twitter.com/yourbrand",
+    instagram: "https://instagram.com/yourbrand",
   },
-};
+} as const;
+export type SiteConfig = typeof site;

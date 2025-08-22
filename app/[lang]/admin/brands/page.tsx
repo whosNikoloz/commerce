@@ -1,4 +1,19 @@
 import { BrandsTable } from "@/components/admin/brand/brands-table";
+import { basePageMetadata } from "@/lib/seo";
+import { Metadata } from "next";
+import { site as siteConfig } from "@/config/site";
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  const url = `${siteConfig.url}/admin/brands`;
+  return basePageMetadata({
+    title: "Admin • Brands",
+    description: "Manage all brands in the admin dashboard.",
+    url,
+    index: false,
+    siteName: siteConfig.name,
+  });
+}
 
 export default function BrandsPage() {
   return (

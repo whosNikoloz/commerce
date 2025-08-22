@@ -21,6 +21,7 @@ import Loading from "./loading";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import CategoryNotFound from "./not-found";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 type CatOrArray = CategoryWithSubs | CategoryModel[];
@@ -62,6 +63,8 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [notFound, setNotFound] = useState(false);
+
 
   const router = useRouter();
   const params = useSearchParams();
@@ -70,40 +73,57 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     let alive = true;
     (async () => {
       try {
-        setLoading(true); setError(null);
+        setLoading(true); setError(null); setNotFound(false);
 
         const [raw, allBrands] = await Promise.all([
-          getCategoryWithSubCategoriesById(categoryId) as unknown as Promise<CatOrArray>,
+          getCategoryWithSubCategoriesById(categoryId) as unknown as Promise<CatOrArray | null>,
           getAllBrands(),
         ]);
         if (!alive) return;
 
-        let parent: CategoryWithSubs;
-        if (Array.isArray(raw)) {
-          const root = raw.find(c => c.id === categoryId) ?? raw.find(c => c.parentId == null) ?? raw[0];
-          const subs = raw.filter(c => c.parentId === root.id);
-          parent = { ...root, subcategories: subs };
+        // Determine parent category
+        let parent: CategoryWithSubs | null = null;
+
+        if (!raw) {
+          parent = null;
+        } else if (Array.isArray(raw)) {
+          const root = raw.find(c => c.id === categoryId)
+            ?? raw.find(c => c.parentId == null)
+            ?? null;
+          if (root) {
+            const subs = raw.filter(c => c.parentId === root.id);
+            parent = { ...root, subcategories: subs };
+          } else {
+            parent = null;
+          }
         } else {
           parent = raw;
         }
 
-        setCategory(parent);
-        setBrands(allBrands);
-
-        // If you want initial state from URL (?page=..., ?sort=...)
-        const pageFromUrl = Number(params.get("page") ?? 1);
-        const sortFromUrl = params.get("sort") ?? "featured";
-        setCurrentPage(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1);
-        setSortBy(sortFromUrl);
+        if (!parent) {
+          setNotFound(true);
+          setCategory(null);
+          setBrands(allBrands);
+        } else {
+          setCategory(parent);
+          setBrands(allBrands);
+          // read initial URL params
+          const pageFromUrl = Number(params.get("page") ?? 1);
+          const sortFromUrl = params.get("sort") ?? "featured";
+          setCurrentPage(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1);
+          setSortBy(sortFromUrl);
+        }
       } catch (e: any) {
         if (!alive) return;
+        // If your serice throws for 404, treat as not found:
+        setNotFound(true);
         setError(e?.message ?? "Failed to load category");
       } finally {
         if (alive) setLoading(false);
       }
     })();
     return () => { alive = false; };
-  }, [categoryId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [categoryId]);
 
   const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
 
@@ -177,6 +197,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     return () => { alive = false; };
   }, [effectiveFilter, sortBy, currentPage, itemsPerPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  if (notFound) return <CategoryNotFound />;
   if (loading) return <Loading />;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
   if (!category) return null;

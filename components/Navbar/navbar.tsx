@@ -44,6 +44,7 @@ export const Navbar = () => {
 
     async function fetchNames() {
       try {
+        if (!isCategory) return;
         if (category) {
           const cat = (await getCategoryById(category)) as CategoryModel;
           if (alive) setCategoryName(cat?.name ?? null);

@@ -1,184 +1,226 @@
-"use client";
+"use client"
 
-import { useState, useMemo } from "react";
-import Link from "next/link";
-import { ArrowRight, Tag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCart } from "@/app/context/cartContext";
+import { useState, useMemo } from "react"
+import Link from "next/link"
+import { ArrowRight, Tag, Truck, Shield, RotateCcw } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useCart } from "@/app/context/cartContext"
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n);
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(price)
+
+const PROMO_CODES = {
+  SAVE10: { discount: 0.1, label: "10% OFF" },
+  WELCOME15: { discount: 0.15, label: "15% OFF" },
+  FREESHIP: { discount: 0, label: "Free Shipping", freeShipping: true },
+}
 
 export default function CartSummary() {
-  const { cart } = useCart();
-  const [promoCode, setPromoCode] = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const { cart } = useCart()
+  const [promoCode, setPromoCode] = useState("")
+  const [appliedPromo, setAppliedPromo] = useState<keyof typeof PROMO_CODES | null>(null)
+  const [shippingOption, setShippingOption] = useState("standard")
 
-  const subtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    [cart]
-  );
-  const promoDiscount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
-  const shipping = subtotal > 50 ? 0 : 9.99;
-  const tax = (subtotal - promoDiscount) * 0.08;
-  const total = subtotal - promoDiscount + shipping + tax;
+  const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart])
+
+  const promoDiscount = appliedPromo ? subtotal * PROMO_CODES[appliedPromo].discount : 0
+
+  const getShippingCost = () => {
+    if (appliedPromo === "FREESHIP" || subtotal > 50) return 0
+    switch (shippingOption) {
+      case "express":
+        return 19.99
+      case "overnight":
+        return 39.99
+      default:
+        return 9.99
+    }
+  }
+
+  const shipping = getShippingCost()
+  const tax = (subtotal - promoDiscount) * 0.08
+  const total = subtotal - promoDiscount + shipping + tax
 
   const applyPromoCode = () => {
-    if (promoCode.trim().toLowerCase() === "save10") {
-      setAppliedPromo("SAVE10");
-      setPromoCode("");
+    const code = promoCode.trim().toUpperCase() as keyof typeof PROMO_CODES
+    if (PROMO_CODES[code]) {
+      setAppliedPromo(code)
+      setPromoCode("")
     }
-  };
+  }
+
+  const removePromoCode = () => {
+    setAppliedPromo(null)
+  }
 
   return (
     <div className="space-y-6">
-      {/* Promo Code */}
-      <Card className="border-brand-muted/60 bg-white dark:bg-brand-muteddark dark:border-brand-muteddark/60 shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-text-light">
-            <Tag className="h-4 w-4" />
+      {/* Promo Code Section
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Tag className="h-5 w-5 text-primary" />
             Promo Code
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           {appliedPromo ? (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 border border-emerald-200">
-              <span className="text-emerald-800 font-medium">{appliedPromo} Applied</span>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="secondary"
+                  className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                >
+                  {appliedPromo}
+                </Badge>
+                <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                  {PROMO_CODES[appliedPromo].label} Applied
+                </span>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setAppliedPromo(null)}
-                className="text-emerald-800 hover:bg-emerald-100"
+                onClick={removePromoCode}
+                className="text-green-800 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900"
               >
                 Remove
               </Button>
             </div>
           ) : (
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter promo code"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                className="bg-brand-surface border-brand-muted/60 text-text-light placeholder:text-text-subtle"
-              />
-              <Button
-                onClick={applyPromoCode}
-                disabled={!promoCode}
-                className="bg-brand-primary hover:bg-brand-primarydark text-white"
-              >
-                Apply
-              </Button>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter promo code"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applyPromoCode()}
+                  className="flex-1"
+                />
+                <Button onClick={applyPromoCode} disabled={!promoCode.trim()} className="px-6">
+                  Apply
+                </Button>
+              </div>
+              <div className="text-xs text-muted-foreground">Try: SAVE10, WELCOME15, or FREESHIP</div>
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Order Summary */}
-      <Card className="border-brand-muted/60 bg-white dark:bg-brand-muteddark dark:border-brand-muteddark/60 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-text-light">Order Summary</CardTitle>
+      <Card className="dark:bg-brand-muteddark bg-brand-muted">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Order Summary</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 text-text-light">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-text-subtle">Subtotal ({cart.length} items)</span>
-              <span>{fmt(subtotal)}</span>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">
+                Subtotal ({cart.length} {cart.length === 1 ? "item" : "items"})
+              </span>
+              <span className="font-medium">{formatPrice(subtotal)}</span>
             </div>
 
             {appliedPromo && (
-              <div className="flex justify-between text-emerald-600">
+              <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
                 <span>Discount ({appliedPromo})</span>
-                <span>-{fmt(promoDiscount)}</span>
+                <span>-{formatPrice(promoDiscount)}</span>
               </div>
             )}
 
-            <div className="flex justify-between">
-              <span className="text-text-subtle">Shipping</span>
-              <span>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Shipping</span>
+              <span className="font-medium">
                 {shipping === 0 ? (
-                  <span className="text-emerald-600">Free</span>
+                  <span className="text-green-600 dark:text-green-400">Free</span>
                 ) : (
-                  fmt(shipping)
+                  formatPrice(shipping)
                 )}
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-text-subtle">Estimated Tax</span>
-              <span>{fmt(tax)}</span>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Tax</span>
+              <span className="font-medium">{formatPrice(tax)}</span>
             </div>
 
-            <Separator className="my-2 bg-brand-muted/60" />
+            <Separator />
 
             <div className="flex justify-between font-semibold text-lg">
               <span>Total</span>
-              <span>{fmt(total)}</span>
+              <span>{formatPrice(total)}</span>
             </div>
           </div>
 
-          {shipping > 0 && subtotal > 0 && (
-            <div className="p-3 rounded-lg bg-brand-surface border border-brand-muted/60 text-text-subtle">
-              Add {fmt(50 - subtotal)} more for free shipping!
+          {/* Free Shipping Progress */}
+          {shipping > 0 && subtotal > 0 && subtotal < 50 && (
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+                <Truck className="h-4 w-4" />
+                <span>Add {formatPrice(50 - subtotal)} more for free shipping!</span>
+              </div>
             </div>
           )}
 
-          <Button
-            asChild
-            size="lg"
-            className="w-full bg-brand-primary hover:bg-brand-primarydark text-white"
-          >
-            <Link href="/cart/checkout">
-              Proceed to Checkout
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Link>
-          </Button>
+          {/* Action Buttons */}
+          <div className="space-y-3 pt-2">
+            <Button asChild size="lg" className="w-full">
+              <Link href="/cart/checkout" className="gap-2">
+                Proceed to Checkout
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
 
-          <Button
-            variant="outline"
-            asChild
-            className="w-full border-brand-primary/30 text-brand-primary hover:bg-brand-muted hover:text-brand-primarydark"
-          >
-            <Link href="/">Continue Shopping</Link>
-          </Button>
+            <Button variant="outline" asChild className="w-full bg-transparent">
+              <Link href="/">Continue Shopping</Link>
+            </Button>
+          </div>
 
-          <div className="text-xs text-text-subtle space-y-1">
-            <p>• Free shipping on orders over $50</p>
-            <p>• 30-day return policy</p>
-            <p>• Secure checkout with SSL encryption</p>
+          {/* Trust Badges */}
+          <div className="pt-4 space-y-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Truck className="h-3 w-3" />
+              <span>Free shipping on orders over $50</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <RotateCcw className="h-3 w-3" />
+              <span>30-day return policy</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Shield className="h-3 w-3" />
+              <span>Secure checkout with SSL encryption</span>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Shipping Options */}
-      <Card className="border-brand-muted/60 bg-white dark:bg-brand-muteddark dark:border-brand-muteddark/60 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-text-light">Shipping Options</CardTitle>
+      {/* Shipping Options
+      <Card className="dark:bg-brand-muteddark bg-brand-muted">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Shipping Options</CardTitle>
         </CardHeader>
         <CardContent>
-          <Select defaultValue="standard">
-            <SelectTrigger className="bg-brand-surface border-brand-muted/60 text-text-light">
+          <Select value={shippingOption} onValueChange={setShippingOption}>
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-brand-surfacedark text-text-light">
+            <SelectContent>
               <SelectItem value="standard">
-                Standard (5-7 days) – {shipping === 0 ? "Free" : fmt(9.99)}
+                Standard (5-7 days) – {subtotal > 50 || appliedPromo === "FREESHIP" ? "Free" : formatPrice(9.99)}
               </SelectItem>
-              <SelectItem value="express">Express (2-3 days) – {fmt(19.99)}</SelectItem>
-              <SelectItem value="overnight">Overnight – {fmt(39.99)}</SelectItem>
+              <SelectItem value="express">Express (2-3 days) – {formatPrice(19.99)}</SelectItem>
+              <SelectItem value="overnight">Overnight – {formatPrice(39.99)}</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
-  );
+  )
 }

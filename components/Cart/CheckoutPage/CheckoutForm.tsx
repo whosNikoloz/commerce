@@ -16,7 +16,7 @@ export default function CheckoutForm() {
   return (
     <div className="space-y-6">
       {/* Contact Information */}
-      <Card>
+      <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
@@ -48,7 +48,7 @@ export default function CheckoutForm() {
       </Card>
 
       {/* Shipping Address */}
-      <Card>
+      <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
@@ -90,7 +90,7 @@ export default function CheckoutForm() {
       </Card>
 
       {/* Billing Address */}
-      <Card>
+      <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
@@ -101,9 +101,9 @@ export default function CheckoutForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="sameAsShipping" 
-              checked={sameAsShipping} 
+            <Checkbox
+              id="sameAsShipping"
+              checked={sameAsShipping}
               onCheckedChange={(checked) => setSameAsShipping(checked === true)}
             />
             <Label htmlFor="sameAsShipping">Same as shipping address</Label>
@@ -145,7 +145,7 @@ export default function CheckoutForm() {
       </Card>
 
       {/* Payment Method */}
-      <Card>
+      <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">

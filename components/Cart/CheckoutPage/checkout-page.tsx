@@ -15,12 +15,12 @@ export default function CheckoutPage() {
   const { cart, clearCart } = useCart()
   const router = useRouter()
 
-  // Handle redirect when cart is empty
-  useEffect(() => {
-    if (cart.length === 0) {
-      router.push("/cart")
-    }
-  }, [cart.length, router])
+  // // Handle redirect when cart is empty
+  // useEffect(() => {
+  //   if (cart.length === 0) {
+  //     router.push("/cart")
+  //   }
+  // }, [cart.length, router])
 
   // Don't render anything while redirecting
   if (cart.length === 0) {
@@ -35,10 +35,10 @@ export default function CheckoutPage() {
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     setIsProcessing(false)
-    
+
     // Clear cart after successful order
     clearCart()
-    
+
     // Redirect to order confirmation
     router.push("/order-confirmation/success")
   }

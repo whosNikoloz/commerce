@@ -23,7 +23,7 @@ export default function OrderSummary({ onSubmit, isProcessing }: OrderSummaryPro
   const total = subtotal + shipping + tax
 
   return (
-    <Card className="sticky top-8">
+    <Card className="sticky top-8 dark:bg-brand-muteddark bg-brand-muted">
       <CardHeader>
         <CardTitle>Order Summary</CardTitle>
       </CardHeader>

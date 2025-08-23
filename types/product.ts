@@ -1,3 +1,5 @@
+import { getBrandById } from "@/app/api/services/brandService";
+import { getCategoryById } from "@/app/api/services/categoryService";
 import { BrandModel } from "./brand";
 import { CategoryModel } from "./category";
 import { StockStatus, Condition } from "./enums";
@@ -37,4 +39,27 @@ export interface ProductRequestModel {
   isComingSoon?: boolean;
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueModel[];
+}
+
+export async function mapProducts(
+  products: ProductRequestModel[],
+): Promise<ProductResponseModel[]> {
+  // You can optimize this by caching brand/category lookups
+  const mapped = await Promise.all(
+    products.map(async (p) => {
+      const brand = await getBrandById(p.brandId);
+      const category = await getCategoryById(p.categoryId);
+
+      return {
+        ...p,
+        brand: brand!,
+        category: category!,
+        productFacetValues: p.productFacetValues.map((f) => ({
+          ...f,
+        })),
+      } as ProductResponseModel;
+    }),
+  );
+
+  return mapped;
 }

@@ -17,8 +17,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BrandModel } from "@/types/brand";
 import { getAllBrands, updateBrand } from "@/app/api/services/brandService";
 
-export function BrandsTable() {
-  const [brands, setBrands] = useState<BrandModel[]>([]);
+interface Props {
+  Brands: BrandModel[];
+}
+
+export function BrandsTable({ Brands: initialBrands }: Props) {
+  const [brands, setBrands] = useState<BrandModel[]>(initialBrands);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

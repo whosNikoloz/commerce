@@ -49,11 +49,16 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { CategoryModel } from "@/types/category";
 
 type ViewMode = "table" | "grid";
 type SortOption = "name" | "price" | "created" | "status";
 
-export function ProductsTable() {
+interface ProductsTableProps {
+  initialCategories: CategoryModel[];
+}
+
+export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -356,7 +361,7 @@ export function ProductsTable() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar (desktop/tablet) */}
         <div className="hidden lg:block lg:col-span-1">
-          <CategoryTree onSelectCategory={setSelectedCategoryId} />
+          <CategoryTree Categories={initialCategories} onSelectCategory={setSelectedCategoryId} />
         </div>
 
         {/* Main */}
@@ -380,6 +385,7 @@ export function ProductsTable() {
                       </SheetHeader>
                       <div className="px-4 pb-4">
                         <CategoryTree
+                          Categories={initialCategories}
                           onSelectCategory={(id) => {
                             setSelectedCategoryId(id);
                           }}

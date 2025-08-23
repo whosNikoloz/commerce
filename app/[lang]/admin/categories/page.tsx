@@ -1,8 +1,10 @@
 import { Metadata } from "next";
 
 import { CategoriesTable } from "@/components/admin/categories-table";
+import { getAllCategories } from "@/app/api/services/categoryService";
 import { basePageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
+import { CategoryModel } from "@/types/category";
 
 export async function generateMetadata(): Promise<Metadata> {
   const url = `${siteConfig.url}/admin/categories`;
@@ -16,7 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const categories: CategoryModel[] = await getAllCategories();
+
   return (
     <div className="space-y-6">
       <div>
@@ -24,7 +28,7 @@ export default function CategoriesPage() {
           Categories
         </h1>
       </div>
-      <CategoriesTable />
+      <CategoriesTable Categories={categories} />
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { BrandsTable } from "@/components/admin/brand/brands-table";
 import { basePageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
+import { getAllBrands } from "@/app/api/services/brandService";
+import { BrandModel } from "@/types/brand";
 
 export async function generateMetadata(): Promise<Metadata> {
   const url = `${siteConfig.url}/admin/brands`;
@@ -16,15 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function BrandsPage() {
+export default async function BrandsPage() {
+  const brands: BrandModel[] = await getAllBrands();
+
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">
-          Products
+          Brands
         </h1>
       </div>
-      <BrandsTable />
+
+      <BrandsTable Brands={brands} />
     </div>
   );
 }

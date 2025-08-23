@@ -1,4 +1,3 @@
-// app/(shop)/category/CategoryPage.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";

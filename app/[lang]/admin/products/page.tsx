@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 import { ProductsTable } from "@/components/admin/product/products-table";
 import { basePageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
+import { CategoryModel } from "@/types/category";
+import { getAllCategories } from "@/app/api/services/categoryService";
 
 export async function generateMetadata(): Promise<Metadata> {
   const url = `${siteConfig.url}/admin/products`;
@@ -16,17 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const categories: CategoryModel[] = await getAllCategories();
+
   return (
-    <div className="space-y-6 ">
-      {" "}
+    <div className="space-y-6">
       <div>
-        {" "}
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">
+        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light">
           Products
         </h1>
       </div>
-      <ProductsTable />
+
+      <ProductsTable initialCategories={categories} />
     </div>
   );
 }

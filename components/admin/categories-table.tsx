@@ -15,26 +15,16 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { getAllCategories, updateCategory } from "@/app/api/services/categoryService";
+import { updateCategory } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
 
-export function CategoriesTable() {
-  const [categories, setCategories] = useState<CategoryModel[]>([]);
+interface Props {
+  Categories: CategoryModel[];
+}
+
+export function CategoriesTable({ Categories }: Props) {
+  const [categories, setCategories] = useState<CategoryModel[]>(Categories);
   const [searchTerm, setSearchTerm] = useState<string>("");
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getAllCategories();
-
-        setCategories(data);
-      } catch (err) {
-        console.error("❌ Error loading categories", err);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   const toggleCategoryVisibility = async (categoryId: string) => {
     const current = categories.find((p) => p.id === categoryId);

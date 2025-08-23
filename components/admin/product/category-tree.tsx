@@ -14,7 +14,6 @@ import {
   Search,
 } from "lucide-react";
 
-import { getAllCategories } from "@/app/api/services/categoryService";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -22,31 +21,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CategoryTreeProps {
+  Categories: CategoryModel[];
   onSelectCategory: (id: string | null) => void;
 }
 
-export function CategoryTree({ onSelectCategory }: CategoryTreeProps) {
-  const [categories, setCategories] = useState<CategoryModel[]>([]);
+export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps) {
+  const [categories] = useState<CategoryModel[]>(Categories);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getAllCategories();
-
-        setCategories(response);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   const toggleExpanded = (categoryId: string) => {
     const next = new Set(expanded);
@@ -225,25 +208,25 @@ export function CategoryTree({ onSelectCategory }: CategoryTreeProps) {
     );
   };
 
-  if (loading) {
-    return (
-      <Card className="lg:sticky lg:top-4">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-            <CardTitle className="text-lg">Categories</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-lg" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Card className="lg:sticky lg:top-4">
+  //       <CardHeader className="pb-3">
+  //         <div className="flex items-center gap-2">
+  //           <Filter className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+  //           <CardTitle className="text-lg">Categories</CardTitle>
+  //         </div>
+  //       </CardHeader>
+  //       <CardContent className="space-y-2">
+  //         {[...Array(6)].map((_, i) => (
+  //           <div key={i} className="animate-pulse">
+  //             <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+  //           </div>
+  //         ))}
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // }
 
   const rootCategories = categories.filter((c) => c.parentId === null);
 

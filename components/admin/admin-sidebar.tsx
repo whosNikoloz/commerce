@@ -121,7 +121,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                     alt="Avatar"
                     className="h-7 w-7 shrink-0 rounded-full"
                     height={50}
-                    src="/img1.png"
+                    src="/img1.jpg"
                     width={50}
                   />
                 ),

@@ -1,7 +1,3 @@
-export default function TermsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function TermsLayout({ children }: { children: React.ReactNode }) {
   return <section className="md:mt-10 mt-0">{children}</section>;
 }

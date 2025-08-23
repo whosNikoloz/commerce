@@ -1,6 +1,7 @@
 "use client";
 
-import { ShoppingCart, Truck, Heart, Sparkles, Clock3, Tag, PackageOpen } from "lucide-react";
+import { ShoppingCart, Truck, Sparkles, Clock3, Tag, PackageOpen } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Condition, StockStatus } from "@/types/enums";
@@ -132,8 +133,9 @@ export function ProductInfo({
         {/* Status + Condition */}
         <div className="mt-2 flex items-center justify-between gap-2">
           <Badge
-            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
-              }`}
+            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${
+              isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+            }`}
             title={getStatusLabel(status, isComingSoon)}
           >
             {getStatusLabel(status, isComingSoon)}
@@ -162,20 +164,20 @@ export function ProductInfo({
         {/* Actions (mobile) */}
         <div className="md:hidden space-y-2 mt-4">
           <Button
-            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md disabled:opacity-60"
-            onClick={onAddToCart}
-            disabled={isOut}
             aria-disabled={isOut}
+            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md disabled:opacity-60"
+            disabled={isOut}
+            onClick={onAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
             <span>{isComingSoon ? "მალე" : isOut ? "ამოიწურა" : "კალათაში დამატება"}</span>
           </Button>
           <div className="grid grid-cols-2 gap-2">
             <Button
-              className="w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white py-3 rounded-md disabled:opacity-60"
-              onClick={onBuyNow}
-              disabled={isOut}
               aria-disabled={isOut}
+              className="w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white py-3 rounded-md disabled:opacity-60"
+              disabled={isOut}
+              onClick={onBuyNow}
             >
               <span>ყიდვა</span>
             </Button>
@@ -185,20 +187,20 @@ export function ProductInfo({
         {/* Actions (desktop) */}
         <div className="hidden md:block mt-4 space-y-3">
           <Button
-            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md disabled:opacity-60"
-            onClick={onAddToCart}
-            disabled={isOut}
             aria-disabled={isOut}
+            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md disabled:opacity-60"
+            disabled={isOut}
+            onClick={onAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
             <span>{isComingSoon ? "მალე" : isOut ? "ამოიწურა" : "დამატება"}</span>
           </Button>
           <div className="grid grid-cols-1 gap-2">
             <Button
-              className="w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white py-3 rounded-md disabled:opacity-60"
-              onClick={onBuyNow}
-              disabled={isOut}
               aria-disabled={isOut}
+              className="w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white py-3 rounded-md disabled:opacity-60"
+              disabled={isOut}
+              onClick={onBuyNow}
             >
               <span>ყიდვა</span>
             </Button>

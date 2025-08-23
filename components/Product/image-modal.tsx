@@ -6,8 +6,8 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal, ModalContent, ModalBody } from "@heroui/modal";
 import { cn } from "@heroui/theme";
 import useEmblaCarousel from "embla-carousel-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ImageModalProps {
   images: string[];
@@ -38,7 +38,6 @@ export default function ImageModal({
   });
 
   const isMobile = useIsMobile();
-
 
   // Reset zoom state when changing images
   useEffect(() => {
@@ -170,15 +169,10 @@ export default function ImageModal({
 
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY,
-      );
+      const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
 
       // Calculate new scale based on how fingers have moved
-      const newScale =
-        (distance / touchRef.current.initialDistance) *
-        touchRef.current.initialZoom;
+      const newScale = (distance / touchRef.current.initialDistance) * touchRef.current.initialZoom;
 
       // Limit scale between 1 and 3
       const limitedScale = Math.max(1, Math.min(3, newScale));
@@ -278,9 +272,7 @@ export default function ImageModal({
                         alt={`${productName} image ${idx + 1}`}
                         className={cn(
                           "object-contain transition-transform duration-300 ease-in-out",
-                          isZoomed && currentIndex === idx
-                            ? "scale-150"
-                            : "scale-100",
+                          isZoomed && currentIndex === idx ? "scale-150" : "scale-100",
                         )}
                         src={image || ""}
                         onClick={toggleZoom}

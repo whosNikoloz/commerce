@@ -9,11 +9,7 @@ import { getDictionary } from "@/lib/dictionaries";
 
 const TranslationContext = createContext<any>({});
 
-export function TranslationProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function TranslationProvider({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const [translations, setTranslations] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,11 +29,7 @@ export function TranslationProvider({
     return <div />;
   }
 
-  return (
-    <TranslationContext.Provider value={translations}>
-      {children}
-    </TranslationContext.Provider>
-  );
+  return <TranslationContext.Provider value={translations}>{children}</TranslationContext.Provider>;
 }
 
 export function useTranslation() {

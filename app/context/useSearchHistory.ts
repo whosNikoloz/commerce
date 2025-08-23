@@ -6,59 +6,72 @@ const KEY_PREFIX = "search-history:";
 const NAMESPACE_DEFAULT = "default";
 
 export function useSearchHistory(options?: {
-    max?: number;
-    namespace?: string;
-    caseInsensitive?: boolean;
+  max?: number;
+  namespace?: string;
+  caseInsensitive?: boolean;
 }) {
-    const { max = 12, namespace = NAMESPACE_DEFAULT, caseInsensitive = true } = options || {};
-    const storageKey = useMemo(() => `${KEY_PREFIX}${namespace}`, [namespace]);
+  const { max = 12, namespace = NAMESPACE_DEFAULT, caseInsensitive = true } = options || {};
+  const storageKey = useMemo(() => `${KEY_PREFIX}${namespace}`, [namespace]);
 
-    const [items, setItems] = useState<Entry[]>([]);
+  const [items, setItems] = useState<Entry[]>([]);
 
-    useEffect(() => {
-        try {
-            const raw = localStorage.getItem(storageKey);
-            if (raw) setItems(JSON.parse(raw));
-        } catch {
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
 
-        }
-    }, [storageKey]);
+      if (raw) setItems(JSON.parse(raw));
+    } catch {}
+  }, [storageKey]);
 
-    const persist = useCallback((next: Entry[]) => {
-        setItems(next);
-        try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch { }
-    }, [storageKey]);
+  const persist = useCallback(
+    (next: Entry[]) => {
+      setItems(next);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      } catch {}
+    },
+    [storageKey],
+  );
 
-    const add = useCallback((termRaw: string) => {
-        const term = termRaw.trim();
-        if (!term) return;
+  const add = useCallback(
+    (termRaw: string) => {
+      const term = termRaw.trim();
 
-        const cmp = (s: string) => (caseInsensitive ? s.toLowerCase() : s);
-        const now = Date.now();
+      if (!term) return;
 
-        const idx = items.findIndex(x => cmp(x.term) === cmp(term));
-        let next = [...items];
+      const cmp = (s: string) => (caseInsensitive ? s.toLowerCase() : s);
+      const now = Date.now();
 
-        if (idx >= 0) {
-            const hit = next[idx];
-            next.splice(idx, 1);
-            next.unshift({ term: hit.term, ts: now, count: hit.count + 1 });
-        } else {
-            next.unshift({ term, ts: now, count: 1 });
-        }
+      const idx = items.findIndex((x) => cmp(x.term) === cmp(term));
+      let next = [...items];
 
-        if (next.length > max) next = next.slice(0, max);
-        persist(next);
-    }, [items, max, caseInsensitive, persist]);
+      if (idx >= 0) {
+        const hit = next[idx];
 
-    const remove = useCallback((termRaw: string) => {
-        const term = termRaw.trim();
-        const cmp = (s: string) => (caseInsensitive ? s.toLowerCase() : s);
-        const next = items.filter(x => cmp(x.term) !== cmp(term));
-        persist(next);
-    }, [items, caseInsensitive, persist]);
+        next.splice(idx, 1);
+        next.unshift({ term: hit.term, ts: now, count: hit.count + 1 });
+      } else {
+        next.unshift({ term, ts: now, count: 1 });
+      }
 
-    const clear = useCallback(() => persist([]), [persist]);
+      if (next.length > max) next = next.slice(0, max);
+      persist(next);
+    },
+    [items, max, caseInsensitive, persist],
+  );
 
-    return { items, add, remove, clear };
+  const remove = useCallback(
+    (termRaw: string) => {
+      const term = termRaw.trim();
+      const cmp = (s: string) => (caseInsensitive ? s.toLowerCase() : s);
+      const next = items.filter((x) => cmp(x.term) !== cmp(term));
+
+      persist(next);
+    },
+    [items, caseInsensitive, persist],
+  );
+
+  const clear = useCallback(() => persist([]), [persist]);
+
+  return { items, add, remove, clear };
 }

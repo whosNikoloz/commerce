@@ -3,12 +3,12 @@ import { Metadata, Viewport } from "next";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
+import { LayoutWrapper } from "./LayoutWrapper";
 
 import { site } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Locale } from "@/i18n.config";
 import { getTranslations } from "@/lib/get-dictionary";
-import { LayoutWrapper } from "./LayoutWrapper";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   openGraph: { siteName: site.name, images: [site.ogImage] },
   twitter: { card: "summary_large_image", images: [site.ogImage] },
 };
-
 
 export const viewport: Viewport = {
   themeColor: [
@@ -51,9 +50,7 @@ export default async function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+          <LayoutWrapper>{children}</LayoutWrapper>
         </Providers>
       </body>
     </html>

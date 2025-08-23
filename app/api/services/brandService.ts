@@ -1,21 +1,22 @@
 import { apiFetch } from "../client/fetcher";
+
 import { BrandModel } from "@/types/brand";
 
 const API_BASE = "http://localhost:5007/Brand";
 
 export async function getAllBrands(): Promise<BrandModel[]> {
-    return apiFetch<BrandModel[]>(`${API_BASE}/get-all-brands`);
+  return apiFetch<BrandModel[]>(`${API_BASE}/get-all-brands`);
 }
 
 export async function getBrandById(id: string): Promise<BrandModel> {
-    return apiFetch<BrandModel>(`${API_BASE}/get-brand-by-${id}`);
+  return apiFetch<BrandModel>(`${API_BASE}/get-brand-by-${id}`);
 }
 
 export async function updateBrand(brand: BrandModel): Promise<string> {
-    return apiFetch<string>(`${API_BASE}/update-brand`, {
-        method: "PUT",
-        body: JSON.stringify(brand),
-    });
+  return apiFetch<string>(`${API_BASE}/update-brand`, {
+    method: "PUT",
+    body: JSON.stringify(brand),
+  });
 }
 
 // export async function searchProducts(
@@ -35,8 +36,6 @@ export async function updateBrand(brand: BrandModel): Promise<string> {
 
 //     return apiFetch<PagedList<ProductResponseModel>>(`${API_BASE}/get-product-by-searching?${params.toString()}`);
 // }
-
-
 
 // export async function createProduct(data: ProductRequestModel): Promise<string> {
 //     return apiFetch<string>(`${API_BASE}/add-product`, {

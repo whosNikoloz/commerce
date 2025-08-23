@@ -1,12 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Edit, Trash2, Plus, Truck, MapPin } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
+import { useState } from "react";
+import { Edit, Trash2, Plus, Truck, MapPin } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -26,21 +34,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ShippingMethod {
-  id: string
-  name: string
-  description: string
-  baseRate: number
-  deliveryTime: string
-  zones: string[]
-  status: "active" | "inactive"
-  type: "standard" | "express" | "overnight" | "free"
+  id: string;
+  name: string;
+  description: string;
+  baseRate: number;
+  deliveryTime: string;
+  zones: string[];
+  status: "active" | "inactive";
+  type: "standard" | "express" | "overnight" | "free";
 }
 
 const initialShippingMethods: ShippingMethod[] = [
@@ -94,30 +108,35 @@ const initialShippingMethods: ShippingMethod[] = [
     status: "inactive",
     type: "express",
   },
-]
+];
 
 export function ShippingTable() {
-  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>(initialShippingMethods)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>(initialShippingMethods);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newMethod, setNewMethod] = useState({
     name: "",
     description: "",
     baseRate: "",
     deliveryTime: "",
     type: "standard" as const,
-  })
+  });
 
   const toggleMethodStatus = (methodId: string) => {
     setShippingMethods(
       shippingMethods.map((method) =>
-        method.id === methodId ? { ...method, status: method.status === "active" ? "inactive" : "active" } : method,
+        method.id === methodId
+          ? {
+              ...method,
+              status: method.status === "active" ? "inactive" : "active",
+            }
+          : method,
       ),
-    )
-  }
+    );
+  };
 
   const deleteMethod = (methodId: string) => {
-    setShippingMethods(shippingMethods.filter((method) => method.id !== methodId))
-  }
+    setShippingMethods(shippingMethods.filter((method) => method.id !== methodId));
+  };
 
   const addMethod = () => {
     if (newMethod.name.trim() && newMethod.baseRate) {
@@ -130,25 +149,32 @@ export function ShippingTable() {
         zones: ["Domestic"],
         status: "active",
         type: newMethod.type,
-      }
-      setShippingMethods([...shippingMethods, method])
-      setNewMethod({ name: "", description: "", baseRate: "", deliveryTime: "", type: "standard" })
-      setIsAddDialogOpen(false)
+      };
+
+      setShippingMethods([...shippingMethods, method]);
+      setNewMethod({
+        name: "",
+        description: "",
+        baseRate: "",
+        deliveryTime: "",
+        type: "standard",
+      });
+      setIsAddDialogOpen(false);
     }
-  }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case "free":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "express":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "overnight":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -169,58 +195,70 @@ export function ShippingTable() {
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>Add New Shipping Method</DialogTitle>
-                  <DialogDescription>Create a new shipping option for your customers.</DialogDescription>
+                  <DialogDescription>
+                    Create a new shipping option for your customers.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
+                    <Label className="text-right" htmlFor="name">
                       Name
                     </Label>
                     <Input
+                      className="col-span-3"
                       id="name"
                       value={newMethod.name}
                       onChange={(e) => setNewMethod({ ...newMethod, name: e.target.value })}
-                      className="col-span-3"
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="description" className="text-right">
+                    <Label className="text-right" htmlFor="description">
                       Description
                     </Label>
                     <Textarea
+                      className="col-span-3"
                       id="description"
                       value={newMethod.description}
-                      onChange={(e) => setNewMethod({ ...newMethod, description: e.target.value })}
-                      className="col-span-3"
+                      onChange={(e) =>
+                        setNewMethod({
+                          ...newMethod,
+                          description: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="rate" className="text-right">
+                    <Label className="text-right" htmlFor="rate">
                       Base Rate ($)
                     </Label>
                     <Input
+                      className="col-span-3"
                       id="rate"
-                      type="number"
                       step="0.01"
+                      type="number"
                       value={newMethod.baseRate}
                       onChange={(e) => setNewMethod({ ...newMethod, baseRate: e.target.value })}
-                      className="col-span-3"
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="delivery" className="text-right">
+                    <Label className="text-right" htmlFor="delivery">
                       Delivery Time
                     </Label>
                     <Input
+                      className="col-span-3"
                       id="delivery"
                       placeholder="e.g., 2-3 business days"
                       value={newMethod.deliveryTime}
-                      onChange={(e) => setNewMethod({ ...newMethod, deliveryTime: e.target.value })}
-                      className="col-span-3"
+                      onChange={(e) =>
+                        setNewMethod({
+                          ...newMethod,
+                          deliveryTime: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="type" className="text-right">
+                    <Label className="text-right" htmlFor="type">
                       Type
                     </Label>
                     <Select
@@ -287,7 +325,7 @@ export function ShippingTable() {
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {method.zones.map((zone) => (
-                        <Badge key={zone} variant="outline" className="text-xs">
+                        <Badge key={zone} className="text-xs" variant="outline">
                           <MapPin className="mr-1 h-3 w-3" />
                           {zone}
                         </Badge>
@@ -300,17 +338,19 @@ export function ShippingTable() {
                         checked={method.status === "active"}
                         onCheckedChange={() => toggleMethodStatus(method.id)}
                       />
-                      <Badge variant={method.status === "active" ? "default" : "secondary"}>{method.status}</Badge>
+                      <Badge variant={method.status === "active" ? "default" : "secondary"}>
+                        {method.status}
+                      </Badge>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="outline" size="sm">
+                      <Button size="sm" variant="outline">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button size="sm" variant="outline">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
@@ -318,15 +358,16 @@ export function ShippingTable() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the shipping method "
-                              {method.name}".
+                              This action cannot be undone. This will permanently delete the
+                              shipping method &quot;
+                              {method.name}&quot;.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => deleteMethod(method.id)}
                               className="bg-red-600 hover:bg-red-700"
+                              onClick={() => deleteMethod(method.id)}
                             >
                               Delete
                             </AlertDialogAction>
@@ -364,7 +405,7 @@ export function ShippingTable() {
                 </div>
                 <Badge>Active</Badge>
               </div>
-              <Button variant="outline" className="w-full">
+              <Button className="w-full" variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Shipping Zone
               </Button>
@@ -382,7 +423,9 @@ export function ShippingTable() {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Free shipping threshold</h4>
-                  <p className="text-sm text-muted-foreground">Minimum order value for free shipping</p>
+                  <p className="text-sm text-muted-foreground">
+                    Minimum order value for free shipping
+                  </p>
                 </div>
                 <Input className="w-24" placeholder="$50" />
               </div>
@@ -405,5 +448,5 @@ export function ShippingTable() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

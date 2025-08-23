@@ -1,27 +1,34 @@
+import type { ProductResponseModel } from "@/types/product";
+import type { PagedList } from "@/types/pagination";
+
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@headlessui/react";
 import { Card, CardBody } from "@heroui/card";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 import { SearchIcon } from "../icons";
+
 import { searchProducts } from "@/app/api/services/productService";
-import type { ProductResponseModel } from "@/types/product";
-import type { PagedList } from "@/types/pagination";
-import Image from "next/image";
 import { useSearchHistory } from "@/app/context/useSearchHistory";
 
 // (Optional) tiny hook using matchMedia
 const MOBILE_BREAKPOINT = 768;
+
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
     const onChange = () => setIsMobile(mql.matches);
+
     setIsMobile(mql.matches);
     mql.addEventListener("change", onChange);
+
     return () => mql.removeEventListener("change", onChange);
   }, []);
+
   return isMobile;
 }
 
@@ -51,8 +58,12 @@ const Search = ({
   const router = useRouter();
 
   // ✅ your history hook
-  const { items: historyItems, add: addHistory, remove: removeHistory, clear: clearHistory } =
-    useSearchHistory({ namespace: "global", max: 15 });
+  const {
+    items: historyItems,
+    add: addHistory,
+    remove: removeHistory,
+    clear: clearHistory,
+  } = useSearchHistory({ namespace: "global", max: 15 });
 
   // keep internal open state synced with parent
   useEffect(() => {
@@ -62,6 +73,7 @@ const Search = ({
   // ✅ Read "q" from URL and trigger search on first load
   useEffect(() => {
     const q = searchParams.get("q") || "";
+
     if (q) {
       setSearchQuery(q);
       doSearch(q); // optional: search immediately
@@ -86,10 +98,12 @@ const Search = ({
 
   const doSearch = async (value: string) => {
     const trimmed = value?.trim() ?? "";
+
     if (!trimmed || trimmed.length < minLen) {
       setSearchResults([]);
       setIsLoading(false);
       setError(null);
+
       return;
     }
     try {
@@ -97,13 +111,14 @@ const Search = ({
       setError(null);
       const resp = await searchProducts(trimmed, "name", "asc", 1, pageSize);
       const items = (resp as PagedList<ProductResponseModel>).items ?? [];
+
       setSearchResults(
         items.map((p) => ({
           id: p.id,
           name: p.name ?? "Unnamed product",
           images: p.images,
           price: p.price,
-        }))
+        })),
       );
     } catch (e: any) {
       setError(e?.message ?? "Search failed");
@@ -115,6 +130,7 @@ const Search = ({
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+
     setSearchQuery(value);
     if (debounceRef.current) window.clearTimeout(debounceRef.current);
     setIsLoading(true);
@@ -170,10 +186,10 @@ const Search = ({
         {isOpen && (
           <motion.div
             animate={{ opacity: 1, y: 0 }}
+            className="absolute left-0 right-0 mt-5 z-50"
             exit={{ opacity: 0, y: -10 }}
             initial={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 right-0 mt-5 z-50"
             id="search-results"
             // Prevent input blur when clicking inside the panel
             onMouseDown={(e) => e.preventDefault()}
@@ -186,8 +202,8 @@ const Search = ({
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-gray-500">Recent searches</span>
                       <button
-                        onClick={clearHistory}
                         className="text-xs text-gray-500 underline hover:text-gray-700"
+                        onClick={clearHistory}
                       >
                         Clear all
                       </button>
@@ -208,9 +224,9 @@ const Search = ({
                           </button>
                           <button
                             aria-label={`Remove ${term}`}
-                            onClick={() => removeHistory(term)}
                             className="opacity-60 group-hover:opacity-100"
                             title="Remove"
+                            onClick={() => removeHistory(term)}
                           >
                             ×
                           </button>
@@ -256,25 +272,25 @@ const Search = ({
                       <motion.li
                         key={result.id}
                         animate={{ opacity: 1, y: 0 }}
+                        className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
                         exit={{ opacity: 0, y: -5 }}
                         initial={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.1 }}
-                        className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
-                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                           addHistory(searchQuery); // save the actual typed query
                           router.push(`/en/category?q=${encodeURIComponent(searchQuery)}`);
                         }}
+                        onMouseDown={(e) => e.preventDefault()}
                       >
                         <div className="flex items-center gap-3">
                           {result.images?.[0] ? (
                             <div className="relative h-10 w-10 flex-shrink-0 rounded-md overflow-hidden border">
                               <Image
-                                src={result.images[0]}
-                                alt={result.name ?? "Product"}
                                 fill
-                                sizes="40px"
+                                alt={result.name ?? "Product"}
                                 className="object-cover"
+                                sizes="40px"
+                                src={result.images[0]}
                               />
                             </div>
                           ) : (

@@ -39,8 +39,8 @@ export default function ContactPage() {
                 <div className="bg-primary/10 text-primary p-4 rounded-lg mb-6">
                   <h3 className="font-semibold text-lg mb-2">Thank You!</h3>
                   <p>
-                    Your message has been sent successfully. We&apos;ll get back
-                    to you as soon as possible.
+                    Your message has been sent successfully. We&apos;ll get back to you as soon as
+                    possible.
                   </p>
                 </div>
               ) : (
@@ -106,9 +106,7 @@ export default function ContactPage() {
         <div>
           <Card>
             <CardBody className="p-6">
-              <h2 className="text-xl font-semibold mb-6">
-                Contact Information
-              </h2>
+              <h2 className="text-xl font-semibold mb-6">Contact Information</h2>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-3">
@@ -153,18 +151,12 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-medium">Email</h3>
                     <p className="text-muted-foreground">
-                      <a
-                        className="hover:text-primary"
-                        href="mailto:info@petdo.com"
-                      >
+                      <a className="hover:text-primary" href="mailto:info@petdo.com">
                         info@petdo.com
                       </a>
                     </p>
                     <p className="text-muted-foreground">
-                      <a
-                        className="hover:text-primary"
-                        href="mailto:support@petdo.com"
-                      >
+                      <a className="hover:text-primary" href="mailto:support@petdo.com">
                         support@petdo.com
                       </a>
                     </p>
@@ -177,12 +169,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">Business Hours</h3>
-                    <p className="text-muted-foreground">
-                      Monday - Friday: 9am - 6pm
-                    </p>
-                    <p className="text-muted-foreground">
-                      Saturday: 10am - 4pm
-                    </p>
+                    <p className="text-muted-foreground">Monday - Friday: 9am - 6pm</p>
+                    <p className="text-muted-foreground">Saturday: 10am - 4pm</p>
                     <p className="text-muted-foreground">Sunday: Closed</p>
                   </div>
                 </div>

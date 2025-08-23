@@ -24,12 +24,7 @@ interface RegisterProps {
   handleOAuth: (provider: string) => void;
 }
 
-export default function RegisterModal({
-  regData,
-  lng,
-  onSwitchMode,
-  handleOAuth,
-}: RegisterProps) {
+export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth }: RegisterProps) {
   const regRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,35 +47,26 @@ export default function RegisterModal({
   const [regUserNameHasBlurred, setRegUserNameHasBlurred] = useState(false);
   const [regEmailHasBlurred, setRegEmailHasBlurred] = useState(false);
 
-  const validateEmail = (value: string) =>
-    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
   const handleRegistration = async () => {
     setIsLoading(true);
     if (registrationState.username === "") {
       setRegUserNameError(
-        lng === "ka"
-          ? "შეავსე სახელი ველი"
-          : "Please fill in the UserName field",
+        lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field",
       );
       setIsLoading(false);
 
       return;
     }
     if (registrationState.email === "") {
-      setRegEmailError(
-        lng == "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field",
-      );
+      setRegEmailError(lng == "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
       setIsLoading(false);
 
       return;
     }
     if (registrationState.password === "") {
-      setRegError(
-        lng == "ka"
-          ? "შეავსე პაროლის ველი"
-          : "Please fill in the Password field",
-      );
+      setRegError(lng == "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
       setIsLoading(false);
 
       return;
@@ -116,11 +102,7 @@ export default function RegisterModal({
         return;
       }
       if (!isEmailValid) {
-        setRegEmailError(
-          lng == "ka"
-            ? "შეიყვანეთ ელ-ფოსტა სწორად"
-            : "Please enter a valid email",
-        );
+        setRegEmailError(lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
         setRegEmailHasBlurred(false);
 
         return;
@@ -175,9 +157,7 @@ export default function RegisterModal({
     if (registrationState.confirmPassword === "") return;
 
     if (registrationState.password !== registrationState.confirmPassword) {
-      setConfirmPasswordError(
-        lng == "ka" ? "პარლი არემთხვევა" : "Password doesnot match",
-      );
+      setConfirmPasswordError(lng == "ka" ? "პარლი არემთხვევა" : "Password doesnot match");
     } else {
       setConfirmPasswordError("");
     }
@@ -188,9 +168,7 @@ export default function RegisterModal({
 
     if (registrationState.password.length < 6) {
       setRegPasswordError(
-        lng == "ka"
-          ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი"
-          : "Password must be more than 6 symbols",
+        lng == "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols",
       );
     } else {
       setRegPasswordError("");
@@ -250,11 +228,7 @@ export default function RegisterModal({
           label: ["font-medium text-gray-700 dark:text-gray-200"],
         }}
         endContent={
-          regEmailHasBlurred ? (
-            <InputLoadingBtn loading={Regemailloader} success={true} />
-          ) : (
-            <></>
-          )
+          regEmailHasBlurred ? <InputLoadingBtn loading={Regemailloader} success={true} /> : <></>
         }
         errorMessage={regEmailError}
         isInvalid={regEmailError !== ""}
@@ -340,9 +314,7 @@ export default function RegisterModal({
 
       <div className="flex items-center justify-center my-4">
         <div className="flex-grow border-t border-gray-300" />
-        <span className="mx-4 text-gray-500 text-sm font-medium">
-          {regData.or}
-        </span>
+        <span className="mx-4 text-gray-500 text-sm font-medium">{regData.or}</span>
         <div className="flex-grow border-t border-gray-300" />
       </div>
 

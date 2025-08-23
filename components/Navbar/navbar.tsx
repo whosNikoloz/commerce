@@ -13,6 +13,7 @@ import Search from "../Search/search-dropdown";
 import SearchForMobile from "../Search/search-for-mobile";
 import { GoBackButton } from "../go-back-button";
 import AuthModal from "../AuthModal/auth-modal";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
@@ -26,7 +27,6 @@ export const Navbar = () => {
   const [subcategoryName, setSubcategoryName] = useState<string | null>(null);
 
   const isMobile = useIsMobile();
-
 
   const handleScroll = () => {
     const scrollY = window.scrollY;
@@ -47,10 +47,12 @@ export const Navbar = () => {
         if (!isCategory) return;
         if (category) {
           const cat = (await getCategoryById(category)) as CategoryModel;
+
           if (alive) setCategoryName(cat?.name ?? null);
         }
         if (subcategory) {
           const sub = (await getCategoryById(subcategory)) as CategoryModel;
+
           if (alive) setSubcategoryName(sub?.name ?? null);
         }
       } catch (err) {
@@ -59,6 +61,7 @@ export const Navbar = () => {
     }
 
     fetchNames();
+
     return () => {
       alive = false;
     };
@@ -70,8 +73,6 @@ export const Navbar = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -86,25 +87,21 @@ export const Navbar = () => {
       {!isMobile || !isCategory ? (
         <nav className="justify-center items-center">
           <div
-            className={`z-50 fixed top-3 left-1/2 -translate-x-1/2  w-11/12 rounded-2xl transition-all duration-300 ${isScrolled && searchModalIsOpen
-              ? "dark:backdrop-blur-2xl backdrop-blur-sm w-11/12 md:w-10/12 lg:w-6/12 bg-black/50 shadow-md"
-              : isScrolled
-                ? "dark:backdrop-blur-2xl backdrop-blur-sm  md:w-6/12 lg:w-3/12  bg-black/50 shadow-md"
-                : "bg-transparent w-11/12 md:w-10/12 lg:w-6/12"
-              }`}
+            className={`z-50 fixed top-3 left-1/2 -translate-x-1/2  w-11/12 rounded-2xl transition-all duration-300 ${
+              isScrolled && searchModalIsOpen
+                ? "dark:backdrop-blur-2xl backdrop-blur-sm w-11/12 md:w-10/12 lg:w-6/12 bg-black/50 shadow-md"
+                : isScrolled
+                  ? "dark:backdrop-blur-2xl backdrop-blur-sm  md:w-6/12 lg:w-3/12  bg-black/50 shadow-md"
+                  : "bg-transparent w-11/12 md:w-10/12 lg:w-6/12"
+            }`}
           >
             <div className="mx-auto px-4">
               <div className="flex items-center justify-between h-16 ">
                 {/* Logo */}
                 <div className="flex items-center space-x-2">
-                  <Link
-                    className="flex items-center space-x-2"
-                    href={`/${lng}`}
-                  >
+                  <Link className="flex items-center space-x-2" href={`/${lng}`}>
                     <HeartFilledIcon className="text-white text-2xl" />
-                    <span className="font-bold text-xl text-white md:block hidden">
-                      Test
-                    </span>
+                    <span className="font-bold text-xl text-white md:block hidden">Test</span>
                   </Link>
                 </div>
                 {isMobile ? (
@@ -151,11 +148,9 @@ export const Navbar = () => {
           <div className="absolute left-1/2 -translate-x-1/2 text-white text-lg font-semibold text-center">
             {subcategoryName
               ? `${categoryName ?? category} / ${subcategoryName ?? subcategory}`
-              : categoryName ?? category}
+              : (categoryName ?? category)}
           </div>
         </div>
-
-
       )}
       <div className="md:hidden z-50 fixed bottom-1 left-1/2 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
         <div className="flex justify-around items-center py-2 space-x-3">
@@ -180,18 +175,9 @@ export const Navbar = () => {
             <span className="text-xs">{lng === "en" ? "Chat" : "ჩათი"}</span>
           </Link>
           {user ? (
-            <Link
-              className="relative flex flex-col items-center"
-              href={`/${lng}/profile`}
-            >
-              <Image
-                alt="User Avatar"
-                className="rounded-full w-6 h-6"
-                src="/img1.jpg"
-              />
-              <span className="text-xs">
-                {lng === "en" ? "Profile" : "პროფილი"}
-              </span>
+            <Link className="relative flex flex-col items-center" href={`/${lng}/profile`}>
+              <Image alt="User Avatar" className="rounded-full w-6 h-6" src="/img1.jpg" />
+              <span className="text-xs">{lng === "en" ? "Profile" : "პროფილი"}</span>
             </Link>
           ) : (
             <AuthModal IsMobile={isMobile} />

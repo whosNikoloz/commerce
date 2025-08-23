@@ -1,13 +1,7 @@
 import { Button } from "@heroui/button";
 import { IconCheck } from "../icons";
 
-export const InputLoadingBtn = ({
-  loading,
-  success,
-}: {
-  loading: boolean;
-  success: boolean;
-}) => {
+export const InputLoadingBtn = ({ loading, success }: { loading: boolean; success: boolean }) => {
   if (loading) {
     return <Button isIconOnly className="bg-transparent" isLoading={loading} />;
   }

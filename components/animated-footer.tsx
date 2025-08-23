@@ -101,11 +101,7 @@ export default function AnimatedFooter() {
             onClick={toggleTheme}
             aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
           >
-            {!isSSR && isDarkMode ? (
-              <SunFilledIcon size={18} />
-            ) : (
-              <MoonFilledIcon size={18} />
-            )}
+            {!isSSR && isDarkMode ? <SunFilledIcon size={18} /> : <MoonFilledIcon size={18} />}
           </motion.button>
         </div>
 
@@ -134,8 +130,8 @@ export default function AnimatedFooter() {
               <span className="text-xl font-bold">ShopWave</span>
             </motion.div>
             <p className={themeStyles.subtitle}>
-              Discover the latest trends and high-quality products at ShopWave.
-              Your one-stop destination for all your shopping needs.
+              Discover the latest trends and high-quality products at ShopWave. Your one-stop
+              destination for all your shopping needs.
             </p>
             <motion.div
               animate="show"
@@ -161,20 +157,11 @@ export default function AnimatedFooter() {
           </motion.div>
 
           <motion.div className="space-y-4" variants={item}>
-            <h3
-              className={`text-lg font-semibold mb-4 border-b ${themeStyles.borderColor} pb-2`}
-            >
+            <h3 className={`text-lg font-semibold mb-4 border-b ${themeStyles.borderColor} pb-2`}>
               Quick Links
             </h3>
             <motion.ul className="space-y-2" variants={container}>
-              {[
-                "Home",
-                "Shop",
-                "Categories",
-                "Deals",
-                "About Us",
-                "Contact",
-              ].map((link, index) => (
+              {["Home", "Shop", "Categories", "Deals", "About Us", "Contact"].map((link, index) => (
                 <motion.li key={index} variants={item}>
                   <Link
                     className={`${themeStyles.subtitle} ${themeStyles.linkHover} flex items-center group`}
@@ -201,9 +188,7 @@ export default function AnimatedFooter() {
           </motion.div>
 
           <motion.div className="space-y-4" variants={item}>
-            <h3
-              className={`text-lg font-semibold mb-4 border-b ${themeStyles.borderColor} pb-2`}
-            >
+            <h3 className={`text-lg font-semibold mb-4 border-b ${themeStyles.borderColor} pb-2`}>
               Customer Service
             </h3>
             <motion.ul className="space-y-4" variants={container}>
@@ -237,9 +222,7 @@ export default function AnimatedFooter() {
           </motion.div>
 
           <motion.div className="space-y-4" variants={item}>
-            <h3
-              className={`text-lg font-semibold mb-4 border-b ${themeStyles.borderColor} pb-2`}
-            >
+            <h3 className={`text-lg font-semibold mb-4 border-b ${themeStyles.borderColor} pb-2`}>
               Stay Updated
             </h3>
             <p className={themeStyles.subtitle}>

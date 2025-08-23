@@ -1,13 +1,14 @@
 "use client";
 
-import { getProductById } from "@/app/api/services/productService";
-import { ProductResponseModel } from "@/types/product";
 import { useState, useEffect, useMemo } from "react";
+
 import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
-import { SimilarProducts } from "./similar-products";
 import { Specifications } from "./specifications";
 import { ImageReview } from "./image-review";
+
+import { ProductResponseModel } from "@/types/product";
+import { getProductById } from "@/app/api/services/productService";
 import { CartItem, useCart } from "@/app/context/cartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
@@ -25,32 +26,39 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [notFound, setNotFound] = useState(false);
 
   const setSelectedFacetsSafe = (next: Record<string, string>) =>
-    setSelectedFacets(prev => {
-      const pk = Object.keys(prev), nk = Object.keys(next);
-      if (pk.length === nk.length && pk.every(k => prev[k] === next[k])) return prev;
+    setSelectedFacets((prev) => {
+      const pk = Object.keys(prev),
+        nk = Object.keys(next);
+
+      if (pk.length === nk.length && pk.every((k) => prev[k] === next[k])) return prev;
+
       return next;
     });
-
 
   const [similar, setSimilar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const tick = async () => {
       try {
         const fresh = await getProductById(product.id);
-        setProduct(fresh);
-      } catch (e) {
-        setNotFound(true);
+        if (!cancelled) setProduct(fresh);
+      } catch {
+        if (!cancelled) setNotFound(true);
       }
     };
-    const iv = setInterval(tick, 30_000);
-    return () => clearInterval(iv);
-  }, [product.id]);
 
-  if (notFound) {
-    return <ProductNotFound />;
-  }
+    // initial fetch + interval
+    tick();
+    const iv = setInterval(tick, 30_000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(iv);
+    };
+  }, [product.id]);
 
   const handleAddToCart = () => {
     const item: CartItem = {
@@ -59,7 +67,9 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       price: product.discountPrice ?? product.price,
       image: product.images?.[0] ?? "/placeholder.png",
       quantity: 1,
-      discount: product.discountPrice ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100)) : 0,
+      discount: product.discountPrice
+        ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
+        : 0,
       originalPrice: product.price,
 
       selectedFacets,
@@ -69,18 +79,20 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   };
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScrollOrResize = () => {
       const scrollThreshold = isMobile ? 900 : 700;
       setIsPriceVisible(window.scrollY < scrollThreshold);
     };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll);
+
+    handleScrollOrResize();
+    window.addEventListener("scroll", handleScrollOrResize);
+    window.addEventListener("resize", handleScrollOrResize);
+
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("scroll", handleScrollOrResize);
+      window.removeEventListener("resize", handleScrollOrResize);
     };
-  }, []);
+  }, [isMobile]);
 
   const galleryImages = useMemo(() => {
     return (product.images ?? []).filter((u) => typeof u === "string" && u.trim());
@@ -89,14 +101,19 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const specs = useMemo(() => {
     if (!product.productFacetValues?.length) return [];
 
-    const grouped = product.productFacetValues.reduce((acc, f) => {
-      const name = f.facetName ?? "";
-      if (!acc[name]) {
-        acc[name] = [];
-      }
-      acc[name].push(f.facetValue ?? "");
-      return acc;
-    }, {} as Record<string, string[]>);
+    const grouped = product.productFacetValues.reduce(
+      (acc, f) => {
+        const name = f.facetName ?? "";
+
+        if (!acc[name]) {
+          acc[name] = [];
+        }
+        acc[name].push(f.facetValue ?? "");
+
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
 
     return [
       {
@@ -109,7 +126,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     ];
   }, [product.productFacetValues]);
 
-
   const similarProducts = useMemo(
     () =>
       similar.map((p) => ({
@@ -119,17 +135,19 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         rating: 0, // your API doesn’t expose rating; fill if available
         image: p.images?.[0] ?? "/placeholder.png",
       })),
-    [similar]
+    [similar],
   );
 
   const price = product.discountPrice ?? product.price;
   const originalPrice = product.discountPrice ? product.price : undefined;
 
+  if (notFound) {
+    return <ProductNotFound />;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">
-        {product.name ?? "პროდუქტი"}
-      </h1>
+      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
         <div className="flex-1">
@@ -141,30 +159,34 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         {product.description && (
           <div className="flex md:items-start place-items-start">
             <div
+              dangerouslySetInnerHTML={{ __html: product.description }}
               className={[
                 "rich-content max-w-md ml-5",
                 "prose prose-sm dark:prose-invert",
                 "prose-ul:list-disc prose-ol:list-decimal",
                 "prose-li:my-1 prose-p:my-2",
-                "whitespace-pre-wrap break-words"
+                "whitespace-pre-wrap break-words",
               ].join(" ")}
-              dangerouslySetInnerHTML={{ __html: product.description }}
             />
           </div>
         )}
 
         <ProductInfo
-          discount={originalPrice ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100)) : 0}
-          originalPrice={originalPrice ?? null}
-          status={product.status}
+          brand={product.brand?.name ?? ""}
           condition={product.condition}
+          discount={
+            originalPrice
+              ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
+              : 0
+          }
+          isComingSoon={product.isComingSoon}
+          isLiquidated={product.isLiquidated}
+          isNewArrival={product.isNewArrival}
+          originalPrice={originalPrice ?? null}
           price={price}
+          status={product.status}
           onAddToCart={handleAddToCart}
           onBuyNow={() => console.log("Buy now clicked")}
-          brand={product.brand?.name ?? ""}
-          isComingSoon={product.isComingSoon}
-          isNewArrival={product.isNewArrival}
-          isLiquidated={product.isLiquidated}
         />
       </div>
 
@@ -176,19 +198,20 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           <div className="prose prose-sm dark:prose-invert">
             <div className="flex md:items-start place-items-start">
               <div
+                dangerouslySetInnerHTML={{
+                  __html: product.brand.description ?? "",
+                }}
                 className={[
                   "rich-content max-w-md",
                   "prose prose-sm dark:prose-invert",
                   "prose-ul:list-disc prose-ol:list-decimal",
                   "prose-li:my-1 prose-p:my-2",
-                  "whitespace-pre-wrap break-words"
+                  "whitespace-pre-wrap break-words",
                 ].join(" ")}
-                dangerouslySetInnerHTML={{ __html: product.brand.description ?? "" }}
               />
             </div>
           </div>
         </div>
-
       )}
 
       {specs.map((g, i) => (
@@ -203,19 +226,23 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       ))}
 
       <ProductInfoBottom
-        discount={originalPrice ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100)) : 0}
+        brand={product.brand?.name ?? ""}
+        condition={product.condition}
+        discount={
+          originalPrice
+            ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
+            : 0
+        }
+        image={product.images?.[0] ?? "/placeholder.png"}
+        isComingSoon={product.isComingSoon}
+        isLiquidated={product.isLiquidated}
+        isNewArrival={product.isNewArrival}
         isVisible={!isPriceVisible}
         name={product.name ?? ""}
         originalPrice={originalPrice}
         price={price}
-        stock={product.status}
         status={product.status}
-        condition={product.condition}
-        image={product.images?.[0] ?? "/placeholder.png"}
-        brand={product.brand?.name ?? ""}
-        isComingSoon={product.isComingSoon}
-        isNewArrival={product.isNewArrival}
-        isLiquidated={product.isLiquidated}
+        stock={product.status}
         onAddToCart={handleAddToCart}
         onBuyNow={() => console.log("Buy now clicked")}
       />

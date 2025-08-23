@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { useCart } from "@/app/context/cartContext"
-import CheckoutForm from "./CheckoutForm"
-import OrderSummary from "./OrderSummary"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/app/context/cartContext";
+import CheckoutForm from "./CheckoutForm";
+import OrderSummary from "./OrderSummary";
 
 export default function CheckoutPage() {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const { cart, clearCart } = useCart()
-  const router = useRouter()
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { cart, clearCart } = useCart();
+  const router = useRouter();
 
   // // Handle redirect when cart is empty
   // useEffect(() => {
@@ -24,24 +24,24 @@ export default function CheckoutPage() {
 
   // Don't render anything while redirecting
   if (cart.length === 0) {
-    return null
+    return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsProcessing(true)
+    e.preventDefault();
+    setIsProcessing(true);
 
     // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    setIsProcessing(false)
+    setIsProcessing(false);
 
     // Clear cart after successful order
-    clearCart()
+    clearCart();
 
     // Redirect to order confirmation
-    router.push("/order-confirmation/success")
-  }
+    router.push("/order-confirmation/success");
+  };
 
   return (
     <div className="min-h-screen">
@@ -64,5 +64,5 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

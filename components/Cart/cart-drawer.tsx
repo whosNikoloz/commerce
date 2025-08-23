@@ -15,18 +15,11 @@ export default function CartDrawer() {
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
-    if (
-      cart?.length &&
-      cart.length !== quantityRef.current &&
-      cart.length > 0
-    ) {
+    if (cart?.length && cart.length !== quantityRef.current && cart.length > 0) {
       quantityRef.current = cart.length;
     }
   }, [cart?.length, isOpen]);
-  const totalPrice = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0,
-  );
+  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
@@ -52,10 +45,7 @@ export default function CartDrawer() {
             leaveFrom="opacity-100 backdrop-blur-sm"
             leaveTo="opacity-0 backdrop-blur-none"
           >
-            <div
-              aria-hidden="true"
-              className="fixed inset-0 bg-black/40 dark:bg-black/60"
-            />
+            <div aria-hidden="true" className="fixed inset-0 bg-black/40 dark:bg-black/60" />
           </Transition.Child>
           <Transition.Child
             as={Fragment}
@@ -68,13 +58,8 @@ export default function CartDrawer() {
           >
             <Dialog.Panel className="fixed right-0 top-0 h-full w-96 max-w-full bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 shadow-2xl rounded-l-xl overflow-hidden flex flex-col">
               <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  🛒 My Cart
-                </h2>
-                <button
-                  className="hover:rotate-90 transition-transform"
-                  onClick={closeCart}
-                >
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">🛒 My Cart</h2>
+                <button className="hover:rotate-90 transition-transform" onClick={closeCart}>
                   <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
                 </button>
               </div>
@@ -113,9 +98,7 @@ export default function CartDrawer() {
                         <div className="flex items-center gap-2">
                           <button
                             className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition-colors"
-                            onClick={() =>
-                              updateCartItem(item.id, item.quantity - 1)
-                            }
+                            onClick={() => updateCartItem(item.id, item.quantity - 1)}
                           >
                             ➖
                           </button>
@@ -124,9 +107,7 @@ export default function CartDrawer() {
                           </span>
                           <button
                             className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition-colors"
-                            onClick={() =>
-                              updateCartItem(item.id, item.quantity + 1)
-                            }
+                            onClick={() => updateCartItem(item.id, item.quantity + 1)}
                           >
                             ➕
                           </button>
@@ -142,9 +123,7 @@ export default function CartDrawer() {
                   </ul>
                   <div className="sticky bottom-0 p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
                     <div className="flex justify-between text-xl font-bold mb-4">
-                      <span className="text-gray-700 dark:text-gray-300">
-                        Total:
-                      </span>
+                      <span className="text-gray-700 dark:text-gray-300">Total:</span>
                       <span className="text-green-600 dark:text-green-400">
                         ${totalPrice.toFixed(2)}
                       </span>

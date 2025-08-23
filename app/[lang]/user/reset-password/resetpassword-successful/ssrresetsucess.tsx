@@ -1,25 +1,25 @@
-"use client";
+// "use client";
 
-import { Hero } from "@/app/components/resetpasswordsuccessful/Hero";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
+// import { Hero } from "@/app/components/resetpasswordsuccessful/Hero";
+// import { useRouter } from "next/navigation";
+// import { useEffect, useState } from "react";
+// import Cookies from "universal-cookie";
 
-export default function SSRResetSuccess(lng: { lang: string }) {
-  const router = useRouter();
-  const [userEmail, setUserEmail] = useState(null);
+// export default function SSRResetSuccess(lng: { lang: string }) {
+//   const router = useRouter();
+//   const [userEmail, setUserEmail] = useState(null);
 
-  useEffect(() => {
-    var cookie = new Cookies();
-    setUserEmail(cookie.get("regEmail"));
+//   useEffect(() => {
+//     var cookie = new Cookies();
+//     setUserEmail(cookie.get("regEmail"));
 
-    cookie.remove("regUserName");
-    cookie.remove("regEmail");
+//     cookie.remove("regUserName");
+//     cookie.remove("regEmail");
 
-    setTimeout(() => {
-      router.push("/");
-    }, 3000);
-  }, [setUserEmail, router]);
+//     setTimeout(() => {
+//       router.push("/");
+//     }, 3000);
+//   }, [setUserEmail, router]);
 
-  return <Hero userEmail={userEmail} lng={lng} />;
-}
+//   return <Hero userEmail={userEmail} lng={lng} />;
+// }

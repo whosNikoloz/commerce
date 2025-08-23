@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { CreditCard } from "lucide-react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CreditCard } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function CheckoutForm() {
-  const [sameAsShipping, setSameAsShipping] = useState(true)
-  const [paymentMethod, setPaymentMethod] = useState("card")
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState("card");
 
   return (
     <div className="space-y-6">
@@ -202,5 +208,5 @@ export default function CheckoutForm() {
         </CardContent>
       </Card>
     </div>
-  )
-} 
+  );
+}

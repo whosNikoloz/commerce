@@ -1,10 +1,13 @@
 "use client";
 
+import type { CategoryModel } from "@/types/category";
+import type { ProductResponseModel } from "@/types/product";
+import type { PagedList } from "@/types/pagination";
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@headlessui/react";
@@ -16,9 +19,6 @@ import { GoBackButton } from "../go-back-button";
 
 import { searchProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
-import type { CategoryModel } from "@/types/category";
-import type { ProductResponseModel } from "@/types/product";
-import type { PagedList } from "@/types/pagination";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
@@ -44,8 +44,12 @@ export default function SearchForMobile({
   const searchParams = useSearchParams();
 
   // ✅ history hook
-  const { items: historyItems, add: addHistory, remove: removeHistory, clear: clearHistory } =
-    useSearchHistory({ namespace: "global", max: 15 });
+  const {
+    items: historyItems,
+    add: addHistory,
+    remove: removeHistory,
+    clear: clearHistory,
+  } = useSearchHistory({ namespace: "global", max: 15 });
 
   // categories state
   const [root, setRoot] = useState<CategoryWithSubs | null>(null);
@@ -65,15 +69,18 @@ export default function SearchForMobile({
   // fetch categories once
   useEffect(() => {
     let alive = true;
+
     (async () => {
       try {
         setLoadingCats(true);
         const raw = (await getAllCategories()) as unknown as CategoryModel[] | CategoryWithSubs;
+
         if (!alive) return;
 
         if (Array.isArray(raw)) {
           const rootNode = raw.find((c) => c.parentId == null) ?? raw[0];
           const subs = raw.filter((c) => c.parentId === rootNode.id);
+
           setRoot({ ...rootNode, subcategories: subs });
         } else {
           setRoot(raw);
@@ -82,6 +89,7 @@ export default function SearchForMobile({
         if (alive) setLoadingCats(false);
       }
     })();
+
     return () => {
       alive = false;
     };
@@ -92,6 +100,7 @@ export default function SearchForMobile({
   // read q from URL
   useEffect(() => {
     const q = searchParams.get("q") || "";
+
     if (q) {
       setSearchQuery(q);
       doSearch(q);
@@ -111,10 +120,12 @@ export default function SearchForMobile({
 
   const doSearch = async (value: string) => {
     const term = value.trim();
+
     if (!term || term.length < minLen) {
       setSearchResults([]);
       setIsLoading(false);
       setError(null);
+
       return;
     }
     try {
@@ -122,13 +133,14 @@ export default function SearchForMobile({
       setError(null);
       const resp = await searchProducts(term, "name", "asc", 1, pageSize);
       const items = (resp as PagedList<ProductResponseModel>).items ?? [];
+
       setSearchResults(
         items.map((p) => ({
           id: p.id,
           name: p.name ?? "Unnamed product",
           images: p.images,
           price: p.price,
-        }))
+        })),
       );
     } catch (e: any) {
       setError(e?.message ?? "Search failed");
@@ -140,6 +152,7 @@ export default function SearchForMobile({
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+
     setSearchQuery(value);
     setIsLoading(true);
     setError(null);
@@ -151,6 +164,7 @@ export default function SearchForMobile({
 
   const goToResultsPage = (q: string) => {
     const term = q.trim();
+
     if (!term) return;
     addHistory(term); // ✅ save to history on navigate
     router.push(`/en/category?q=${encodeURIComponent(term)}`);
@@ -179,8 +193,8 @@ export default function SearchForMobile({
         alt={c.name ?? "Category Image"}
         className="h-16 w-16 object-contain mb-3"
         height={128}
-        width={128}
         src={img}
+        width={128}
       />
     );
   };
@@ -219,25 +233,33 @@ export default function SearchForMobile({
             placeholder="What are you looking for?"
             type="search"
             value={searchQuery}
-            onChange={() => { }}
+            onChange={() => {}}
           />
         </button>
       )}
 
       <Modal
         hideCloseButton
+        className="dark:bg-brand-muteddark bg-brand-surface"
         isOpen={isModalOpen}
         motionProps={{
           variants: {
-            enter: { y: 0, opacity: 1, transition: { duration: 0.1, ease: "easeOut" } },
-            exit: { y: 0, opacity: 0, transition: { duration: 0.1, ease: "easeIn" } },
+            enter: {
+              y: 0,
+              opacity: 1,
+              transition: { duration: 0.1, ease: "easeOut" },
+            },
+            exit: {
+              y: 0,
+              opacity: 0,
+              transition: { duration: 0.1, ease: "easeIn" },
+            },
           },
         }}
         placement="top"
         scrollBehavior="inside"
         size="full"
         onClose={handleClose}
-        className="dark:bg-brand-muteddark bg-brand-surface"
       >
         <ModalContent>
           {() => (
@@ -249,8 +271,8 @@ export default function SearchForMobile({
                   <Input
                     aria-controls="search-results"
                     aria-expanded={isModalOpen}
-                    autoComplete="off"
                     aria-label="Search"
+                    autoComplete="off"
                     className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[15px]"
                     id="search-input"
                     placeholder="What are you looking for?"
@@ -277,8 +299,8 @@ export default function SearchForMobile({
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-gray-500">Recent searches</span>
                           <button
-                            onClick={clearHistory}
                             className="text-xs text-gray-500 underline hover:text-gray-700"
+                            onClick={clearHistory}
                           >
                             Clear all
                           </button>
@@ -289,14 +311,17 @@ export default function SearchForMobile({
                               key={term}
                               className="group flex items-center gap-2 px-3 py-1 rounded-full border text-sm hover:bg-gray-50"
                             >
-                              <button className="hover:underline" onClick={() => selectHistoryTerm(term)}>
+                              <button
+                                className="hover:underline"
+                                onClick={() => selectHistoryTerm(term)}
+                              >
                                 {term}
                               </button>
                               <button
                                 aria-label={`Remove ${term}`}
-                                onClick={() => removeHistory(term)}
                                 className="opacity-60 group-hover:opacity-100"
                                 title="Remove"
+                                onClick={() => removeHistory(term)}
                               >
                                 ×
                               </button>
@@ -308,7 +333,9 @@ export default function SearchForMobile({
                       <div className="flex flex-col items-center justify-center py-6 text-gray-400">
                         <SearchIcon className="h-12 w-12 mb-3 opacity-30" />
                         <p className="text-sm">You don’t have any search history yet</p>
-                        <p className="text-xs text-gray-500 mt-1">Start typing to search products</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Start typing to search products
+                        </p>
                       </div>
                     )}
 
@@ -318,27 +345,27 @@ export default function SearchForMobile({
                       <div className="grid grid-cols-3 gap-4 w-full">
                         {loadingCats
                           ? Array.from({ length: 6 }).map((_, i) => (
-                            <Card key={i} className="p-4">
-                              <div className="animate-pulse flex flex-col items-center">
-                                <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
-                                <div className="h-3 w-20 bg-gray-300/50 rounded" />
-                              </div>
-                            </Card>
-                          ))
+                              <Card key={i} className="p-4">
+                                <div className="animate-pulse flex flex-col items-center">
+                                  <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
+                                  <div className="h-3 w-20 bg-gray-300/50 rounded" />
+                                </div>
+                              </Card>
+                            ))
                           : categories.map((category) => (
-                            <Card
-                              key={category.id}
-                              className="cursor-pointer hover:shadow-md transition-shadow"
-                              onClick={() => goToResultsPage(category.name ?? "")}
-                            >
-                              <CardBody className="flex flex-col items-center justify-center">
-                                {renderCatThumb(category)}
-                                <span className="text-sm font-medium text-center line-clamp-2">
-                                  {category.name}
-                                </span>
-                              </CardBody>
-                            </Card>
-                          ))}
+                              <Card
+                                key={category.id}
+                                className="cursor-pointer hover:shadow-md transition-shadow"
+                                onClick={() => goToResultsPage(category.name ?? "")}
+                              >
+                                <CardBody className="flex flex-col items-center justify-center">
+                                  {renderCatThumb(category)}
+                                  <span className="text-sm font-medium text-center line-clamp-2">
+                                    {category.name}
+                                  </span>
+                                </CardBody>
+                              </Card>
+                            ))}
                       </div>
                     </div>
                   </div>
@@ -372,22 +399,22 @@ export default function SearchForMobile({
                       <motion.li
                         key={result.id}
                         animate={{ opacity: 1, y: 0 }}
-                        initial={{ opacity: 0, y: -5 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        transition={{ duration: 0.1 }}
                         className="p-2 hover:bg-gray-100 hover:text-black rounded-md cursor-pointer"
-                        onMouseDown={(e) => e.preventDefault()}
+                        exit={{ opacity: 0, y: -5 }}
+                        initial={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.1 }}
                         onClick={() => goToResultsPage(result.name ?? "")} // ✅ saves history via goToResultsPage
+                        onMouseDown={(e) => e.preventDefault()}
                       >
                         <div className="flex items-center gap-3">
                           {result.images?.[0] ? (
                             <div className="relative h-10 w-10 flex-shrink-0 rounded-md overflow-hidden border">
                               <Image
-                                src={result.images[0]}
-                                alt={result.name ?? "Product"}
                                 fill
-                                sizes="40px"
+                                alt={result.name ?? "Product"}
                                 className="object-cover"
+                                sizes="40px"
+                                src={result.images[0]}
                               />
                             </div>
                           ) : (

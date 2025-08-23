@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit, Trash2, Tag, Eye, EyeOff } from "lucide-react";
+import { Tag, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -15,7 +17,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { getAllCategories, updateCategory } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
-import { toast } from "sonner";
 
 export function CategoriesTable() {
   const [categories, setCategories] = useState<CategoryModel[]>([]);
@@ -25,6 +26,7 @@ export function CategoriesTable() {
     const fetchCategories = async () => {
       try {
         const data = await getAllCategories();
+
         setCategories(data);
       } catch (err) {
         console.error("❌ Error loading categories", err);
@@ -35,15 +37,16 @@ export function CategoriesTable() {
   }, []);
 
   const toggleCategoryVisibility = async (categoryId: string) => {
-    const current = categories.find(p => p.id === categoryId);
+    const current = categories.find((p) => p.id === categoryId);
+
     if (!current) return;
 
     const prevCategories = categories;
 
     setCategories((prev) =>
       prev.map((category) =>
-        category.id === categoryId ? { ...category, isActive: !category.isActive } : category
-      )
+        category.id === categoryId ? { ...category, isActive: !category.isActive } : category,
+      ),
     );
 
     const payload: CategoryModel = {
@@ -52,7 +55,7 @@ export function CategoriesTable() {
       description: current.description,
       parentId: current.parentId,
       isActive: !current.isActive,
-      facets: current.facets
+      facets: current.facets,
     };
 
     try {
@@ -63,8 +66,6 @@ export function CategoriesTable() {
       toast.error("პროდუქტის განახლება ვერ მოხერხდა.");
       setCategories(prevCategories);
     }
-
-
   };
 
   const deleteCategory = (categoryId: string) => {
@@ -74,7 +75,7 @@ export function CategoriesTable() {
   const filteredCategories = categories.filter(
     (category) =>
       category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      category.description?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -82,11 +83,11 @@ export function CategoriesTable() {
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <input
-            type="text"
+            className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
             placeholder="Search by name or description..."
+            type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
           />
         </div>
       </CardHeader>
@@ -120,8 +121,8 @@ export function CategoriesTable() {
                 <TableCell>
                   {category.parentId ? (
                     <Badge
-                      variant="outline"
                       className="border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300"
+                      variant="outline"
                     >
                       {categories.find((c) => c.id === category.parentId)?.name || "|"}
                     </Badge>
@@ -131,16 +132,14 @@ export function CategoriesTable() {
                 </TableCell>
 
                 <TableCell>
-                  <Badge variant="secondary">
-                    {category.facets?.length ?? 0} facets
-                  </Badge>
+                  <Badge variant="secondary">{category.facets?.length ?? 0} facets</Badge>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <Switch
                       checked={(category as any).visible}
-                      onCheckedChange={() => toggleCategoryVisibility(category.id)}
                       className="data-[state=checked]:bg-blue-600"
+                      onCheckedChange={() => toggleCategoryVisibility(category.id)}
                     />
                     {(category as any).visible ? (
                       <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />

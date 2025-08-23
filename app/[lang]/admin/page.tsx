@@ -2,14 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/modal";
+
 import AdminDashboard from "@/components/admin/admin-dashboard";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  useDisclosure,
-} from "@heroui/modal";
 import LoginModal from "@/components/admin/login-modal";
 import { GoBackButton } from "@/components/go-back-button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -60,7 +55,6 @@ export default function AdminPage() {
   }, []);
 
   const isMobile = useIsMobile();
-
 
   const handleCloseModal = () => {
     onClose();
@@ -146,10 +140,11 @@ export default function AdminPage() {
   return (
     <div className="space-y-6 ">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">
+          Dashboard
+        </h1>
       </div>
       <AdminDashboard />
     </div>
-  )
-
+  );
 }

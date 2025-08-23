@@ -1,30 +1,27 @@
 import { apiFetch } from "../client/fetcher";
-import { ProductResponseModel, ProductRequestModel } from "@/types/product";
-import { FilterModel } from "@/types/filter";
-import { PagedList } from "@/types/pagination";
+
 import { CategoryModel } from "@/types/category";
 
 const API_BASE = "http://localhost:5007/Category";
 
 export async function getAllCategories(): Promise<CategoryModel[]> {
-    return apiFetch<CategoryModel[]>(`${API_BASE}/get-all-categories`);
+  return apiFetch<CategoryModel[]>(`${API_BASE}/get-all-categories`);
 }
 
 export async function getCategoryById(id: string): Promise<CategoryModel> {
-    return apiFetch<CategoryModel>(`${API_BASE}/get-category-by-${id}`);
+  return apiFetch<CategoryModel>(`${API_BASE}/get-category-by-${id}`);
 }
 
 export async function getCategoryWithSubCategoriesById(id: string): Promise<CategoryModel> {
-    return apiFetch<CategoryModel>(`${API_BASE}/get-category-with-subcategories?id=${id}`);
+  return apiFetch<CategoryModel>(`${API_BASE}/get-category-with-subcategories?id=${id}`);
 }
 
 export async function updateCategory(data: CategoryModel): Promise<string> {
-    return apiFetch<string>(`${API_BASE}/update-category`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-    });
+  return apiFetch<string>(`${API_BASE}/update-category`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
 }
-
 
 // export async function getProductsByCategory(id: string): Promise<ProductResponseModel[]> {
 //     return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);

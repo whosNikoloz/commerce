@@ -2,14 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Sparkles, Clock3, Tag, ShoppingCart, Eye, RefreshCcw, Star } from "lucide-react";
+import { Heart, Sparkles, Clock3, Tag, ShoppingCart, Eye } from "lucide-react";
+import { Card, CardBody } from "@heroui/card";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardBody } from "@heroui/card";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 import { CartItem, useCart } from "@/app/context/cartContext";
-import { useState } from "react";
 
 interface ProductGridProps {
   products: ProductResponseModel[];
@@ -18,15 +19,20 @@ interface ProductGridProps {
 
 function formatCondition(c: Condition) {
   switch (c) {
-    case Condition.New: return "New";
-    case Condition.Used: return "Used";
-    case Condition.LikeNew: return "Like New";
-    default: return "";
+    case Condition.New:
+      return "New";
+    case Condition.Used:
+      return "Used";
+    case Condition.LikeNew:
+      return "Like New";
+    default:
+      return "";
   }
 }
 
 function formatPrice(p?: number) {
   if (typeof p !== "number") return "";
+
   return `$${p.toFixed(2)}`;
 }
 
@@ -35,7 +41,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
   const [selectedImages, setSelectedImages] = useState<Record<string, number>>({});
 
   const handleAddToCart = (productId: string) => {
-    const product = products.find(p => p.id === productId);
+    const product = products.find((p) => p.id === productId);
+
     if (!product) return;
 
     const item: CartItem = {
@@ -44,24 +51,29 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       price: product.discountPrice ?? product.price,
       image: product.images?.[0] ?? "/placeholder.png",
       quantity: 1,
-      discount: product.discountPrice ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100)) : 0,
+      discount: product.discountPrice
+        ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
+        : 0,
       originalPrice: product.price,
     };
 
     addToCart(item);
-  }
+  };
 
   const handleImageSelect = (productId: string, imageIndex: number) => {
-    setSelectedImages(prev => ({
+    setSelectedImages((prev) => ({
       ...prev,
-      [productId]: imageIndex
+      [productId]: imageIndex,
     }));
   };
 
   return (
-    <div className={viewMode === "grid"
-      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6"
-      : "space-y-4"}
+    <div
+      className={
+        viewMode === "grid"
+          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6"
+          : "space-y-4"
+      }
     >
       {products.map((product) => {
         const images = product.images && product.images.length > 0 ? product.images : ["/img1.jpg"];
@@ -70,36 +82,36 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
         const inStock = product.status === StockStatus.InStock;
 
         const hasDiscount =
-          typeof product.discountPrice === "number" &&
-          product.discountPrice < product.price;
+          typeof product.discountPrice === "number" && product.discountPrice < product.price;
 
         const displayPrice = hasDiscount ? product.discountPrice! : product.price;
         const originalPrice = hasDiscount ? product.price : undefined;
 
         const size = product.productFacetValues?.find(
-          f => f.facetName?.toLowerCase() === "size"
+          (f) => f.facetName?.toLowerCase() === "size",
         )?.facetValue;
         const color = product.productFacetValues?.find(
-          f => f.facetName?.toLowerCase() === "color"
+          (f) => f.facetName?.toLowerCase() === "color",
         )?.facetValue;
 
-        const metaLine = [
-          product.brand?.name,
-          color,
-          size,
-          formatCondition(product.condition)
-        ].filter(Boolean).join(" • ");
+        const metaLine = [product.brand?.name, color, size, formatCondition(product.condition)]
+          .filter(Boolean)
+          .join(" • ");
 
         const showComingSoon = product.isComingSoon === true;
         const showNew = product.isNewArrival === true;
         const showClearance = product.isLiquidated === true;
 
         const discountPct = hasDiscount
-          ? Math.max(0, Math.round(((product.price - product.discountPrice!) / product.price) * 100))
+          ? Math.max(
+              0,
+              Math.round(((product.price - product.discountPrice!) / product.price) * 100),
+            )
           : 0;
 
         let ctaLabel = "Add to Cart";
         let ctaDisabled = !inStock;
+
         if (showComingSoon) {
           ctaLabel = "Coming Soon";
           ctaDisabled = true;
@@ -140,34 +152,34 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                     </div>
 
                     <Button
+                      aria-label="Add to wishlist"
+                      className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-sm hover:bg-white hover:scale-110 h-9 w-9 rounded-full shadow-lg border-0 transition-all duration-200"
                       size="icon"
                       variant="ghost"
-                      className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-sm hover:bg-white hover:scale-110 h-9 w-9 rounded-full shadow-lg border-0 transition-all duration-200"
-                      aria-label="Add to wishlist"
                     >
                       <Heart className="h-4 w-4 text-gray-600 group-hover:text-red-500 transition-colors" />
                     </Button>
 
                     <div className="relative group/image rounded-t-2xl overflow-hidden">
                       <Image
-                        src={currentImage}
                         alt={product.name ?? "Product image"}
-                        width={250}
-                        height={250}
                         className={`w-full ${viewMode === "grid" ? "aspect-square" : "h-40"} object-cover transition-transform duration-500 group-hover:scale-105`}
+                        height={250}
+                        src={currentImage}
+                        width={250}
                       />
 
                       {/* Left Arrow */}
                       {images.length > 1 && (
                         <button
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleImageSelect(
                               product.id,
-                              (selectedImageIndex - 1 + images.length) % images.length
+                              (selectedImageIndex - 1 + images.length) % images.length,
                             );
                           }}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
                         >
                           &#8592;
                         </button>
@@ -175,20 +187,16 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
 
                       {images.length > 1 && (
                         <button
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleImageSelect(
-                              product.id,
-                              (selectedImageIndex + 1) % images.length
-                            );
+                            handleImageSelect(product.id, (selectedImageIndex + 1) % images.length);
                           }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-colors"
                         >
                           &#8594;
                         </button>
                       )}
                     </div>
-
                   </div>
 
                   <div className="p-4 space-y-3">
@@ -197,9 +205,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                         {product.name ?? "Unnamed Product"}
                       </h3>
                       {metaLine && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          {metaLine}
-                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{metaLine}</p>
                       )}
                     </div>
 
@@ -226,8 +232,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
 
                       <Link href={`/product/${product.id}`}>
                         <Button
-                          variant="outline"
                           className="px-4 border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 rounded-xl transition-all duration-200"
+                          variant="outline"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -243,19 +249,19 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="relative shrink-0">
                       <Image
-                        src={currentImage}
                         alt={product.name ?? "Product image"}
-                        width={112}
-                        height={84}
                         className="w-[88px] h-[66px] sm:w-[112px] sm:h-[84px] object-contain rounded-md bg-white"
+                        height={84}
+                        src={currentImage}
+                        width={112}
                       />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="space-y-1">
                         <Link
-                          href={`/product/${product.id}`}
                           className="block text-[15px] sm:text-[16px] font-semibold text-text-light dark:text-text-lightdark leading-tight line-clamp-1 hover:text-brand-primary transition-colors"
+                          href={`/product/${product.id}`}
                         >
                           {product.name ?? "Unnamed Product"}
                         </Link>

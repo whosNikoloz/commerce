@@ -23,12 +23,7 @@ interface LoginProps {
   handleOAuth: (provider: string) => void;
 }
 
-export default function LoginModal({
-  loginData,
-  lng,
-  onSwitchMode,
-  handleOAuth,
-}: LoginProps) {
+export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loginState, setLoginState] = useState({
@@ -43,26 +38,19 @@ export default function LoginModal({
   const [Logloader, setLogLoader] = useState(false);
   const [logEmailHasBlurred, setEmailLogHasBlurred] = useState(false);
 
-  const validateEmail = (value: string) =>
-    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
   const handleLogin = async () => {
     setIsLoading(true);
     if (loginState.email === "") {
-      setLoginEmailError(
-        lng == "ka"
-          ? "შეავსე ელ-ფოსტის ველი"
-          : "Please fill in the Email field",
-      );
+      setLoginEmailError(lng == "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
       setIsLoading(false);
 
       return;
     }
     if (loginState.password === "") {
       setLoginPasswordError(
-        lng == "ka"
-          ? "შეავსე პაროლის ველი"
-          : "Please fill in the Password field",
+        lng == "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field",
       );
       setIsLoading(false);
 
@@ -90,9 +78,7 @@ export default function LoginModal({
       }
       if (!isEmailValid) {
         setLoginEmailError(
-          lng == "ka"
-            ? "შეიყვანეთ ელ-ფოსტა სწორად"
-            : "Please enter a valid email",
+          lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email",
         );
         setEmailLogHasBlurred(false);
 
@@ -129,11 +115,7 @@ export default function LoginModal({
           label: ["font-medium text-gray-700 dark:text-gray-200"],
         }}
         endContent={
-          logEmailHasBlurred ? (
-            <InputLoadingBtn loading={Logloader} success={true} />
-          ) : (
-            <></>
-          )
+          logEmailHasBlurred ? <InputLoadingBtn loading={Logloader} success={true} /> : <></>
         }
         errorMessage={loginEmailError}
         isInvalid={loginEmailError !== ""}
@@ -200,9 +182,7 @@ export default function LoginModal({
 
       <div className="flex items-center justify-center my-4">
         <div className="flex-grow border-t border-gray-300" />
-        <span className="mx-4 text-gray-500 text-sm font-medium">
-          {loginData.or}
-        </span>
+        <span className="mx-4 text-gray-500 text-sm font-medium">{loginData.or}</span>
         <div className="flex-grow border-t border-gray-300" />
       </div>
 

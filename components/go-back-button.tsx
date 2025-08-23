@@ -7,11 +7,7 @@ interface GoBackButtonProps {
   onClick: () => void;
 }
 
-export const GoBackButton: React.FC<GoBackButtonProps> = ({
-  className,
-  size = 25,
-  onClick,
-}) => {
+export const GoBackButton: React.FC<GoBackButtonProps> = ({ className, size = 25, onClick }) => {
   return (
     <Button
       isIconOnly

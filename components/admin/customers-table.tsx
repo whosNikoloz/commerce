@@ -1,13 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Eye, Edit, Mail, Phone, MapPin, ShoppingBag, Calendar } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState } from "react";
+import { Eye, Edit, Mail, Phone, MapPin, ShoppingBag, Calendar } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -15,33 +23,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Customer {
-  id: string
-  name: string
-  email: string
-  phone: string
-  avatar: string
-  joinDate: string
-  totalOrders: number
-  totalSpent: number
-  status: "active" | "inactive"
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  joinDate: string;
+  totalOrders: number;
+  totalSpent: number;
+  status: "active" | "inactive";
   address: {
-    street: string
-    city: string
-    state: string
-    zip: string
-    country: string
-  }
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
   recentOrders: {
-    id: string
-    orderNumber: string
-    date: string
-    total: number
-    status: string
-  }[]
+    id: string;
+    orderNumber: string;
+    date: string;
+    total: number;
+    status: string;
+  }[];
 }
 
 const initialCustomers: Customer[] = [
@@ -63,8 +71,20 @@ const initialCustomers: Customer[] = [
       country: "USA",
     },
     recentOrders: [
-      { id: "1", orderNumber: "ORD-2024-001", date: "2024-01-15", total: 139.97, status: "processing" },
-      { id: "2", orderNumber: "ORD-2024-010", date: "2024-01-10", total: 89.99, status: "delivered" },
+      {
+        id: "1",
+        orderNumber: "ORD-2024-001",
+        date: "2024-01-15",
+        total: 139.97,
+        status: "processing",
+      },
+      {
+        id: "2",
+        orderNumber: "ORD-2024-010",
+        date: "2024-01-10",
+        total: 89.99,
+        status: "delivered",
+      },
     ],
   },
   {
@@ -84,7 +104,15 @@ const initialCustomers: Customer[] = [
       zip: "90210",
       country: "USA",
     },
-    recentOrders: [{ id: "3", orderNumber: "ORD-2024-002", date: "2024-01-14", total: 299.99, status: "shipped" }],
+    recentOrders: [
+      {
+        id: "3",
+        orderNumber: "ORD-2024-002",
+        date: "2024-01-14",
+        total: 299.99,
+        status: "shipped",
+      },
+    ],
   },
   {
     id: "3",
@@ -103,7 +131,15 @@ const initialCustomers: Customer[] = [
       zip: "60601",
       country: "USA",
     },
-    recentOrders: [{ id: "4", orderNumber: "ORD-2024-003", date: "2024-01-13", total: 188.96, status: "pending" }],
+    recentOrders: [
+      {
+        id: "4",
+        orderNumber: "ORD-2024-003",
+        date: "2024-01-13",
+        total: 188.96,
+        status: "pending",
+      },
+    ],
   },
   {
     id: "4",
@@ -123,8 +159,20 @@ const initialCustomers: Customer[] = [
       country: "USA",
     },
     recentOrders: [
-      { id: "5", orderNumber: "ORD-2024-004", date: "2024-01-12", total: 79.99, status: "delivered" },
-      { id: "6", orderNumber: "ORD-2024-008", date: "2024-01-08", total: 159.99, status: "delivered" },
+      {
+        id: "5",
+        orderNumber: "ORD-2024-004",
+        date: "2024-01-12",
+        total: 79.99,
+        status: "delivered",
+      },
+      {
+        id: "6",
+        orderNumber: "ORD-2024-008",
+        date: "2024-01-08",
+        total: 159.99,
+        status: "delivered",
+      },
     ],
   },
   {
@@ -144,37 +192,59 @@ const initialCustomers: Customer[] = [
       zip: "98101",
       country: "USA",
     },
-    recentOrders: [{ id: "7", orderNumber: "ORD-2024-005", date: "2024-01-11", total: 79.98, status: "cancelled" }],
+    recentOrders: [
+      {
+        id: "7",
+        orderNumber: "ORD-2024-005",
+        date: "2024-01-11",
+        total: 79.98,
+        status: "cancelled",
+      },
+    ],
   },
-]
+];
 
 export function CustomersTable() {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
   const customerStats = {
     total: customers.length,
     active: customers.filter((c) => c.status === "active").length,
     totalRevenue: customers.reduce((sum, c) => sum + c.totalSpent, 0),
     avgOrderValue:
-      customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.reduce((sum, c) => sum + c.totalOrders, 0),
-  }
+      customers.reduce((sum, c) => sum + c.totalSpent, 0) /
+      customers.reduce((sum, c) => sum + c.totalOrders, 0),
+  };
 
   const getCustomerTier = (totalSpent: number) => {
     if (totalSpent >= 2000)
-      return { label: "VIP", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" }
+      return {
+        label: "VIP",
+        color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+      };
     if (totalSpent >= 1000)
-      return { label: "Gold", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" }
+      return {
+        label: "Gold",
+        color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+      };
     if (totalSpent >= 500)
-      return { label: "Silver", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400" }
-    return { label: "Bronze", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" }
-  }
+      return {
+        label: "Silver",
+        color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
+      };
+
+    return {
+      label: "Bronze",
+      color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    };
+  };
 
   return (
     <div className="space-y-6">
@@ -212,10 +282,14 @@ export function CustomersTable() {
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">VIP Customers</CardTitle>
-            <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">VIP</Badge>
+            <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+              VIP
+            </Badge>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{customers.filter((c) => c.totalSpent >= 2000).length}</div>
+            <div className="text-2xl font-bold">
+              {customers.filter((c) => c.totalSpent >= 2000).length}
+            </div>
             <p className="text-xs text-muted-foreground">$2000+ lifetime value</p>
           </CardContent>
         </Card>
@@ -231,10 +305,10 @@ export function CustomersTable() {
               </CardDescription>
             </div>
             <Input
+              className="w-64"
               placeholder="Search customers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-64"
             />
           </div>
         </CardHeader>
@@ -254,13 +328,17 @@ export function CustomersTable() {
             </TableHeader>
             <TableBody>
               {filteredCustomers.map((customer) => {
-                const tier = getCustomerTier(customer.totalSpent)
+                const tier = getCustomerTier(customer.totalSpent);
+
                 return (
                   <TableRow key={customer.id} className="border-slate-200 dark:border-slate-700">
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
-                          <AvatarImage src={customer.avatar || "/placeholder.svg"} alt={customer.name} />
+                          <AvatarImage
+                            alt={customer.name}
+                            src={customer.avatar || "/placeholder.svg"}
+                          />
                           <AvatarFallback>
                             {customer.name
                               .split(" ")
@@ -269,7 +347,9 @@ export function CustomersTable() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium text-slate-900 dark:text-slate-100">{customer.name}</div>
+                          <div className="font-medium text-slate-900 dark:text-slate-100">
+                            {customer.name}
+                          </div>
                           <div className="text-sm text-muted-foreground">ID: {customer.id}</div>
                         </div>
                       </div>
@@ -295,33 +375,42 @@ export function CustomersTable() {
                     <TableCell>
                       <Badge className={tier.color}>{tier.label}</Badge>
                     </TableCell>
-                    <TableCell className="text-slate-500 dark:text-slate-400">{customer.joinDate}</TableCell>
+                    <TableCell className="text-slate-500 dark:text-slate-400">
+                      {customer.joinDate}
+                    </TableCell>
                     <TableCell>
-                      <Badge variant={customer.status === "active" ? "default" : "secondary"}>{customer.status}</Badge>
+                      <Badge variant={customer.status === "active" ? "default" : "secondary"}>
+                        {customer.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button size="sm" variant="outline">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl">
                             <DialogHeader>
                               <DialogTitle>Customer Details - {customer.name}</DialogTitle>
-                              <DialogDescription>Complete customer information and order history</DialogDescription>
+                              <DialogDescription>
+                                Complete customer information and order history
+                              </DialogDescription>
                             </DialogHeader>
-                            <Tabs defaultValue="profile" className="w-full">
+                            <Tabs className="w-full" defaultValue="profile">
                               <TabsList className="grid w-full grid-cols-3">
                                 <TabsTrigger value="profile">Profile</TabsTrigger>
                                 <TabsTrigger value="orders">Orders</TabsTrigger>
                                 <TabsTrigger value="address">Address</TabsTrigger>
                               </TabsList>
-                              <TabsContent value="profile" className="space-y-4">
+                              <TabsContent className="space-y-4" value="profile">
                                 <div className="flex items-center space-x-4">
                                   <Avatar className="h-16 w-16 ring-2 ring-blue-500/20">
-                                    <AvatarImage src={customer.avatar || "/placeholder.svg"} alt={customer.name} />
+                                    <AvatarImage
+                                      alt={customer.name}
+                                      src={customer.avatar || "/placeholder.svg"}
+                                    />
                                     <AvatarFallback className="text-lg">
                                       {customer.name
                                         .split(" ")
@@ -339,24 +428,38 @@ export function CustomersTable() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div>
-                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">Customer Since</h4>
-                                    <p className="text-sm text-muted-foreground">{customer.joinDate}</p>
+                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                      Customer Since
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      {customer.joinDate}
+                                    </p>
                                   </div>
                                   <div>
-                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">Customer Tier</h4>
+                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                      Customer Tier
+                                    </h4>
                                     <Badge className={tier.color}>{tier.label}</Badge>
                                   </div>
                                   <div>
-                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">Total Orders</h4>
-                                    <p className="text-sm text-muted-foreground">{customer.totalOrders} orders</p>
+                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                      Total Orders
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      {customer.totalOrders} orders
+                                    </p>
                                   </div>
                                   <div>
-                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">Lifetime Value</h4>
-                                    <p className="text-sm text-muted-foreground">${customer.totalSpent.toFixed(2)}</p>
+                                    <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                      Lifetime Value
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      ${customer.totalSpent.toFixed(2)}
+                                    </p>
                                   </div>
                                 </div>
                               </TabsContent>
-                              <TabsContent value="orders" className="space-y-4">
+                              <TabsContent className="space-y-4" value="orders">
                                 <div className="space-y-2">
                                   {customer.recentOrders.map((order) => (
                                     <div
@@ -367,7 +470,9 @@ export function CustomersTable() {
                                         <p className="font-medium text-slate-900 dark:text-slate-100">
                                           {order.orderNumber}
                                         </p>
-                                        <p className="text-sm text-muted-foreground">{order.date}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {order.date}
+                                        </p>
                                       </div>
                                       <div className="text-right">
                                         <p className="font-medium text-slate-900 dark:text-slate-100">
@@ -379,7 +484,7 @@ export function CustomersTable() {
                                   ))}
                                 </div>
                               </TabsContent>
-                              <TabsContent value="address" className="space-y-4">
+                              <TabsContent className="space-y-4" value="address">
                                 <div>
                                   <h4 className="font-medium flex items-center text-slate-900 dark:text-slate-100">
                                     <MapPin className="mr-2 h-4 w-4" />
@@ -388,7 +493,8 @@ export function CustomersTable() {
                                   <div className="text-sm text-muted-foreground mt-2">
                                     <p>{customer.address.street}</p>
                                     <p>
-                                      {customer.address.city}, {customer.address.state} {customer.address.zip}
+                                      {customer.address.city}, {customer.address.state}{" "}
+                                      {customer.address.zip}
                                     </p>
                                     <p>{customer.address.country}</p>
                                   </div>
@@ -397,18 +503,18 @@ export function CustomersTable() {
                             </Tabs>
                           </DialogContent>
                         </Dialog>
-                        <Button variant="outline" size="sm">
+                        <Button size="sm" variant="outline">
                           <Edit className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                )
+                );
               })}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,31 +1,15 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { cn } from "@/lib/utils"
-import {
-  Sidebar,
-  SidebarBody,
-  SidebarLink,
-} from "@/components/ui/sidebar"
-
-import {
-  IconArrowLeft,
-  IconBrandTabler,
-  IconSettings,
-  IconUserBolt,
-  IconHome,
-  IconBox,
-  IconCreditCard,
-  IconChartBar,
-  IconTags,
-  IconTruck,
-  IconUsers,
-} from "@tabler/icons-react"
-
-import { motion } from "framer-motion"
+import React, { useState } from "react";
+import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Button } from "@heroui/button"
+import { Button } from "@heroui/button";
+import Link from "next/link";
+import Image from "next/image";
 
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 const links = [
   {
@@ -73,10 +57,10 @@ const links = [
   //   href: "#",
   //   icon: <IconSettings className="h-5 w-5 text-muted-foreground" />,
   // },
-]
+];
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -91,7 +75,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       throw new Error(result.message || "Unauthorized");
     }
     router.push("/");
-  }
+  };
 
   return (
     <div
@@ -133,12 +117,12 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                 label: "Manu Arora",
                 href: "#",
                 icon: (
-                  <img
-                    src="https://assets.aceternity.com/manu.png"
-                    className="h-7 w-7 shrink-0 rounded-full"
-                    width={50}
-                    height={50}
+                  <Image
                     alt="Avatar"
+                    className="h-7 w-7 shrink-0 rounded-full"
+                    height={50}
+                    src="/img1.png"
+                    width={50}
                   />
                 ),
               }}
@@ -153,28 +137,28 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
 
 export const Logo = () => {
   return (
-    <a
-      href="#"
+    <Link
       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+      href="#"
     >
       <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
       <motion.span
-        initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="font-medium whitespace-pre text-black dark:text-white"
+        initial={{ opacity: 0 }}
       >
         Acet Labs
       </motion.span>
-    </a>
+    </Link>
   );
 };
 export const LogoIcon = () => {
   return (
-    <a
-      href="#"
+    <Link
       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+      href="#"
     >
       <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
-    </a>
+    </Link>
   );
 };

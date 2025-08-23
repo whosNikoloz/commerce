@@ -16,10 +16,7 @@ interface ForgotPasswordProps {
   lng: string;
 }
 
-export default function ForgotPasswordModal({
-  forgotData,
-  lng,
-}: ForgotPasswordProps) {
+export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordProps) {
   const forgotRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,17 +29,12 @@ export default function ForgotPasswordModal({
   const [forgotEmailLoader, setForgotEmailLoader] = useState(false);
   const [forgotEmailHasBlurred, setEmailForgotHasBlurred] = useState(false);
 
-  const validateEmail = (value: string) =>
-    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
   const handleForgotPassword = async () => {
     setIsLoading(true);
     if (forgotState.email === "") {
-      setForgotEmailError(
-        lng == "ka"
-          ? "შეავსე ელ-ფოსტის ველი"
-          : "Please fill in the Email field",
-      );
+      setForgotEmailError(lng == "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
       setIsLoading(false);
 
       return;
@@ -69,9 +61,7 @@ export default function ForgotPasswordModal({
       }
       if (!isEmailValid) {
         setForgotEmailError(
-          lng == "ka"
-            ? "შეიყვანეთ ელ-ფოსტა სწორად"
-            : "Please enter a valid email",
+          lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email",
         );
         setEmailForgotHasBlurred(false);
 
@@ -92,9 +82,7 @@ export default function ForgotPasswordModal({
 
   return (
     <div className="space-y-3">
-      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-        {forgotData.subText}
-      </p>
+      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{forgotData.subText}</p>
 
       <Input
         ref={forgotRef}

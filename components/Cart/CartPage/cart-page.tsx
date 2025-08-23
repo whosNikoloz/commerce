@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
-import { useCart } from "@/app/context/cartContext"
-import CartHeader from "./CartHeader"
-import CartSummary from "./CartSummary"
-import EmptyCart from "./EmptyCart"
-import CartItems from "./CartItems"
+import CartHeader from "./CartHeader";
+import CartSummary from "./CartSummary";
+import EmptyCart from "./EmptyCart";
+import CartItems from "./CartItems";
+
+import { useCart } from "@/app/context/cartContext";
 
 export default function CartPage() {
-  const { cart } = useCart()
+  const { cart } = useCart();
 
   if (cart.length === 0) {
-    return <EmptyCart />
+    return <EmptyCart />;
   }
 
   return (
@@ -27,5 +28,5 @@ export default function CartPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -131,8 +131,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
       <Modal
         classNames={{
-          backdrop:
-            " backdrop-blur-sm",
+          backdrop: " backdrop-blur-sm",
           base: "rounded-t-xl",
         }}
         hideCloseButton={IsMobile}
@@ -212,21 +211,14 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                   />
                 )}
 
-                {authMode === "forgot" && (
-                  <ForgotPasswordModal forgotData={forgotData} lng={lng} />
-                )}
+                {authMode === "forgot" && <ForgotPasswordModal forgotData={forgotData} lng={lng} />}
               </ModalBody>
               <ModalFooter>
                 <div className="md:hidden fixed bottom-1 left-1/2 z-50 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
                   <div className="flex justify-around items-center py-2">
-                    <Link
-                      className="flex flex-col items-center"
-                      href={`/${lng}`}
-                    >
+                    <Link className="flex flex-col items-center" href={`/${lng}`}>
                       <HomeIcon className="text-green-500 w-6 h-6" />
-                      <span className="text-xs">
-                        {lng === "ka" ? "Home" : "მთავარი"}
-                      </span>
+                      <span className="text-xs">{lng === "ka" ? "Home" : "მთავარი"}</span>
                     </Link>
 
                     <div
@@ -241,27 +233,18 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                       }}
                     >
                       <SearchIcon />
-                      <span className="text-xs">
-                        {lng === "ka" ? "Search" : "ძებნა"}
-                      </span>
+                      <span className="text-xs">{lng === "ka" ? "Search" : "ძებნა"}</span>
                     </div>
 
                     <Cartlink />
 
-                    <Link
-                      className="flex flex-col items-center"
-                      href={`/${lng}/contact`}
-                    >
+                    <Link className="flex flex-col items-center" href={`/${lng}/contact`}>
                       <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">
-                        {lng === "ka" ? "Chat" : "ჩათი"}
-                      </span>
+                      <span className="text-xs">{lng === "ka" ? "Chat" : "ჩათი"}</span>
                     </Link>
                     <span className="flex flex-col items-center">
                       <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">
-                        {"en" === "en" ? "Login" : "შესვლა"}
-                      </span>
+                      <span className="text-xs">{"en" === "en" ? "Login" : "შესვლა"}</span>
                     </span>
                   </div>
                 </div>

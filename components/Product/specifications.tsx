@@ -7,41 +7,55 @@ interface SpecificationsProps {
 }
 
 const shallowEqual = (a: Record<string, string>, b: Record<string, string>) => {
-  const ak = Object.keys(a), bk = Object.keys(b);
+  const ak = Object.keys(a),
+    bk = Object.keys(b);
+
   if (ak.length !== bk.length) return false;
   for (const k of ak) if (a[k] !== b[k]) return false;
+
   return true;
 };
 
 export function Specifications({ specs = [], value, onChange }: SpecificationsProps) {
   const multiFacetNames = useMemo(() => {
     const s = new Set<string>();
-    specs.forEach(f => { if (f.facetValues.length > 1) s.add(f.facetName); });
+
+    specs.forEach((f) => {
+      if (f.facetValues.length > 1) s.add(f.facetName);
+    });
+
     return s;
   }, [specs]);
 
   const defaults = useMemo(() => {
     const d: Record<string, string> = {};
-    specs.forEach(f => { if (f.facetValues.length) d[f.facetName] = f.facetValues[0]; });
+
+    specs.forEach((f) => {
+      if (f.facetValues.length) d[f.facetName] = f.facetValues[0];
+    });
+
     return d;
   }, [specs]);
 
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
-  const userActionRef = useRef(false);                 // ✅ gate emits to user actions only
+  const userActionRef = useRef(false); // ✅ gate emits to user actions only
   const lastEmittedRef = useRef<Record<string, string>>({}); // avoid duplicate emits
 
   // Sync local state from props (no onChange here)
   useEffect(() => {
     if (!specs.length) {
       if (!shallowEqual(selectedValues, {})) setSelectedValues({});
+
       return;
     }
     const next: Record<string, string> = {};
+
     specs.forEach(({ facetName, facetValues }) => {
       const allowed = new Set(facetValues);
       const candidate =
         (value && value[facetName] !== undefined ? value[facetName] : selectedValues[facetName]) ??
         defaults[facetName];
+
       next[facetName] = allowed.has(String(candidate)) ? String(candidate) : facetValues[0];
     });
     if (!shallowEqual(selectedValues, next)) {
@@ -56,6 +70,7 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
     if (!userActionRef.current) return;
 
     const payload: Record<string, string> = {};
+
     Object.keys(selectedValues).forEach((name) => {
       if (multiFacetNames.has(name)) payload[name] = selectedValues[name];
     });
@@ -68,9 +83,10 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
   }, [selectedValues, multiFacetNames, onChange]);
 
   const handleSelect = (facetName: string, val: string) => {
-    setSelectedValues(prev => {
+    setSelectedValues((prev) => {
       if (prev[facetName] === val) return prev; // no-op
-      userActionRef.current = true;             // mark as user-driven
+      userActionRef.current = true; // mark as user-driven
+
       return { ...prev, [facetName]: val };
     });
   };
@@ -82,6 +98,7 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
           {specs.map((spec) => {
             const isMulti = spec.facetValues.length > 1;
             const selected = selectedValues[spec.facetName];
+
             return (
               <div key={spec.facetName} className="grid grid-cols-2 border-b pb-2 items-center">
                 <span className="font-medium">{spec.facetName}</span>
@@ -90,15 +107,19 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
                     <div className="flex gap-2 flex-wrap justify-end">
                       {spec.facetValues.map((v) => {
                         const isSelected = selected === v;
+
                         return (
                           <button
                             key={v}
-                            type="button"
-                            onClick={() => handleSelect(spec.facetName, v)}
                             aria-pressed={isSelected}
                             className={`px-3 py-1.5 text-sm font-medium rounded-full border-2 transition-all
-                              ${isSelected ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                                : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:text-blue-600"}`}
+                              ${
+                                isSelected
+                                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                                  : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:text-blue-600"
+                              }`}
+                            type="button"
+                            onClick={() => handleSelect(spec.facetName, v)}
                           >
                             {v}
                           </button>

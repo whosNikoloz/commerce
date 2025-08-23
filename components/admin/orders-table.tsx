@@ -1,13 +1,27 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Eye, Edit, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Eye, Edit, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -15,33 +29,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Order {
-  id: string
-  orderNumber: string
+  id: string;
+  orderNumber: string;
   customer: {
-    name: string
-    email: string
-  }
+    name: string;
+    email: string;
+  };
   items: {
-    name: string
-    quantity: number
-    price: number
-  }[]
-  total: number
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded"
-  paymentStatus: "paid" | "pending" | "failed" | "refunded"
-  shippingMethod: string
-  orderDate: string
+    name: string;
+    quantity: number;
+    price: number;
+  }[];
+  total: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+  paymentStatus: "paid" | "pending" | "failed" | "refunded";
+  shippingMethod: string;
+  orderDate: string;
   shippingAddress: {
-    street: string
-    city: string
-    state: string
-    zip: string
-    country: string
-  }
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
 }
 
 const initialOrders: Order[] = [
@@ -156,77 +170,80 @@ const initialOrders: Order[] = [
       country: "USA",
     },
   },
-]
+];
 
 export function OrdersTable() {
-  const [orders, setOrders] = useState<Order[]>(initialOrders)
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [searchTerm, setSearchTerm] = useState("")
+  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const updateOrderStatus = (orderId: string, newStatus: Order["status"]) => {
-    setOrders(orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)))
-  }
+    setOrders(
+      orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)),
+    );
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "processing":
-        return <RefreshCw className="h-4 w-4" />
+        return <RefreshCw className="h-4 w-4" />;
       case "shipped":
-        return <Truck className="h-4 w-4" />
+        return <Truck className="h-4 w-4" />;
       case "delivered":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "cancelled":
       case "refunded":
-        return <XCircle className="h-4 w-4" />
+        return <XCircle className="h-4 w-4" />;
       default:
-        return <Package className="h-4 w-4" />
+        return <Package className="h-4 w-4" />;
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
       case "processing":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
       case "shipped":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
       case "delivered":
-        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
       case "cancelled":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
       case "refunded":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
       case "paid":
-        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
       case "pending":
-        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
       case "failed":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
       case "refunded":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const filteredOrders = orders.filter((order) => {
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
+    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
     const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesStatus && matchesSearch
-  })
+      order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesStatus && matchesSearch;
+  });
 
   const orderStats = {
     total: orders.length,
@@ -234,54 +251,74 @@ export function OrdersTable() {
     processing: orders.filter((o) => o.status === "processing").length,
     shipped: orders.filter((o) => o.status === "shipped").length,
     delivered: orders.filter((o) => o.status === "delivered").length,
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-5">
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Total Orders
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{orderStats.total}</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {orderStats.total}
+            </div>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Pending
+            </CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{orderStats.pending}</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {orderStats.pending}
+            </div>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">Processing</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Processing
+            </CardTitle>
             <RefreshCw className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{orderStats.processing}</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {orderStats.processing}
+            </div>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">Shipped</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Shipped
+            </CardTitle>
             <Truck className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{orderStats.shipped}</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {orderStats.shipped}
+            </div>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">Delivered</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Delivered
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{orderStats.delivered}</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {orderStats.delivered}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -297,10 +334,10 @@ export function OrdersTable() {
             </div>
             <div className="flex items-center space-x-2">
               <Input
+                className="w-64"
                 placeholder="Search orders..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
               />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40">
@@ -329,7 +366,9 @@ export function OrdersTable() {
                 <TableHead className="text-slate-900 dark:text-slate-100">Status</TableHead>
                 <TableHead className="text-slate-900 dark:text-slate-100">Payment</TableHead>
                 <TableHead className="text-slate-900 dark:text-slate-100">Date</TableHead>
-                <TableHead className="text-right text-slate-900 dark:text-slate-100">Actions</TableHead>
+                <TableHead className="text-right text-slate-900 dark:text-slate-100">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -337,7 +376,9 @@ export function OrdersTable() {
                 <TableRow key={order.id} className="border-slate-200 dark:border-slate-700">
                   <TableCell>
                     <div>
-                      <div className="font-medium text-slate-900 dark:text-slate-100">{order.orderNumber}</div>
+                      <div className="font-medium text-slate-900 dark:text-slate-100">
+                        {order.orderNumber}
+                      </div>
                       <div className="text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
                         {order.shippingMethod}
                       </div>
@@ -345,7 +386,9 @@ export function OrdersTable() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium text-slate-900 dark:text-slate-100">{order.customer.name}</div>
+                      <div className="font-medium text-slate-900 dark:text-slate-100">
+                        {order.customer.name}
+                      </div>
                       <div className="text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
                         {order.customer.email}
                       </div>
@@ -353,7 +396,8 @@ export function OrdersTable() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm text-slate-900 dark:text-slate-100">
-                      {order.items.length} item{order.items.length > 1 ? "s" : ""}
+                      {order.items.length} item
+                      {order.items.length > 1 ? "s" : ""}
                     </div>
                   </TableCell>
                   <TableCell className="font-medium text-slate-900 dark:text-slate-100">
@@ -366,17 +410,21 @@ export function OrdersTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge className={getPaymentStatusColor(order.paymentStatus)}>{order.paymentStatus}</Badge>
+                    <Badge className={getPaymentStatusColor(order.paymentStatus)}>
+                      {order.paymentStatus}
+                    </Badge>
                   </TableCell>
-                  <TableCell className="text-slate-900 dark:text-slate-100">{order.orderDate}</TableCell>
+                  <TableCell className="text-slate-900 dark:text-slate-100">
+                    {order.orderDate}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
-                            variant="outline"
-                            size="sm"
                             className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25"
+                            size="sm"
+                            variant="outline"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -390,19 +438,28 @@ export function OrdersTable() {
                               Complete order information and management
                             </DialogDescription>
                           </DialogHeader>
-                          <Tabs defaultValue="details" className="w-full">
+                          <Tabs className="w-full" defaultValue="details">
                             <TabsList className="grid w-full grid-cols-3">
-                              <TabsTrigger value="details" className="text-slate-900 dark:text-slate-100">
+                              <TabsTrigger
+                                className="text-slate-900 dark:text-slate-100"
+                                value="details"
+                              >
                                 Details
                               </TabsTrigger>
-                              <TabsTrigger value="items" className="text-slate-900 dark:text-slate-100">
+                              <TabsTrigger
+                                className="text-slate-900 dark:text-slate-100"
+                                value="items"
+                              >
                                 Items
                               </TabsTrigger>
-                              <TabsTrigger value="shipping" className="text-slate-900 dark:text-slate-100">
+                              <TabsTrigger
+                                className="text-slate-900 dark:text-slate-100"
+                                value="shipping"
+                              >
                                 Shipping
                               </TabsTrigger>
                             </TabsList>
-                            <TabsContent value="details" className="space-y-4">
+                            <TabsContent className="space-y-4" value="details">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
                                   <h4 className="font-medium text-slate-900 dark:text-slate-100">
@@ -416,10 +473,14 @@ export function OrdersTable() {
                                   </p>
                                 </div>
                                 <div>
-                                  <h4 className="font-medium text-slate-900 dark:text-slate-100">Order Status</h4>
+                                  <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                    Order Status
+                                  </h4>
                                   <Select
                                     value={order.status}
-                                    onValueChange={(value: Order["status"]) => updateOrderStatus(order.id, value)}
+                                    onValueChange={(value: Order["status"]) =>
+                                      updateOrderStatus(order.id, value)
+                                    }
                                   >
                                     <SelectTrigger className="w-full">
                                       <SelectValue className="text-slate-900 dark:text-slate-100" />
@@ -435,7 +496,7 @@ export function OrdersTable() {
                                 </div>
                               </div>
                             </TabsContent>
-                            <TabsContent value="items" className="space-y-4">
+                            <TabsContent className="space-y-4" value="items">
                               <div className="space-y-2">
                                 {order.items.map((item, index) => (
                                   <div
@@ -443,7 +504,9 @@ export function OrdersTable() {
                                     className="flex justify-between items-center p-2 border rounded border-slate-200 dark:border-slate-700"
                                   >
                                     <div>
-                                      <p className="font-medium text-slate-900 dark:text-slate-100">{item.name}</p>
+                                      <p className="font-medium text-slate-900 dark:text-slate-100">
+                                        {item.name}
+                                      </p>
                                       <p className="text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
                                         Qty: {item.quantity}
                                       </p>
@@ -455,13 +518,17 @@ export function OrdersTable() {
                                 ))}
                                 <div className="flex justify-between items-center p-2 border-t font-medium border-slate-200 dark:border-slate-700">
                                   <span className="text-slate-900 dark:text-slate-100">Total</span>
-                                  <span className="text-slate-900 dark:text-slate-100">${order.total.toFixed(2)}</span>
+                                  <span className="text-slate-900 dark:text-slate-100">
+                                    ${order.total.toFixed(2)}
+                                  </span>
                                 </div>
                               </div>
                             </TabsContent>
-                            <TabsContent value="shipping" className="space-y-4">
+                            <TabsContent className="space-y-4" value="shipping">
                               <div>
-                                <h4 className="font-medium text-slate-900 dark:text-slate-100">Shipping Address</h4>
+                                <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                  Shipping Address
+                                </h4>
                                 <div className="text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
                                   <p>{order.shippingAddress.street}</p>
                                   <p>
@@ -472,7 +539,9 @@ export function OrdersTable() {
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-medium text-slate-900 dark:text-slate-100">Shipping Method</h4>
+                                <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                                  Shipping Method
+                                </h4>
                                 <p className="text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
                                   {order.shippingMethod}
                                 </p>
@@ -482,9 +551,9 @@ export function OrdersTable() {
                         </DialogContent>
                       </Dialog>
                       <Button
-                        variant="outline"
-                        size="sm"
                         className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25"
+                        size="sm"
+                        variant="outline"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -497,5 +566,5 @@ export function OrdersTable() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

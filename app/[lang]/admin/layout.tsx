@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import type { Viewport, Metadata } from "next";
+
 import { Locale } from "@/i18n.config";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { basePageMetadata } from "@/lib/seo";
@@ -15,9 +16,11 @@ export const viewport: Viewport = {
 type LayoutParams = { lang: Locale };
 type LayoutProps = { children: React.ReactNode; params: Promise<LayoutParams> };
 
-export async function generateMetadata(
-  { params }: { params: Promise<LayoutParams> }
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<LayoutParams>;
+}): Promise<Metadata> {
   const { lang } = await params;
   const url = `${siteConfig.url}/${lang}/admin`;
 

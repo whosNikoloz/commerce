@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link";
+import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function EmptyCart() {
   return (
@@ -30,12 +31,13 @@ export default function EmptyCart() {
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold text-foreground">Your cart is empty</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Looks like you haven't added any items to your cart yet. Start shopping to fill it up!
+                Looks like you haven&apos;t added any items to your cart yet. Start shopping to fill
+                it up!
               </p>
             </div>
 
             <div className="space-y-4 pt-4">
-              <Button asChild size="lg" className="gap-2">
+              <Button asChild className="gap-2" size="lg">
                 <Link href="/">
                   Start Shopping
                   <ArrowRight className="h-4 w-4" />
@@ -52,5 +54,5 @@ export default function EmptyCart() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

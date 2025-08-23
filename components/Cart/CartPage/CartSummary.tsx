@@ -1,65 +1,67 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import Link from "next/link"
-import { ArrowRight, Tag, Truck, Shield, RotateCcw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useCart } from "@/app/context/cartContext"
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { ArrowRight, Truck, Shield, RotateCcw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/app/context/cartContext";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  }).format(price)
+  }).format(price);
 
 const PROMO_CODES = {
   SAVE10: { discount: 0.1, label: "10% OFF" },
   WELCOME15: { discount: 0.15, label: "15% OFF" },
   FREESHIP: { discount: 0, label: "Free Shipping", freeShipping: true },
-}
+};
 
 export default function CartSummary() {
-  const { cart } = useCart()
-  const [promoCode, setPromoCode] = useState("")
-  const [appliedPromo, setAppliedPromo] = useState<keyof typeof PROMO_CODES | null>(null)
-  const [shippingOption, setShippingOption] = useState("standard")
+  const { cart } = useCart();
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<keyof typeof PROMO_CODES | null>(null);
+  const [shippingOption, setShippingOption] = useState("standard");
 
-  const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart])
+  const subtotal = useMemo(
+    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cart],
+  );
 
-  const promoDiscount = appliedPromo ? subtotal * PROMO_CODES[appliedPromo].discount : 0
+  const promoDiscount = appliedPromo ? subtotal * PROMO_CODES[appliedPromo].discount : 0;
 
   const getShippingCost = () => {
-    if (appliedPromo === "FREESHIP" || subtotal > 50) return 0
+    if (appliedPromo === "FREESHIP" || subtotal > 50) return 0;
     switch (shippingOption) {
       case "express":
-        return 19.99
+        return 19.99;
       case "overnight":
-        return 39.99
+        return 39.99;
       default:
-        return 9.99
+        return 9.99;
     }
-  }
+  };
 
-  const shipping = getShippingCost()
-  const tax = (subtotal - promoDiscount) * 0.08
-  const total = subtotal - promoDiscount + shipping + tax
+  const shipping = getShippingCost();
+  const tax = (subtotal - promoDiscount) * 0.08;
+  const total = subtotal - promoDiscount + shipping + tax;
 
   const applyPromoCode = () => {
-    const code = promoCode.trim().toUpperCase() as keyof typeof PROMO_CODES
+    const code = promoCode.trim().toUpperCase() as keyof typeof PROMO_CODES;
+
     if (PROMO_CODES[code]) {
-      setAppliedPromo(code)
-      setPromoCode("")
+      setAppliedPromo(code);
+      setPromoCode("");
     }
-  }
+  };
 
   const removePromoCode = () => {
-    setAppliedPromo(null)
-  }
+    setAppliedPromo(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -171,14 +173,14 @@ export default function CartSummary() {
 
           {/* Action Buttons */}
           <div className="space-y-3 pt-2">
-            <Button asChild size="lg" className="w-full">
-              <Link href="/cart/checkout" className="gap-2">
+            <Button asChild className="w-full" size="lg">
+              <Link className="gap-2" href="/cart/checkout">
                 Proceed to Checkout
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
 
-            <Button variant="outline" asChild className="w-full bg-transparent">
+            <Button asChild className="w-full bg-transparent" variant="outline">
               <Link href="/">Continue Shopping</Link>
             </Button>
           </div>
@@ -222,5 +224,5 @@ export default function CartSummary() {
         </CardContent>
       </Card> */}
     </div>
-  )
+  );
 }

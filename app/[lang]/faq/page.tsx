@@ -22,21 +22,19 @@ export default function FaqPage() {
         <div>
           <h2 className="text-3xl font-bold mb-4">Our Story</h2>
           <p className="text-muted-foreground mb-4">
-            Founded in 2015, PetDo started with a simple mission: to provide
-            high-quality products for pets and make pet parenting easier and
-            more enjoyable.
+            Founded in 2015, PetDo started with a simple mission: to provide high-quality products
+            for pets and make pet parenting easier and more enjoyable.
           </p>
           <p className="text-muted-foreground mb-4">
-            What began as a small local shop has grown into a trusted online
-            destination for pet lovers across the country. Our founder, Sarah
-            Johnson, a passionate dog owner, recognized the need for premium pet
-            products that prioritize both quality and affordability.
+            What began as a small local shop has grown into a trusted online destination for pet
+            lovers across the country. Our founder, Sarah Johnson, a passionate dog owner,
+            recognized the need for premium pet products that prioritize both quality and
+            affordability.
           </p>
           <p className="text-muted-foreground">
-            Today, we continue to be guided by our love for animals and
-            commitment to exceptional customer service. Every product in our
-            catalog is carefully selected to ensure it meets our high standards
-            for quality, safety, and value.
+            Today, we continue to be guided by our love for animals and commitment to exceptional
+            customer service. Every product in our catalog is carefully selected to ensure it meets
+            our high standards for quality, safety, and value.
           </p>
         </div>
         <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden">
@@ -54,8 +52,8 @@ export default function FaqPage() {
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold mb-4">Our Values</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            At PetDo, our core values guide everything we do, from product
-            selection to customer service.
+            At PetDo, our core values guide everything we do, from product selection to customer
+            service.
           </p>
         </div>
 
@@ -66,8 +64,8 @@ export default function FaqPage() {
             </div>
             <h3 className="font-semibold text-lg mb-2">Pet Wellbeing</h3>
             <p className="text-muted-foreground">
-              We prioritize products that contribute to the health, happiness,
-              and wellbeing of your pets.
+              We prioritize products that contribute to the health, happiness, and wellbeing of your
+              pets.
             </p>
           </div>
 
@@ -77,8 +75,8 @@ export default function FaqPage() {
             </div>
             <h3 className="font-semibold text-lg mb-2">Quality Assurance</h3>
             <p className="text-muted-foreground">
-              We rigorously test and verify all products to ensure they meet our
-              high standards for quality and safety.
+              We rigorously test and verify all products to ensure they meet our high standards for
+              quality and safety.
             </p>
           </div>
 
@@ -88,8 +86,8 @@ export default function FaqPage() {
             </div>
             <h3 className="font-semibold text-lg mb-2">Customer Focus</h3>
             <p className="text-muted-foreground">
-              We&apos;re dedicated to providing exceptional service and building
-              lasting relationships with our customers.
+              We&apos;re dedicated to providing exceptional service and building lasting
+              relationships with our customers.
             </p>
           </div>
 
@@ -99,8 +97,8 @@ export default function FaqPage() {
             </div>
             <h3 className="font-semibold text-lg mb-2">Reliability</h3>
             <p className="text-muted-foreground">
-              We deliver on our promises with fast shipping, accurate orders,
-              and responsive customer support.
+              We deliver on our promises with fast shipping, accurate orders, and responsive
+              customer support.
             </p>
           </div>
         </div>
@@ -111,8 +109,8 @@ export default function FaqPage() {
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            The passionate people behind PetDo who work tirelessly to bring the
-            best products to you and your pets.
+            The passionate people behind PetDo who work tirelessly to bring the best products to you
+            and your pets.
           </p>
         </div>
 
@@ -139,10 +137,7 @@ export default function FaqPage() {
               image: "https://picsum.photos/id/257/200/300",
             },
           ].map((member, index) => (
-            <div
-              key={index}
-              className="bg-card rounded-lg border overflow-hidden"
-            >
+            <div key={index} className="bg-card rounded-lg border overflow-hidden">
               <div className="relative h-64 w-full">
                 <Image
                   fill
@@ -162,12 +157,10 @@ export default function FaqPage() {
 
       {/* CTA Section */}
       <div className="bg-primary text-primary-foreground rounded-lg p-8 md:p-12 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">
-          Join the PetDo Family
-        </h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4">Join the PetDo Family</h2>
         <p className="max-w-2xl mx-auto mb-6">
-          Discover premium products for your furry friends and join thousands of
-          satisfied pet parents who trust PetDo.
+          Discover premium products for your furry friends and join thousands of satisfied pet
+          parents who trust PetDo.
         </p>
         <Button color="secondary" size="lg">
           <Link href="/shop">Shop Now</Link>

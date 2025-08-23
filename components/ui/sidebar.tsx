@@ -1,9 +1,10 @@
 "use client";
-import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import Link from "next/link";
+
+import { cn } from "@/lib/utils";
 
 interface Links {
   label: string;
@@ -17,15 +18,15 @@ interface SidebarContextProps {
   animate: boolean;
 }
 
-const SidebarContext = createContext<SidebarContextProps | undefined>(
-  undefined
-);
+const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
 
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
+
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider");
   }
+
   return context;
 };
 
@@ -64,7 +65,7 @@ export const Sidebar = ({
   animate?: boolean;
 }) => {
   return (
-    <SidebarProvider open={open} setOpen={setOpen} animate={animate}>
+    <SidebarProvider animate={animate} open={open} setOpen={setOpen}>
       {children}
     </SidebarProvider>
   );
@@ -85,16 +86,17 @@ export const DesktopSidebar = ({
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
+
   return (
     <>
       <motion.div
-        className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-brand-mute dark:bg-brand-muteddark w-[300px] shrink-0",
-          className
-        )}
         animate={{
           width: animate ? (open ? "300px" : "60px") : "300px",
         }}
+        className={cn(
+          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-brand-mute dark:bg-brand-muteddark w-[300px] shrink-0",
+          className,
+        )}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         {...props}
@@ -105,17 +107,14 @@ export const DesktopSidebar = ({
   );
 };
 
-export const MobileSidebar = ({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"div">) => {
+export const MobileSidebar = ({ className, children, ...props }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
+
   return (
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden bg-brand-muted dark:bg-brand-muteddark  items-center justify-between  w-full"
+          "h-10 px-4 py-4 flex flex-row md:hidden bg-brand-muted dark:bg-brand-muteddark  items-center justify-between  w-full",
         )}
         {...props}
       >
@@ -128,24 +127,24 @@ export const MobileSidebar = ({
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
+              className={cn(
+                "fixed h-full w-full inset-0 bg-brand-muted dark:bg-brand-muteddark p-10 z-[100] flex flex-col justify-between",
+                className,
+              )}
               exit={{ x: "-100%", opacity: 0 }}
+              initial={{ x: "-100%", opacity: 0 }}
               transition={{
                 duration: 0.3,
                 ease: "easeInOut",
               }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-brand-muted dark:bg-brand-muteddark p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
             >
-              <div
+              <button
                 className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
                 onClick={() => setOpen(!open)}
               >
                 <IconX />
-              </div>
+              </button>
               {children}
             </motion.div>
           )}
@@ -155,22 +154,13 @@ export const MobileSidebar = ({
   );
 };
 
-export const SidebarLink = ({
-  link,
-  className,
-  ...props
-}: {
-  link: Links;
-  className?: string;
-}) => {
+export const SidebarLink = ({ link, className, ...props }: { link: Links; className?: string }) => {
   const { open, animate } = useSidebar();
+
   return (
     <Link
+      className={cn("flex items-center justify-start gap-2  group/sidebar py-2", className)}
       href={link.href}
-      className={cn(
-        "flex items-center justify-start gap-2  group/sidebar py-2",
-        className
-      )}
       {...props}
     >
       {link.icon}

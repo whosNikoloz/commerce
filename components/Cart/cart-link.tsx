@@ -13,11 +13,7 @@ export default function Cartlink() {
   const [cartChanged, setCartChanged] = useState(false); // State for tracking cart change
 
   useEffect(() => {
-    if (
-      cart?.length &&
-      cart.length !== quantityRef.current &&
-      cart.length > 0
-    ) {
+    if (cart?.length && cart.length !== quantityRef.current && cart.length > 0) {
       quantityRef.current = cart.length;
       setCartChanged(true); // Trigger animation when cart changes
     }
@@ -28,15 +24,14 @@ export default function Cartlink() {
   useEffect(() => {
     if (cartChanged) {
       const timer = setTimeout(() => setCartChanged(false), 500); // Reset animation after 500ms
+
       return () => clearTimeout(timer);
     }
   }, [cartChanged]);
 
   return (
     <Badge
-      className={`border-0 absolute top-2 right-2 ${
-        cartChanged ? "hidden" : ""
-      }`} 
+      className={`border-0 absolute top-2 right-2 ${cartChanged ? "hidden" : ""}`}
       color="danger"
       content={totalQuantity}
       size="sm"
@@ -45,9 +40,7 @@ export default function Cartlink() {
       <Button
         isIconOnly
         as={Link}
-        className={`relative rounded-full bg-transparent ${
-          cartChanged ? "animate-ping" : ""
-        }`} 
+        className={`relative rounded-full bg-transparent ${cartChanged ? "animate-ping" : ""}`}
         href="/cart"
         variant="solid"
       >

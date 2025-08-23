@@ -154,20 +154,14 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   const handleLogin = async () => {
     setIsLoading(true);
     if (loginState.email === "") {
-      setLoginEmailError(
-        lng == "ka"
-          ? "შეავსე ელ-ფოსტის ველი"
-          : "Please fill in the Email field",
-      );
+      setLoginEmailError(lng == "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
       setIsLoading(false);
 
       return;
     }
     if (loginState.password === "") {
       setLoginPasswordError(
-        lng == "ka"
-          ? "შეავსე პაროლის ველი"
-          : "Please fill in the Password field",
+        lng == "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field",
       );
       setIsLoading(false);
 
@@ -197,28 +191,20 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
     setIsLoading(true);
     if (registrationState.username === "") {
       setRegUserNameError(
-        lng === "ka"
-          ? "შეავსე სახელი ველი"
-          : "Please fill in the UserName field",
+        lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field",
       );
       setIsLoading(false);
 
       return;
     }
     if (registrationState.email === "") {
-      setRegEmailError(
-        lng == "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field",
-      );
+      setRegEmailError(lng == "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
       setIsLoading(false);
 
       return;
     }
     if (registrationState.password === "") {
-      setRegError(
-        lng == "ka"
-          ? "შეავსე პაროლის ველი"
-          : "Please fill in the Password field",
-      );
+      setRegError(lng == "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
       setIsLoading(false);
 
       return;
@@ -254,8 +240,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
     // }
   };
 
-  const validateEmail = (value: string) =>
-    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
   const handleLoginEmailExists = async () => {
     setLoginEmailError("");
@@ -270,9 +255,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
       }
       if (!isEmailValid) {
         setLoginEmailError(
-          lng == "ka"
-            ? "შეიყვანეთ ელ-ფოსტა სწორად"
-            : "Please enter a valid email",
+          lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email",
         );
         setEmailLogHasBlurred(false);
 
@@ -309,11 +292,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         return;
       }
       if (!isEmailValid) {
-        setRegEmailError(
-          lng == "ka"
-            ? "შეიყვანეთ ელ-ფოსტა სწორად"
-            : "Please enter a valid email",
-        );
+        setRegEmailError(lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
         setRegEmailHasBlurred(false);
 
         return;
@@ -382,9 +361,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
     if (registrationState.confirmPassword === "") return;
 
     if (registrationState.password !== registrationState.confirmPassword) {
-      setConfirmPasswordError(
-        lng == "ka" ? "პარლი არემთხვევა" : "Password doesnot match",
-      );
+      setConfirmPasswordError(lng == "ka" ? "პარლი არემთხვევა" : "Password doesnot match");
     } else {
       setConfirmPasswordError("");
     }
@@ -395,9 +372,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
     if (registrationState.password.length < 6) {
       setRegPasswordError(
-        lng == "ka"
-          ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი"
-          : "Passwrod must be more Then 8 Symbols",
+        lng == "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Passwrod must be more Then 8 Symbols",
       );
     } else {
       setRegPasswordError("");
@@ -486,8 +461,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
       <Modal
         classNames={{
-          backdrop:
-            "bg-gradient-to-b from-gray-900/60 to-gray-900/80 backdrop-blur-sm",
+          backdrop: "bg-gradient-to-b from-gray-900/60 to-gray-900/80 backdrop-blur-sm",
           base: "rounded-t-xl",
         }}
         hideCloseButton={IsMobile}
@@ -550,16 +524,11 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                             "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
                             "hover:bg-gray-100 dark:hover:bg-slate-600",
                           ],
-                          label: [
-                            "font-medium text-gray-700 dark:text-gray-200",
-                          ],
+                          label: ["font-medium text-gray-700 dark:text-gray-200"],
                         }}
                         endContent={
                           logEmailHasBlurred ? (
-                            <InputLoadingBtn
-                              loading={Logloader}
-                              success={true}
-                            />
+                            <InputLoadingBtn loading={Logloader} success={true} />
                           ) : (
                             <></>
                           )
@@ -567,9 +536,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         errorMessage={loginEmailError}
                         isInvalid={loginEmailError !== ""}
                         label={loginData.email}
-                        startContent={
-                          <i className="fas fa-envelope text-blue-500" />
-                        }
+                        startContent={<i className="fas fa-envelope text-blue-500" />}
                         type="email"
                         value={loginState.email}
                         onBlur={handleLoginEmailExists}
@@ -588,16 +555,12 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                             "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
                             "hover:bg-gray-100 dark:hover:bg-slate-600",
                           ],
-                          label: [
-                            "font-medium text-gray-700 dark:text-gray-200",
-                          ],
+                          label: ["font-medium text-gray-700 dark:text-gray-200"],
                         }}
                         errorMessage={loginPasswordError}
                         isInvalid={loginPasswordError !== ""}
                         label={loginData.password}
-                        startContent={
-                          <i className="fas fa-lock text-blue-500" />
-                        }
+                        startContent={<i className="fas fa-lock text-blue-500" />}
                         type="password"
                         value={loginState.password}
                         onChange={(e) =>
@@ -633,16 +596,11 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                             "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
                             "hover:bg-gray-100 dark:hover:bg-slate-600",
                           ],
-                          label: [
-                            "font-medium text-gray-700 dark:text-gray-200",
-                          ],
+                          label: ["font-medium text-gray-700 dark:text-gray-200"],
                         }}
                         endContent={
                           regUserNameHasBlurred ? (
-                            <InputLoadingBtn
-                              loading={Regusernameloader}
-                              success={true}
-                            />
+                            <InputLoadingBtn loading={Regusernameloader} success={true} />
                           ) : (
                             <></>
                           )
@@ -650,9 +608,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         errorMessage={regUserNameError}
                         isInvalid={regUserNameError !== ""}
                         label={regData.username}
-                        startContent={
-                          <i className="fas fa-user text-blue-500" />
-                        }
+                        startContent={<i className="fas fa-user text-blue-500" />}
                         type="text"
                         value={registrationState.username}
                         onBlur={handleRegisterUsernameExists}
@@ -670,16 +626,11 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                             "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
                             "hover:bg-gray-100 dark:hover:bg-slate-600",
                           ],
-                          label: [
-                            "font-medium text-gray-700 dark:text-gray-200",
-                          ],
+                          label: ["font-medium text-gray-700 dark:text-gray-200"],
                         }}
                         endContent={
                           regEmailHasBlurred ? (
-                            <InputLoadingBtn
-                              loading={Regemailloader}
-                              success={true}
-                            />
+                            <InputLoadingBtn loading={Regemailloader} success={true} />
                           ) : (
                             <></>
                           )
@@ -687,9 +638,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         errorMessage={regEmailError}
                         isInvalid={regEmailError !== ""}
                         label={regData.email}
-                        startContent={
-                          <i className="fas fa-envelope text-blue-500" />
-                        }
+                        startContent={<i className="fas fa-envelope text-blue-500" />}
                         type="email"
                         value={registrationState.email}
                         onBlur={handleRegisterEmailExists}
@@ -709,16 +658,12 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                             "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
                             "hover:bg-gray-100 dark:hover:bg-slate-600",
                           ],
-                          label: [
-                            "font-medium text-gray-700 dark:text-gray-200",
-                          ],
+                          label: ["font-medium text-gray-700 dark:text-gray-200"],
                         }}
                         errorMessage={regRegPasswordError}
                         isInvalid={regRegPasswordError !== ""}
                         label={regData.password}
-                        startContent={
-                          <i className="fas fa-lock text-blue-500" />
-                        }
+                        startContent={<i className="fas fa-lock text-blue-500" />}
                         type="password"
                         value={registrationState.password}
                         onBlur={handleBlurPassword}
@@ -738,16 +683,12 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                             "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
                             "hover:bg-gray-100 dark:hover:bg-slate-600",
                           ],
-                          label: [
-                            "font-medium text-gray-700 dark:text-gray-200",
-                          ],
+                          label: ["font-medium text-gray-700 dark:text-gray-200"],
                         }}
                         errorMessage={confirmPasswordError}
                         isInvalid={confirmPasswordError !== ""}
                         label={regData.confirmPassword}
-                        startContent={
-                          <i className="fas fa-lock text-blue-500" />
-                        }
+                        startContent={<i className="fas fa-lock text-blue-500" />}
                         type="password"
                         value={registrationState.confirmPassword}
                         onBlur={handleBlurConfirmPassword}
@@ -778,10 +719,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                       }}
                       endContent={
                         regEmailHasBlurred ? (
-                          <InputLoadingBtn
-                            loading={forgotEmailLoader}
-                            success={true}
-                          />
+                          <InputLoadingBtn loading={forgotEmailLoader} success={true} />
                         ) : (
                           <></>
                         )
@@ -789,9 +727,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                       errorMessage={forgotEmailError}
                       isInvalid={forgotEmailError !== ""}
                       label={forgotState.email}
-                      startContent={
-                        <i className="fas fa-envelope text-blue-500" />
-                      }
+                      startContent={<i className="fas fa-envelope text-blue-500" />}
                       type="email"
                       value={forgotState.email}
                       onBlur={handleLoginEmailExists}
@@ -839,21 +775,15 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         startContent={<i className="fab fa-facebook-f mr-2" />}
                         onPress={() => handleOAuth("facebook")}
                       >
-                        {authMode === "login"
-                          ? loginData.facebookAuth
-                          : regData.facebookAuth}
+                        {authMode === "login" ? loginData.facebookAuth : regData.facebookAuth}
                       </Button>
 
                       <Button
                         className="w-full bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 font-bold py-3 rounded-lg shadow-md transition-colors"
-                        startContent={
-                          <i className="fab fa-google mr-2 text-[#4285F4]" />
-                        }
+                        startContent={<i className="fab fa-google mr-2 text-[#4285F4]" />}
                         onPress={() => handleOAuth("google")}
                       >
-                        {authMode === "login"
-                          ? loginData.googleAuth
-                          : regData.googleAuth}
+                        {authMode === "login" ? loginData.googleAuth : regData.googleAuth}
                       </Button>
                       <div className="text-center mt-4">
                         <button
@@ -884,14 +814,9 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
               <ModalFooter>
                 <div className="md:hidden fixed bottom-1 left-1/2 z-50 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
                   <div className="flex justify-around items-center py-2">
-                    <Link
-                      className="flex flex-col items-center"
-                      href={`/${lng}`}
-                    >
+                    <Link className="flex flex-col items-center" href={`/${lng}`}>
                       <HomeIcon className="text-green-500 w-6 h-6" />
-                      <span className="text-xs">
-                        {lng === "ka" ? "Home" : "მთავარი"}
-                      </span>
+                      <span className="text-xs">{lng === "ka" ? "Home" : "მთავარი"}</span>
                     </Link>
 
                     <div
@@ -906,27 +831,18 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                       }}
                     >
                       <SearchIcon />
-                      <span className="text-xs">
-                        {lng === "ka" ? "Search" : "ძებნა"}
-                      </span>
+                      <span className="text-xs">{lng === "ka" ? "Search" : "ძებნა"}</span>
                     </div>
 
                     <Cartlink />
 
-                    <Link
-                      className="flex flex-col items-center"
-                      href={`/${lng}/contact`}
-                    >
+                    <Link className="flex flex-col items-center" href={`/${lng}/contact`}>
                       <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">
-                        {lng === "ka" ? "Chat" : "ჩათი"}
-                      </span>
+                      <span className="text-xs">{lng === "ka" ? "Chat" : "ჩათი"}</span>
                     </Link>
                     <span className="flex flex-col items-center">
                       <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">
-                        {"en" === "en" ? "Login" : "შესვლა"}
-                      </span>
+                      <span className="text-xs">{"en" === "en" ? "Login" : "შესვლა"}</span>
                     </span>
                   </div>
                 </div>

@@ -14,10 +14,7 @@ export interface LanguageSwitchProps {
   classNames?: SwitchProps["classNames"];
 }
 
-export const LanguageSwitch: FC<LanguageSwitchProps> = ({
-  className,
-  classNames,
-}) => {
+export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames }) => {
   const isSSR = useIsSSR();
   const pathName = usePathname();
   const router = useRouter();
@@ -31,8 +28,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({
     const secondSlashIndex = pathName.indexOf("/", 1);
 
     if (secondSlashIndex !== -1) {
-      const newPath =
-        "/" + selectedLanguage + pathName.substring(secondSlashIndex);
+      const newPath = "/" + selectedLanguage + pathName.substring(secondSlashIndex);
 
       router.push(newPath);
 
@@ -60,14 +56,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({
     handleLanguageChange(newLang);
   };
 
-  const {
-    Component,
-    slots,
-    isSelected,
-    getBaseProps,
-    getInputProps,
-    getWrapperProps,
-  } = useSwitch({
+  const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } = useSwitch({
     isSelected: lang === "ka" || isSSR,
     "aria-label": `Switch to ${lang === "ka" ? "English" : "Georgian"} mode`,
     onChange,
@@ -79,7 +68,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({
         className: clsx(
           "px-px transition-opacity hover:opacity-80 cursor-pointer",
           className,
-          classNames?.base
+          classNames?.base,
         ),
       })}
     >
@@ -101,15 +90,11 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({
               "px-0",
               "mx-0",
             ],
-            classNames?.wrapper
+            classNames?.wrapper,
           ),
         })}
       >
-        {isSelected || isSSR ? (
-          <GeorgiaIcon  size={30}/>
-        ) : (
-          <EnglishIcon  size={30}/>
-        )}
+        {isSelected || isSSR ? <GeorgiaIcon size={30} /> : <EnglishIcon size={30} />}
       </div>
     </Component>
   );

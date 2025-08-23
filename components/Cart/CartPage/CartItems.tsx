@@ -1,12 +1,14 @@
 "use client";
 
+import type { CartItem as CartItemType } from "@/app/context/cartContext";
+
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/app/context/cartContext";
-import type { CartItem as CartItemType } from "@/app/context/cartContext";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
@@ -19,7 +21,9 @@ const monthly = (price: number, months = 24) => Math.ceil(price / months);
 function formatSpecs(facets?: Record<string, string>) {
   if (!facets) return "";
   const entries = Object.entries(facets);
+
   if (!entries.length) return "";
+
   return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
 }
 
@@ -48,11 +52,11 @@ export default function CartItems() {
                 <div className="relative shrink-0">
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md overflow-hidden bg-muted">
                     <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
                       fill
-                      sizes="96px"
+                      alt={item.name}
                       className="object-cover"
+                      sizes="96px"
+                      src={item.image || "/placeholder.svg"}
                     />
                   </div>
                 </div>
@@ -66,13 +70,12 @@ export default function CartItems() {
                   {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {Object.entries(item.selectedFacets).map(([k, v]) => (
-                        <Badge key={k} variant="secondary" className="h-5 text-[11px] px-1.5">
+                        <Badge key={k} className="h-5 text-[11px] px-1.5" variant="secondary">
                           {k}: {v}
                         </Badge>
                       ))}
                     </div>
                   )}
-
 
                   {/* თვეში გადასახადი */}
                   {/* <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted px-2.5 py-1 text-[11px] sm:text-xs text-muted-foreground">
@@ -88,7 +91,7 @@ export default function CartItems() {
                           <span className="text-sm text-muted-foreground line-through">
                             {formatPrice(originalPrice!)}
                           </span>
-                          <Badge variant="destructive" className="text-[11px] px-1.5 py-0.5">
+                          <Badge className="text-[11px] px-1.5 py-0.5" variant="destructive">
                             -{discount}%
                           </Badge>
                         </>
@@ -102,22 +105,26 @@ export default function CartItems() {
               <div className="order-3 md:order-none flex md:justify-center">
                 <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border">
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 w-10 sm:w-9 p-0"
-                    onClick={() => updateCartItem(item.id, Math.max(1, quantity - 1), item.variantKey)} // 🔹 variantKey
-                    disabled={quantity <= 1}
                     aria-label="Decrease"
+                    className="h-9 w-10 sm:w-9 p-0"
+                    disabled={quantity <= 1}
+                    onClick={() =>
+                      updateCartItem(item.id, Math.max(1, quantity - 1), item.variantKey)
+                    } // 🔹 variantKey
+                    size="sm"
+                    variant="ghost"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="min-w-[2.75rem] text-center text-sm font-medium">{quantity}</span>
+                  <span className="min-w-[2.75rem] text-center text-sm font-medium">
+                    {quantity}
+                  </span>
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 w-10 sm:w-9 p-0"
-                    onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)} // 🔹 variantKey
                     aria-label="Increase"
+                    className="h-9 w-10 sm:w-9 p-0"
+                    size="sm"
+                    onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)} // 🔹 variantKey
+                    variant="ghost"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -132,7 +139,7 @@ export default function CartItems() {
                     <span className="text-sm text-muted-foreground line-through">
                       {formatPrice(originalPrice!)}
                     </span>
-                    <Badge variant="destructive" className="text-xs px-2 py-0.5">
+                    <Badge className="text-xs px-2 py-0.5" variant="destructive">
                       -{discount}%
                     </Badge>
                   </div>
@@ -143,11 +150,11 @@ export default function CartItems() {
               <div className="order-4 md:order-none flex justify-end">
                 <div className="flex items-center gap-1">
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeFromCart(item.id, item.variantKey)} // 🔹 variantKey
-                    className="text-muted-foreground hover:text-destructive"
                     aria-label="Remove"
+                    className="text-muted-foreground hover:text-destructive"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => removeFromCart(item.id, item.variantKey)} // 🔹 variantKey
                   >
                     <Trash2 className="h-5 w-5" />
                   </Button>

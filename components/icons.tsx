@@ -2,19 +2,8 @@ import * as React from "react";
 
 import { IconSvgProps } from "@/types";
 
-export const Logo: React.FC<IconSvgProps> = ({
-  size = 36,
-  width,
-  height,
-  ...props
-}) => (
-  <svg
-    fill="none"
-    height={size || height}
-    viewBox="0 0 32 32"
-    width={size || width}
-    {...props}
-  >
+export const Logo: React.FC<IconSvgProps> = ({ size = 36, width, height, ...props }) => (
+  <svg fill="none" height={size || height} viewBox="0 0 32 32" width={size || width} {...props}>
     <path
       clipRule="evenodd"
       d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
@@ -24,12 +13,7 @@ export const Logo: React.FC<IconSvgProps> = ({
   </svg>
 );
 
-export const HomeIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const HomeIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     fill="none"
     height={height || size}
@@ -39,11 +23,7 @@ export const HomeIcon = ({
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g
-      id="SVGRepo_tracerCarrier"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
       <path
         d="M6.49996 7C7.96131 5.53865 9.5935 4.41899 10.6975 3.74088C11.5021 3.24665 12.4978 3.24665 13.3024 3.74088C14.4064 4.41899 16.0386 5.53865 17.5 7C20.6683 10.1684 20.5 12 20.5 15C20.5 16.4098 20.3895 17.5988 20.2725 18.4632C20.1493 19.3726 19.3561 20 18.4384 20H17C15.8954 20 15 19.1046 15 18V16C15 15.2043 14.6839 14.4413 14.1213 13.8787C13.5587 13.3161 12.7956 13 12 13C11.2043 13 10.4413 13.3161 9.87864 13.8787C9.31603 14.4413 8.99996 15.2043 8.99996 16V18C8.99996 19.1046 8.10453 20 6.99996 20H5.56152C4.64378 20 3.85061 19.3726 3.72745 18.4631C3.61039 17.5988 3.49997 16.4098 3.49997 15C3.49997 12 3.33157 10.1684 6.49996 7Z"
@@ -79,12 +59,7 @@ export const IconCheck = ({
     </svg>
   );
 };
-export const ProfileIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const ProfileIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     fill="none"
     height={height || size}
@@ -94,11 +69,7 @@ export const ProfileIcon = ({
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g
-      id="SVGRepo_tracerCarrier"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
       <g id="style=linear">
         <g id="profile">
@@ -122,12 +93,7 @@ export const ProfileIcon = ({
   </svg>
 );
 
-export const MoonFilledIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const MoonFilledIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     aria-hidden="true"
     focusable="false"
@@ -144,12 +110,7 @@ export const MoonFilledIcon = ({
   </svg>
 );
 
-export const SunFilledIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const SunFilledIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     aria-hidden="true"
     focusable="false"
@@ -166,12 +127,7 @@ export const SunFilledIcon = ({
   </svg>
 );
 
-export const HeartFilledIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const HeartFilledIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     aria-hidden="true"
     focusable="false"
@@ -219,12 +175,7 @@ export const SearchIcon = (props: IconSvgProps) => (
   </svg>
 );
 
-export const ShoppingCartIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const ShoppingCartIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     fill="none"
     height={height || size}
@@ -234,11 +185,7 @@ export const ShoppingCartIcon = ({
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g
-      id="SVGRepo_tracerCarrier"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
       <path
         d="M2.23737 2.28845C1.84442 2.15746 1.41968 2.36983 1.28869 2.76279C1.15771 3.15575 1.37008 3.58049 1.76303 3.71147L2.02794 3.79978C2.70435 4.02524 3.15155 4.17551 3.481 4.32877C3.79296 4.47389 3.92784 4.59069 4.01426 4.71059C4.10068 4.83049 4.16883 4.99538 4.20785 5.33722C4.24907 5.69823 4.2502 6.17 4.2502 6.883L4.2502 9.55484C4.25018 10.9224 4.25017 12.0247 4.36673 12.8917C4.48774 13.7918 4.74664 14.5497 5.34855 15.1516C5.95047 15.7535 6.70834 16.0124 7.60845 16.1334C8.47542 16.25 9.57773 16.25 10.9453 16.25H18.0002C18.4144 16.25 18.7502 15.9142 18.7502 15.5C18.7502 15.0857 18.4144 14.75 18.0002 14.75H11.0002C9.56479 14.75 8.56367 14.7484 7.80832 14.6468C7.07455 14.5482 6.68598 14.3677 6.40921 14.091C6.17403 13.8558 6.00839 13.5398 5.9034 13H16.0222C16.9817 13 17.4614 13 17.8371 12.7522C18.2128 12.5045 18.4017 12.0636 18.7797 11.1817L19.2082 10.1817C20.0177 8.2929 20.4225 7.34849 19.9779 6.67422C19.5333 5.99996 18.5058 5.99996 16.4508 5.99996H5.74526C5.73936 5.69227 5.72644 5.41467 5.69817 5.16708C5.64282 4.68226 5.52222 4.2374 5.23112 3.83352C4.94002 3.42965 4.55613 3.17456 4.1137 2.96873C3.69746 2.7751 3.16814 2.59868 2.54176 2.38991L2.23737 2.28845Z"
@@ -256,12 +203,7 @@ export const ShoppingCartIcon = ({
   </svg>
 );
 
-export const GeorgiaIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const GeorgiaIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     aria-hidden="true"
     className="iconify iconify--twemoji"
@@ -275,11 +217,7 @@ export const GeorgiaIcon = ({
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g
-      id="SVGRepo_tracerCarrier"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
       <path d="M32 5H20.5v10.5H36V9a4 4 0 0 0-4-4z" fill="#EEE" />
       <path d="M20.5 5h-5v10.5H0v5h15.5V31h5V20.5H36v-5H20.5z" fill="#E8112D" />
@@ -306,12 +244,7 @@ export const GeorgiaIcon = ({
   </svg>
 );
 
-export const EnglishIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: IconSvgProps) => (
+export const EnglishIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     fill="#000000"
     height={size || height}
@@ -324,11 +257,7 @@ export const EnglishIcon = ({
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g
-      id="SVGRepo_tracerCarrier"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
       {" "}
       <path

@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ArrowLeft, ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 interface CartHeaderProps {
-  itemCount: number
+  itemCount: number;
 }
 
 export default function CartHeader({ itemCount }: CartHeaderProps) {
@@ -24,12 +25,12 @@ export default function CartHeader({ itemCount }: CartHeaderProps) {
           </div>
         </div>
       </div>
-      <Button variant="outline" asChild className="gap-2 bg-transparent">
+      <Button asChild className="gap-2 bg-transparent" variant="outline">
         <Link href="/">
           <ArrowLeft className="h-4 w-4" />
           Continue Shopping
         </Link>
       </Button>
     </div>
-  )
+  );
 }

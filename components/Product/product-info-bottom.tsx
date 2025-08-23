@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ShoppingCart, Sparkles, Clock3, Tag, Truck } from "lucide-react";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
+
 import { StockStatus, Condition } from "@/types/enums";
 
 type Currency = "₾" | "$" | "€";
@@ -65,16 +66,16 @@ export function ProductInfoBottom({
       ? Math.round(((originalPrice - price) / originalPrice) * 100)
       : 0);
 
-  const hasDiscount =
-    !!originalPrice && originalPrice > price && computedDiscount > 0;
+  const hasDiscount = !!originalPrice && originalPrice > price && computedDiscount > 0;
 
   const inStock = status === StockStatus.InStock && !isComingSoon;
   const ctaDisabled = !inStock;
 
   return (
     <div
-      className={`fixed bottom-14 md:bottom-0 left-0 right-0 bg-brand-muted dark:bg-brand-muteddark shadow-lg px-4 py-3 transform transition-all duration-300 z-50 ease-in-out ${isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-        }`}
+      className={`fixed bottom-14 md:bottom-0 left-0 right-0 bg-brand-muted dark:bg-brand-muteddark shadow-lg px-4 py-3 transform transition-all duration-300 z-50 ease-in-out ${
+        isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      }`}
     >
       <div className="container mx-auto flex items-center justify-between gap-3">
         {/* Left: image + name + meta */}
@@ -87,9 +88,7 @@ export function ProductInfoBottom({
             width={64}
           />
           <div className="hidden md:flex md:flex-col min-w-0">
-            <span className="text-sm md:text-lg font-semibold truncate">
-              {name}
-            </span>
+            <span className="text-sm md:text-lg font-semibold truncate">{name}</span>
             <div className="flex items-center gap-1.5 mt-0.5">
               {freeShipping && (
                 <Badge className="text-foreground bg-white/80" variant="flat">
@@ -118,9 +117,7 @@ export function ProductInfoBottom({
               {typeof stock === "number" && stock <= 3 && stock > 0 && (
                 <Badge className="bg-orange-600 text-white">ბოლო {stock} ც</Badge>
               )}
-              {brand && (
-                <Badge className="bg-white/80 text-foreground">{brand}</Badge>
-              )}
+              {brand && <Badge className="bg-white/80 text-foreground">{brand}</Badge>}
             </div>
           </div>
         </div>
@@ -136,18 +133,16 @@ export function ProductInfoBottom({
                 <span className="text-xs md:text-base text-gray-500 line-through">
                   {originalPrice!.toFixed(2)} {currency}
                 </span>
-                <Badge className="ml-1 text-xs bg-red-500 text-white">
-                  -{computedDiscount}%
-                </Badge>
+                <Badge className="ml-1 text-xs bg-red-500 text-white">-{computedDiscount}%</Badge>
               </>
             )}
           </div>
 
           <Button
-            className="h-10 px-3 md:px-4 ml-2 md:ml-4 flex items-center gap-1 md:gap-2 bg-black text-white disabled:opacity-60"
-            onClick={onAddToCart}
-            disabled={ctaDisabled}
             aria-disabled={ctaDisabled}
+            className="h-10 px-3 md:px-4 ml-2 md:ml-4 flex items-center gap-1 md:gap-2 bg-black text-white disabled:opacity-60"
+            disabled={ctaDisabled}
+            onClick={onAddToCart}
           >
             <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
             <span className="hidden xs:inline">
@@ -156,10 +151,10 @@ export function ProductInfoBottom({
           </Button>
 
           <Button
-            className="hidden md:inline-flex h-10 px-4 bg-foreground text-background disabled:opacity-60"
-            onClick={onBuyNow}
-            disabled={ctaDisabled}
             aria-disabled={ctaDisabled}
+            className="hidden md:inline-flex h-10 px-4 bg-foreground text-background disabled:opacity-60"
+            disabled={ctaDisabled}
+            onClick={onBuyNow}
           >
             პირდაპირ ყიდვა
           </Button>

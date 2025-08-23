@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "sonner";
 
+import { TenantProvider } from "../context/tenantContext";
+
 import { CartProvider } from "@/app/context/cartContext";
 import { TranslationProvider } from "@/hooks/useTranslation";
-import { TenantProvider } from "../context/tenantContext";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -19,9 +20,7 @@ export interface ProvidersProps {
 
 declare module "@react-types/shared" {
   interface RouterConfig {
-    routerOptions: NonNullable<
-      Parameters<ReturnType<typeof useRouter>["push"]>[1]
-    >;
+    routerOptions: NonNullable<Parameters<ReturnType<typeof useRouter>["push"]>[1]>;
   }
 }
 

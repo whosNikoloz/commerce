@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useDisclosure } from "@heroui/modal";
 
 import { ShoppingCartIcon } from "../icons";
+
 import { useCart } from "@/app/context/cartContext";
 
 export default function CartDropdown() {
@@ -30,7 +31,9 @@ export default function CartDropdown() {
         onClose();
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
@@ -38,13 +41,18 @@ export default function CartDropdown() {
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleClickCart = () => {
-    if (isOpen) { onClose(); return; }
+    if (isOpen) {
+      onClose();
+
+      return;
+    }
     onOpen();
   };
 
   useEffect(() => {
     if (cartChanged) {
       const timer = setTimeout(() => setCartChanged(false), 500);
+
       return () => clearTimeout(timer);
     }
   }, [cartChanged]);
@@ -69,8 +77,11 @@ export default function CartDropdown() {
       </Badge>
 
       <div
-        className={`absolute right-0 top-14 w-96 transform transition-all duration-200 ${isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-          }`}
+        className={`absolute right-0 top-14 w-96 transform transition-all duration-200 ${
+          isOpen
+            ? "opacity-100 scale-100 translate-y-0"
+            : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+        }`}
       >
         <Card className="overflow-hidden">
           <CardHeader className="pb-3">
@@ -128,11 +139,15 @@ export default function CartDropdown() {
                           <Button
                             isIconOnly
                             className="h-8 w-8"
+                            isDisabled={item.quantity <= 1}
                             variant="solid"
                             onPress={() =>
-                              updateCartItem(item.id, Math.max(1, item.quantity - 1), (item as any).variantKey)
+                              updateCartItem(
+                                item.id,
+                                Math.max(1, item.quantity - 1),
+                                (item as any).variantKey,
+                              )
                             }
-                            isDisabled={item.quantity <= 1}
                           >
                             -
                           </Button>
@@ -152,11 +167,11 @@ export default function CartDropdown() {
 
                           <Button
                             isIconOnly
+                            aria-label="Remove item"
                             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            title="Remove item"
                             variant="ghost"
                             onPress={() => removeFromCart(item.id, (item as any).variantKey)}
-                            aria-label="Remove item"
-                            title="Remove item"
                           >
                             X
                           </Button>

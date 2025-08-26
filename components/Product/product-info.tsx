@@ -85,7 +85,7 @@ export function ProductInfo({
 
   return (
     <div className="space-y-6">
-      <div className="md:sticky relative md:top-20 max-w-72 p-6 rounded-lg shadow-sm border dark:bg-brand-muteddark bg-brand-muted">
+      <div className="md:sticky relative md:top-20 sm:max-w-72 md:w-full p-6 rounded-lg shadow-sm border dark:bg-brand-muteddark bg-brand-muted">
         {/* Top chips: flags & brand */}
         <div className="flex flex-wrap gap-2 mb-3">
           {isComingSoon && (
@@ -133,9 +133,8 @@ export function ProductInfo({
         {/* Status + Condition */}
         <div className="mt-2 flex items-center justify-between gap-2">
           <Badge
-            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${
-              isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
-            }`}
+            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+              }`}
             title={getStatusLabel(status, isComingSoon)}
           >
             {getStatusLabel(status, isComingSoon)}

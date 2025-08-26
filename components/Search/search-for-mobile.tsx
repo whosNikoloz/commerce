@@ -233,7 +233,7 @@ export default function SearchForMobile({
             placeholder="What are you looking for?"
             type="search"
             value={searchQuery}
-            onChange={() => {}}
+            onChange={() => { }}
           />
         </button>
       )}
@@ -345,27 +345,27 @@ export default function SearchForMobile({
                       <div className="grid grid-cols-3 gap-4 w-full">
                         {loadingCats
                           ? Array.from({ length: 6 }).map((_, i) => (
-                              <Card key={i} className="p-4">
-                                <div className="animate-pulse flex flex-col items-center">
-                                  <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
-                                  <div className="h-3 w-20 bg-gray-300/50 rounded" />
-                                </div>
-                              </Card>
-                            ))
+                            <Card key={i} className="p-4">
+                              <div className="animate-pulse flex flex-col items-center">
+                                <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
+                                <div className="h-3 w-20 bg-gray-300/50 rounded" />
+                              </div>
+                            </Card>
+                          ))
                           : categories.map((category) => (
-                              <Card
-                                key={category.id}
-                                className="cursor-pointer hover:shadow-md transition-shadow"
-                                onClick={() => goToResultsPage(category.name ?? "")}
-                              >
-                                <CardBody className="flex flex-col items-center justify-center">
-                                  {renderCatThumb(category)}
-                                  <span className="text-sm font-medium text-center line-clamp-2">
-                                    {category.name}
-                                  </span>
-                                </CardBody>
-                              </Card>
-                            ))}
+                            <Card
+                              key={category.id}
+                              className="cursor-pointer hover:shadow-md transition-shadow"
+                              onClick={() => goToResultsPage(category.name ?? "")}
+                            >
+                              <CardBody className="flex flex-col items-center justify-center">
+                                {renderCatThumb(category)}
+                                <span className="text-sm font-medium text-center line-clamp-2">
+                                  {category.name}
+                                </span>
+                              </CardBody>
+                            </Card>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -403,7 +403,11 @@ export default function SearchForMobile({
                         exit={{ opacity: 0, y: -5 }}
                         initial={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.1 }}
-                        onClick={() => goToResultsPage(result.name ?? "")} // ✅ saves history via goToResultsPage
+                        onClick={() => {
+                          router.push(`/en/product/${result.id}`);
+                          handleClose();
+                        }}
+
                         onMouseDown={(e) => e.preventDefault()}
                       >
                         <div className="flex items-center gap-3">

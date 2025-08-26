@@ -132,7 +132,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         id: typeof p.id === "string" ? Number(p.id) : p.id,
         name: p.name ?? "Unnamed",
         price: p.discountPrice ?? p.price,
-        rating: 0, // your API doesn’t expose rating; fill if available
+        rating: 0,
         image: p.images?.[0] ?? "/placeholder.png",
       })),
     [similar],
@@ -146,21 +146,46 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
+    <div className="container mx-auto px-4">
+      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">
+        {product.name ?? "პროდუქტი"}
+      </h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
-        <div className="flex-1 max-w-[800px] ">
+        <div className="flex-1 max-w-[800px] order-1 lg:order-1">
           <ImageReview images={galleryImages} productName={product.name ?? ""} />
         </div>
 
-        <h1 className="text-3xl md:hidden block font-bold">{product.name}</h1>
+        <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">
+          {product.name}
+        </h1>
 
-        <div className="flex md:items-start place-items-start">
+        <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm
+             lg:sticky lg:top-24 lg:self-start lg:h-fit">
+          <ProductInfo
+            brand={product.brand?.name ?? ""}
+            condition={product.condition}
+            discount={
+              originalPrice
+                ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
+                : 0
+            }
+            isComingSoon={product.isComingSoon}
+            isLiquidated={product.isLiquidated}
+            isNewArrival={product.isNewArrival}
+            originalPrice={originalPrice ?? null}
+            price={price}
+            status={product.status}
+            onAddToCart={handleAddToCart}
+            onBuyNow={() => console.log("Buy now clicked")}
+          />
+        </div>
+
+        <div className="order-4 lg:order-2 flex md:items-start place-items-start">
           <div
             dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
             className={[
-              "rich-content max-w-md ml-5",
+              "rich-content max-w-md mx-auto md:ml-5",
               "prose prose-sm dark:prose-invert",
               "prose-ul:list-disc prose-ol:list-decimal",
               "prose-li:my-1 prose-p:my-2",
@@ -168,49 +193,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             ].join(" ")}
           />
         </div>
-
-        <ProductInfo
-          brand={product.brand?.name ?? ""}
-          condition={product.condition}
-          discount={
-            originalPrice
-              ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
-              : 0
-          }
-          isComingSoon={product.isComingSoon}
-          isLiquidated={product.isLiquidated}
-          isNewArrival={product.isNewArrival}
-          originalPrice={originalPrice ?? null}
-          price={price}
-          status={product.status}
-          onAddToCart={handleAddToCart}
-          onBuyNow={() => console.log("Buy now clicked")}
-        />
       </div>
-
-      {/* <SimilarProducts products={similarProducts} /> */}
-
-      {product.brand && (
-        <div className="mb-12">
-          <h2 className="text-xl font-semibold mb-4">ბრენდის ისტორია : {product.brand.name}</h2>
-          <div className="prose prose-sm dark:prose-invert">
-            <div className="flex md:items-start place-items-start">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: product.brand.description ?? "",
-                }}
-                className={[
-                  "rich-content max-w-md",
-                  "prose prose-sm dark:prose-invert",
-                  "prose-ul:list-disc prose-ol:list-decimal",
-                  "prose-li:my-1 prose-p:my-2",
-                  "whitespace-pre-wrap break-words",
-                ].join(" ")}
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {specs.map((g, i) => (
         <div key={i} className="my-12">
@@ -246,4 +229,5 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       />
     </div>
   );
+
 }

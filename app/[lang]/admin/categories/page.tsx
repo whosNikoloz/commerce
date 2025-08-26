@@ -5,6 +5,12 @@ import { getAllCategories } from "@/app/api/services/categoryService";
 import { basePageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
 import { CategoryModel } from "@/types/category";
+import { cache } from "react";
+
+
+const getCategoriesCached = cache(async (): Promise<CategoryModel[]> => {
+  return await getAllCategories();
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const url = `${siteConfig.url}/admin/categories`;
@@ -19,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CategoriesPage() {
-  const categories: CategoryModel[] = await getAllCategories();
+  const categories: CategoryModel[] = await getCategoriesCached();
 
   return (
     <div className="space-y-6">

@@ -154,7 +154,7 @@ export function Footer() {
               <form
                 className="flex gap-2"
                 onSubmit={(e) => {
-                  e.preventDefault(); /* handle subscribe */
+                  e.preventDefault();
                 }}
               >
                 <Input
@@ -203,7 +203,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* bottom bar */}
           <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200/70 px-6 py-5 text-center sm:flex-row dark:border-slate-700/60">
             <p className="font-sans text-sm text-slate-500 dark:text-slate-400">
               © {year} StyleMove. All rights reserved.

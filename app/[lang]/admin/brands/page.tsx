@@ -5,6 +5,12 @@ import { basePageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
 import { getAllBrands } from "@/app/api/services/brandService";
 import { BrandModel } from "@/types/brand";
+import { cache } from "react";
+
+
+const getBrandsCached = cache(async (): Promise<BrandModel[]> => {
+  return await getAllBrands();
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const url = `${siteConfig.url}/admin/brands`;
@@ -19,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BrandsPage() {
-  const brands: BrandModel[] = await getAllBrands();
+  const brands: BrandModel[] = await getBrandsCached();
 
   return (
     <div className="space-y-6">

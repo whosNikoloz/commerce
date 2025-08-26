@@ -1,55 +1,36 @@
+// components/admin/product/products-table.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import {
-  Eye,
-  EyeOff,
-  Search,
-  Package,
-  RefreshCw,
-  Grid,
-  List,
-  SortAsc,
-  Filter,
-  Layers, // icon for mobile categories trigger
-} from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
-
-import UpdateProductModal from "./update-product-modal";
-import ReviewImagesModal from "./review-images-modal";
-import { CategoryTree } from "./category-tree";
+import {
+  Eye, EyeOff, Search, Package, RefreshCw, Grid, List, SortAsc, Filter, Layers,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { StockStatus, Condition } from "@/types/enums";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { ProductRequestModel } from "@/types/product";
 import {
-  deleteProductById,
-  getProductsByCategory,
-  updateProduct,
-} from "@/app/api/services/productService";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { CategoryModel } from "@/types/category";
+import type { ProductRequestModel } from "@/types/product";
+import { deleteProductById, getProductsByCategory, updateProduct } from "@/app/api/services/productService";
+import type { CategoryModel } from "@/types/category";
+
+// ✅ Lazy-load heavy pieces to reduce TTI
+const UpdateProductModal = dynamic(() => import("./update-product-modal"), { ssr: false });
+const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
+const CategoryTree = dynamic(() => import("./category-tree").then(m => m.CategoryTree), { ssr: false });
 
 type ViewMode = "table" | "grid";
 type SortOption = "name" | "price" | "created" | "status";
@@ -58,54 +39,74 @@ interface ProductsTableProps {
   initialCategories: CategoryModel[];
 }
 
+function useDebounced<T>(value: T, delay = 250): T {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setV(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return v;
+}
+
 export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearch = useDebounced(searchTerm, 250);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [sortBy, setSortBy] = useState<SortOption>("name");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
-  // Prefer grid on small screens by default
+  // ✅ Non-blocking UI when switching categories
+  const [isPending, startTransition] = useTransition();
+
+  // Prefer grid on small screens by default (runs once)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isSmall = window.matchMedia("(max-width: 1023px)").matches;
-
       if (isSmall) setViewMode("grid");
     }
   }, []);
 
+  // Fetch on category changes only
   useEffect(() => {
     if (!selectedCategoryId) {
       setProducts([]);
-
       return;
     }
 
-    const fetchProducts = async () => {
+    let aborted = false;
+    const run = async () => {
       setLoading(true);
       setError(null);
       try {
+        // ✅ mark the route non-cacheable server side on this API if needed (noStore)
         const response = await getProductsByCategory(selectedCategoryId);
-
-        setProducts(response);
+        if (!aborted) setProducts(response);
       } catch (err) {
-        setError("Failed to load products");
-        console.error("Failed to fetch products", err);
+        if (!aborted) {
+          setError("Failed to load products");
+          console.error("Failed to fetch products", err);
+        }
       } finally {
-        setLoading(false);
+        if (!aborted) setLoading(false);
       }
     };
 
-    fetchProducts();
+    run();
+    return () => {
+      aborted = true;
+    };
   }, [selectedCategoryId]);
 
   const handleDeleteProduct = async (productId: string) => {
     try {
       await deleteProductById(productId);
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
+      setProducts(prev => prev.filter(p => p.id !== productId));
       toast.success("პროდუქტი წარმატებით წაიშალა");
     } catch (err) {
       console.error("Failed to delete product", err);
@@ -116,85 +117,55 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const handleUpdateProduct = async (
     productId: string,
     description: string,
-    flags: {
-      isLiquidated: boolean;
-      isComingSoon: boolean;
-      isNewArrival: boolean;
-    },
+    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
   ) => {
-    const current = products.find((p) => p.id === productId);
-
+    const current = products.find(p => p.id === productId);
     if (!current) return;
 
-    const prevProducts = products;
-
-    const patched = {
+    const prev = products;
+    const patched: ProductRequestModel = {
       ...current,
       description,
       isLiquidated: flags.isLiquidated,
       isComingSoon: flags.isComingSoon,
       isNewArrival: flags.isNewArrival,
-    };
-
-    setProducts((prev) => prev.map((p) => (p.id === productId ? patched : p)));
-
-    const payload: ProductRequestModel = {
-      id: current.id,
-      name: current.name ?? "",
-      price: current.price,
+      // ensure required fields exist:
       discountPrice: current.discountPrice ?? undefined,
-      categoryId: current.categoryId,
-      status: current.status,
-      condition: current.condition,
-      isActive: current.isActive,
-      description,
-      isLiquidated: flags.isLiquidated,
-      isComingSoon: flags.isComingSoon,
-      isNewArrival: flags.isNewArrival,
       images: current.images ?? [],
-      brandId: current.brandId,
       productFacetValues: current.productFacetValues ?? [],
+      brandId: current.brandId,
+      categoryId: current.categoryId,
     };
+
+    setProducts(prevList => prevList.map(p => (p.id === productId ? patched : p)));
 
     try {
-      await updateProduct(payload);
+      await updateProduct(patched);
       toast.success("პროდუქტი წარმატებით განახლდა");
     } catch (err) {
       console.error("Failed to update product", err);
       toast.error("პროდუქტის განახლება ვერ მოხერხდა");
-      setProducts(prevProducts);
+      setProducts(prev);
     }
   };
 
   const toggleProductVisibility = async (productId: string) => {
-    const current = products.find((p) => p.id === productId);
-
+    const current = products.find(p => p.id === productId);
     if (!current) return;
 
-    const prevProducts = products;
+    const prev = products;
+    const nextActive = !current.isActive;
 
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === productId ? { ...product, isActive: !product.isActive } : product,
-      ),
-    );
+    setProducts(list => list.map(p => (p.id === productId ? { ...p, isActive: nextActive } : p)));
 
     const payload: ProductRequestModel = {
-      id: current.id,
-      name: current.name ?? "",
-      price: current.price,
+      ...current,
+      isActive: nextActive,
       discountPrice: current.discountPrice ?? undefined,
-      categoryId: current.categoryId ?? "",
-      status: current.status,
-      condition: current.condition,
-      isActive: !current.isActive,
-      description: current.description,
-      isLiquidated: current.isLiquidated,
-      isComingSoon: current.isComingSoon,
-      isNewArrival: current.isNewArrival,
       images: current.images ?? [],
+      productFacetValues: current.productFacetValues ?? [],
       brandId: current.brandId ?? "",
-      productFacetValues: [],
+      categoryId: current.categoryId ?? "",
     };
 
     try {
@@ -203,84 +174,50 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     } catch (err) {
       console.error("Failed to update product", err);
       toast.error("პროდუქტის განახლება ვერ მოხერხდა");
-      setProducts(prevProducts);
+      setProducts(prev);
     }
   };
 
-  const filteredAndSortedProducts = useMemo(
-    () =>
-      products
-        .filter((product) => {
-          const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase());
-          const matchesStatus =
-            statusFilter === "all" ||
-            (statusFilter === "active" && product.isActive) ||
-            (statusFilter === "inactive" && !product.isActive);
+  const filteredAndSortedProducts = useMemo(() => {
+    const q = debouncedSearch.toLowerCase().trim();
+    const list = products
+      .filter(p => {
+        const matchesSearch = q ? (p.name ?? "").toLowerCase().includes(q) : true;
+        const matchesStatus =
+          statusFilter === "all" ||
+          (statusFilter === "active" && p.isActive) ||
+          (statusFilter === "inactive" && !p.isActive);
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        switch (sortBy) {
+          case "name": return (a.name || "").localeCompare(b.name || "");
+          case "price": return a.price - b.price;
+          case "status": return a.status - b.status;
+          default: return 0;
+        }
+      });
 
-          return matchesSearch && matchesStatus;
-        })
-        .sort((a, b) => {
-          switch (sortBy) {
-            case "name":
-              return (a.name || "").localeCompare(b.name || "");
-            case "price":
-              return a.price - b.price;
-            case "status":
-              return a.status - b.status;
-            default:
-              return 0;
-          }
-        }),
-    [products, searchTerm, statusFilter, sortBy],
-  );
+    return list;
+  }, [products, debouncedSearch, statusFilter, sortBy]);
 
-  const getStatusClass = (status: StockStatus) => {
-    switch (status) {
-      case 0:
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-      case 1:
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400";
-    }
-  };
+  const getStatusClass = (status: StockStatus) =>
+    status === StockStatus.InStock
+      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+      : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
 
-  const getStatusLabel = (status: StockStatus) => {
-    switch (status) {
-      case 0:
-        return "მარაგშია";
-      case 1:
-        return "არ არის მარაგში";
-      default:
-        return "უცნობი სტატუსი";
-    }
-  };
+  const getStatusLabel = (status: StockStatus) =>
+    status === StockStatus.InStock ? "მარაგშია" : "არ არის მარაგში";
 
-  const getConditionClass = (condition: Condition) => {
-    switch (condition) {
-      case 0:
-        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
-      case 1:
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
-      case 2:
-        return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400";
-    }
-  };
+  const getConditionClass = (condition: Condition) =>
+    condition === Condition.New
+      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+      : condition === Condition.Used
+        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+        : "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
 
-  const getConditionLabel = (condition: Condition) => {
-    switch (condition) {
-      case 0:
-        return "ახალი";
-      case 1:
-        return "მეორადი";
-      case 2:
-        return "როგორც ახალი";
-      default:
-        return "უცნობი მდგომარეობა";
-    }
-  };
+  const getConditionLabel = (condition: Condition) =>
+    condition === Condition.New ? "ახალი" : condition === Condition.Used ? "მეორადი" : "როგორც ახალი";
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
     <Card className="group hover:shadow-lg transition-all duration-200 bg-brand-surface dark:bg-brand-surfacedark">
@@ -291,8 +228,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               fill
               alt={product.name ?? "Product"}
               className="rounded-lg object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               src={product.images?.[0] || "/placeholder.svg"}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              priority={false}
             />
             {product.images && product.images.length > 1 && (
               <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
@@ -326,9 +264,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               {product.discountPrice ? (
                 <div className="flex items-center gap-2">
                   <span className="text-red-500 line-through text-sm">{product.price} ₾</span>
-                  <span className="text-green-600 text-sm font-bold">
-                    {product.discountPrice} ₾
-                  </span>
+                  <span className="text-green-600 text-sm font-bold">{product.discountPrice} ₾</span>
                 </div>
               ) : (
                 <span className="text-green-600 text-sm font-bold">{product.price} ₾</span>
@@ -336,17 +272,14 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Switch
-                checked={product.isActive}
-                onCheckedChange={() => toggleProductVisibility(product.id)}
-              />
+              <Switch checked={product.isActive} onCheckedChange={() => toggleProductVisibility(product.id)} />
               <UpdateProductModal
                 initialDescription={product.description}
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
                 initialIsNewArrival={product.isNewArrival}
                 productId={product.id}
-                onSave={(id, desc, flags) => handleUpdateProduct(id, desc, flags)}
+                onSave={handleUpdateProduct}
               />
               <ReviewImagesModal />
             </div>
@@ -361,7 +294,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar (desktop/tablet) */}
         <div className="hidden lg:block lg:col-span-1">
-          <CategoryTree Categories={initialCategories} onSelectCategory={setSelectedCategoryId} />
+          <CategoryTree
+            Categories={initialCategories}
+            onSelectCategory={(id) => startTransition(() => setSelectedCategoryId(id))}
+          />
         </div>
 
         {/* Main */}
@@ -386,18 +322,17 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       <div className="px-4 pb-4">
                         <CategoryTree
                           Categories={initialCategories}
-                          onSelectCategory={(id) => {
-                            setSelectedCategoryId(id);
-                          }}
+                          onSelectCategory={(id) => startTransition(() => setSelectedCategoryId(id))}
                         />
                       </div>
                     </SheetContent>
                   </Sheet>
 
-                  {/* Search */}
+                  {/* Search (debounced) */}
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
                     <Input
+                      aria-label="Search products"
                       className="pl-10"
                       placeholder="Search products..."
                       value={searchTerm}
@@ -408,10 +343,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
                 {/* Filters / sort / view */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <Select
-                    value={statusFilter}
-                    onValueChange={(value: any) => setStatusFilter(value)}
-                  >
+                  <Select value={statusFilter} onValueChange={(v: "all" | "active" | "inactive") => setStatusFilter(v)}>
                     <SelectTrigger className="w-32">
                       <Filter className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Status" />
@@ -423,7 +355,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                     </SelectContent>
                   </Select>
 
-                  <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+                  <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
                     <SelectTrigger className="w-32">
                       <SortAsc className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Sort" />
@@ -443,6 +375,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       size="sm"
                       variant={viewMode === "table" ? "default" : "ghost"}
                       onClick={() => setViewMode("table")}
+                      aria-pressed={viewMode === "table"}
                     >
                       <List className="h-4 w-4" />
                     </Button>
@@ -451,6 +384,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       size="sm"
                       variant={viewMode === "grid" ? "default" : "ghost"}
                       onClick={() => setViewMode("grid")}
+                      aria-pressed={viewMode === "grid"}
                     >
                       <Grid className="h-4 w-4" />
                     </Button>
@@ -461,7 +395,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               {selectedCategoryId && (
                 <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Package className="h-4 w-4" />
-                  <span>{filteredAndSortedProducts.length} products found</span>
+                  <span>
+                    {isPending ? "Updating..." : `${filteredAndSortedProducts.length} products found`}
+                  </span>
                 </div>
               )}
             </CardHeader>
@@ -475,23 +411,20 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       Select a Category
                     </h3>
                     <p className="text-slate-500 dark:text-slate-500 max-w-sm">
-                      Choose a category from the sidebar (or button on mobile) to view and manage
-                      products.
+                      Choose a category from the sidebar (or button on mobile) to view and manage products.
                     </p>
                   </div>
                 ) : loading ? (
                   <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
                       <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
-                      <span className="text-slate-600 dark:text-slate-400">
-                        Loading products...
-                      </span>
+                      <span className="text-slate-600 dark:text-slate-400">Loading products...</span>
                     </div>
                   </div>
                 ) : error ? (
                   <div className="text-center py-12 px-6">
                     <div className="text-red-500 mb-2">{error}</div>
-                    <Button variant="outline" onClick={() => window.location.reload()}>
+                    <Button variant="outline" onClick={() => location.reload()}>
                       Try Again
                     </Button>
                   </div>
@@ -502,16 +435,14 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       No Products Found
                     </h3>
                     <p className="text-slate-500 dark:text-slate-500 max-w-sm">
-                      {searchTerm
-                        ? "Try adjusting your search terms"
-                        : "No products available in this category"}
+                      {debouncedSearch ? "Try adjusting your search terms" : "No products available in this category"}
                     </p>
                   </div>
                 ) : viewMode === "grid" ? (
                   <div className="p-4 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4">
-                      {filteredAndSortedProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                      {filteredAndSortedProducts.map(p => (
+                        <ProductCard key={p.id} product={p} />
                       ))}
                     </div>
                   </div>
@@ -530,19 +461,16 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredAndSortedProducts.map((product) => (
-                          <TableRow
-                            key={product.id}
-                            className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                          >
+                        {filteredAndSortedProducts.map(product => (
+                          <TableRow key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                             <TableCell>
                               <div className="relative w-16 h-16">
                                 <Image
                                   alt={product.name ?? "Product"}
                                   className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                                   height={64}
-                                  src={product.images?.[0] || "/placeholder.svg"}
                                   width={64}
+                                  src={product.images?.[0] || "/placeholder.svg"}
                                 />
                                 {product.images && product.images.length > 1 && (
                                   <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
@@ -559,18 +487,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                 <div className="text-xs text-slate-500 dark:text-slate-400">
                                   ID: {product.id}
                                 </div>
-                                {/* Mobile badges inline under name */}
                                 <div className="mt-2 flex flex-wrap gap-1 md:hidden">
-                                  <Badge
-                                    className={getStatusClass(product.status)}
-                                    variant="default"
-                                  >
+                                  <Badge className={getStatusClass(product.status)} variant="default">
                                     {getStatusLabel(product.status)}
                                   </Badge>
-                                  <Badge
-                                    className={getConditionClass(product.condition)}
-                                    variant="default"
-                                  >
+                                  <Badge className={getConditionClass(product.condition)} variant="default">
                                     {getConditionLabel(product.condition)}
                                   </Badge>
                                 </div>
@@ -579,12 +500,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             <TableCell className="whitespace-nowrap">
                               {product.discountPrice ? (
                                 <div className="space-y-1">
-                                  <div className="text-red-500 line-through text-sm">
-                                    {product.price} ₾
-                                  </div>
-                                  <div className="text-green-600 font-bold">
-                                    {product.discountPrice} ₾
-                                  </div>
+                                  <div className="text-red-500 line-through text-sm">{product.price} ₾</div>
+                                  <div className="text-green-600 font-bold">{product.discountPrice} ₾</div>
                                 </div>
                               ) : (
                                 <div className="text-green-600 font-bold">{product.price} ₾</div>
@@ -596,25 +513,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                               </Badge>
                             </TableCell>
                             <TableCell className="hidden lg:table-cell">
-                              <Badge
-                                className={getConditionClass(product.condition)}
-                                variant="default"
-                              >
+                              <Badge className={getConditionClass(product.condition)} variant="default">
                                 {getConditionLabel(product.condition)}
                               </Badge>
                             </TableCell>
                             <TableCell className="hidden sm:table-cell">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={product.isActive}
-                                  className="data-[state=checked]:bg-green-600"
-                                  onCheckedChange={() => toggleProductVisibility(product.id)}
-                                />
-                              </div>
+                              <Switch
+                                checked={product.isActive}
+                                className="data-[state=checked]:bg-green-600"
+                                onCheckedChange={() => toggleProductVisibility(product.id)}
+                              />
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
-                                {/* For small screens, quick toggle here */}
                                 <div className="sm:hidden mr-1">
                                   <Switch
                                     checked={product.isActive}
@@ -627,7 +538,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   initialIsLiquidated={product.isLiquidated}
                                   initialIsNewArrival={product.isNewArrival}
                                   productId={product.id}
-                                  onSave={(id, desc, flags) => handleUpdateProduct(id, desc, flags)}
+                                  onSave={handleUpdateProduct}
                                 />
                                 <ReviewImagesModal />
                               </div>

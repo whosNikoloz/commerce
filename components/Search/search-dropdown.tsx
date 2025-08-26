@@ -278,7 +278,8 @@ const Search = ({
                         transition={{ duration: 0.1 }}
                         onClick={() => {
                           addHistory(searchQuery); // save the actual typed query
-                          router.push(`/en/category?q=${encodeURIComponent(searchQuery)}`);
+                          router.push(`/en/product/${result.id}`);
+                          setIsOpen(false);
                         }}
                         onMouseDown={(e) => e.preventDefault()}
                       >

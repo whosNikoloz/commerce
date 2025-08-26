@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Heart, Award, Users, Truck } from "lucide-react";
 import { Button } from "@heroui/button";
 
-export default function ShippingPage() {
+export default function GuaranteePage() {
   return (
     <div className="container px-4 py-8 md:px-6 md:py-12">
       <div className="mb-8">

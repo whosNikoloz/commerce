@@ -1,29 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import ProductFilters from "./ProductFilters";
 import ProductHeader from "./ProductHeader";
 import ProductGrid from "./ProductGrid";
-import ProductPagination from "./ProductPagination";
 import Loading from "./loading";
 import CategoryNotFound from "./not-found";
 
 import { CategoryModel } from "@/types/category";
 import { BrandModel } from "@/types/brand";
-import { FacetModel, FacetFilterModel } from "@/types/facet";
+import { FacetModel } from "@/types/facet";
 import { FilterModel } from "@/types/filter";
 import { ProductResponseModel } from "@/types/product";
-import { getAllBrands } from "@/app/api/services/brandService";
-import { getCategoryWithSubCategoriesById } from "@/app/api/services/categoryService";
 import { Condition, StockStatus } from "@/types/enums";
 import { searchProductsByFilter } from "@/app/api/services/productService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
-type CatOrArray = CategoryWithSubs | CategoryModel[];
 
 const toggleInArray = <T,>(arr: T[] | undefined, val: T) => {
   const a = arr ?? [];
@@ -31,7 +27,7 @@ const toggleInArray = <T,>(arr: T[] | undefined, val: T) => {
   return a.includes(val) ? a.filter((x) => x !== val) : [...a, val];
 };
 
-const toggleFacetValue = (arr: FacetFilterModel[] | undefined, facetValueId: string) => {
+const toggleFacetValue = (arr: { facetValueId: string }[] | undefined, facetValueId: string) => {
   const a = arr ?? [];
 
   return a.some((f) => f.facetValueId === facetValueId)
@@ -39,16 +35,48 @@ const toggleFacetValue = (arr: FacetFilterModel[] | undefined, facetValueId: str
     : [...a, { facetValueId }];
 };
 
-export default function CategoryPage({ categoryId }: { categoryId: string }) {
-  const [category, setCategory] = useState<CategoryWithSubs | null>(null);
-  const [brands, setBrands] = useState<BrandModel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function CategoryPage({
+  categoryId,
+  __initialCategory,
+  __initialBrands,
+  __initialProducts,
+  __initialTotal,
+  __initialPage,
+  __initialSort,
+}: {
+  categoryId: string;
+  __initialCategory?: CategoryWithSubs | null;
+  __initialBrands?: BrandModel[] | null;
+  __initialProducts?: ProductResponseModel[];
+  __initialTotal?: number;
+  __initialPage?: number;
+  __initialSort?: string;
+}) {
   const isMobile = useIsMobile();
+  const router = useRouter();
+  const params = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
+  const [category] = useState<CategoryWithSubs | null>(__initialCategory ?? null);
+  const [brands] = useState<BrandModel[]>(__initialBrands ?? []);
+  const [loading, setLoading] = useState(!__initialCategory);
+  //const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(!__initialCategory);
+
+  // products state (hydrated)
+  const [products, setProducts] = useState<ProductResponseModel[]>(__initialProducts ?? []);
+  const [totalCount, setTotalCount] = useState<number>(__initialTotal ?? 0);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+
+  const [sortBy, setSortBy] = useState(__initialSort ?? "featured");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [currentPage, setCurrentPage] = useState(__initialPage ?? 1);
+  const itemsPerPage = 12;
+
+  // Filters (init from URL once, then keep URL in sync)
   const [filter, setFilter] = useState<FilterModel>({
     brandIds: [],
-    categoryIds: [],
+    categoryIds: category ? [category.id] : [],
     condition: [],
     stockStatus: undefined,
     minPrice: undefined,
@@ -56,106 +84,114 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     facetFilters: [],
   });
 
-  const [products, setProducts] = useState<ProductResponseModel[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-
-  const [sortBy, setSortBy] = useState("featured");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const [notFound, setNotFound] = useState(false);
-
-  const router = useRouter();
-  const params = useSearchParams();
+  useEffect(() => {
+    if (__initialCategory) {
+      setNotFound(false);
+      setLoading(false);
+    } else {
+      setNotFound(true);
+      setLoading(false);
+    }
+  }, [categoryId]);
 
   useEffect(() => {
-    let alive = true;
+    if (!category) return;
+
+    const brandsParam = params.getAll("brand");
+    const condParam = params.getAll("cond").map((v) => Number(v)) as Condition[];
+    const stockParam = params.get("stock");
+    const min = params.get("min");
+    const max = params.get("max");
+    const facetIds = params.getAll("facet");
+
+    const pageFromUrl = Number(params.get("page") ?? __initialPage ?? 1);
+    const sortFromUrl = params.get("sort") ?? __initialSort ?? "featured";
+
+    setCurrentPage(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1);
+    setSortBy(sortFromUrl);
+
+    setFilter({
+      brandIds: brandsParam,
+      categoryIds: [category.id],
+      condition: condParam.filter((x) => x === 0 || x === 1 || x === 2),
+      stockStatus: stockParam !== null ? (Number(stockParam) as StockStatus) : undefined,
+      minPrice: min ? Number(min) : undefined,
+      maxPrice: max ? Number(max) : undefined,
+      facetFilters: facetIds.map((id) => ({ facetValueId: id })),
+    });
+  }, [category?.id]);
+
+  const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
+
+  // Fetch when filter/sort/page changes (URL ↔ state sync)
+  useEffect(() => {
+    if (!category) return;
+
+    const effectiveFilter = { ...filter, categoryIds: [category.id] };
+    let cancelled = false;
 
     (async () => {
+      setLoadingProducts(true);
+
+      // reflect in URL
+      startTransition(() => {
+        const next = new URLSearchParams();
+
+        next.set("page", String(currentPage));
+        next.set("sort", sortBy);
+
+        (effectiveFilter.brandIds ?? []).forEach((b) => next.append("brand", b));
+        (effectiveFilter.condition ?? []).forEach((c) => next.append("cond", String(c)));
+        if (effectiveFilter.stockStatus !== undefined)
+          next.set("stock", String(effectiveFilter.stockStatus));
+        if (effectiveFilter.minPrice !== undefined)
+          next.set("min", String(effectiveFilter.minPrice));
+        if (effectiveFilter.maxPrice !== undefined)
+          next.set("max", String(effectiveFilter.maxPrice));
+        (effectiveFilter.facetFilters ?? []).forEach((f) => next.append("facet", f.facetValueId));
+
+        router.replace(`?${next.toString()}`, { scroll: false });
+      });
+
       try {
-        setLoading(true);
-        setError(null);
-        setNotFound(false);
+        const res = await searchProductsByFilter({
+          filter: effectiveFilter,
+          page: currentPage,
+          pageSize: itemsPerPage,
+          sortBy,
+        });
 
-        const [raw, allBrands] = await Promise.all([
-          getCategoryWithSubCategoriesById(categoryId) as unknown as Promise<CatOrArray | null>,
-          getAllBrands(),
-        ]);
-
-        if (!alive) return;
-
-        // Determine parent category
-        let parent: CategoryWithSubs | null = null;
-
-        if (!raw) {
-          parent = null;
-        } else if (Array.isArray(raw)) {
-          const root =
-            raw.find((c) => c.id === categoryId) ?? raw.find((c) => c.parentId == null) ?? null;
-
-          if (root) {
-            const subs = raw.filter((c) => c.parentId === root.id);
-
-            parent = { ...root, subcategories: subs };
-          } else {
-            parent = null;
-          }
-        } else {
-          parent = raw;
-        }
-
-        if (!parent) {
-          setNotFound(true);
-          setCategory(null);
-          setBrands(allBrands);
-        } else {
-          setCategory(parent);
-          setBrands(allBrands);
-          // read initial URL params
-          const pageFromUrl = Number(params.get("page") ?? 1);
-          const sortFromUrl = params.get("sort") ?? "featured";
-
-          setCurrentPage(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1);
-          setSortBy(sortFromUrl);
-        }
+        if (cancelled) return;
+        setProducts(res.items ?? []);
+        setTotalCount(res.totalCount ?? 0);
       } catch (e: any) {
-        if (!alive) return;
-        // If your serice throws for 404, treat as not found:
-        setNotFound(true);
-        setError(e?.message ?? "Failed to load category");
+        if (cancelled) return;
+        setProducts([]);
+        setTotalCount(0);
       } finally {
-        if (alive) setLoading(false);
+        if (cancelled) return;
+        setLoadingProducts(false);
       }
     })();
 
     return () => {
-      alive = false;
+      cancelled = true;
     };
-  }, [categoryId]);
+  }, [category?.id, filter, sortBy, currentPage]);
 
-  const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
+  if (notFound) return <CategoryNotFound />;
+  if (loading || !category) return <Loading />;
 
-  // Always include the category id in the filter we send to server
-  const effectiveFilter: FilterModel | null = useMemo(() => {
-    if (!category) return null;
+  const subcategories = category.subcategories ?? [];
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
+  const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`;
 
-    return { ...filter, categoryIds: [category.id] };
-  }, [category, filter]);
-
-  // Handlers that also reset paging to 1
   const onBrandToggle = (brandId: string) => {
-    setFilter((prev) => ({
-      ...prev,
-      brandIds: toggleInArray(prev.brandIds, brandId),
-    }));
+    setFilter((prev) => ({ ...prev, brandIds: toggleInArray(prev.brandIds, brandId) }));
     setCurrentPage(1);
   };
   const onConditionToggle = (cond: Condition) => {
-    setFilter((prev) => ({
-      ...prev,
-      condition: toggleInArray(prev.condition, cond),
-    }));
+    setFilter((prev) => ({ ...prev, condition: toggleInArray(prev.condition, cond) }));
     setCurrentPage(1);
   };
   const onStockChange = (status?: StockStatus) => {
@@ -187,10 +223,20 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     setCurrentPage(1);
   };
 
+  const facetValueLookup = useMemo(() => {
+    const map: Record<string, string> = {};
+    (category?.facets ?? []).forEach(f =>
+      (f.facetValues ?? []).forEach(v => {
+        map[v.id] = v.value ?? v.id;
+      })
+    );
+    return map;
+  }, [category]);
+
   const clearFilters = () => {
     setFilter({
       brandIds: [],
-      categoryIds: [],
+      categoryIds: [category.id],
       condition: [],
       stockStatus: undefined,
       minPrice: undefined,
@@ -207,56 +253,6 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
     (filter.minPrice !== undefined || filter.maxPrice !== undefined ? 1 : 0) +
     (filter.facetFilters?.length ?? 0);
 
-  // ✅ Single data fetcher: server paging every time
-  useEffect(() => {
-    if (!effectiveFilter) return;
-
-    let alive = true;
-
-    (async () => {
-      try {
-        setLoadingProducts(true);
-
-        const next = new URLSearchParams(params);
-
-        next.set("page", String(currentPage));
-        next.set("sort", sortBy);
-        router.replace(`?${next.toString()}`, { scroll: false });
-
-        const res = await searchProductsByFilter({
-          filter: effectiveFilter,
-          page: currentPage,
-          pageSize: itemsPerPage,
-          sortBy,
-        });
-
-        if (!alive) return;
-
-        setProducts(res.items);
-        setTotalCount(res.totalCount ?? 0);
-      } catch {
-        if (!alive) return;
-        setProducts([]);
-        setTotalCount(0);
-      } finally {
-        if (alive) setLoadingProducts(false);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, [effectiveFilter, sortBy, currentPage, itemsPerPage]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (notFound) return <CategoryNotFound />;
-  if (loading) return <Loading />;
-  if (error) return <div className="p-6 text-red-500">{error}</div>;
-  if (!category) return null;
-
-  const subcategories = category.subcategories ?? [];
-  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
-  const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`;
-
   return (
     <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
       <div className="container mx-auto px-4 py-4 lg:py-6">
@@ -266,7 +262,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
             brands={brands}
             buildSubHref={buildSubHref}
             clearFilters={clearFilters}
-            facets={facets}
+            facets={(category.facets ?? []) as FacetModel[]}
             filter={filter}
             subcategories={subcategories}
             onBrandToggle={onBrandToggle}
@@ -282,24 +278,18 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
               activeFiltersCount={activeFiltersCount}
               brandLookup={Object.fromEntries(brands.map((b) => [b.id, b.name ?? b.id]))}
               filter={filter}
+              facetValueLookup={facetValueLookup}
               productCount={totalCount}
               sortBy={sortBy}
               title={category.name ?? ""}
               viewMode={viewMode}
               onClearAll={clearFilters}
               onClearPrice={() =>
-                setFilter((f) => ({
-                  ...f,
-                  minPrice: undefined,
-                  maxPrice: undefined,
-                }))
+                setFilter((f) => ({ ...f, minPrice: undefined, maxPrice: undefined }))
               }
               onClearStockStatus={() => setFilter((f) => ({ ...f, stockStatus: undefined }))}
               onRemoveBrand={(id) =>
-                setFilter((f) => ({
-                  ...f,
-                  brandIds: (f.brandIds ?? []).filter((x) => x !== id),
-                }))
+                setFilter((f) => ({ ...f, brandIds: (f.brandIds ?? []).filter((x) => x !== id) }))
               }
               onRemoveCategory={(id) =>
                 setFilter((f) => ({
@@ -308,10 +298,7 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
                 }))
               }
               onRemoveCondition={(c) =>
-                setFilter((f) => ({
-                  ...f,
-                  condition: (f.condition ?? []).filter((x) => x !== c),
-                }))
+                setFilter((f) => ({ ...f, condition: (f.condition ?? []).filter((x) => x !== c) }))
               }
               onRemoveFacet={(vid) =>
                 setFilter((f) => ({
@@ -327,9 +314,8 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
             />
 
             {loadingProducts ? (
-              // skeletons
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                {Array.from({ length: 9 }).map((_, i) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                {Array.from({ length: 12 }).map((_, i) => (
                   <div
                     key={i}
                     className="group bg-brand-muted dark:bg-brand-muteddark border rounded-lg shadow-sm p-3 lg:p-4"
@@ -354,11 +340,29 @@ export default function CategoryPage({ categoryId }: { categoryId: string }) {
               <ProductGrid products={products} viewMode={viewMode} />
             )}
 
-            <ProductPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            <div className="flex items-center justify-center gap-2">
+              <button
+                className="px-3 py-2 border rounded disabled:opacity-50"
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              >
+                Prev
+              </button>
+              <span className="text-sm">
+                {currentPage} / {Math.max(1, Math.ceil(totalCount / itemsPerPage))}
+              </span>
+              <button
+                className="px-3 py-2 border rounded disabled:opacity-50"
+                disabled={currentPage >= Math.max(1, Math.ceil(totalCount / itemsPerPage))}
+                onClick={() =>
+                  setCurrentPage((p) =>
+                    Math.min(Math.max(1, Math.ceil(totalCount / itemsPerPage)), p + 1),
+                  )
+                }
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -313,7 +313,7 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
 
           <button
             aria-label="Previous image"
-            className="absolute left-2 top-[200px] -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
             onClick={(e) => {
               e.stopPropagation();
               prevImage();
@@ -323,13 +323,13 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
           </button>
           <button
             aria-label="Next image"
-            className="absolute right-2 top-[200px] -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white text-white hover:text-black  z-20"
             onClick={(e) => {
               e.stopPropagation();
               nextImage();
             }}
           >
-            <ChevronRight className="h-5 w-5 text-white" />
+            <ChevronRight className="h-5 w-5 " />
           </button>
 
           {isHovering && (

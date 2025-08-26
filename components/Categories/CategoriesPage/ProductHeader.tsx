@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Grid, List } from "lucide-react";
+import { ChevronDown, CoinsIcon, Grid, List } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -42,16 +42,10 @@ interface ProductHeaderProps {
   onSortChange: (sort: string) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
-
-  // ✅ Real filter model
   filter: FilterModel;
-
-  // ✅ Optional lookups for pretty chip labels (fallback to IDs if omitted)
   brandLookup?: Record<string, string>;
   categoryLookup?: Record<string, string>;
   facetValueLookup?: Record<string, string>;
-
-  // ✅ Either use granular callbacks...
   onRemoveBrand?: (id: string) => void;
   onRemoveCategory?: (id: string) => void;
   onRemoveCondition?: (c: Condition) => void;
@@ -59,10 +53,7 @@ interface ProductHeaderProps {
   onClearPrice?: () => void;
   onRemoveFacet?: (facetValueId: string) => void;
   onClearAll?: () => void;
-
-  // ...or keep your old single handler (we’ll fallback to it if provided)
   onFilterChange?: (filterType: string, value: string | number | boolean | number[]) => void;
-
   activeFiltersCount: number;
 }
 
@@ -102,7 +93,6 @@ export default function ProductHeader({
     hasPrice ||
     facetFilters.length > 0;
 
-  // ---- Fallback shims if only onFilterChange is provided ----
   const _removeBrand = (id: string) =>
     onRemoveBrand ? onRemoveBrand(id) : onFilterChange?.("brandIds:remove", id);
   const _removeCategory = (id: string) =>
@@ -117,11 +107,11 @@ export default function ProductHeader({
   const _clearAll = () => (onClearAll ? onClearAll() : onFilterChange?.("all:clear", ""));
 
   return (
-    <div className="flex flex-col gap-4">
+    <header>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl lg:text-2xl font-bold">{title}</h1>
-          <p className="text-sm lg:text-base text-muted-foreground">
+          <p aria-live="polite" className="text-sm lg:text-base text-muted-foreground">
             {productCount} products found
           </p>
         </div>
@@ -129,7 +119,11 @@ export default function ProductHeader({
         <div className="flex items-center gap-2 lg:gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="min-w-[120px] lg:min-w-[140px]" variant="outline">
+              <Button
+                aria-label="Sort products"
+                className="min-w-[120px] lg:min-w-[140px]"
+                variant="outline"
+              >
                 <span className="hidden sm:inline">Sort by</span>
                 <span className="sm:hidden">Sort</span>
                 <ChevronDown className="ml-2 h-4 w-4" />
@@ -146,8 +140,10 @@ export default function ProductHeader({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex border rounded-md">
+          <div aria-label="View mode" className="flex border rounded-md" role="tablist">
             <Button
+              aria-label="Grid view"
+              aria-pressed={viewMode === "grid"}
               className="rounded-r-none"
               size="sm"
               variant={viewMode === "grid" ? "default" : "ghost"}
@@ -156,6 +152,8 @@ export default function ProductHeader({
               <Grid className="h-4 w-4" />
             </Button>
             <Button
+              aria-label="List view"
+              aria-pressed={viewMode === "list"}
               className="rounded-l-none"
               size="sm"
               variant={viewMode === "list" ? "default" : "ghost"}
@@ -173,30 +171,27 @@ export default function ProductHeader({
         </div>
       </div>
 
-      {/* Active Filter Chips (FilterModel-based) */}
       {hasAnyChip && (
-        <div className="flex flex-wrap gap-2">
-          {/* Brands */}
+        <nav aria-label="Active filters" className="flex flex-wrap gap-2 mt-2">
           {brandIds.map((id) => (
             <Badge key={`b-${id}`} className="gap-1" variant="secondary">
               {brandLookup?.[id] ?? id}
-              <button aria-label="Remove brand" onClick={() => _removeBrand(id)}>
+              <button
+                aria-label={`Remove brand ${brandLookup?.[id] ?? id}`}
+                onClick={() => _removeBrand(id)}
+              >
                 ×
               </button>
             </Badge>
           ))}
-
-          {/* Categories */}
-          {categoryIds.map((id) => (
+          {/* {categoryIds.map((id) => (
             <Badge key={`c-${id}`} className="gap-1" variant="secondary">
               {categoryLookup?.[id] ?? id}
               <button aria-label="Remove category" onClick={() => _removeCategory(id)}>
                 ×
               </button>
             </Badge>
-          ))}
-
-          {/* Conditions */}
+          ))} */}
           {conditions.map((c) => (
             <Badge key={`cond-${c}`} className="gap-1" variant="secondary">
               {conditionLabel(c)}
@@ -205,8 +200,6 @@ export default function ProductHeader({
               </button>
             </Badge>
           ))}
-
-          {/* Stock status */}
           {hasStock && (
             <Badge className="gap-1" variant="secondary">
               {stockLabel(filter.stockStatus)}
@@ -215,8 +208,6 @@ export default function ProductHeader({
               </button>
             </Badge>
           )}
-
-          {/* Price range */}
           {hasPrice && (
             <Badge className="gap-1" variant="secondary">
               {`${filter.minPrice ?? 0}–${filter.maxPrice ?? "∞"}`}
@@ -225,25 +216,44 @@ export default function ProductHeader({
               </button>
             </Badge>
           )}
+          {facetFilters.map((ff) => {
+            const id = ff.facetValueId;
+            const name = facetValueLookup?.[id] ?? id;
+            return (
+              <Badge
+                key={`fv-${id}`}
+                className="gap-2 px-2 py-1"
+                variant="secondary"
+                data-facet-id={id}
+                title={`${name} (${id})`}
+              >
+                <div className="flex flex-col leading-tight items-start">
+                  <span className="text-sm">{name}</span>
+                </div>
 
-          {/* Facet values */}
-          {facetFilters.map((ff) => (
-            <Badge key={`fv-${ff.facetValueId}`} className="gap-1" variant="secondary">
-              {facetValueLookup?.[ff.facetValueId] ?? ff.facetValueId}
-              <button aria-label="Remove facet" onClick={() => _removeFacet(ff.facetValueId)}>
-                ×
-              </button>
-            </Badge>
-          ))}
-
-          {/* Clear all (optional) */}
+                <button
+                  type="button"
+                  aria-label={`Remove facet ${name}`}
+                  onClick={() => _removeFacet(id)}
+                  className="ml-1"
+                >
+                  ×
+                </button>
+              </Badge>
+            );
+          })}
           {activeFiltersCount > 0 && (
-            <Badge className="gap-1 cursor-pointer" variant="outline" onClick={_clearAll}>
+            <Badge
+              aria-label="Clear all filters"
+              className="gap-1 cursor-pointer"
+              variant="outline"
+              onClick={_clearAll}
+            >
               Clear all
             </Badge>
           )}
-        </div>
+        </nav>
       )}
-    </div>
+    </header>
   );
 }

@@ -150,26 +150,24 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
-        <div className="flex-1">
+        <div className="flex-1 max-w-[800px] ">
           <ImageReview images={galleryImages} productName={product.name ?? ""} />
         </div>
 
         <h1 className="text-3xl md:hidden block font-bold">{product.name}</h1>
 
-        {product.description && (
-          <div className="flex md:items-start place-items-start">
-            <div
-              dangerouslySetInnerHTML={{ __html: product.description }}
-              className={[
-                "rich-content max-w-md ml-5",
-                "prose prose-sm dark:prose-invert",
-                "prose-ul:list-disc prose-ol:list-decimal",
-                "prose-li:my-1 prose-p:my-2",
-                "whitespace-pre-wrap break-words",
-              ].join(" ")}
-            />
-          </div>
-        )}
+        <div className="flex md:items-start place-items-start">
+          <div
+            dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
+            className={[
+              "rich-content max-w-md ml-5",
+              "prose prose-sm dark:prose-invert",
+              "prose-ul:list-disc prose-ol:list-decimal",
+              "prose-li:my-1 prose-p:my-2",
+              "whitespace-pre-wrap break-words",
+            ].join(" ")}
+          />
+        </div>
 
         <ProductInfo
           brand={product.brand?.name ?? ""}

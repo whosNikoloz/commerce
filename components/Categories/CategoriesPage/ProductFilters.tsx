@@ -31,18 +31,14 @@ type ProductFiltersProps = {
   brands: BrandModel[];
   subcategories: SubcategoryItem[];
   facets: FacetModel[];
-
   onBrandToggle: (brandId: string) => void;
   onConditionToggle: (cond: Condition) => void;
   onStockChange: (status?: StockStatus) => void;
   onPriceChange: (min?: number, max?: number) => void;
   onFacetToggle: (facetValueId: string) => void;
   onFacetRadioChange: (facetId: string, facetValueId: string) => void;
-
   clearFilters: () => void;
   activeFiltersCount: number;
-
-  // ახალი: ქვე-კატეგორიის ბმულის გენერატორი
   buildSubHref: (sub: CategoryModel) => string;
 };
 
@@ -75,12 +71,7 @@ function FacetBlock({
   switch (facet.displayType) {
     case FacetTypeEnum.CheckboxList:
       return (
-        <button
-          className="space-y-3"
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
+        <div className="space-y-3">
           {values.map((v) => (
             <div key={v.id} className="flex items-center space-x-2">
               <Checkbox
@@ -93,7 +84,7 @@ function FacetBlock({
               </label>
             </div>
           ))}
-        </button>
+        </div>
       );
     case FacetTypeEnum.RadioButtonList: {
       const selectedId = selectedRadioValueId(filter, facet);
@@ -125,7 +116,6 @@ function FacetBlock({
       );
     }
     default:
-      // Range/Numeric/Search/Date — ბაკეტებად გამოყენებისას ასევე იმუშავებს Checkbox-ებად
       return (
         <div className="space-y-3 text-xs text-muted-foreground">
           {values.length > 0 ? (
@@ -142,7 +132,7 @@ function FacetBlock({
               </div>
             ))
           ) : (
-            <em>ამ ტიპის ფეისეტისთვის სერვერმა უნდა მოაწოდოს მნიშვნელობები.</em>
+            <em>Server should provide values for this facet type.</em>
           )}
         </div>
       );
@@ -168,36 +158,30 @@ function SidebarContent({
 
   return (
     <div className="space-y-6">
-      {/* ქვე-კატეგორიები — ლინკებად */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">კატეგორიები</h2>
+        <h2 className="text-lg font-semibold mb-4">Categories</h2>
         <div className="space-y-2">
           {subcategories.map((sub) => (
             <Link
               key={sub.id}
+              prefetch
               className="flex items-center justify-between w-full p-2 text-left rounded-md hover:bg-muted transition-colors"
               href={buildSubHref(sub)}
             >
               <span className="text-sm">{sub.name}</span>
-              <span className="text-xs text-muted-foreground">({sub.count ?? 0})</span>
+              <span className="text-xs text-muted-foreground">({(sub as any).count ?? 0})</span>
             </Link>
           ))}
         </div>
       </div>
 
       <Accordion collapsible className="w-full" type="single">
-        {/* ფასი */}
         <AccordionItem value="price">
-          <AccordionTrigger>ფასის დიაპაზონი</AccordionTrigger>
+          <AccordionTrigger>Price Range</AccordionTrigger>
           <AccordionContent>
-            <button
-              className="space-y-4"
-              onClick={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
+            <div className="space-y-4">
               <Slider
-                className="w-full"
+                className="w-full mt-2"
                 max={1000}
                 min={0}
                 step={10}
@@ -222,20 +206,14 @@ function SidebarContent({
                   onChange={(e) => onPriceChange(minPrice, Number(e.target.value) || 1000)}
                 />
               </div>
-            </button>
+            </div>
           </AccordionContent>
         </AccordionItem>
 
-        {/* ბრენდები */}
         <AccordionItem value="brands">
-          <AccordionTrigger>ბრენდები</AccordionTrigger>
+          <AccordionTrigger>Brands</AccordionTrigger>
           <AccordionContent>
-            <button
-              className="space-y-3"
-              onClick={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
+            <div className="space-y-3">
               {brands.map((b) => {
                 const active = (filter.brandIds ?? []).includes(b.id);
 
@@ -252,13 +230,12 @@ function SidebarContent({
                   </div>
                 );
               })}
-            </button>
+            </div>
           </AccordionContent>
         </AccordionItem>
 
-        {/* მარაგი */}
         <AccordionItem value="stock">
-          <AccordionTrigger>მარაგი</AccordionTrigger>
+          <AccordionTrigger>Stock</AccordionTrigger>
           <AccordionContent>
             <RadioGroup
               className="space-y-3"
@@ -269,29 +246,28 @@ function SidebarContent({
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="stock-all" value="all" />
-                <Label htmlFor="stock-all">ყველა</Label>
+                <Label htmlFor="stock-all">All</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="stock-in" value={String(StockStatus.InStock)} />
-                <Label htmlFor="stock-in">მარაგშია</Label>
+                <Label htmlFor="stock-in">In stock</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="stock-out" value={String(StockStatus.OutOfStock)} />
-                <Label htmlFor="stock-out">ამოიწურა</Label>
+                <Label htmlFor="stock-out">Out of stock</Label>
               </div>
             </RadioGroup>
           </AccordionContent>
         </AccordionItem>
 
-        {/* მდგომარეობა */}
         <AccordionItem value="condition">
-          <AccordionTrigger>მდგომარეობა</AccordionTrigger>
+          <AccordionTrigger>Condition</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
               {[
-                { v: Condition.New, label: "ახალი" },
-                { v: Condition.Used, label: "მეორადი" },
-                { v: Condition.LikeNew, label: "როგორც ახალი" },
+                { v: Condition.New, label: "New" },
+                { v: Condition.Used, label: "Used" },
+                { v: Condition.LikeNew, label: "Like new" },
               ].map((c) => {
                 const active = (filter.condition ?? []).includes(c.v);
 
@@ -328,7 +304,7 @@ function SidebarContent({
       </Accordion>
 
       <Button className="w-full" variant="outline" onClick={clearFilters}>
-        ყველა ფილტრის გასუფთავება
+        Clear all filters
       </Button>
     </div>
   );
@@ -339,23 +315,30 @@ export default function ProductFilters(props: ProductFiltersProps) {
 
   return (
     <>
-      <div className="hidden lg:block bg-brand-muted dark:bg-brand-muteddark sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg bg-card p-6 shadow-sm">
+      <aside
+        aria-label="Filters"
+        className="hidden lg:block bg-brand-muted dark:bg-brand-muteddark sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg bg-card p-6 shadow-sm"
+      >
         <SidebarContent {...props} />
-      </div>
+      </aside>
 
       <Sheet>
         <SheetTrigger asChild className="bg-brand-muted dark:bg-brand-muteddark">
           <Button className="lg:hidden relative" variant="outline">
             <Filter className="h-4 w-4 mr-2" />
-            ფილტრები
+            Filters
             {activeFiltersCount > 0 && (
               <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs">{activeFiltersCount}</Badge>
             )}
           </Button>
         </SheetTrigger>
-        <SheetContent className="w-[300px] p-0 bg-brand-muted dark:bg-brand-muteddark" side="left">
+        <SheetContent
+          aria-label="Mobile filters"
+          className="w-[300px] p-0 bg-brand-muted dark:bg-brand-muteddark"
+          side="left"
+        >
           <SheetHeader className="p-6 pb-4">
-            <SheetTitle>ფილტრები</SheetTitle>
+            <SheetTitle>Filters</SheetTitle>
           </SheetHeader>
           <div className="px-6 pb-6 overflow-y-auto max-h-[calc(100vh-80px)]">
             <SidebarContent {...props} />

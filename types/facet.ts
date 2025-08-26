@@ -10,7 +10,7 @@ export interface FacetFilterModel {
 }
 
 export interface FacetValueModel {
-  id?: string;
+  id: string;
   value?: string;
   parentId?: string;
 }

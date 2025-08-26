@@ -18,10 +18,9 @@ import { getAllCategories } from "@/app/api/services/categoryService";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
-
 export default function SearchPage({ query = "" }: { query?: string }) {
-  const [root, setRoot] = useState<CategoryWithSubs | null>(null);
+  // ✅ store ALL categories (flat)
+  const [allCategories, setAllCategories] = useState<CategoryModel[]>([]);
   const [loadingCats, setLoadingCats] = useState(false);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -36,28 +35,30 @@ export default function SearchPage({ query = "" }: { query?: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 24;
 
-  // (optional) keep page/sort in URL
   const router = useRouter();
   const params = useSearchParams();
 
-  // bootstrap categories sidebar
+  // 🔹 Load ALL categories (no subcategory filtering)
   useEffect(() => {
     let alive = true;
 
     (async () => {
       try {
         setLoadingCats(true);
-        const raw = (await getAllCategories()) as unknown as CategoryModel[] | CategoryWithSubs;
+        const raw = (await getAllCategories()) as unknown as CategoryModel[] | CategoryModel;
 
         if (!alive) return;
 
         if (Array.isArray(raw)) {
-          const rootNode = raw.find((c) => c.parentId == null) ?? raw[0];
-          const subs = raw.filter((c) => c.parentId === rootNode.id);
-
-          setRoot({ ...rootNode, subcategories: subs });
+          setAllCategories(raw.filter((c) => c.parentId == null));
+        } else if (raw) {
+          if (raw.parentId == null) {
+            setAllCategories([raw]);
+          } else {
+            setAllCategories([]);
+          }
         } else {
-          setRoot(raw);
+          setAllCategories([]);
         }
 
         // seed from URL (?page=&sort=)
@@ -77,7 +78,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // fetch products (server-side paging + sorting)
+  // 🔹 Fetch products (server paging + sorting)
   useEffect(() => {
     let alive = true;
 
@@ -85,7 +86,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
       try {
         setLoading(true);
 
-        // (optional) keep URL in sync
+        // sync URL (query, sort, page)
         const next = new URLSearchParams(params);
 
         next.set("page", String(currentPage));
@@ -117,9 +118,11 @@ export default function SearchPage({ query = "" }: { query?: string }) {
       alive = false;
     };
     // include sortBy + currentPage + query
-  }, [query, currentPage, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, currentPage, sortBy]);
 
-  const categories = useMemo(() => root?.subcategories ?? [], [root]);
+  // 🔹 Use ALL categories in the sidebar
+  const categories = useMemo(() => allCategories, [allCategories]);
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`;
 

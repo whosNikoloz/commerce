@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import NextLink from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { getAllCategories } from "@/app/api/services/categoryService";
@@ -12,13 +11,11 @@ export function CategoryCarousel() {
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     (async () => {
       try {
         const data = await getAllCategories();
-
         setCategories(data);
       } catch (e) {
         console.error(e);
@@ -39,7 +36,6 @@ export function CategoryCarousel() {
 
     for (const c of categories) {
       const pid = c.parentId?.trim();
-
       if (pid) {
         if (!map.has(pid)) map.set(pid, []);
         map.get(pid)!.push(c);
@@ -68,26 +64,15 @@ export function CategoryCarousel() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {parentCategories.map((parent) => {
           const children = childrenByParent.get(parent.id) ?? [];
-          const go = () => router.push(`/category/${parent.id}`);
-          const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              go();
-            }
-          };
 
           return (
-            <div
+            <NextLink
               key={parent.id}
-              className="group cursor-pointer bg-surface dark:bg-surfacedark rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-muted dark:border-muteddark"
-              role="link"
-              tabIndex={0}
-              onClick={go}
-              onKeyDown={onKey}
+              href={`/category/${parent.id}`}
+              className="group block bg-surface dark:bg-surfacedark rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-muted dark:border-muteddark"
             >
               <div className="relative h-48 overflow-hidden">
                 <img
-                  // src={`/images/categories/${parent.id}.png`}
                   alt={parent.name || "Category"}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   src={"/img2.jpg"}
@@ -114,30 +99,28 @@ export function CategoryCarousel() {
                 {children.length > 0 && (
                   <div className="mb-4 -m-1 flex flex-wrap">
                     {children.map((child) => (
-                      <Link
+                      <NextLink
                         key={child.id}
                         className="m-1 inline-flex items-center rounded-full border border-muted dark:border-muteddark px-3 py-1 text-xs text-text-subtle dark:text-text-subtledark hover:bg-muted dark:hover:bg-muteddark transition-colors"
                         href={`/category/${child.id}`}
                         onClick={(e) => e.stopPropagation()}
                       >
                         {child.name ?? "—"}
-                      </Link>
+                      </NextLink>
                     ))}
                   </div>
                 )}
 
-                <Button
-                  className="w-full bg-brand-primary dark:bg-brand-primarydark hover:bg-primary/90 dark:hover:bg-brand-primarydark/90 text-white font-sans font-medium transition-colors duration-300"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    go();
-                  }}
-                >
-                  Shop {parent.name ?? "Category"}
-                </Button>
+                <NextLink href={`/category/${parent.id}`} onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    className="w-full bg-brand-primary dark:bg-brand-primarydark hover:bg-primary/90 dark:hover:bg-brand-primarydark/90 text-white font-sans font-medium transition-colors duration-300"
+                    size="sm"
+                  >
+                    Shop {parent.name ?? "Category"}
+                  </Button>
+                </NextLink>
               </div>
-            </div>
+            </NextLink>
           );
         })}
       </div>

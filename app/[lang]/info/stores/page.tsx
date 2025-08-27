@@ -1,170 +1,289 @@
-import Image from "next/image";
+
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Heart, Award, Users, Truck } from "lucide-react";
-import { Button } from "@heroui/button";
+import dynamic from "next/dynamic";
+import { site as siteConfig } from "@/config/site";
+import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { MapPin, Phone, Clock, Navigation, Star, Wifi, CreditCard, ParkingMeter } from "lucide-react";
+import StoreMapClient from "@/components/Info/stores/StoreMap.client";
 
-export default function StorsPage() {
+
+const STORES = [
+  {
+    name: "PetDo — მთავარი მაღაზია",
+    street: "რუსთაველის გამზირი 10",
+    city: "თბილისი",
+    region: "Tbilisi",
+    postal: "0108",
+    phone: "+995 577 60 23 99",
+    lat: 41.7006,
+    lng: 44.7966,
+    hours: "ორშ-შაბ 10:00-20:00",
+    description: "ჩვენი უმსხვილესი ფილიალი სრული ასორტიმენტით",
+    features: ["parking", "wifi", "card"],
+    rating: 4.8,
+    isMain: true
+  },
+  {
+    name: "PetDo — ბათუმი",
+    street: "ჭავჭავაძის 25",
+    city: "ბათუმი",
+    region: "Adjara",
+    postal: "6000",
+    phone: "+995 598 00 00 00",
+    lat: 41.6168,
+    lng: 41.6367,
+    hours: "ორშ-შაბ 10:00-19:00",
+    description: "ზღვისპირა ქალაქის მცხოვრებლებისთვის",
+    features: ["parking", "card"],
+    rating: 4.6,
+    isMain: false
+  },
+  {
+    name: "PetDo — ვაკე",
+    street: "ვაშლიჯვრის 15ბ",
+    city: "თბილისი",
+    region: "Tbilisi",
+    postal: "0162",
+    phone: "+995 577 11 22 33",
+    lat: 41.7158,
+    lng: 44.7742,
+    hours: "ორშ-შაბ 10:00-19:00",
+    description: "კომფორტული ლოკაცია ვაკეში",
+    features: ["wifi", "card"],
+    rating: 4.7,
+    isMain: false
+  }
+];
+
+const FEATURE_ICONS = {
+  parking: ParkingMeter,
+  wifi: Wifi,
+  card: CreditCard
+};
+
+const FEATURE_LABELS = {
+  parking: "პარკინგი",
+  wifi: "უფასო Wi-Fi",
+  card: "ბარათით გადახდა"
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const url = `${base}/info/stores`;
+  return basePageMetadata({
+    title: "ფილიალები და მისამართები",
+    description: "იპოვე უახლოესი ფილიალი — მისამართები, დროის რეჟიმი და ტელეფონები.",
+    url,
+    images: ["/og/stores-og.jpg"],
+    siteName: siteConfig.name,
+    index: true,
+  });
+}
+
+function JsonLd() {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const breadcrumb = buildBreadcrumbJsonLd([
+    { name: "მთავარი", url: `${base}/` },
+    { name: "ინფო", url: `${base}/info` },
+    { name: "ფილიალები", url: `${base}/info/stores` },
+  ]);
+
+  const organizations = STORES.map((s) => ({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: s.name,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: s.street,
+      addressLocality: s.city,
+      addressRegion: s.region,
+      postalCode: s.postal,
+      addressCountry: "GE",
+    },
+    telephone: s.phone,
+    geo: { "@type": "GeoCoordinates", latitude: s.lat, longitude: s.lng },
+    openingHours: s.hours,
+    url: base,
+  }));
+
   return (
-    <div className="container px-4 py-8 md:px-6 md:py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">About PetDo</h1>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Link className="hover:text-primary" href="/">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <span>About</span>
-        </div>
-      </div>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {organizations.map((o, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(o) }} />
+      ))}
+    </>
+  );
+}
 
-      {/* Hero Section */}
-      <div className="grid md:grid-cols-2 gap-8 items-center mb-16">
-        <div>
-          <h2 className="text-3xl font-bold mb-4">Our Story</h2>
-          <p className="text-muted-foreground mb-4">
-            Founded in 2015, PetDo started with a simple mission: to provide high-quality products
-            for pets and make pet parenting easier and more enjoyable.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            What began as a small local shop has grown into a trusted online destination for pet
-            lovers across the country. Our founder, Sarah Johnson, a passionate dog owner,
-            recognized the need for premium pet products that prioritize both quality and
-            affordability.
-          </p>
-          <p className="text-muted-foreground">
-            Today, we continue to be guided by our love for animals and commitment to exceptional
-            customer service. Every product in our catalog is carefully selected to ensure it meets
-            our high standards for quality, safety, and value.
-          </p>
-        </div>
-        <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden">
-          <Image
-            fill
-            alt="PetDo team with dogs"
-            className="object-cover"
-            src="https://picsum.photos/id/257/200/300"
-          />
-        </div>
-      </div>
+export default function StoresPage() {
+  // ⬇️ მოვამზადოთ მონაცემები StoreMap კომპონენტისთვის
+  const storesForMap = STORES.map((s) => ({
+    name: s.name,
+    lat: s.lat,
+    lng: s.lng,
+    address: `${s.street}, ${s.city}, ${s.region} ${s.postal}`,
+    phone: s.phone,
+    hours: s.hours,
+    isMain: s.isMain,
+  }));
 
-      {/* Values Section */}
-      <div className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Our Values</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            At PetDo, our core values guide everything we do, from product selection to customer
-            service.
-          </p>
-        </div>
+  return (
+    <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
+      <JsonLd />
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Heart className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Pet Wellbeing</h3>
-            <p className="text-muted-foreground">
-              We prioritize products that contribute to the health, happiness, and wellbeing of your
-              pets.
-            </p>
-          </div>
+      {/* Breadcrumb */}
+      <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
+        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <span className="mx-2">/</span>
+        <span aria-current="page" className="text-foreground font-medium">ფილიალები</span>
+      </nav>
 
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Award className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Quality Assurance</h3>
-            <p className="text-muted-foreground">
-              We rigorously test and verify all products to ensure they meet our high standards for
-              quality and safety.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Users className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Customer Focus</h3>
-            <p className="text-muted-foreground">
-              We&apos;re dedicated to providing exceptional service and building lasting
-              relationships with our customers.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Truck className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Reliability</h3>
-            <p className="text-muted-foreground">
-              We deliver on our promises with fast shipping, accurate orders, and responsive
-              customer support.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Section */}
-      <div className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            The passionate people behind PetDo who work tirelessly to bring the best products to you
-            and your pets.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              name: "Sarah Johnson",
-              role: "Founder & CEO",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "Michael Chen",
-              role: "Head of Product",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "Emily Rodriguez",
-              role: "Customer Experience",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "David Kim",
-              role: "Logistics Manager",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-          ].map((member, index) => (
-            <div key={index} className="bg-card rounded-lg border overflow-hidden">
-              <div className="relative h-64 w-full">
-                <Image
-                  fill
-                  alt={member.name}
-                  className="object-cover"
-                  src={member.image || "/placeholder.svg"}
-                />
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-lg">{member.name}</h3>
-                <p className="text-muted-foreground">{member.role}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-primary text-primary-foreground rounded-lg p-8 md:p-12 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">Join the PetDo Family</h2>
-        <p className="max-w-2xl mx-auto mb-6">
-          Discover premium products for your furry friends and join thousands of satisfied pet
-          parents who trust PetDo.
+      {/* Header */}
+      <div className="mb-6 text-center">
+        <h1 className="mb-4 text-4xl p-1 font-bold bg-gradient-to-r from-primary to-green-600 bg-clip-text text-transparent">
+          ჩვენი ფილიალები
+        </h1>
+        <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
+          იპოვნეთ უახლოესი ფილიალი და ეწვიეთ ჩვენს მაღაზიებს.
+          ყველა ლოკაციაზე ხელმისაწვდომია სრული ასორტიმენტი და პროფესიონალური კონსულტაცია.
         </p>
-        <Button color="secondary" size="lg">
-          <Link href="/shop">Shop Now</Link>
-        </Button>
+      </div>
+
+      <section className="mb-12">
+        <StoreMapClient stores={storesForMap} height={420} className="mb-2" />
+        <p className="text-xs text-muted-foreground text-center">
+          რუკა: OpenStreetMap • დააწკაპე „ჩემი მდებარეობა“, რომ ახლოს მდებარე ფილიალს მიუახლოვდე
+        </p>
+      </section>
+
+      <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="text-center rounded-xl bg-primary/5 p-6">
+          <div className="text-3xl font-bold text-primary">{STORES.length}</div>
+          <div className="text-sm text-muted-foreground">ფილიალი</div>
+        </div>
+        <div className="text-center rounded-xl bg-green-500/5 p-6">
+          <div className="text-3xl font-bold text-green-600">2+</div>
+          <div className="text-sm text-muted-foreground">ქალაქი</div>
+        </div>
+        <div className="text-center rounded-xl bg-blue-500/5 p-6">
+          <div className="text-3xl font-bold text-blue-600">10-20</div>
+          <div className="text-sm text-muted-foreground">სამუშაო საათი</div>
+        </div>
+      </div>
+
+      {/* Stores Grid */}
+      <div className="grid gap-8 lg:grid-cols-2">
+        {STORES.map((store, index) => (
+          <article
+            key={index}
+            className={`group relative rounded-2xl border p-8 shadow-sm hover:shadow-lg transition-all duration-300 ${store.isMain ? 'ring-2 ring-primary/20 bg-primary/5' : 'bg-card'}`}
+          >
+            {/* Main Badge */}
+            {store.isMain && (
+              <div className="absolute -top-3 left-6">
+                <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
+                  მთავარი ფილიალი
+                </span>
+              </div>
+            )}
+
+            {/* Store Header */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                {store.name}
+              </h2>
+              <p className="text-muted-foreground mb-3">{store.description}</p>
+
+              {/* Rating */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-4 w-4 ${i < Math.floor(store.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm font-medium">{store.rating}</span>
+                <span className="text-xs text-muted-foreground">(124 შეფასება)</span>
+              </div>
+            </div>
+
+            {/* Store Info */}
+            <div className="space-y-4 mb-6">
+              {/* Address */}
+              <div className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="font-medium">{store.street}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {store.city}, {store.region} {store.postal}
+                  </div>
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-center gap-3">
+                <Phone className="h-5 w-5 text-primary flex-shrink-0" />
+                <a
+                  className="hover:text-primary hover:underline transition-colors font-medium"
+                  href={`tel:${store.phone.replace(/\s+/g, "")}`}
+                >
+                  {store.phone}
+                </a>
+              </div>
+
+              {/* Hours */}
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-medium">{store.hours}</span>
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="mb-6">
+              <h3 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wider">
+                მომსახურება
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {store.features.map((feature) => {
+                  const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
+                  const label = FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS];
+                  return (
+                    <div
+                      key={feature}
+                      className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs"
+                    >
+                      <Icon className="h-3 w-3" />
+                      {label}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <a
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground px-4 py-3 text-sm font-medium hover:bg-primary/90 transition-colors"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.lat},${store.lng}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Navigation className="h-4 w-4" />
+                რუკაზე ნახვა
+              </a>
+              <a
+                className="inline-flex items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+                href={`tel:${store.phone.replace(/\s+/g, "")}`}
+              >
+                <Phone className="h-4 w-4" />
+              </a>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );

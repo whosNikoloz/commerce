@@ -1,170 +1,284 @@
-import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Heart, Award, Users, Truck } from "lucide-react";
-import { Button } from "@heroui/button";
+import { site as siteConfig } from "@/config/site";
+import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { Shield, Calendar, CheckCircle, XCircle, Wrench, Phone, FileText, AlertTriangle } from "lucide-react";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const url = `${base}/info/guarantee`;
+  return basePageMetadata({
+    title: "გარანტია — პირობები და წესები",
+    description: "გაიგე საგარანტიო მომსახურების წესები: ვადა, გავრცელების არეალი და გამონაკლისები.",
+    url,
+    images: ["/og/guarantee-og.jpg"],
+    siteName: siteConfig.name,
+    index: true,
+  });
+}
+
+function JsonLd() {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const breadcrumb = buildBreadcrumbJsonLd([
+    { name: "მთავარი", url: `${base}/` },
+    { name: "ინფო", url: `${base}/info` },
+    { name: "გარანტია", url: `${base}/info/guarantee` },
+  ]);
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />;
+}
 
 export default function GuaranteePage() {
+  const guaranteeTypes = [
+    {
+      category: "ელექტრონიკა",
+      period: "24 თვე",
+      color: "blue",
+      items: ["ავტომატური კვებები", "LED განათება", "ტემპერატურის კონტროლერები", "ფილტრაცია"]
+    },
+    {
+      category: "აქსესუარები",
+      period: "12 თვე",
+      color: "green",
+      items: ["ტანკები და აკვარიუმები", "თერმომეტრები", "დეკორაციული ელემენტები"]
+    },
+    {
+      category: "თოვლის პროდუქტები",
+      period: "6 თვე",
+      color: "purple",
+      items: ["სამაგრი იარაღები", "ნაბიჯი და საწოლები", "სპორტული ინვენტარი"]
+    },
+    {
+      category: "საკვები და ვიტამინები",
+      period: "ვადის გასვლამდე",
+      color: "orange",
+      items: ["მშრალი საკვები", "ვიტამინური დანამატები", "ლაქომები"]
+    }
+  ];
+
+  const warrantySteps = [
+    {
+      step: 1,
+      title: "შეინარჩუნეთ ქვითარი",
+      description: "დაინახეთ შეძენის ქვითარი და გარანტიული ბარათი",
+      icon: FileText
+    },
+    {
+      step: 2,
+      title: "დაგვიკავშირდით",
+      description: "მოგვმართეთ პრობლემის აღწერით და შეძენის დეტალებით",
+      icon: Phone
+    },
+    {
+      step: 3,
+      title: "დიაგნოსტიკა",
+      description: "ჩვენი ექსპერტები შეაფასებენ პროდუქტის მდგომარეობას",
+      icon: Wrench
+    },
+    {
+      step: 4,
+      title: "გადაწყვეტილება",
+      description: "შევძლებთ შეცვლას, შეკეთებას ან თანხის დაბრუნებას",
+      icon: CheckCircle
+    }
+  ];
+
+  const covered = [
+    "ქარხნული დეფექტები და წარმოების ბრაკი",
+    "ფუნქციონირების ნაკლები საწყისი პერიოდიდან",
+    "არასწორი შეკვრა ან არასრული კომპლექტაცია",
+    "მასალის ხარისხის პრობლემები",
+    "ელექტრონული კომპონენტების გაუმართაობა",
+    "მწარმოებლის მითითებული დახასიათებების შეუსაბამობა"
+  ];
+
+  const notCovered = [
+    "მექანიკური დაზიანებები (დაცემა, დარტყმა)",
+    "არასათანადო გამოყენების შედეგები",
+    "სითხის ზემოქმედება (თუ პროდუქტი არ არის წყალგაძლიერი)",
+    "ბუნებრივი ცვეთა ხანგრძლივი გამოყენების შემდეგ",
+    "თვითნებური შეკეთების მცდელობები",
+    "არაორიგინალური ნაწილებისა და აქსესუარების გამოყენება"
+  ];
+
+  const colorClasses = {
+    blue: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
+    green: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
+    purple: "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
+    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800"
+  };
+
   return (
-    <div className="container px-4 py-8 md:px-6 md:py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">About PetDo</h1>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Link className="hover:text-primary" href="/">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <span>About</span>
+    <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
+      <JsonLd />
+
+      {/* Breadcrumb */}
+      <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
+        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <span className="mx-2">/</span>
+        <span aria-current="page" className="text-foreground font-medium">გარანტია</span>
+      </nav>
+
+      {/* Header */}
+      <div className="mb-16 text-center">
+        <h1 className="mb-4 text-4xl p-1 font-bold bg-gradient-to-r from-primary to-green-600 bg-clip-text text-transparent">
+          გარანტია — წესები და პირობები
+        </h1>
+        <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+          ჩვენ ვიზრუნებთ თქვენი ყიდვის ხარისხზე და ვაძლევთ საგარანტიო მომსახურებას
+          ყველა პროდუქტზე ბრენდის პოლიტიკის შესაბამისად.
+        </p>
+        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-50 dark:bg-green-950/20 px-4 py-2 text-sm text-green-700 dark:text-green-300">
+          <Shield className="h-4 w-4" />
+          ოფიციალური მწარმოებლის გარანტია
         </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="grid md:grid-cols-2 gap-8 items-center mb-16">
-        <div>
-          <h2 className="text-3xl font-bold mb-4">Our Story</h2>
-          <p className="text-muted-foreground mb-4">
-            Founded in 2015, PetDo started with a simple mission: to provide high-quality products
-            for pets and make pet parenting easier and more enjoyable.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            What began as a small local shop has grown into a trusted online destination for pet
-            lovers across the country. Our founder, Sarah Johnson, a passionate dog owner,
-            recognized the need for premium pet products that prioritize both quality and
-            affordability.
-          </p>
-          <p className="text-muted-foreground">
-            Today, we continue to be guided by our love for animals and commitment to exceptional
-            customer service. Every product in our catalog is carefully selected to ensure it meets
-            our high standards for quality, safety, and value.
-          </p>
-        </div>
-        <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden">
-          <Image
-            fill
-            alt="PetDo team with dogs"
-            className="object-cover"
-            src="https://picsum.photos/id/257/200/300"
-          />
-        </div>
-      </div>
-
-      {/* Values Section */}
+      {/* Guarantee Periods */}
       <div className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Our Values</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            At PetDo, our core values guide everything we do, from product selection to customer
-            service.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Heart className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Pet Wellbeing</h3>
-            <p className="text-muted-foreground">
-              We prioritize products that contribute to the health, happiness, and wellbeing of your
-              pets.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Award className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Quality Assurance</h3>
-            <p className="text-muted-foreground">
-              We rigorously test and verify all products to ensure they meet our high standards for
-              quality and safety.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Users className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Customer Focus</h3>
-            <p className="text-muted-foreground">
-              We&apos;re dedicated to providing exceptional service and building lasting
-              relationships with our customers.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Truck className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Reliability</h3>
-            <p className="text-muted-foreground">
-              We deliver on our promises with fast shipping, accurate orders, and responsive
-              customer support.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Section */}
-      <div className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            The passionate people behind PetDo who work tirelessly to bring the best products to you
-            and your pets.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              name: "Sarah Johnson",
-              role: "Founder & CEO",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "Michael Chen",
-              role: "Head of Product",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "Emily Rodriguez",
-              role: "Customer Experience",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "David Kim",
-              role: "Logistics Manager",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-          ].map((member, index) => (
-            <div key={index} className="bg-card rounded-lg border overflow-hidden">
-              <div className="relative h-64 w-full">
-                <Image
-                  fill
-                  alt={member.name}
-                  className="object-cover"
-                  src={member.image || "/placeholder.svg"}
-                />
+        <h2 className="mb-8 text-2xl font-bold text-center">გარანტიის ვადები კატეგორიების მიხედვით</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {guaranteeTypes.map((type, index) => (
+            <div
+              key={index}
+              className={`rounded-xl border p-6 transition-transform hover:scale-105 ${colorClasses[type.color as keyof typeof colorClasses]}`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold">{type.category}</h3>
+                <div className="rounded-full bg-white dark:bg-gray-800 px-3 py-1 text-sm font-medium shadow-sm">
+                  {type.period}
+                </div>
               </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-lg">{member.name}</h3>
-                <p className="text-muted-foreground">{member.role}</p>
-              </div>
+              <ul className="space-y-2">
+                {type.items.map((item, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-sm">
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="bg-primary text-primary-foreground rounded-lg p-8 md:p-12 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">Join the PetDo Family</h2>
-        <p className="max-w-2xl mx-auto mb-6">
-          Discover premium products for your furry friends and join thousands of satisfied pet
-          parents who trust PetDo.
-        </p>
-        <Button color="secondary" size="lg">
-          <Link href="/shop">Shop Now</Link>
-        </Button>
+      {/* Warranty Process */}
+      <div className="mb-16">
+        <h2 className="mb-8 text-2xl font-bold text-center">გარანტიის მოქმედების პროცესი</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {warrantySteps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <div key={index} className="relative">
+                {/* Connection Line */}
+                {index < warrantySteps.length - 1 && (
+                  <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent transform translate-x-2" />
+                )}
+
+                <div className="rounded-xl border bg-card p-6 shadow-sm hover:shadow-md transition-shadow text-center">
+                  <div className="mb-4 inline-flex items-center justify-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      {step.step}
+                    </div>
+                  </div>
+                  <Icon className="h-6 w-6 text-primary mx-auto mb-3" />
+                  <h3 className="mb-2 font-semibold">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* What's Covered vs Not Covered */}
+      <div className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Covered */}
+        <div className="rounded-xl border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20 p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="rounded-xl bg-green-100 dark:bg-green-900/30 p-3">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-green-900 dark:text-green-100">
+              რა მოიცავს გარანტია
+            </h3>
+          </div>
+          <ul className="space-y-3">
+            {covered.map((item, index) => (
+              <li key={index} className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-green-800 dark:text-green-200">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Not Covered */}
+        <div className="rounded-xl border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20 p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="rounded-xl bg-red-100 dark:bg-red-900/30 p-3">
+              <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-red-900 dark:text-red-100">
+              რა არ მოიცავს გარანტია
+            </h3>
+          </div>
+          <ul className="space-y-3">
+            {notCovered.map((item, index) => (
+              <li key={index} className="flex items-start gap-3">
+                <XCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-red-800 dark:text-red-200">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Important Notice */}
+      <div className="mb-16">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20 p-8">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-amber-100 dark:bg-amber-900/30 p-3 flex-shrink-0">
+              <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-amber-900 dark:text-amber-100 mb-3">
+                მნიშვნელოვანი ინფორმაცია
+              </h3>
+              <div className="space-y-3 text-sm text-amber-800 dark:text-amber-200">
+                <p>
+                  • გარანტია ვალიდურია მხოლოდ ოფიციალური ქვითრის არსებობის შემთხვევაში
+                </p>
+                <p>
+                  • გარანტიულ განიხილვამდე დარწმუნდით, რომ პროდუქტი გამოყენებულია მწარმოებლის ინსტრუქციის შესაბამისად
+                </p>
+                <p>
+                  • საგარანტიო მომსახურება მოიცავს უფასო შეკეთებას, შეცვლას ან თანხის დაბრუნებას (პრობლემის ხასიათიდან გამომდინარე)
+                </p>
+                <p>
+                  • გარანტიული პროდუქტები ექვემდებარება ტექნიკურ შემოწმებას ჩვენი სერვისცენტრის მიერ
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Extended Warranty Option */}
+      <div className="mb-16">
+        <div className="rounded-2xl bg-gradient-to-r from-primary/5 to-blue-500/5 border p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">გაფართოებული გარანტია</h2>
+          <p className="max-w-2xl mx-auto text-muted-foreground mb-6">
+            სასურველია გაფართოებული გარანტიის შეძენა?
+            ზოგიერთი პროდუქტისთვის ხელმისაწვდომია დამატებითი დაცვის პაკეტები.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-6 py-3 font-medium hover:bg-primary/90 transition-colors"
+          >
+            <Shield className="h-4 w-4" />
+            გაიგე მეტი
+          </Link>
+        </div>
       </div>
     </div>
   );

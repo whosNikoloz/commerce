@@ -1,170 +1,314 @@
-import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Heart, Award, Users, Truck } from "lucide-react";
-import { Button } from "@heroui/button";
+import { site as siteConfig } from "@/config/site";
+import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { Shield, Database, Users, Clock, Eye, Settings, Lock, Globe } from "lucide-react";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const url = `${base}/info/privacy-policy`;
+  return basePageMetadata({
+    title: "კონფიდენციალურობის პოლიტიკა",
+    description: "როგორ ვაგროვებთ და ვაცნობიერებთ პერსონალურ მონაცემებს: მიზნები, ვადები, მესამე პირები.",
+    url,
+    images: ["/og/privacy-og.jpg"],
+    siteName: siteConfig.name,
+    index: true,
+  });
+}
+
+function JsonLd() {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const breadcrumb = buildBreadcrumbJsonLd([
+    { name: "მთავარი", url: `${base}/` },
+    { name: "ინფო", url: `${base}/info` },
+    { name: "კონფიდენციალურობა", url: `${base}/info/privacy-policy` },
+  ]);
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />;
+}
 
 export default function PrivacyPage() {
+  const dataTypes = [
+    {
+      icon: Users,
+      title: "პერსონალური ინფორმაცია",
+      items: ["სახელი და გვარი", "ელექტრონული ფოსტა", "ტელეფონის ნომერი", "მისამართი"],
+      color: "blue"
+    },
+    {
+      icon: Database,
+      title: "შეკვეთების ინფორმაცია",
+      items: ["შეძენილი პროდუქტები", "გადახდის ისტორია", "მიწოდების დეტალები", "უკუგების შესახებ"],
+      color: "green"
+    },
+    {
+      icon: Globe,
+      title: "ტექნიკური მონაცემები",
+      items: ["IP მისამართი", "ბრაუზერის ინფორმაცია", "მოწყობილობის ტიპი", "ქუქი ფაილები"],
+      color: "purple"
+    },
+    {
+      icon: Eye,
+      title: "ქცევითი მონაცემები",
+      items: ["ვებსაიტზე აქტივობა", "კლიკების მიმდევრობა", "მოძებნული პროდუქტები", "გვერდების ნახვები"],
+      color: "orange"
+    }
+  ];
+
+  const purposes = [
+    {
+      icon: Settings,
+      title: "სერვისის მიწოდება",
+      description: "შეკვეთების დამუშავება, მიწოდება და მომხმარებლის მხარდაჭერა"
+    },
+    {
+      icon: Shield,
+      title: "უსაფრთხოება",
+      description: "თაღლითობის თავიდან აცილება და ანგარიშების დაცვა"
+    },
+    {
+      icon: Database,
+      title: "სერვისის გაუმჯობესება",
+      description: "ანალიტიკა, მომხმარებლის გამოცდილების ოპტიმიზაცია"
+    },
+    {
+      icon: Users,
+      title: "კომუნიკაცია",
+      description: "მარკეტინგული შეთავაზებები და პროდუქტების განახლებები"
+    }
+  ];
+
+  const rights = [
+    "წვდომა - თქვენს მონაცემებზე ინფორმაციის მიღება",
+    "გამოსწორება - არასწორი მონაცემების შეცვლა",
+    "წაშლა - მონაცემების სრული ამოშლა",
+    "შეზღუდვა - დამუშავების შეწყვეტა",
+    "პორტაბილურობა - მონაცემების ექსპორტი",
+    "აღსრულების უარყოფა - ავტომატური გადაწყვეტილების წინააღმდეგ"
+  ];
+
+  const thirdParties = [
+    {
+      name: "გადახდის პროცესორები",
+      purpose: "ბარათით გადახდების დამუშავება",
+      data: "ფინანსური ინფორმაცია"
+    },
+    {
+      name: "კურიერული სერვისები",
+      purpose: "პროდუქტების მიწოდება",
+      data: "სახელი, მისამართი, ტელეფონი"
+    },
+    {
+      name: "ანალიტიკის სერვისები",
+      purpose: "ვებსაიტის გაუმჯობესება",
+      data: "ანონიმური გამოყენების სტატისტიკა"
+    },
+    {
+      name: "ელფოსტის სერვისები",
+      purpose: "ღია კომუნიკაცია",
+      data: "ელფოსტა და საკომუნიკაციო პრეფერენსები"
+    }
+  ];
+
+  const colorClasses = {
+    blue: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
+    green: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
+    purple: "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
+    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800"
+  };
+
   return (
-    <div className="container px-4 py-8 md:px-6 md:py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">About PetDo</h1>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Link className="hover:text-primary" href="/">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <span>About</span>
-        </div>
-      </div>
+    <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
+      <JsonLd />
 
-      {/* Hero Section */}
-      <div className="grid md:grid-cols-2 gap-8 items-center mb-16">
-        <div>
-          <h2 className="text-3xl font-bold mb-4">Our Story</h2>
-          <p className="text-muted-foreground mb-4">
-            Founded in 2015, PetDo started with a simple mission: to provide high-quality products
-            for pets and make pet parenting easier and more enjoyable.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            What began as a small local shop has grown into a trusted online destination for pet
-            lovers across the country. Our founder, Sarah Johnson, a passionate dog owner,
-            recognized the need for premium pet products that prioritize both quality and
-            affordability.
-          </p>
-          <p className="text-muted-foreground">
-            Today, we continue to be guided by our love for animals and commitment to exceptional
-            customer service. Every product in our catalog is carefully selected to ensure it meets
-            our high standards for quality, safety, and value.
-          </p>
-        </div>
-        <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden">
-          <Image
-            fill
-            alt="PetDo team with dogs"
-            className="object-cover"
-            src="https://picsum.photos/id/257/200/300"
-          />
-        </div>
-      </div>
+      {/* Breadcrumb */}
+      <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
+        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <span className="mx-2">/</span>
+        <span aria-current="page" className="text-foreground font-medium">კონფიდენციალურობა</span>
+      </nav>
 
-      {/* Values Section */}
-      <div className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Our Values</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            At PetDo, our core values guide everything we do, from product selection to customer
-            service.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Heart className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Pet Wellbeing</h3>
-            <p className="text-muted-foreground">
-              We prioritize products that contribute to the health, happiness, and wellbeing of your
-              pets.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Award className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Quality Assurance</h3>
-            <p className="text-muted-foreground">
-              We rigorously test and verify all products to ensure they meet our high standards for
-              quality and safety.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Users className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Customer Focus</h3>
-            <p className="text-muted-foreground">
-              We&apos;re dedicated to providing exceptional service and building lasting
-              relationships with our customers.
-            </p>
-          </div>
-
-          <div className="bg-card rounded-lg border p-6 text-center">
-            <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-              <Truck className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Reliability</h3>
-            <p className="text-muted-foreground">
-              We deliver on our promises with fast shipping, accurate orders, and responsive
-              customer support.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Section */}
-      <div className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            The passionate people behind PetDo who work tirelessly to bring the best products to you
-            and your pets.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              name: "Sarah Johnson",
-              role: "Founder & CEO",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "Michael Chen",
-              role: "Head of Product",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "Emily Rodriguez",
-              role: "Customer Experience",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-            {
-              name: "David Kim",
-              role: "Logistics Manager",
-              image: "https://picsum.photos/id/257/200/300",
-            },
-          ].map((member, index) => (
-            <div key={index} className="bg-card rounded-lg border overflow-hidden">
-              <div className="relative h-64 w-full">
-                <Image
-                  fill
-                  alt={member.name}
-                  className="object-cover"
-                  src={member.image || "/placeholder.svg"}
-                />
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-lg">{member.name}</h3>
-                <p className="text-muted-foreground">{member.role}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-primary text-primary-foreground rounded-lg p-8 md:p-12 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">Join the PetDo Family</h2>
-        <p className="max-w-2xl mx-auto mb-6">
-          Discover premium products for your furry friends and join thousands of satisfied pet
-          parents who trust PetDo.
+      {/* Header */}
+      <div className="mb-16 text-center">
+        <h1 className="mb-4 text-4xl p-1 font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+          კონფიდენციალურობის პოლიტიკა
+        </h1>
+        <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+          ჩვენ ვზრუნავთ თქვენი პერსონალური მონაცემების უსაფრთხოებაზე და კონფიდენციალურობაზე.
+          ეს პოლიტიკა აღწერს როგორ ვაგროვებთ, ვიყენებთ და ვიცავთ თქვენს ინფორმაციას.
         </p>
-        <Button color="secondary" size="lg">
-          <Link href="/shop">Shop Now</Link>
-        </Button>
+        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-50 dark:bg-green-950/20 px-4 py-2 text-sm text-green-700 dark:text-green-300">
+          <Lock className="h-4 w-4" />
+          GDPR შესაბამისი დაცვა
+        </div>
+      </div>
+
+      {/* Data Collection Overview */}
+      <div className="mb-16">
+        <h2 className="mb-8 text-2xl font-bold text-center">რა მონაცემებს ვაგროვებთ</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {dataTypes.map((type, index) => {
+            const Icon = type.icon;
+            return (
+              <div
+                key={index}
+                className={`rounded-xl border p-6 transition-transform hover:scale-105 ${colorClasses[type.color as keyof typeof colorClasses]}`}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="rounded-lg bg-white dark:bg-gray-800 p-2 shadow-sm">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold">{type.title}</h3>
+                </div>
+                <ul className="space-y-2">
+                  {type.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-sm">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Usage Purposes */}
+      <div className="mb-16">
+        <h2 className="mb-8 text-2xl font-bold text-center">რატომ ვიყენებთ თქვენს მონაცემებს</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {purposes.map((purpose, index) => {
+            const Icon = purpose.icon;
+            return (
+              <div key={index} className="flex gap-4 rounded-xl border bg-card p-6 shadow-sm">
+                <div className="rounded-lg bg-primary/10 p-3">
+                  <Icon className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="mb-2 font-semibold">{purpose.title}</h3>
+                  <p className="text-sm text-muted-foreground">{purpose.description}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Data Retention */}
+      <div className="mb-16">
+        <div className="rounded-2xl border bg-card p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="rounded-xl bg-primary/10 p-3">
+              <Clock className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-2xl font-semibold">მონაცემების შენახვის ვადები</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary mb-2">3 წელი</div>
+              <div className="text-sm text-muted-foreground">შეკვეთების ისტორია</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">2 წელი</div>
+              <div className="text-sm text-muted-foreground">მარკეტინგული მონაცემები</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">30 დღე</div>
+              <div className="text-sm text-muted-foreground">ტექნიკური ლოგები</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Third Parties */}
+      <div className="mb-16">
+        <h2 className="mb-8 text-2xl font-bold text-center">მესამე პირები</h2>
+        <div className="overflow-hidden rounded-xl border">
+          <div className="bg-muted/50 px-6 py-4">
+            <p className="text-sm text-muted-foreground">
+              ჩვენ ვუზიარებთ მონაცემებს მხოლოდ სანდო პარტნიორებს სერვისის გაუმჯობესების მიზნით
+            </p>
+          </div>
+          <div className="divide-y">
+            {thirdParties.map((party, index) => (
+              <div key={index} className="flex items-center justify-between p-6">
+                <div>
+                  <h3 className="font-medium">{party.name}</h3>
+                  <p className="text-sm text-muted-foreground">{party.purpose}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-medium">{party.data}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* User Rights */}
+      <div className="mb-16">
+        <h2 className="mb-8 text-2xl font-bold text-center">თქვენი უფლებები</h2>
+        <div className="rounded-xl border bg-card p-8">
+          <p className="mb-6 text-muted-foreground">
+            საქართველოს პერსონალურ მონაცემთა დაცვის კანონის შესაბამისად, თქვენ გაქვთ შემდეგი უფლებები:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {rights.map((right, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <div className="mt-1.5 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
+                <span className="text-sm">{right}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Security Measures */}
+      <div className="mb-16">
+        <div className="rounded-2xl bg-gradient-to-r from-primary/5 to-blue-500/5 border p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="rounded-xl bg-primary/10 p-3">
+              <Shield className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-2xl font-semibold">უსაფრთხოების ზომები</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="mb-3 text-2xl">🔒</div>
+              <h3 className="mb-2 font-medium">SSL შიფრაცია</h3>
+              <p className="text-sm text-muted-foreground">ყველა მონაცემი იშიფრება გადაცემისას</p>
+            </div>
+            <div className="text-center">
+              <div className="mb-3 text-2xl">🛡️</div>
+              <h3 className="mb-2 font-medium">უსაფრთხო სერვერები</h3>
+              <p className="text-sm text-muted-foreground">ISO 27001 სერტიფიცირებული ინფრასტრუქტურა</p>
+            </div>
+            <div className="text-center">
+              <div className="mb-3 text-2xl">👥</div>
+              <h3 className="mb-2 font-medium">შეზღუდული წვდომა</h3>
+              <p className="text-sm text-muted-foreground">მონაცემებზე წვდომა მხოლოდ უფლებამოსილ პერსონალს</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact for Privacy */}
+      <div className="rounded-2xl bg-gradient-to-r from-primary to-blue-600 p-8 text-center text-white">
+        <h2 className="text-2xl font-bold mb-4">კითხვები კონფიდენციალურობის შესახებ?</h2>
+        <p className="mb-6 text-primary-foreground/90">
+          გვექნება სიხარული დაგეხმაროთ თქვენი მონაცემების უფლებების განხორციელებაში
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="mailto:privacy@petdo.ge"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 text-white px-6 py-3 font-medium hover:bg-white/20 transition-colors"
+          >
+            privacy@petdo.ge
+          </a>
+        </div>
       </div>
     </div>
   );

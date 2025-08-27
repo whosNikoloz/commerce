@@ -23,7 +23,7 @@ interface UpdateBrandModalProps {
   initialDescription?: string;
   initialOrigin?: string;
   initialName?: string;
-  onSave: (id: string, name: string, description: string, origin: string) => void; // ✅ order aligned with BrandsTable
+  onSave: (id: string, name: string, description: string, origin: string) => void;
 }
 
 export default function UpdateBrandModal({

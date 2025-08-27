@@ -10,6 +10,7 @@ import Image from "next/image";
 
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { FileQuestionIcon } from "lucide-react";
 
 const links = [
   {
@@ -26,6 +27,11 @@ const links = [
     label: "Products",
     href: "/admin/products",
     icon: <IconBox className="h-5 w-5 text-muted-foreground" />,
+  },
+  {
+    label: "Faqs",
+    href: "/admin/faqs",
+    icon: <FileQuestionIcon className="h-5 w-5 text-muted-foreground" />,
   },
   // {
   //   label: "Customers",

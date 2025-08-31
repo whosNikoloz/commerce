@@ -4,16 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import {
-  Facebook,
-  Instagram,
-  Mail,
-  Phone,
-  Twitter,
-  Youtube,
-} from "lucide-react";
+import { Facebook, Instagram, Mail, Phone, Twitter, Youtube } from "lucide-react";
 
 import { SunFilledIcon, MoonFilledIcon } from "./icons";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -89,17 +83,21 @@ export function Footer() {
             </div>
 
             <motion.button
-              type="button"
               aria-label={`Switch to ${nextMode} mode`}
-              title={`გადართე ${nextMode === "dark" ? "მუქ" : "ღია"} თემაზე`}
               className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/80 p-2 text-slate-700 shadow-sm outline-none transition hover:bg-white focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200"
+              title={`გადართე ${nextMode === "dark" ? "მუქ" : "ღია"} თემაზე`}
+              type="button"
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.94 }}
               onClick={toggleTheme}
             >
               <span className="sr-only">Theme toggle</span>
               {mounted ? (
-                resolvedTheme === "dark" ? <SunFilledIcon size={18} /> : <MoonFilledIcon size={18} />
+                resolvedTheme === "dark" ? (
+                  <SunFilledIcon size={18} />
+                ) : (
+                  <MoonFilledIcon size={18} />
+                )
               ) : (
                 <div className="h-[18px] w-[18px]" />
               )}
@@ -110,8 +108,8 @@ export function Footer() {
             {linkGroups.map((group) => (
               <nav key={group.title} aria-labelledby={`footer-${group.title}`}>
                 <h4
-                  id={`footer-${group.title}`}
                   className="mb-3 font-semibold text-slate-900 dark:text-white"
+                  id={`footer-${group.title}`}
                 >
                   {group.title}
                 </h4>
@@ -136,19 +134,19 @@ export function Footer() {
               <address className="not-italic">
                 <ul className="mb-3  text-sm text-slate-600  dark:text-slate-300 flex gap-4">
                   <li className="flex items-center gap-2 w-max">
-                    <Phone size={18} aria-hidden="true" />
+                    <Phone aria-hidden="true" size={18} />
                     <a
-                      href="tel:+995577602399"
                       className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                      href="tel:+995577602399"
                     >
                       577 60 23 99
                     </a>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Mail size={18} aria-hidden="true" />
+                    <Mail aria-hidden="true" size={18} />
                     <a
-                      href="mailto:dsada@gmail.com"
                       className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                      href="mailto:dsada@gmail.com"
                     >
                       dsada@gmail.com
                     </a>
@@ -162,10 +160,10 @@ export function Footer() {
                     {/* გარე ბმულებისთვის <a> + rel */}
                     <a
                       aria-label={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="inline-flex rounded-full p-1 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                      href={href}
+                      rel="noopener noreferrer"
+                      target="_blank"
                     >
                       <Icon size={18} />
                     </a>
@@ -174,24 +172,24 @@ export function Footer() {
               </ul>
 
               <form
+                aria-label="სიახლეებზე გამოწერა"
                 className="flex gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   // TODO: ჩართეთ თქვენი subscribe ლოგიკა ან API ქოლი
                 }}
-                aria-label="სიახლეებზე გამოწერა"
               >
-                <label htmlFor="newsletter-email" className="sr-only">
+                <label className="sr-only" htmlFor="newsletter-email">
                   ელ-ფოსტის მისამართი
                 </label>
                 <Input
-                  id="newsletter-email"
                   required
+                  autoComplete="email"
                   className="bg-white/80 placeholder:text-slate-400 dark:bg-slate-800/70"
+                  id="newsletter-email"
+                  inputMode="email"
                   placeholder="you@example.com"
                   type="email"
-                  inputMode="email"
-                  autoComplete="email"
                 />
                 <Button
                   className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900"

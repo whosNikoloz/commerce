@@ -1,58 +1,76 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { site as siteConfig } from "@/config/site";
-import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
-import { Shield, Calendar, CheckCircle, XCircle, Wrench, Phone, FileText, AlertTriangle } from "lucide-react";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const base = siteConfig.url.replace(/\/$/, "");
-  const url = `${base}/info/guarantee`;
-  return basePageMetadata({
+import Link from "next/link";
+import { Shield, CheckCircle, XCircle, Wrench, Phone, FileText, AlertTriangle } from "lucide-react";
+
+import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import { site as siteConfig } from "@/config/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  return i18nPageMetadata({
     title: "გარანტია — პირობები და წესები",
     description: "გაიგე საგარანტიო მომსახურების წესები: ვადა, გავრცელების არეალი და გამონაკლისები.",
-    url,
+    lang,
+    path: "/info/guarantee",
     images: ["/og/guarantee-og.jpg"],
     siteName: siteConfig.name,
     index: true,
   });
 }
 
-function JsonLd() {
-  const base = siteConfig.url.replace(/\/$/, "");
+function JsonLd({ lang }: { lang: string }) {
+  const home = buildI18nUrls("/", lang).canonical;
+  const info = buildI18nUrls("/info", lang).canonical;
+  const page = buildI18nUrls("/info/guarantee", lang).canonical;
+
   const breadcrumb = buildBreadcrumbJsonLd([
-    { name: "მთავარი", url: `${base}/` },
-    { name: "ინფო", url: `${base}/info` },
-    { name: "გარანტია", url: `${base}/info/guarantee` },
+    { name: "მთავარი", url: home },
+    { name: "ინფო", url: info },
+    { name: "გარანტია", url: page },
   ]);
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />;
+
+  return (
+    <script
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      type="application/ld+json"
+    />
+  );
 }
 
-export default function GuaranteePage() {
+export default async function GuaranteePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+
   const guaranteeTypes = [
     {
       category: "ელექტრონიკა",
       period: "24 თვე",
       color: "blue",
-      items: ["ავტომატური კვებები", "LED განათება", "ტემპერატურის კონტროლერები", "ფილტრაცია"]
+      items: ["ავტომატური კვებები", "LED განათება", "ტემპერატურის კონტროლერები", "ფილტრაცია"],
     },
     {
       category: "აქსესუარები",
       period: "12 თვე",
       color: "green",
-      items: ["ტანკები და აკვარიუმები", "თერმომეტრები", "დეკორაციული ელემენტები"]
+      items: ["ტანკები და აკვარიუმები", "თერმომეტრები", "დეკორაციული ელემენტები"],
     },
     {
       category: "თოვლის პროდუქტები",
       period: "6 თვე",
       color: "purple",
-      items: ["სამაგრი იარაღები", "ნაბიჯი და საწოლები", "სპორტული ინვენტარი"]
+      items: ["სამაგრი იარაღები", "ნაბიჯი და საწოლები", "სპორტული ინვენტარი"],
     },
     {
       category: "საკვები და ვიტამინები",
       period: "ვადის გასვლამდე",
       color: "orange",
-      items: ["მშრალი საკვები", "ვიტამინური დანამატები", "ლაქომები"]
-    }
+      items: ["მშრალი საკვები", "ვიტამინური დანამატები", "ლაქომები"],
+    },
   ];
 
   const warrantySteps = [
@@ -60,26 +78,26 @@ export default function GuaranteePage() {
       step: 1,
       title: "შეინარჩუნეთ ქვითარი",
       description: "დაინახეთ შეძენის ქვითარი და გარანტიული ბარათი",
-      icon: FileText
+      icon: FileText,
     },
     {
       step: 2,
       title: "დაგვიკავშირდით",
       description: "მოგვმართეთ პრობლემის აღწერით და შეძენის დეტალებით",
-      icon: Phone
+      icon: Phone,
     },
     {
       step: 3,
       title: "დიაგნოსტიკა",
       description: "ჩვენი ექსპერტები შეაფასებენ პროდუქტის მდგომარეობას",
-      icon: Wrench
+      icon: Wrench,
     },
     {
       step: 4,
       title: "გადაწყვეტილება",
       description: "შევძლებთ შეცვლას, შეკეთებას ან თანხის დაბრუნებას",
-      icon: CheckCircle
-    }
+      icon: CheckCircle,
+    },
   ];
 
   const covered = [
@@ -88,7 +106,7 @@ export default function GuaranteePage() {
     "არასწორი შეკვრა ან არასრული კომპლექტაცია",
     "მასალის ხარისხის პრობლემები",
     "ელექტრონული კომპონენტების გაუმართაობა",
-    "მწარმოებლის მითითებული დახასიათებების შეუსაბამობა"
+    "მწარმოებლის მითითებული დახასიათებების შეუსაბამობა",
   ];
 
   const notCovered = [
@@ -97,25 +115,29 @@ export default function GuaranteePage() {
     "სითხის ზემოქმედება (თუ პროდუქტი არ არის წყალგაძლიერი)",
     "ბუნებრივი ცვეთა ხანგრძლივი გამოყენების შემდეგ",
     "თვითნებური შეკეთების მცდელობები",
-    "არაორიგინალური ნაწილებისა და აქსესუარების გამოყენება"
+    "არაორიგინალური ნაწილებისა და აქსესუარების გამოყენება",
   ];
 
   const colorClasses = {
     blue: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
     green: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
     purple: "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
-    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800"
+    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800",
   };
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-      <JsonLd />
+      <JsonLd lang={lang} />
 
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
-        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <Link className="hover:text-primary transition-colors" href="/">
+          მთავარი
+        </Link>
         <span className="mx-2">/</span>
-        <span aria-current="page" className="text-foreground font-medium">გარანტია</span>
+        <span aria-current="page" className="text-foreground font-medium">
+          გარანტია
+        </span>
       </nav>
 
       {/* Header */}
@@ -124,8 +146,8 @@ export default function GuaranteePage() {
           გარანტია — წესები და პირობები
         </h1>
         <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-          ჩვენ ვიზრუნებთ თქვენი ყიდვის ხარისხზე და ვაძლევთ საგარანტიო მომსახურებას
-          ყველა პროდუქტზე ბრენდის პოლიტიკის შესაბამისად.
+          ჩვენ ვიზრუნებთ თქვენი ყიდვის ხარისხზე და ვაძლევთ საგარანტიო მომსახურებას ყველა პროდუქტზე
+          ბრენდის პოლიტიკის შესაბამისად.
         </p>
         <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-50 dark:bg-green-950/20 px-4 py-2 text-sm text-green-700 dark:text-green-300">
           <Shield className="h-4 w-4" />
@@ -135,7 +157,9 @@ export default function GuaranteePage() {
 
       {/* Guarantee Periods */}
       <div className="mb-16">
-        <h2 className="mb-8 text-2xl font-bold text-center">გარანტიის ვადები კატეგორიების მიხედვით</h2>
+        <h2 className="mb-8 text-2xl font-bold text-center">
+          გარანტიის ვადები კატეგორიების მიხედვით
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {guaranteeTypes.map((type, index) => (
             <div
@@ -167,6 +191,7 @@ export default function GuaranteePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {warrantySteps.map((step, index) => {
             const Icon = step.icon;
+
             return (
               <div key={index} className="relative">
                 {/* Connection Line */}
@@ -245,14 +270,14 @@ export default function GuaranteePage() {
                 მნიშვნელოვანი ინფორმაცია
               </h3>
               <div className="space-y-3 text-sm text-amber-800 dark:text-amber-200">
+                <p>• გარანტია ვალიდურია მხოლოდ ოფიციალური ქვითრის არსებობის შემთხვევაში</p>
                 <p>
-                  • გარანტია ვალიდურია მხოლოდ ოფიციალური ქვითრის არსებობის შემთხვევაში
+                  • გარანტიულ განიხილვამდე დარწმუნდით, რომ პროდუქტი გამოყენებულია მწარმოებლის
+                  ინსტრუქციის შესაბამისად
                 </p>
                 <p>
-                  • გარანტიულ განიხილვამდე დარწმუნდით, რომ პროდუქტი გამოყენებულია მწარმოებლის ინსტრუქციის შესაბამისად
-                </p>
-                <p>
-                  • საგარანტიო მომსახურება მოიცავს უფასო შეკეთებას, შეცვლას ან თანხის დაბრუნებას (პრობლემის ხასიათიდან გამომდინარე)
+                  • საგარანტიო მომსახურება მოიცავს უფასო შეკეთებას, შეცვლას ან თანხის დაბრუნებას
+                  (პრობლემის ხასიათიდან გამომდინარე)
                 </p>
                 <p>
                   • გარანტიული პროდუქტები ექვემდებარება ტექნიკურ შემოწმებას ჩვენი სერვისცენტრის მიერ
@@ -268,12 +293,12 @@ export default function GuaranteePage() {
         <div className="rounded-2xl bg-gradient-to-r from-primary/5 to-blue-500/5 border p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">გაფართოებული გარანტია</h2>
           <p className="max-w-2xl mx-auto text-muted-foreground mb-6">
-            სასურველია გაფართოებული გარანტიის შეძენა?
-            ზოგიერთი პროდუქტისთვის ხელმისაწვდომია დამატებითი დაცვის პაკეტები.
+            სასურველია გაფართოებული გარანტიის შეძენა? ზოგიერთი პროდუქტისთვის ხელმისაწვდომია
+            დამატებითი დაცვის პაკეტები.
           </p>
           <Link
-            href="/contact"
             className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-6 py-3 font-medium hover:bg-primary/90 transition-colors"
+            href="/contact"
           >
             <Shield className="h-4 w-4" />
             გაიგე მეტი

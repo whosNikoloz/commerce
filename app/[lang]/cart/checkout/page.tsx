@@ -1,13 +1,31 @@
-import React from "react";
+import type { Metadata } from "next";
 
 import CheckoutPage from "@/components/Cart/CheckoutPage/checkout-page";
+import { i18nPageMetadata } from "@/lib/seo";
+import { site as siteConfig } from "@/config/site";
+import { Locale } from "@/i18n.config";
 
-const CheckoutPageRoute = () => {
-  return (
-    <>
-      <CheckoutPage />
-    </>
-  );
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const isKa = lang === "ka";
 
-export default CheckoutPageRoute;
+  return i18nPageMetadata({
+    title: isKa ? "გადახდა" : "Checkout",
+    description: isKa
+      ? "დაამოწმეთ შეკვეთა და დაასრულეთ გადახდა."
+      : "Review your order and complete checkout.",
+    lang,
+    path: "/checkout",
+    images: ["/og/checkout-og.jpg"],
+    siteName: siteConfig.name,
+    index: false,
+  });
+}
+
+export default function CheckoutPageRoute() {
+  return <CheckoutPage />;
+}

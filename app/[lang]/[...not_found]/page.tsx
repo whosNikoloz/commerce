@@ -1,33 +1,49 @@
 "use client";
 
-import { CategoryCarousel } from "@/components/Home/category-carousel";
-import { Link } from "lucide-react";
-import { usePathname } from "next/navigation";
-export default function NotFound() {
-  const pathname = usePathname();
+import NextLink from "next/link";
+import { useParams } from "next/navigation";
+import { Home } from "lucide-react";
 
-  const language = pathname.split("/")[1];
+import { CategoryCarousel } from "@/components/Home/category-carousel";
+
+const copy = {
+  en: {
+    title: "Page Not Found",
+    desc: "The page you’re looking for doesn’t exist or was removed.",
+    home: "Go home",
+  },
+  ka: {
+    title: "გვერდი ვერ მოიძებნა",
+    desc: "საძიებელი გვერდი არ არსებობს ან წაიშალა.",
+    home: "მთავარზე დაბრუნება",
+  },
+};
+
+export default function NotFound() {
+  const { lang } = useParams<{ lang?: "en" | "ka" }>();
+  const t = lang === "ka" ? copy.ka : copy.en;
+  const homeHref = `/${lang ?? "en"}`;
 
   return (
-    <>
-      <div className="flex items-center justify-center mt-28">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-semibold">Page Not Found</h2>
-          <p className="text-muted-foreground">
-            The page you’re looking for doesn’t exist or was removed.
-          </p>
+    <div className="mt-28 flex items-center justify-center px-4">
+      <div className="text-center space-y-6 w-full max-w-6xl">
+        <h2 className="text-2xl font-semibold">{t.title}</h2>
+        <p className="text-muted-foreground">{t.desc}</p>
 
-          <div className="mx-auto max-w-5xl">
-            <CategoryCarousel />
-          </div>
+        <div className="mx-auto max-w-5xl">
+          <CategoryCarousel />
+        </div>
 
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <Link className="px-4 py-2 rounded-md border" href="/">
-              Go home
-            </Link>
-          </div>
+        <div className="mt-2 flex items-center justify-center">
+          <NextLink
+            className="inline-flex items-center gap-2 rounded-md border px-4 py-2 hover:bg-muted transition"
+            href={homeHref}
+          >
+            <Home className="h-4 w-4" />
+            {t.home}
+          </NextLink>
         </div>
       </div>
-    </>
+    </div>
   );
 }

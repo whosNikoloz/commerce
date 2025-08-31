@@ -8,7 +8,12 @@ import UpdateBrandModal from "./update-brad-modal";
 import AddBrandModal from "./add-brand-modal";
 
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,9 +27,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import { BrandModel } from "@/types/brand";
-import { getAllBrands, updateBrand, createBrand, deleteBrand } from "@/app/api/services/brandService";
+import {
+  getAllBrands,
+  updateBrand,
+  createBrand,
+  deleteBrand,
+} from "@/app/api/services/brandService";
 
 interface Props {
   Brands: BrandModel[];
@@ -49,6 +58,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     const fetchBrands = async () => {
       try {
         const response = await getAllBrands();
+
         setBrands(response);
       } catch (err) {
         console.error("Error fetching brands:", err);
@@ -57,6 +67,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
         setLoading(false);
       }
     };
+
     fetchBrands();
   }, []);
 
@@ -68,6 +79,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     origin: string,
   ) => {
     const current = brands.find((p) => p.id === brandId);
+
     if (!current) return;
 
     const prevBrands = brands;
@@ -90,10 +102,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     const newBrand: BrandModel = { id: tempId, name, description, origin };
 
     const prevBrands = brands;
+
     setBrands((prev) => [newBrand, ...prev]);
 
     try {
       const createdId: string = await createBrand(name, origin, description);
+
       setBrands((prev) => prev.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
       toast.success("ბრენდი წარმატებით დაემატა.");
     } catch (err) {
@@ -105,6 +119,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
   const handleDeleteBrand = async (brandId: string) => {
     const prevBrands = brands;
+
     setDeleting(true);
 
     setBrands((prev) => prev.filter((b) => b.id !== brandId));
@@ -165,7 +180,9 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                   <TableRow key={brand.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">
                       {brand.name}
-                      <div className="text-sm text-slate-500 dark:text-slate-400">ID: {brand.id}</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">
+                        ID: {brand.id}
+                      </div>
                     </TableCell>
                     <TableCell>{brand.origin}</TableCell>
                     <TableCell className="max-w-[520px] truncate">{brand.description}</TableCell>
@@ -179,8 +196,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                           onSave={handleUpdateBrand}
                         />
                         <Button
-                          variant="destructive"
                           size="sm"
+                          variant="destructive"
                           onClick={() => {
                             setDeleteTarget(brand);
                             setDeleteOpen(true);
@@ -195,7 +212,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
                 {filteredBrands.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-slate-500">
+                    <TableCell className="text-center py-8 text-slate-500" colSpan={4}>
                       Brand not found.
                     </TableCell>
                   </TableRow>
@@ -216,8 +233,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
             <AlertDialogDescription>
               {deleteTarget ? (
                 <>
-                  You are about to delete <span className="font-semibold">{deleteTarget.name}</span>.
-                  ეს ქმედება შეუქცევადია და ბრენდი ამოიშლება სიიდან.
+                  You are about to delete <span className="font-semibold">{deleteTarget.name}</span>
+                  . ეს ქმედება შეუქცევადია და ბრენდი ამოიშლება სიიდან.
                 </>
               ) : (
                 "ეს ქმედება შეუქცევადია."

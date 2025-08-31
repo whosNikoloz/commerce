@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, CoinsIcon, Grid, List } from "lucide-react";
+import { ChevronDown, Grid, List } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -219,23 +219,24 @@ export default function ProductHeader({
           {facetFilters.map((ff) => {
             const id = ff.facetValueId;
             const name = facetValueLookup?.[id] ?? id;
+
             return (
               <Badge
                 key={`fv-${id}`}
                 className="gap-2 px-2 py-1"
-                variant="secondary"
                 data-facet-id={id}
                 title={`${name} (${id})`}
+                variant="secondary"
               >
                 <div className="flex flex-col leading-tight items-start">
                   <span className="text-sm">{name}</span>
                 </div>
 
                 <button
-                  type="button"
                   aria-label={`Remove facet ${name}`}
-                  onClick={() => _removeFacet(id)}
                   className="ml-1"
+                  type="button"
+                  onClick={() => _removeFacet(id)}
                 >
                   ×
                 </button>

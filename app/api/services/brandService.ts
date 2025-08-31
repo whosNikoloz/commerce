@@ -21,7 +21,7 @@ export async function updateBrand(brand: BrandModel): Promise<string> {
 export async function createBrand(
   name: string,
   origin: string,
-  description: string
+  description: string,
 ): Promise<string> {
   const data = { name, origin, description };
 
@@ -34,13 +34,8 @@ export async function createBrand(
   });
 }
 
-
 export async function deleteBrand(id: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-brand-by-${id}`, {
     method: "PUT",
   });
 }
-
-
-
-

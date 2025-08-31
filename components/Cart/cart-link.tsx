@@ -1,32 +1,34 @@
-import React, { useEffect, useRef, useState } from "react"; // Import useState here
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Badge } from "@heroui/badge";
-import Link from "next/link";
 
 import { ShoppingCartIcon } from "../icons";
 
-import { useCart } from "@/app/context/cartContext";
+import { useCartStore } from "@/app/context/cartContext";
 
 export default function Cartlink() {
-  const { cart } = useCart();
-  const quantityRef = useRef(cart?.length);
-  const [cartChanged, setCartChanged] = useState(false); // State for tracking cart change
+  // pull minimal selectors to avoid unnecessary re-renders
+  const cartLen = useCartStore((s) => s.getCount());
+  const totalQuantity = useCartStore((s) => s.cart.reduce((acc, item) => acc + item.quantity, 0));
+
+  const quantityRef = useRef(cartLen);
+  const [cartChanged, setCartChanged] = useState(false);
 
   useEffect(() => {
-    if (cart?.length && cart.length !== quantityRef.current && cart.length > 0) {
-      quantityRef.current = cart.length;
-      setCartChanged(true); // Trigger animation when cart changes
+    if (cartLen > 0 && cartLen !== quantityRef.current) {
+      quantityRef.current = cartLen;
+      setCartChanged(true);
     }
-  }, [cart?.length]);
-
-  const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
+  }, [cartLen]);
 
   useEffect(() => {
-    if (cartChanged) {
-      const timer = setTimeout(() => setCartChanged(false), 500); // Reset animation after 500ms
+    if (!cartChanged) return;
+    const timer = setTimeout(() => setCartChanged(false), 500);
 
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, [cartChanged]);
 
   return (

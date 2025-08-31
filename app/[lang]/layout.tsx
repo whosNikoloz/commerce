@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
-import { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
+
 import clsx from "clsx";
 
 import { Providers } from "./providers";
@@ -7,8 +8,8 @@ import { LayoutWrapper } from "./LayoutWrapper";
 
 import { site } from "@/config/site";
 import { fontSans } from "@/config/fonts";
-import { Locale } from "@/i18n.config";
-import { getTranslations } from "@/lib/get-dictionary";
+import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
+import { locales, defaultLocale } from "@/i18n.config";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -30,14 +31,27 @@ export default async function RootLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  const dictionary = await getTranslations(lang);
+
+  // guard the lang to one of our supported locales
+  const safeLang = (locales as readonly string[]).includes(lang)
+    ? (lang as (typeof locales)[number])
+    : defaultLocale;
 
   return (
-    <html suppressHydrationWarning lang={lang}>
+    <html suppressHydrationWarning lang={safeLang}>
       <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd()) }}
+          type="application/ld+json"
+        />
+        <script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebsiteJsonLd()) }}
+          type="application/ld+json"
+        />
+
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
           rel="stylesheet"
@@ -45,7 +59,7 @@ export default async function RootLayout({
       </head>
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased bg-brand-muted dark:bg-brand-surfacedark",
+          "min-h-screen bg-brand-muted dark:bg-brand-surfacedark font-sans antialiased",
           fontSans.variable,
         )}
       >

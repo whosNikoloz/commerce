@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { CreditCard } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CreditCard } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function CheckoutForm() {
@@ -44,11 +45,11 @@ export default function CheckoutForm() {
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="john@example.com" />
+            <Input id="email" placeholder="john@example.com" type="email" />
           </div>
           <div>
             <Label htmlFor="phone">Phone Number</Label>
-            <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" />
+            <Input id="phone" placeholder="+1 (555) 123-4567" type="tel" />
           </div>
         </CardContent>
       </Card>
@@ -108,8 +109,8 @@ export default function CheckoutForm() {
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="sameAsShipping"
               checked={sameAsShipping}
+              id="sameAsShipping"
               onCheckedChange={(checked) => setSameAsShipping(checked === true)}
             />
             <Label htmlFor="sameAsShipping">Same as shipping address</Label>
@@ -163,21 +164,21 @@ export default function CheckoutForm() {
         <CardContent className="space-y-4">
           <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
             <div className="flex items-center space-x-2 p-4 border rounded-lg">
-              <RadioGroupItem value="card" id="card" />
-              <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer">
+              <RadioGroupItem id="card" value="card" />
+              <Label className="flex items-center gap-2 cursor-pointer" htmlFor="card">
                 <CreditCard className="h-4 w-4" />
                 Credit/Debit Card
               </Label>
             </div>
             <div className="flex items-center space-x-2 p-4 border rounded-lg">
-              <RadioGroupItem value="paypal" id="paypal" />
-              <Label htmlFor="paypal" className="cursor-pointer">
+              <RadioGroupItem id="paypal" value="paypal" />
+              <Label className="cursor-pointer" htmlFor="paypal">
                 PayPal
               </Label>
             </div>
             <div className="flex items-center space-x-2 p-4 border rounded-lg">
-              <RadioGroupItem value="apple" id="apple" />
-              <Label htmlFor="apple" className="cursor-pointer">
+              <RadioGroupItem id="apple" value="apple" />
+              <Label className="cursor-pointer" htmlFor="apple">
                 Apple Pay
               </Label>
             </div>

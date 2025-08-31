@@ -1,12 +1,24 @@
 // components/admin/product/products-table.tsx
 "use client";
 
+import type { ProductRequestModel } from "@/types/product";
+import type { CategoryModel } from "@/types/category";
+
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
-  Eye, EyeOff, Search, Package, RefreshCw, Grid, List, SortAsc, Filter, Layers,
+  Eye,
+  EyeOff,
+  Search,
+  Package,
+  RefreshCw,
+  Grid,
+  List,
+  SortAsc,
+  Filter,
+  Layers,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,23 +26,36 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { StockStatus, Condition } from "@/types/enums";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import type { ProductRequestModel } from "@/types/product";
-import { deleteProductById, getProductsByCategory, updateProduct } from "@/app/api/services/productService";
-import type { CategoryModel } from "@/types/category";
+import {
+  deleteProductById,
+  getProductsByCategory,
+  updateProduct,
+} from "@/app/api/services/productService";
 
 // ✅ Lazy-load heavy pieces to reduce TTI
 const UpdateProductModal = dynamic(() => import("./update-product-modal"), { ssr: false });
 const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
-const CategoryTree = dynamic(() => import("./category-tree").then(m => m.CategoryTree), { ssr: false });
+const CategoryTree = dynamic(() => import("./category-tree").then((m) => m.CategoryTree), {
+  ssr: false,
+});
 
 type ViewMode = "table" | "grid";
 type SortOption = "name" | "price" | "created" | "status";
@@ -41,10 +66,13 @@ interface ProductsTableProps {
 
 function useDebounced<T>(value: T, delay = 250): T {
   const [v, setV] = useState(value);
+
   useEffect(() => {
     const id = setTimeout(() => setV(value), delay);
+
     return () => clearTimeout(id);
   }, [value, delay]);
+
   return v;
 }
 
@@ -68,6 +96,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isSmall = window.matchMedia("(max-width: 1023px)").matches;
+
       if (isSmall) setViewMode("grid");
     }
   }, []);
@@ -76,6 +105,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   useEffect(() => {
     if (!selectedCategoryId) {
       setProducts([]);
+
       return;
     }
 
@@ -86,6 +116,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       try {
         // ✅ mark the route non-cacheable server side on this API if needed (noStore)
         const response = await getProductsByCategory(selectedCategoryId);
+
         if (!aborted) setProducts(response);
       } catch (err) {
         if (!aborted) {
@@ -98,6 +129,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     };
 
     run();
+
     return () => {
       aborted = true;
     };
@@ -106,7 +138,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const handleDeleteProduct = async (productId: string) => {
     try {
       await deleteProductById(productId);
-      setProducts(prev => prev.filter(p => p.id !== productId));
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
       toast.success("პროდუქტი წარმატებით წაიშალა");
     } catch (err) {
       console.error("Failed to delete product", err);
@@ -119,7 +151,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     description: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
   ) => {
-    const current = products.find(p => p.id === productId);
+    const current = products.find((p) => p.id === productId);
+
     if (!current) return;
 
     const prev = products;
@@ -137,7 +170,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       categoryId: current.categoryId,
     };
 
-    setProducts(prevList => prevList.map(p => (p.id === productId ? patched : p)));
+    setProducts((prevList) => prevList.map((p) => (p.id === productId ? patched : p)));
 
     try {
       await updateProduct(patched);
@@ -150,13 +183,16 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   };
 
   const toggleProductVisibility = async (productId: string) => {
-    const current = products.find(p => p.id === productId);
+    const current = products.find((p) => p.id === productId);
+
     if (!current) return;
 
     const prev = products;
     const nextActive = !current.isActive;
 
-    setProducts(list => list.map(p => (p.id === productId ? { ...p, isActive: nextActive } : p)));
+    setProducts((list) =>
+      list.map((p) => (p.id === productId ? { ...p, isActive: nextActive } : p)),
+    );
 
     const payload: ProductRequestModel = {
       ...current,
@@ -181,20 +217,25 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const filteredAndSortedProducts = useMemo(() => {
     const q = debouncedSearch.toLowerCase().trim();
     const list = products
-      .filter(p => {
+      .filter((p) => {
         const matchesSearch = q ? (p.name ?? "").toLowerCase().includes(q) : true;
         const matchesStatus =
           statusFilter === "all" ||
           (statusFilter === "active" && p.isActive) ||
           (statusFilter === "inactive" && !p.isActive);
+
         return matchesSearch && matchesStatus;
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case "name": return (a.name || "").localeCompare(b.name || "");
-          case "price": return a.price - b.price;
-          case "status": return a.status - b.status;
-          default: return 0;
+          case "name":
+            return (a.name || "").localeCompare(b.name || "");
+          case "price":
+            return a.price - b.price;
+          case "status":
+            return a.status - b.status;
+          default:
+            return 0;
         }
       });
 
@@ -217,7 +258,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         : "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
 
   const getConditionLabel = (condition: Condition) =>
-    condition === Condition.New ? "ახალი" : condition === Condition.Used ? "მეორადი" : "როგორც ახალი";
+    condition === Condition.New
+      ? "ახალი"
+      : condition === Condition.Used
+        ? "მეორადი"
+        : "როგორც ახალი";
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
     <Card className="group hover:shadow-lg transition-all duration-200 bg-brand-surface dark:bg-brand-surfacedark">
@@ -228,9 +273,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               fill
               alt={product.name ?? "Product"}
               className="rounded-lg object-cover"
-              src={product.images?.[0] || "/placeholder.svg"}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={false}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              src={product.images?.[0] || "/placeholder.svg"}
             />
             {product.images && product.images.length > 1 && (
               <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
@@ -264,7 +309,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               {product.discountPrice ? (
                 <div className="flex items-center gap-2">
                   <span className="text-red-500 line-through text-sm">{product.price} ₾</span>
-                  <span className="text-green-600 text-sm font-bold">{product.discountPrice} ₾</span>
+                  <span className="text-green-600 text-sm font-bold">
+                    {product.discountPrice} ₾
+                  </span>
                 </div>
               ) : (
                 <span className="text-green-600 text-sm font-bold">{product.price} ₾</span>
@@ -272,7 +319,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Switch checked={product.isActive} onCheckedChange={() => toggleProductVisibility(product.id)} />
+              <Switch
+                checked={product.isActive}
+                onCheckedChange={() => toggleProductVisibility(product.id)}
+              />
               <UpdateProductModal
                 initialDescription={product.description}
                 initialIsComingSoon={product.isComingSoon}
@@ -322,7 +372,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       <div className="px-4 pb-4">
                         <CategoryTree
                           Categories={initialCategories}
-                          onSelectCategory={(id) => startTransition(() => setSelectedCategoryId(id))}
+                          onSelectCategory={(id) =>
+                            startTransition(() => setSelectedCategoryId(id))
+                          }
                         />
                       </div>
                     </SheetContent>
@@ -343,7 +395,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
                 {/* Filters / sort / view */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <Select value={statusFilter} onValueChange={(v: "all" | "active" | "inactive") => setStatusFilter(v)}>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(v: "all" | "active" | "inactive") => setStatusFilter(v)}
+                  >
                     <SelectTrigger className="w-32">
                       <Filter className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Status" />
@@ -371,20 +426,20 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
                   <div className="flex items-center border rounded-md overflow-hidden">
                     <Button
+                      aria-pressed={viewMode === "table"}
                       className="rounded-none"
                       size="sm"
                       variant={viewMode === "table" ? "default" : "ghost"}
                       onClick={() => setViewMode("table")}
-                      aria-pressed={viewMode === "table"}
                     >
                       <List className="h-4 w-4" />
                     </Button>
                     <Button
+                      aria-pressed={viewMode === "grid"}
                       className="rounded-none"
                       size="sm"
                       variant={viewMode === "grid" ? "default" : "ghost"}
                       onClick={() => setViewMode("grid")}
-                      aria-pressed={viewMode === "grid"}
                     >
                       <Grid className="h-4 w-4" />
                     </Button>
@@ -396,7 +451,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Package className="h-4 w-4" />
                   <span>
-                    {isPending ? "Updating..." : `${filteredAndSortedProducts.length} products found`}
+                    {isPending
+                      ? "Updating..."
+                      : `${filteredAndSortedProducts.length} products found`}
                   </span>
                 </div>
               )}
@@ -411,14 +468,17 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       Select a Category
                     </h3>
                     <p className="text-slate-500 dark:text-slate-500 max-w-sm">
-                      Choose a category from the sidebar (or button on mobile) to view and manage products.
+                      Choose a category from the sidebar (or button on mobile) to view and manage
+                      products.
                     </p>
                   </div>
                 ) : loading ? (
                   <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
                       <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
-                      <span className="text-slate-600 dark:text-slate-400">Loading products...</span>
+                      <span className="text-slate-600 dark:text-slate-400">
+                        Loading products...
+                      </span>
                     </div>
                   </div>
                 ) : error ? (
@@ -435,13 +495,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       No Products Found
                     </h3>
                     <p className="text-slate-500 dark:text-slate-500 max-w-sm">
-                      {debouncedSearch ? "Try adjusting your search terms" : "No products available in this category"}
+                      {debouncedSearch
+                        ? "Try adjusting your search terms"
+                        : "No products available in this category"}
                     </p>
                   </div>
                 ) : viewMode === "grid" ? (
                   <div className="p-4 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4">
-                      {filteredAndSortedProducts.map(p => (
+                      {filteredAndSortedProducts.map((p) => (
                         <ProductCard key={p.id} product={p} />
                       ))}
                     </div>
@@ -461,16 +523,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredAndSortedProducts.map(product => (
-                          <TableRow key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        {filteredAndSortedProducts.map((product) => (
+                          <TableRow
+                            key={product.id}
+                            className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          >
                             <TableCell>
                               <div className="relative w-16 h-16">
                                 <Image
                                   alt={product.name ?? "Product"}
                                   className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                                   height={64}
-                                  width={64}
                                   src={product.images?.[0] || "/placeholder.svg"}
+                                  width={64}
                                 />
                                 {product.images && product.images.length > 1 && (
                                   <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
@@ -488,10 +553,16 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   ID: {product.id}
                                 </div>
                                 <div className="mt-2 flex flex-wrap gap-1 md:hidden">
-                                  <Badge className={getStatusClass(product.status)} variant="default">
+                                  <Badge
+                                    className={getStatusClass(product.status)}
+                                    variant="default"
+                                  >
                                     {getStatusLabel(product.status)}
                                   </Badge>
-                                  <Badge className={getConditionClass(product.condition)} variant="default">
+                                  <Badge
+                                    className={getConditionClass(product.condition)}
+                                    variant="default"
+                                  >
                                     {getConditionLabel(product.condition)}
                                   </Badge>
                                 </div>
@@ -500,8 +571,12 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             <TableCell className="whitespace-nowrap">
                               {product.discountPrice ? (
                                 <div className="space-y-1">
-                                  <div className="text-red-500 line-through text-sm">{product.price} ₾</div>
-                                  <div className="text-green-600 font-bold">{product.discountPrice} ₾</div>
+                                  <div className="text-red-500 line-through text-sm">
+                                    {product.price} ₾
+                                  </div>
+                                  <div className="text-green-600 font-bold">
+                                    {product.discountPrice} ₾
+                                  </div>
                                 </div>
                               ) : (
                                 <div className="text-green-600 font-bold">{product.price} ₾</div>
@@ -513,7 +588,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                               </Badge>
                             </TableCell>
                             <TableCell className="hidden lg:table-cell">
-                              <Badge className={getConditionClass(product.condition)} variant="default">
+                              <Badge
+                                className={getConditionClass(product.condition)}
+                                variant="default"
+                              >
                                 {getConditionLabel(product.condition)}
                               </Badge>
                             </TableCell>

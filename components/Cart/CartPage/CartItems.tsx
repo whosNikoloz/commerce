@@ -1,14 +1,13 @@
 "use client";
 
-import type { CartItem as CartItemType } from "@/app/context/cartContext";
-
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/app/context/cartContext";
+import { useCartStore } from "@/app/context/cartContext";
+import { CartItemType } from "@/types/cart";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
@@ -17,7 +16,7 @@ const toNumber = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0));
 const percent = (o: number, c: number) => Math.max(0, Math.round(((o - c) / o) * 100));
 const monthly = (price: number, months = 24) => Math.ceil(price / months);
 
-// 🔹 პატარა ჰელპერი specs-ის ლამაზი სტრიქონისთვის
+// პატარა ჰელპერი specs-ის ლამაზი სტრიქონისთვის
 function formatSpecs(facets?: Record<string, string>) {
   if (!facets) return "";
   const entries = Object.entries(facets);
@@ -28,7 +27,11 @@ function formatSpecs(facets?: Record<string, string>) {
 }
 
 export default function CartItems() {
-  const { cart, updateCartItem, removeFromCart } = useCart();
+  // ✅ Zustand selectors
+  const cart = useCartStore((s) => s.cart);
+  const updateCartItem = useCartStore((s) => s.updateCartItem);
+  const removeFromCart = useCartStore((s) => s.removeFromCart);
+
   const items = cart as Array<CartItemType & { originalPrice?: number }>;
 
   return (
@@ -39,7 +42,7 @@ export default function CartItems() {
         const hasDiscount = !!originalPrice && originalPrice > price;
         const discount = hasDiscount ? percent(originalPrice!, price) : 0;
         const quantity = toNumber(item.quantity);
-        const specsLine = formatSpecs(item.selectedFacets); // <- აქ
+        const specsLine = formatSpecs(item.selectedFacets);
 
         return (
           <Card
@@ -53,6 +56,7 @@ export default function CartItems() {
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md overflow-hidden bg-muted">
                     <Image
                       fill
+                      priority
                       alt={item.name}
                       className="object-cover"
                       sizes="96px"
@@ -66,7 +70,7 @@ export default function CartItems() {
                     {item.name}
                   </h3>
 
-                  {/* 🔹 არჩეული სპეციფიკაციები — როგორც ბეჟები */}
+                  {/* არჩეული სპეციფიკაციები — როგორც ბეჟები */}
                   {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {Object.entries(item.selectedFacets).map(([k, v]) => (
@@ -77,12 +81,7 @@ export default function CartItems() {
                     </div>
                   )}
 
-                  {/* თვეში გადასახადი */}
-                  {/* <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted px-2.5 py-1 text-[11px] sm:text-xs text-muted-foreground">
-                    თვეში: <span className="text-foreground font-medium">{monthly(price)}₾</span>-დან
-                  </div> */}
-
-                  {/* მობილურის ფასი */}
+                  {/* მობილურის ფასი (mobile) */}
                   <div className="mt-2 md:hidden">
                     <div className="flex items-center gap-2">
                       <span className="text-base font-semibold">{formatPrice(price)}</span>
@@ -108,11 +107,11 @@ export default function CartItems() {
                     aria-label="Decrease"
                     className="h-9 w-10 sm:w-9 p-0"
                     disabled={quantity <= 1}
-                    onClick={() =>
-                      updateCartItem(item.id, Math.max(1, quantity - 1), item.variantKey)
-                    } // 🔹 variantKey
                     size="sm"
                     variant="ghost"
+                    onClick={() =>
+                      updateCartItem(item.id, Math.max(1, quantity - 1), item.variantKey)
+                    }
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
@@ -123,8 +122,8 @@ export default function CartItems() {
                     aria-label="Increase"
                     className="h-9 w-10 sm:w-9 p-0"
                     size="sm"
-                    onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)} // 🔹 variantKey
                     variant="ghost"
+                    onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -154,7 +153,7 @@ export default function CartItems() {
                     className="text-muted-foreground hover:text-destructive"
                     size="icon"
                     variant="ghost"
-                    onClick={() => removeFromCart(item.id, item.variantKey)} // 🔹 variantKey
+                    onClick={() => removeFromCart(item.id, item.variantKey)}
                   >
                     <Trash2 className="h-5 w-5" />
                   </Button>

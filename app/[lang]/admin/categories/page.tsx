@@ -1,36 +1,44 @@
-import { Metadata } from "next";
+// app/[lang]/admin/categories/page.tsx
+import type { Metadata } from "next";
+import type { CategoryModel } from "@/types/category";
+import type { Locale } from "@/i18n.config";
+
+import { cache } from "react";
 
 import { CategoriesTable } from "@/components/admin/categories-table";
 import { getAllCategories } from "@/app/api/services/categoryService";
-import { basePageMetadata } from "@/lib/seo";
+import { i18nPageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
-import { CategoryModel } from "@/types/category";
-import { cache } from "react";
-
 
 const getCategoriesCached = cache(async (): Promise<CategoryModel[]> => {
   return await getAllCategories();
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const url = `${siteConfig.url}/admin/categories`;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
 
-  return basePageMetadata({
+  return i18nPageMetadata({
     title: "Admin • Categories",
     description: "Manage all categories in the admin dashboard.",
-    url,
-    index: false,
+    lang,
+    path: "/admin/categories",
+    images: [siteConfig.ogImage],
     siteName: siteConfig.name,
+    index: false, // keep admin pages out of search
   });
 }
 
 export default async function CategoriesPage() {
-  const categories: CategoryModel[] = await getCategoriesCached();
+  const categories = await getCategoriesCached();
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">
+        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light">
           Categories
         </h1>
       </div>

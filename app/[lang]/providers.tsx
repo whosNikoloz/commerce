@@ -7,12 +7,11 @@ import { HeroUIProvider } from "@heroui/system";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "sonner";
+import NextTopLoader from "nextjs-toploader";
 
 import { TenantProvider } from "../context/tenantContext";
 
-import { CartProvider } from "@/app/context/cartContext";
 import { TranslationProvider } from "@/hooks/useTranslation";
-import NextTopLoader from 'nextjs-toploader';
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -35,20 +34,20 @@ export function Providers({ children, themeProps }: ProvidersProps) {
           <TranslationProvider>
             <NextTopLoader
               color="#2299DD"
-              initialPosition={0.08}
-              crawlSpeed={200}
-              height={3}
               crawl={true}
-              showSpinner={true}
+              crawlSpeed={200}
               easing="ease"
-              speed={200}
+              height={3}
+              initialPosition={0.08}
               shadow="0 0 10px #2299DD,0 0 5px #2299DD"
+              showAtBottom={false}
+              showSpinner={true}
+              speed={200}
               template='<div class="bar" role="bar"><div class="peg"></div></div> 
                   <div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
               zIndex={1600}
-              showAtBottom={false}
             />
-            <CartProvider>{children}</CartProvider>
+            {children}
             <Toaster richColors position="bottom-right" />
           </TranslationProvider>
         </NextThemesProvider>

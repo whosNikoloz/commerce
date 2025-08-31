@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -75,10 +76,12 @@ export function Liquidated() {
                 <Badge className="absolute top-3 left-3 z-10 bg-primary dark:bg-brand-primarydark text-white">
                   Liquided
                 </Badge>
-                <img
-                  alt={p.name ?? "Product"}
-                  className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
-                  src={p.images?.[0] || "/placeholder.svg"}
+                <Image
+                  alt={p?.name ?? "Product"}
+                  className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
+                  height={800}
+                  src={p?.images?.[0] ?? "/placeholder.svg"}
+                  width={800}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
               </div>

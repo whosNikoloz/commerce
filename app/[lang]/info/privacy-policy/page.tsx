@@ -1,81 +1,105 @@
 import type { Metadata } from "next";
+
 import Link from "next/link";
-import { site as siteConfig } from "@/config/site";
-import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { Shield, Database, Users, Clock, Eye, Settings, Lock, Globe } from "lucide-react";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const base = siteConfig.url.replace(/\/$/, "");
-  const url = `${base}/info/privacy-policy`;
-  return basePageMetadata({
+import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import { site as siteConfig } from "@/config/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  return i18nPageMetadata({
     title: "კონფიდენციალურობის პოლიტიკა",
-    description: "როგორ ვაგროვებთ და ვაცნობიერებთ პერსონალურ მონაცემებს: მიზნები, ვადები, მესამე პირები.",
-    url,
+    description:
+      "როგორ ვაგროვებთ და ვაცნობიერებთ პერსონალურ მონაცემებს: მიზნები, ვადები, მესამე პირები.",
+    lang,
+    path: "/info/privacy-policy",
     images: ["/og/privacy-og.jpg"],
     siteName: siteConfig.name,
     index: true,
   });
 }
 
-function JsonLd() {
-  const base = siteConfig.url.replace(/\/$/, "");
+function JsonLd({ lang }: { lang: string }) {
+  const home = buildI18nUrls("/", lang).canonical;
+  const info = buildI18nUrls("/info", lang).canonical;
+  const page = buildI18nUrls("/info/privacy-policy", lang).canonical;
+
   const breadcrumb = buildBreadcrumbJsonLd([
-    { name: "მთავარი", url: `${base}/` },
-    { name: "ინფო", url: `${base}/info` },
-    { name: "კონფიდენციალურობა", url: `${base}/info/privacy-policy` },
+    { name: "მთავარი", url: home },
+    { name: "ინფო", url: info },
+    { name: "კონფიდენციალურობა", url: page },
   ]);
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />;
+
+  return (
+    <script
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      type="application/ld+json"
+    />
+  );
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+
   const dataTypes = [
     {
       icon: Users,
       title: "პერსონალური ინფორმაცია",
       items: ["სახელი და გვარი", "ელექტრონული ფოსტა", "ტელეფონის ნომერი", "მისამართი"],
-      color: "blue"
+      color: "blue",
     },
     {
       icon: Database,
       title: "შეკვეთების ინფორმაცია",
       items: ["შეძენილი პროდუქტები", "გადახდის ისტორია", "მიწოდების დეტალები", "უკუგების შესახებ"],
-      color: "green"
+      color: "green",
     },
     {
       icon: Globe,
       title: "ტექნიკური მონაცემები",
       items: ["IP მისამართი", "ბრაუზერის ინფორმაცია", "მოწყობილობის ტიპი", "ქუქი ფაილები"],
-      color: "purple"
+      color: "purple",
     },
     {
       icon: Eye,
       title: "ქცევითი მონაცემები",
-      items: ["ვებსაიტზე აქტივობა", "კლიკების მიმდევრობა", "მოძებნული პროდუქტები", "გვერდების ნახვები"],
-      color: "orange"
-    }
+      items: [
+        "ვებსაიტზე აქტივობა",
+        "კლიკების მიმდევრობა",
+        "მოძებნული პროდუქტები",
+        "გვერდების ნახვები",
+      ],
+      color: "orange",
+    },
   ];
 
   const purposes = [
     {
       icon: Settings,
       title: "სერვისის მიწოდება",
-      description: "შეკვეთების დამუშავება, მიწოდება და მომხმარებლის მხარდაჭერა"
+      description: "შეკვეთების დამუშავება, მიწოდება და მომხმარებლის მხარდაჭერა",
     },
     {
       icon: Shield,
       title: "უსაფრთხოება",
-      description: "თაღლითობის თავიდან აცილება და ანგარიშების დაცვა"
+      description: "თაღლითობის თავიდან აცილება და ანგარიშების დაცვა",
     },
     {
       icon: Database,
       title: "სერვისის გაუმჯობესება",
-      description: "ანალიტიკა, მომხმარებლის გამოცდილების ოპტიმიზაცია"
+      description: "ანალიტიკა, მომხმარებლის გამოცდილების ოპტიმიზაცია",
     },
     {
       icon: Users,
       title: "კომუნიკაცია",
-      description: "მარკეტინგული შეთავაზებები და პროდუქტების განახლებები"
-    }
+      description: "მარკეტინგული შეთავაზებები და პროდუქტების განახლებები",
+    },
   ];
 
   const rights = [
@@ -84,48 +108,52 @@ export default function PrivacyPage() {
     "წაშლა - მონაცემების სრული ამოშლა",
     "შეზღუდვა - დამუშავების შეწყვეტა",
     "პორტაბილურობა - მონაცემების ექსპორტი",
-    "აღსრულების უარყოფა - ავტომატური გადაწყვეტილების წინააღმდეგ"
+    "აღსრულების უარყოფა - ავტომატური გადაწყვეტილების წინააღმდეგ",
   ];
 
   const thirdParties = [
     {
       name: "გადახდის პროცესორები",
       purpose: "ბარათით გადახდების დამუშავება",
-      data: "ფინანსური ინფორმაცია"
+      data: "ფინანსური ინფორმაცია",
     },
     {
       name: "კურიერული სერვისები",
       purpose: "პროდუქტების მიწოდება",
-      data: "სახელი, მისამართი, ტელეფონი"
+      data: "სახელი, მისამართი, ტელეფონი",
     },
     {
       name: "ანალიტიკის სერვისები",
       purpose: "ვებსაიტის გაუმჯობესება",
-      data: "ანონიმური გამოყენების სტატისტიკა"
+      data: "ანონიმური გამოყენების სტატისტიკა",
     },
     {
       name: "ელფოსტის სერვისები",
       purpose: "ღია კომუნიკაცია",
-      data: "ელფოსტა და საკომუნიკაციო პრეფერენსები"
-    }
+      data: "ელფოსტა და საკომუნიკაციო პრეფერენსები",
+    },
   ];
 
   const colorClasses = {
     blue: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
     green: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
     purple: "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
-    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800"
+    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800",
   };
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-      <JsonLd />
+      <JsonLd lang={lang} />
 
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
-        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <Link className="hover:text-primary transition-colors" href="/">
+          მთავარი
+        </Link>
         <span className="mx-2">/</span>
-        <span aria-current="page" className="text-foreground font-medium">კონფიდენციალურობა</span>
+        <span aria-current="page" className="text-foreground font-medium">
+          კონფიდენციალურობა
+        </span>
       </nav>
 
       {/* Header */}
@@ -134,8 +162,8 @@ export default function PrivacyPage() {
           კონფიდენციალურობის პოლიტიკა
         </h1>
         <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-          ჩვენ ვზრუნავთ თქვენი პერსონალური მონაცემების უსაფრთხოებაზე და კონფიდენციალურობაზე.
-          ეს პოლიტიკა აღწერს როგორ ვაგროვებთ, ვიყენებთ და ვიცავთ თქვენს ინფორმაციას.
+          ჩვენ ვზრუნავთ თქვენი პერსონალური მონაცემების უსაფრთხოებაზე და კონფიდენციალურობაზე. ეს
+          პოლიტიკა აღწერს როგორ ვაგროვებთ, ვიყენებთ და ვიცავთ თქვენს ინფორმაციას.
         </p>
         <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-50 dark:bg-green-950/20 px-4 py-2 text-sm text-green-700 dark:text-green-300">
           <Lock className="h-4 w-4" />
@@ -149,6 +177,7 @@ export default function PrivacyPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {dataTypes.map((type, index) => {
             const Icon = type.icon;
+
             return (
               <div
                 key={index}
@@ -180,6 +209,7 @@ export default function PrivacyPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {purposes.map((purpose, index) => {
             const Icon = purpose.icon;
+
             return (
               <div key={index} className="flex gap-4 rounded-xl border bg-card p-6 shadow-sm">
                 <div className="rounded-lg bg-primary/10 p-3">
@@ -252,7 +282,8 @@ export default function PrivacyPage() {
         <h2 className="mb-8 text-2xl font-bold text-center">თქვენი უფლებები</h2>
         <div className="rounded-xl border bg-card p-8">
           <p className="mb-6 text-muted-foreground">
-            საქართველოს პერსონალურ მონაცემთა დაცვის კანონის შესაბამისად, თქვენ გაქვთ შემდეგი უფლებები:
+            საქართველოს პერსონალურ მონაცემთა დაცვის კანონის შესაბამისად, თქვენ გაქვთ შემდეგი
+            უფლებები:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {rights.map((right, index) => (
@@ -284,12 +315,16 @@ export default function PrivacyPage() {
             <div className="text-center">
               <div className="mb-3 text-2xl">🛡️</div>
               <h3 className="mb-2 font-medium">უსაფრთხო სერვერები</h3>
-              <p className="text-sm text-muted-foreground">ISO 27001 სერტიფიცირებული ინფრასტრუქტურა</p>
+              <p className="text-sm text-muted-foreground">
+                ISO 27001 სერტიფიცირებული ინფრასტრუქტურა
+              </p>
             </div>
             <div className="text-center">
               <div className="mb-3 text-2xl">👥</div>
               <h3 className="mb-2 font-medium">შეზღუდული წვდომა</h3>
-              <p className="text-sm text-muted-foreground">მონაცემებზე წვდომა მხოლოდ უფლებამოსილ პერსონალს</p>
+              <p className="text-sm text-muted-foreground">
+                მონაცემებზე წვდომა მხოლოდ უფლებამოსილ პერსონალს
+              </p>
             </div>
           </div>
         </div>
@@ -303,8 +338,8 @@ export default function PrivacyPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="mailto:privacy@petdo.ge"
             className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 text-white px-6 py-3 font-medium hover:bg-white/20 transition-colors"
+            href="mailto:privacy@petdo.ge"
           >
             privacy@petdo.ge
           </a>

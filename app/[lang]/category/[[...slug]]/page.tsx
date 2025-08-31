@@ -1,4 +1,3 @@
-// app/[lang]/category/[...slug]/page.tsx
 import type { Metadata } from "next";
 import type { FilterModel } from "@/types/filter";
 import type { Condition, StockStatus } from "@/types/enums";
@@ -7,10 +6,11 @@ import Script from "next/script";
 import { notFound } from "next/navigation";
 
 import {
-  basePageMetadata,
+  i18nPageMetadata,
   buildBreadcrumbJsonLd,
   buildItemListJsonLd,
   toAbsoluteImages,
+  buildI18nUrls,
 } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
 import SearchPage from "@/components/Categories/SearchPage/search-page";
@@ -79,7 +79,7 @@ function buildFilter(
   };
 }
 
-// ========== Metadata ==========
+/* ========== Metadata (i18n-aware) ========== */
 export async function generateMetadata({
   params,
   searchParams,
@@ -96,6 +96,7 @@ export async function generateMetadata({
   let title = "Category";
   let description = "Browse categories";
   let images: string[] | undefined;
+  let index = true;
 
   if (categoryId) {
     const category = await getCategoryById(categoryId).catch(() => null);
@@ -105,43 +106,36 @@ export async function generateMetadata({
       description = query
         ? `Products in ${category.name} matching "${query}".`
         : (category.description ?? `Shop ${category.name} products.`);
-      //if (category.image) images = toAbsoluteImages([category.image]);
+      if ((category as any)?.image) images = [(category as any).image as string];
+      // index category pages normally; but avoid indexing if it's a search view
+      index = !query;
     } else {
       title = "Category not found";
       description = `The category ${categoryId} could not be found or was removed.`;
+      index = false;
     }
   } else if (query) {
-    title = `Search results for "${query}"`;
+    //title = `Search results for "${query}"`;
+    title = query;
     description = `Browse products matching "${query}".`;
+    // generally better to noindex pure search pages
+    index = false;
   }
 
-  const base = siteConfig.url.replace(/\/$/, "");
   const path = categoryId ? `/category/${slug.join("/")}` : "/category";
-  const url = `${base}/${lang}${path}${query ? `?q=${encodeURIComponent(query)}` : ""}`;
 
-  const meta = basePageMetadata({
+  return i18nPageMetadata({
     title,
     description,
-    url,
-    images,
+    lang,
+    path, // canonical/alternates built from this path (no query)
+    images, // i18nPageMetadata will absolutize
     siteName: siteConfig.name,
+    index,
   });
-
-  return {
-    ...meta,
-    alternates: { canonical: url },
-    robots: { index: title !== "Category not found", follow: true },
-    openGraph: { ...meta.openGraph, url, siteName: siteConfig.name },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: images?.[0],
-    },
-  };
 }
 
-// ========== Page ==========
+/* ========== Page ========== */
 export default async function CategoryIndex({
   params,
   searchParams,
@@ -152,16 +146,18 @@ export default async function CategoryIndex({
   const { lang, slug = [] } = await params;
   const sp = await searchParams;
 
-  const base = siteConfig.url.replace(/\/$/, "");
   const q = (sp.q ?? "").trim();
   const categoryId = slug[0] ?? null;
 
-  // Search-only landing
+  // --- Search-only landing (no category) ---
   if (!categoryId) {
+    const home = buildI18nUrls("/", lang).canonical;
+    const catalog = buildI18nUrls("/category", lang).canonical;
+
     const crumbsJsonLd = buildBreadcrumbJsonLd([
-      { name: "Home", url: `${base}/${lang}` },
-      { name: "Catalog", url: `${base}/${lang}/category` },
-      { name: q ? `Search: ${q}` : "Search", url: `${base}/${lang}/category` },
+      { name: "Home", url: home },
+      { name: "Catalog", url: catalog },
+      { name: q ? `Search: ${q}` : "Search", url: catalog },
     ]);
 
     return (
@@ -213,22 +209,34 @@ export default async function CategoryIndex({
     sortBy,
   }).catch(() => ({ items: [], totalCount: 0 }));
 
-  // JSON-LD
-  const currentUrl = `${base}/${lang}/category/${slug.join("/")}`;
+  // JSON-LD (localized URLs)
+  const home = buildI18nUrls("/", lang).canonical;
+  const catalog = buildI18nUrls("/category", lang).canonical;
+  const current = buildI18nUrls(`/category/${slug.join("/")}`, lang).canonical;
+
   const crumbsJsonLd = buildBreadcrumbJsonLd([
-    { name: "Home", url: `${base}/${lang}` },
-    { name: "Catalog", url: `${base}/${lang}/category` },
-    { name: parent.name ?? "Category", url: currentUrl },
+    { name: "Home", url: home },
+    { name: "Catalog", url: catalog },
+    { name: parent.name ?? "Category", url: current },
   ]);
 
   const listJsonLd =
     (initial.items?.length ?? 0) > 0
       ? buildItemListJsonLd(
-          (initial.items ?? []).map((p: any) => ({
-            name: p.name,
-            url: `${base}/${lang}/product/${p.id}`,
-            image: toAbsoluteImages([typeof p.image === "string" ? p.image : p?.images?.[0]])[0],
-          })),
+          (initial.items ?? []).map((p: any) => {
+            const img =
+              typeof p.image === "string"
+                ? p.image
+                : Array.isArray(p.images) && p.images.length > 0
+                  ? p.images[0]
+                  : siteConfig.ogImage;
+
+            return {
+              name: p.name,
+              url: buildI18nUrls(`/product/${p.id}`, lang).canonical,
+              image: toAbsoluteImages([img])[0],
+            };
+          }),
         )
       : undefined;
 

@@ -1,25 +1,35 @@
-// app/admin/products/page.tsx
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { cache } from "react";
+import type { CategoryModel } from "@/types/category";
+import type { Locale } from "@/i18n.config";
+
+import { Suspense, cache } from "react";
 
 import { ProductsTable } from "@/components/admin/product/products-table";
-import { basePageMetadata } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 import { getAllCategories } from "@/app/api/services/categoryService";
-import type { CategoryModel } from "@/types/category";
+import { i18nPageMetadata } from "@/lib/seo";
+import { site as siteConfig } from "@/config/site";
 
 const getCategoriesCached = cache(async (): Promise<CategoryModel[]> => {
   return await getAllCategories();
 });
 
-export const metadata: Metadata = basePageMetadata({
-  title: "Admin • Products",
-  description: "Manage all products in the admin dashboard.",
-  url: `${siteConfig.url}/admin/products`,
-  index: false,
-  siteName: siteConfig.name,
-});
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  return i18nPageMetadata({
+    title: "Admin • Products",
+    description: "Manage all products in the admin dashboard.",
+    lang,
+    path: "/admin/products",
+    images: [siteConfig.ogImage],
+    siteName: siteConfig.name,
+    index: false,
+  });
+}
 
 export default async function ProductsPage() {
   const categories = await getCategoriesCached();

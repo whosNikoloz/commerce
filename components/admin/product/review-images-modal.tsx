@@ -51,8 +51,8 @@ export default function ReviewImagesModal({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
-  const EMPTY_FILES = useMemo<File[]>(() => [], []);
-  const resolvedDefaultFiles = defaultFiles ?? EMPTY_FILES;
+  //const EMPTY_FILES = useMemo<File[]>(() => [], []);
+  //const resolvedDefaultFiles = defaultFiles ?? EMPTY_FILES;
 
   //const { toast } = useToast()
   const [isDragging, setIsDragging] = useState(false);

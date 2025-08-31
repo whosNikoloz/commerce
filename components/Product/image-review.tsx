@@ -180,6 +180,9 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
                       fill
                       alt={`${productName} view ${index + 1}`}
                       className="object-contain"
+                      loading={index === 0 ? undefined : "eager"}
+                      priority={index === 0}
+                      sizes="100vw"
                       src={image || placeholder}
                       onClick={handleProductClick}
                     />
@@ -290,6 +293,9 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
                       fill
                       alt={`${productName} view ${index + 1}`}
                       className="object-contain"
+                      loading={index === 0 ? undefined : "eager"}
+                      priority={index === 0}
+                      sizes="(min-width: 1024px) 600px, 100vw"
                       src={image || placeholder}
                       onClick={handleProductClick}
                     />

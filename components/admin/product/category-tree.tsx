@@ -85,16 +85,17 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
   const renderTree = (cats: CategoryModel[], parentId: string | null = null, level: number = 0) => {
     const visibleCats = searchTerm
       ? cats.filter(
-        (c) => c.parentId === parentId && filteredCategories.some((fc) => fc.id === c.id),
-      )
+          (c) => c.parentId === parentId && filteredCategories.some((fc) => fc.id === c.id),
+        )
       : cats.filter((c) => c.parentId === parentId);
 
     if (visibleCats.length === 0) return null;
 
     return (
       <div
-        className={`space-y-1 ${level > 0 ? "ml-4 pl-3 border-l border-slate-200 dark:border-slate-700" : ""
-          }`}
+        className={`space-y-1 ${
+          level > 0 ? "ml-4 pl-3 border-l border-slate-200 dark:border-slate-700" : ""
+        }`}
       >
         {visibleCats.map((cat) => {
           const isExpanded = expanded.has(cat.id);
@@ -107,7 +108,6 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
           return (
             <div key={cat.id} className="group">
               <div
-                role="button"
                 className={[
                   "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 relative",
                   isSelected
@@ -117,6 +117,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
                     : "",
                 ].join(" ")}
+                role="button"
                 onClick={() => handleCategorySelect(cat.id)}
               >
                 {/* Toggle */}
@@ -281,13 +282,13 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
             <div className="space-y-2">
               {/* All Categories */}
               <div
-                role="button"
                 className={[
                   "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 border",
                   selectedCategory === null
                     ? "bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900/40 dark:to-slate-900/20 border-slate-200 dark:border-slate-700 shadow-sm"
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent",
                 ].join(" ")}
+                role="button"
                 onClick={() => handleCategorySelect(null)}
               >
                 <Folder className="h-4 w-4 text-slate-500 dark:text-slate-400" />

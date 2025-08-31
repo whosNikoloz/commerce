@@ -1,23 +1,42 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import Link from "next/link";
 
-import { useCart } from "@/app/context/cartContext";
+import { useCartStore } from "@/app/context/cartContext";
+
+const fmt = new Intl.NumberFormat("ka-GE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const gel = (n: number) => `${fmt.format(n)} ₾`;
 
 export default function OrderSummary() {
-  const { cart } = useCart();
-  const quantityRef = useRef(cart?.length || 0);
+  const cart = useCartStore((s) => s.cart);
+  const subtotal = useCartStore((s) => s.getSubtotal());
 
-  useEffect(() => {
-    if (cart?.length !== undefined && cart.length !== quantityRef.current && cart.length > 0) {
-      quantityRef.current = cart.length;
-    }
-  }, [cart?.length]);
-  const originalPrice = cart?.reduce((acc, item) => acc + item.price * item.quantity, 0) || 7592;
-  const savings = 299;
-  const storePickup = 99;
-  const tax = 799;
-  const total = originalPrice - savings + storePickup + tax;
+  const originalTotal = cart.reduce((acc, i) => {
+    const pct =
+      typeof i.discount === "number"
+        ? i.discount
+        : Number.isFinite(Number(i.discount))
+          ? Number(i.discount)
+          : 0;
+
+    const unitOriginal =
+      typeof i.originalPrice === "number"
+        ? i.originalPrice
+        : pct > 0
+          ? i.price / (1 - pct / 100)
+          : i.price;
+
+    return acc + unitOriginal * i.quantity;
+  }, 0);
+
+  const savings = Math.max(0, originalTotal - subtotal);
+
+  const storePickup = 0;
+  const tax = 0;
+  const total = subtotal + storePickup + tax;
 
   return (
     <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
@@ -31,13 +50,13 @@ export default function OrderSummary() {
                 Original price
               </dt>
               <dd className="text-base font-medium text-gray-900 dark:text-white">
-                ${originalPrice.toFixed(2)}
+                {gel(originalTotal)}
               </dd>
             </dl>
 
             <dl className="flex items-center justify-between gap-4">
               <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Savings</dt>
-              <dd className="text-base font-medium text-green-600">-${savings.toFixed(2)}</dd>
+              <dd className="text-base font-medium text-green-600">-{gel(savings)}</dd>
             </dl>
 
             <dl className="flex items-center justify-between gap-4">
@@ -45,29 +64,25 @@ export default function OrderSummary() {
                 Store Pickup
               </dt>
               <dd className="text-base font-medium text-gray-900 dark:text-white">
-                ${storePickup.toFixed(2)}
+                {gel(storePickup)}
               </dd>
             </dl>
 
             <dl className="flex items-center justify-between gap-4">
               <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Tax</dt>
-              <dd className="text-base font-medium text-gray-900 dark:text-white">
-                ${tax.toFixed(2)}
-              </dd>
+              <dd className="text-base font-medium text-gray-900 dark:text-white">{gel(tax)}</dd>
             </dl>
           </div>
 
           <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
             <dt className="text-base font-bold text-gray-900 dark:text-white">Total</dt>
-            <dd className="text-base font-bold text-gray-900 dark:text-white">
-              ${total.toFixed(2)}
-            </dd>
+            <dd className="text-base font-bold text-gray-900 dark:text-white">{gel(total)}</dd>
           </dl>
         </div>
 
         <Link
           className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-          href="#"
+          href="/checkout"
         >
           Proceed to Checkout
         </Link>
@@ -76,17 +91,11 @@ export default function OrderSummary() {
           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">or</span>
           <Link
             className="inline-flex items-center gap-2 text-sm font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
-            href="#"
+            href="/"
             title="Continue Shopping"
           >
             Continue Shopping
-            <svg
-              aria-hidden="true"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
               <path
                 d="M19 12H5m14 0-4 4m4-4-4-4"
                 stroke="currentColor"

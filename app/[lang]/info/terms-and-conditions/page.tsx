@@ -1,32 +1,50 @@
 import type { Metadata } from "next";
+
 import Link from "next/link";
-import { site as siteConfig } from "@/config/site";
-import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { CheckCircle, Shield, Truck, CreditCard, AlertTriangle, Users } from "lucide-react";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const base = siteConfig.url.replace(/\/$/, "");
-  const url = `${base}/info/terms-and-conditions`;
-  return basePageMetadata({
+import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import { site as siteConfig } from "@/config/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  return i18nPageMetadata({
     title: "წესები და პირობები",
-    description: "სერვისის გამოყენების წესები: შეკვეთა, გადახდა, მიწოდება, პასუხისმგებლობა და დავები.",
-    url,
+    description:
+      "სერვისის გამოყენების წესები: შეკვეთა, გადახდა, მიწოდება, პასუხისმგებლობა და დავები.",
+    lang,
+    path: "/info/terms-and-conditions",
     images: ["/og/terms-og.jpg"],
     siteName: siteConfig.name,
     index: true,
   });
 }
 
-function JsonLd() {
-  const base = siteConfig.url.replace(/\/$/, "");
+function JsonLd({ lang }: { lang: string }) {
+  const home = buildI18nUrls("/", lang).canonical;
+  const page = buildI18nUrls("/info/terms-and-conditions", lang).canonical;
+
   const breadcrumb = buildBreadcrumbJsonLd([
-    { name: "მთავარი", url: `${base}/` },
-    { name: "წესები & პირობები", url: `${base}/info/terms-and-conditions` },
+    { name: "მთავარი", url: home },
+    { name: "წესები & პირობები", url: page },
   ]);
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />;
+
+  return (
+    <script
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      type="application/ld+json"
+    />
+  );
 }
 
-export default function TermsPage() {
+export default async function TermsPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+
   const sections = [
     {
       icon: CheckCircle,
@@ -35,8 +53,8 @@ export default function TermsPage() {
         "შეკვეთის განთავსება წარმოადგენს იურიდიულად სავალდებულო შეთავაზებას",
         "ხელშეკრულება დაიდება შეკვეთის დადასტურების შემდეგ",
         "ვიტოვებთ უფლებას უარი ვთქვათ შეკვეთაზე გამართლებული მიზეზების გამო",
-        "შეკვეთის მონაცემები უნდა იყოს სწორი და სრული"
-      ]
+        "შეკვეთის მონაცემები უნდა იყოს სწორი და სრული",
+      ],
     },
     {
       icon: CreditCard,
@@ -45,8 +63,8 @@ export default function TermsPage() {
         "ყველა ფასი აღნიშნულია ლარებში (₾) და მოიცავს დღგ-ს",
         "ფასები შეიძლება შეიცვალოს წინასწარი გაფრთხილების გარეშე",
         "განსაკუთრებული შეთავაზებები ძალაშია მითითებულ ვადამდე",
-        "დამატებითი მიწოდების ღირებულება განისაზღვრება მისამართისა და წონის მიხედვით"
-      ]
+        "დამატებითი მიწოდების ღირებულება განისაზღვრება მისამართისა და წონის მიხედვით",
+      ],
     },
     {
       icon: Truck,
@@ -55,8 +73,8 @@ export default function TermsPage() {
         "მიწოდების ვადები და ტარიფები დეტალურად არის აღწერილი მიწოდების გვერდზე",
         "მიწოდების დრო არ არის გარანტირებული განსაკუთრებულ შემთხვევებში",
         "თბილისში - 1-2 სამუშაო დღე, რეგიონებში - 2-4 სამუშაო დღე",
-        "დაზიანებული პროდუქტის შემთხვევაში დაუყოვნებლივ დაგვიკავშირდით"
-      ]
+        "დაზიანებული პროდუქტის შემთხვევაში დაუყოვნებლივ დაგვიკავშირდით",
+      ],
     },
     {
       icon: Shield,
@@ -65,8 +83,8 @@ export default function TermsPage() {
         "არაკოსმეტიკური ზარალი გამორიცხულია კანონის ნებადართული ფარგლების ფარგლებში",
         "არ ვიღებთ პასუხისმგებლობას არაპირდაპირ და შემთხვევით ზარალზე",
         "მაქსიმალური პასუხისმგებლობა შემოიფარგლება პროდუქტის ღირებულებით",
-        "სპეციალური, გამოტოვებული სარგებელი არ ანაზღაურდება"
-      ]
+        "სპეციალური, გამოტოვებული სარგებელი არ ანაზღაურდება",
+      ],
     },
     {
       icon: Users,
@@ -75,8 +93,8 @@ export default function TermsPage() {
         "გამოიყენეთ სერვისი კანონიერი მიზნებისთვის",
         "არ გავრცელოთ ყალბი ან შეცდომაში შემყვანი ინფორმაცია",
         "დაიცავით სხვა მომხმარებლების უფლებები",
-        "არ შეეცადოთ სისტემის უსაფრთხოების დარღვევას"
-      ]
+        "არ შეეცადოთ სისტემის უსაფრთხოების დარღვევას",
+      ],
     },
     {
       icon: AlertTriangle,
@@ -85,20 +103,24 @@ export default function TermsPage() {
         "ყველა დავა გადაწყდება საქართველოს კანონმდებლობის შესაბამისად",
         "იურისდიქცია განისაზღვრება თბილისის სასამართლოებში",
         "პირველად ვცდილობთ დავის მშვიდობიან გამოსწორებას",
-        "მედიაცია შესაძლებელია ორივე მხარის თანხმობით"
-      ]
-    }
+        "მედიაცია შესაძლებელია ორივე მხარის თანხმობით",
+      ],
+    },
   ];
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-      <JsonLd />
+      <JsonLd lang={lang} />
 
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
-        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <Link className="hover:text-primary transition-colors" href="/">
+          მთავარი
+        </Link>
         <span className="mx-2">/</span>
-        <span aria-current="page" className="text-foreground font-medium">წესები & პირობები</span>
+        <span aria-current="page" className="text-foreground font-medium">
+          წესები & პირობები
+        </span>
       </nav>
 
       {/* Header */}
@@ -107,8 +129,8 @@ export default function TermsPage() {
           წესები და პირობები
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-          გაეცანით ჩვენი სერვისის გამოყენების წესებს და პირობებს.
-          ეს დოკუმენტი რეგულირებს ურთიერთობას თქვენსა და ჩვენს შორის.
+          გაეცანით ჩვენი სერვისის გამოყენების წესებს და პირობებს. ეს დოკუმენტი რეგულირებს
+          ურთიერთობას თქვენსა და ჩვენს შორის.
         </p>
         <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-950/20 px-4 py-2 text-sm text-blue-700 dark:text-blue-300">
           <CheckCircle className="h-4 w-4" />
@@ -120,6 +142,7 @@ export default function TermsPage() {
       <div className="space-y-8">
         {sections.map((section, index) => {
           const Icon = section.icon;
+
           return (
             <section
               key={index}
@@ -149,7 +172,7 @@ export default function TermsPage() {
       <div className="mt-12 rounded-xl bg-muted/50 p-6 text-center">
         <p className="text-sm text-muted-foreground">
           შეკითხვების შემთხვევაში დაუკავშირდით ჩვენს მხარდაჭერის გუნდს{" "}
-          <Link href="/contact" className="text-primary hover:underline font-medium">
+          <Link className="text-primary hover:underline font-medium" href="/contact">
             საკონტაქტო გვერდზე
           </Link>
         </p>

@@ -123,6 +123,18 @@ export default function CategoryPage({
 
   const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
 
+  const facetValueLookup = useMemo(() => {
+    const map: Record<string, string> = {};
+
+    (category?.facets ?? []).forEach((f) =>
+      (f.facetValues ?? []).forEach((v) => {
+        map[v.id] = v.value ?? v.id;
+      }),
+    );
+
+    return map;
+  }, [category]);
+
   // Fetch when filter/sort/page changes (URL ↔ state sync)
   useEffect(() => {
     if (!category) return;
@@ -223,16 +235,6 @@ export default function CategoryPage({
     setCurrentPage(1);
   };
 
-  const facetValueLookup = useMemo(() => {
-    const map: Record<string, string> = {};
-    (category?.facets ?? []).forEach(f =>
-      (f.facetValues ?? []).forEach(v => {
-        map[v.id] = v.value ?? v.id;
-      })
-    );
-    return map;
-  }, [category]);
-
   const clearFilters = () => {
     setFilter({
       brandIds: [],
@@ -277,8 +279,8 @@ export default function CategoryPage({
             <ProductHeader
               activeFiltersCount={activeFiltersCount}
               brandLookup={Object.fromEntries(brands.map((b) => [b.id, b.name ?? b.id]))}
-              filter={filter}
               facetValueLookup={facetValueLookup}
+              filter={filter}
               productCount={totalCount}
               sortBy={sortBy}
               title={category.name ?? ""}

@@ -133,8 +133,9 @@ export function ProductInfo({
         {/* Status + Condition */}
         <div className="mt-2 flex items-center justify-between gap-2">
           <Badge
-            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
-              }`}
+            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${
+              isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+            }`}
             title={getStatusLabel(status, isComingSoon)}
           >
             {getStatusLabel(status, isComingSoon)}

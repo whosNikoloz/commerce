@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Instagram,
@@ -18,6 +18,7 @@ import Image from "next/image";
 import { Input } from "@heroui/input";
 import { useTheme } from "next-themes";
 import { useIsSSR } from "@react-aria/ssr";
+
 import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
 
 export default function AnimatedFooter() {
@@ -95,11 +96,11 @@ export default function AnimatedFooter() {
       <div className="container mx-auto px-4 pb-12 pt-6">
         <div className="flex justify-end mb-4">
           <motion.button
+            aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
             className={`p-2 rounded-full ${themeStyles.iconBg} transition-colors hover:opacity-80`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleTheme}
-            aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
           >
             {!isSSR && isDarkMode ? <SunFilledIcon size={18} /> : <MoonFilledIcon size={18} />}
           </motion.button>

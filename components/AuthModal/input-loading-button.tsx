@@ -1,4 +1,5 @@
 import { Button } from "@heroui/button";
+
 import { IconCheck } from "../icons";
 
 export const InputLoadingBtn = ({ loading, success }: { loading: boolean; success: boolean }) => {

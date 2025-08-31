@@ -5,19 +5,19 @@ import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
 import CartItems from "./CartItems";
 
-import { useCart } from "@/app/context/cartContext";
+import { useCartStore } from "@/app/context/cartContext";
 
 export default function CartPage() {
-  const { cart } = useCart();
+  const cartLen = useCartStore((s) => s.getCount());
 
-  if (cart.length === 0) {
+  if (cartLen === 0) {
     return <EmptyCart />;
   }
 
   return (
     <div className="min-h-screen bg-inherit">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <CartHeader itemCount={cart.length} />
+        <CartHeader itemCount={cartLen} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <CartItems />

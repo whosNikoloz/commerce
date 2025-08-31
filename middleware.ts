@@ -2,48 +2,53 @@ import { NextResponse, type NextRequest } from "next/server";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
 
-import { i18n } from "@/i18n.config";
+import { locales, type Locale, defaultLocale } from "@/i18n.config";
 
-function getLocale(request: NextRequest): string {
-  const negotiatorHeaders: Record<string, string> = {};
+export const isLocale = (v: string): v is Locale =>
+  (locales as readonly string[]).includes(v as Locale);
 
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
+export const toLocale = (v: string): Locale => (isLocale(v) ? v : defaultLocale);
 
-  const locales: readonly string[] = i18n.locales;
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  const locale = matchLocale(languages, locales, i18n.defaultLocale);
+function getBestLocale(req: NextRequest): Locale {
+  const headers: Record<string, string> = {};
 
-  return locale || i18n.defaultLocale;
+  req.headers.forEach((v, k) => (headers[k] = v));
+  const languages = new Negotiator({ headers }).languages();
+  const matched = matchLocale(languages, locales as readonly string[], defaultLocale);
+
+  return toLocale(matched);
+}
+
+function pathLocale(pathname: string): Locale | null {
+  const seg = pathname.split("/")[1] || "";
+
+  return isLocale(seg) ? seg : null;
 }
 
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // 1) Let media files bypass
-  if (/\.(mp4|mp3|avi|png|ico|jpg|jpeg|gif|webp)$/i.test(pathname)) {
+  // 1) Let static/media files bypass
+  if (/\.(?:mp4|mp3|avi|png|ico|jpg|jpeg|gif|webp|svg|txt|xml|json|woff2?)$/i.test(pathname)) {
     return NextResponse.next();
   }
 
-  const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
-  );
+  // 2) Redirect to best locale if missing from path
+  const locInPath = pathLocale(pathname);
 
-  if (pathnameIsMissingLocale) {
-    const locale = getLocale(request);
+  if (!locInPath) {
+    const best = getBestLocale(request);
 
-    return NextResponse.redirect(new URL(`/${locale}${pathname}${search}`, request.url));
+    return NextResponse.redirect(new URL(`/${best}${pathname}${search}`, request.url));
   }
 
   const adminToken = request.cookies.get("admin_token")?.value;
-  const localeFromPath =
-    i18n.locales.find((loc) => pathname.startsWith(`/${loc}/`)) || i18n.defaultLocale;
-
-  const isAdminRoot = pathname === `/${localeFromPath}/admin`;
-  const isAdminSubRoute = pathname.startsWith(`/${localeFromPath}/admin/`) && !isAdminRoot;
+  const isAdminRoot = pathname === `/${locInPath}/admin`;
+  const isAdminSubRoute = pathname.startsWith(`/${locInPath}/admin/`) && !isAdminRoot;
 
   if (!adminToken && isAdminSubRoute) {
     const nextParam = encodeURIComponent(`${pathname}${search || ""}`);
-    const url = new URL(`/${localeFromPath}/admin?next=${nextParam}`, request.url);
+    const url = new URL(`/${locInPath}/admin?next=${nextParam}`, request.url);
 
     return NextResponse.redirect(url);
   }
@@ -52,5 +57,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|music/.*).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|mp4|mp3|avi|txt|xml|json|woff2?)).*)",
+  ],
 };

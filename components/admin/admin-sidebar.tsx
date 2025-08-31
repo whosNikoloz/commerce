@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { FileQuestionIcon } from "lucide-react";
 
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { FileQuestionIcon } from "lucide-react";
 
 const links = [
   {

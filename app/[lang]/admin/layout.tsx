@@ -1,9 +1,8 @@
 import "@/styles/globals.css";
 import type { Viewport, Metadata } from "next";
 
-import { Locale } from "@/i18n.config";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { basePageMetadata } from "@/lib/seo";
+import { i18nPageMetadata } from "@/lib/seo";
 import { site as siteConfig } from "@/config/site";
 
 export const viewport: Viewport = {
@@ -13,27 +12,31 @@ export const viewport: Viewport = {
   ],
 };
 
-type LayoutParams = { lang: Locale };
-type LayoutProps = { children: React.ReactNode; params: Promise<LayoutParams> };
-
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<LayoutParams>;
+  params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
-  const { lang } = await params;
-  const url = `${siteConfig.url}/${lang}/admin`;
+  const { lang: raw } = await params;
+  const lang = raw === "ka" || raw === "en" ? raw : "en"; // normalize to your supported locales
 
-  return basePageMetadata({
+  return i18nPageMetadata({
     title: "Admin",
     description: "Administrative dashboard.",
-    url,
-    index: false,
+    lang,
+    path: "/admin",
+    images: [siteConfig.ogImage],
     siteName: siteConfig.name,
+    index: false, // noindex admin
   });
 }
 
-export default async function AdminLayout({ children /*, params*/ }: LayoutProps) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}) {
   return (
     <AdminSidebar>
       <div className="flex flex-1">

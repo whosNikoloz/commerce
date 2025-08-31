@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Tag, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 

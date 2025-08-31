@@ -1,12 +1,20 @@
-
 import type { Metadata } from "next";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import { site as siteConfig } from "@/config/site";
-import { basePageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
-import { MapPin, Phone, Clock, Navigation, Star, Wifi, CreditCard, ParkingMeter } from "lucide-react";
-import StoreMapClient from "@/components/Info/stores/StoreMap.client";
 
+import Link from "next/link";
+import {
+  MapPin,
+  Phone,
+  Clock,
+  Navigation,
+  Star,
+  Wifi,
+  CreditCard,
+  ParkingMeter,
+} from "lucide-react";
+
+import { site as siteConfig } from "@/config/site";
+import { buildBreadcrumbJsonLd, buildI18nUrls, i18nPageMetadata } from "@/lib/seo";
+import StoreMapClient from "@/components/Info/stores/StoreMap.client";
 
 const STORES = [
   {
@@ -22,7 +30,7 @@ const STORES = [
     description: "ჩვენი უმსხვილესი ფილიალი სრული ასორტიმენტით",
     features: ["parking", "wifi", "card"],
     rating: 4.8,
-    isMain: true
+    isMain: true,
   },
   {
     name: "PetDo — ბათუმი",
@@ -37,7 +45,7 @@ const STORES = [
     description: "ზღვისპირა ქალაქის მცხოვრებლებისთვის",
     features: ["parking", "card"],
     rating: 4.6,
-    isMain: false
+    isMain: false,
   },
   {
     name: "PetDo — ვაკე",
@@ -52,43 +60,52 @@ const STORES = [
     description: "კომფორტული ლოკაცია ვაკეში",
     features: ["wifi", "card"],
     rating: 4.7,
-    isMain: false
-  }
+    isMain: false,
+  },
 ];
 
 const FEATURE_ICONS = {
   parking: ParkingMeter,
   wifi: Wifi,
-  card: CreditCard
+  card: CreditCard,
 };
 
 const FEATURE_LABELS = {
   parking: "პარკინგი",
   wifi: "უფასო Wi-Fi",
-  card: "ბარათით გადახდა"
+  card: "ბარათით გადახდა",
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const base = siteConfig.url.replace(/\/$/, "");
-  const url = `${base}/info/stores`;
-  return basePageMetadata({
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  return i18nPageMetadata({
     title: "ფილიალები და მისამართები",
     description: "იპოვე უახლოესი ფილიალი — მისამართები, დროის რეჟიმი და ტელეფონები.",
-    url,
+    lang,
+    path: "/info/stores",
     images: ["/og/stores-og.jpg"],
     siteName: siteConfig.name,
     index: true,
   });
 }
 
-function JsonLd() {
-  const base = siteConfig.url.replace(/\/$/, "");
+function JsonLd({ lang }: { lang: string }) {
+  const home = buildI18nUrls("/", lang).canonical;
+  const info = buildI18nUrls("/info", lang).canonical;
+  const page = buildI18nUrls("/info/stores", lang).canonical;
+
   const breadcrumb = buildBreadcrumbJsonLd([
-    { name: "მთავარი", url: `${base}/` },
-    { name: "ინფო", url: `${base}/info` },
-    { name: "ფილიალები", url: `${base}/info/stores` },
+    { name: "მთავარი", url: home },
+    { name: "ინფო", url: info },
+    { name: "ფილიალები", url: page },
   ]);
 
+  const base = new URL(page).origin;
   const organizations = STORES.map((s) => ({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -109,16 +126,24 @@ function JsonLd() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+        type="application/ld+json"
+      />
       {organizations.map((o, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(o) }} />
+        <script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(o) }}
+          key={i}
+          type="application/ld+json"
+        />
       ))}
     </>
   );
 }
 
-export default function StoresPage() {
-  // ⬇️ მოვამზადოთ მონაცემები StoreMap კომპონენტისთვის
+export default async function StoresPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+
   const storesForMap = STORES.map((s) => ({
     name: s.name,
     lat: s.lat,
@@ -131,13 +156,17 @@ export default function StoresPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-      <JsonLd />
+      <JsonLd lang={lang} />
 
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">
-        <Link className="hover:text-primary transition-colors" href="/">მთავარი</Link>
+        <Link className="hover:text-primary transition-colors" href="/">
+          მთავარი
+        </Link>
         <span className="mx-2">/</span>
-        <span aria-current="page" className="text-foreground font-medium">ფილიალები</span>
+        <span aria-current="page" className="text-foreground font-medium">
+          ფილიალები
+        </span>
       </nav>
 
       {/* Header */}
@@ -146,13 +175,13 @@ export default function StoresPage() {
           ჩვენი ფილიალები
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-          იპოვნეთ უახლოესი ფილიალი და ეწვიეთ ჩვენს მაღაზიებს.
-          ყველა ლოკაციაზე ხელმისაწვდომია სრული ასორტიმენტი და პროფესიონალური კონსულტაცია.
+          იპოვნეთ უახლოესი ფილიალი და ეწვიეთ ჩვენს მაღაზიებს. ყველა ლოკაციაზე ხელმისაწვდომია სრული
+          ასორტიმენტი და პროფესიონალური კონსულტაცია.
         </p>
       </div>
 
       <section className="mb-12">
-        <StoreMapClient stores={storesForMap} height={420} className="mb-2" />
+        <StoreMapClient className="mb-2" height={420} stores={storesForMap} />
         <p className="text-xs text-muted-foreground text-center">
           რუკა: OpenStreetMap • დააწკაპე „ჩემი მდებარეობა“, რომ ახლოს მდებარე ფილიალს მიუახლოვდე
         </p>
@@ -178,7 +207,7 @@ export default function StoresPage() {
         {STORES.map((store, index) => (
           <article
             key={index}
-            className={`group relative rounded-2xl border p-8 shadow-sm hover:shadow-lg transition-all duration-300 ${store.isMain ? 'ring-2 ring-primary/20 bg-primary/5' : 'bg-card'}`}
+            className={`group relative rounded-2xl border p-8 shadow-sm hover:shadow-lg transition-all duration-300 ${store.isMain ? "ring-2 ring-primary/20 bg-primary/5" : "bg-card"}`}
           >
             {/* Main Badge */}
             {store.isMain && (
@@ -202,7 +231,7 @@ export default function StoresPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${i < Math.floor(store.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                      className={`h-4 w-4 ${i < Math.floor(store.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
                     />
                   ))}
                 </div>
@@ -251,6 +280,7 @@ export default function StoresPage() {
                 {store.features.map((feature) => {
                   const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
                   const label = FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS];
+
                   return (
                     <div
                       key={feature}
@@ -269,8 +299,8 @@ export default function StoresPage() {
               <a
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground px-4 py-3 text-sm font-medium hover:bg-primary/90 transition-colors"
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.lat},${store.lng}`)}`}
-                target="_blank"
                 rel="noopener noreferrer"
+                target="_blank"
               >
                 <Navigation className="h-4 w-4" />
                 რუკაზე ნახვა

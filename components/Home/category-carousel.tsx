@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
@@ -17,6 +18,7 @@ export function CategoryCarousel() {
     (async () => {
       try {
         const data = await getAllCategories();
+
         setCategories(data ?? []);
       } catch (e) {
         console.error(e);
@@ -29,28 +31,37 @@ export function CategoryCarousel() {
 
   const parentCategories = useMemo(
     () => categories.filter((c) => !c.parentId || c.parentId.trim() === ""),
-    [categories]
+    [categories],
   );
 
   const childrenByParent = useMemo(() => {
     const map = new Map<string, CategoryModel[]>();
+
     for (const c of categories) {
       const pid = c.parentId?.trim();
+
       if (pid) {
         if (!map.has(pid)) map.set(pid, []);
         map.get(pid)!.push(c);
       }
     }
+
     return map;
   }, [categories]);
 
   const go = useCallback((href: string) => router.push(href), [router]);
 
   if (loading)
-    return <div className="text-center py-10 text-text-subtle dark:text-text-subtledark">იტვირთება…</div>;
+    return (
+      <div className="text-center py-10 text-text-subtle dark:text-text-subtledark">იტვირთება…</div>
+    );
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
   if (!parentCategories.length)
-    return <div className="text-center py-10 text-text-subtle dark:text-text-subtledark">მშობელი კატეგორია არ არსებობს.</div>;
+    return (
+      <div className="text-center py-10 text-text-subtle dark:text-text-subtledark">
+        მშობელი კატეგორია არ არსებობს.
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,6 +73,7 @@ export function CategoryCarousel() {
           return (
             <div
               key={parent.id}
+              className="group cursor-pointer block bg-surface dark:bg-surfacedark rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-muted dark:border-muteddark"
               role="link"
               tabIndex={0}
               onClick={() => go(parentHref)}
@@ -71,7 +83,6 @@ export function CategoryCarousel() {
                   go(parentHref);
                 }
               }}
-              className="group cursor-pointer block bg-surface dark:bg-surfacedark rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-muted dark:border-muteddark"
             >
               <div className="relative h-48 overflow-hidden">
                 <img

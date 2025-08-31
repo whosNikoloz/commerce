@@ -9,7 +9,7 @@ import { ImageReview } from "./image-review";
 
 import { ProductResponseModel } from "@/types/product";
 import { getProductById } from "@/app/api/services/productService";
-import { CartItem, useCart } from "@/app/context/cartContext";
+import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 
@@ -21,7 +21,7 @@ type Props = {
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
-  const { addToCart } = useCart();
+  const addToCart = useCartStore((s) => s.addToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
 
@@ -44,6 +44,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     const tick = async () => {
       try {
         const fresh = await getProductById(product.id);
+
         if (!cancelled) setProduct(fresh);
       } catch {
         if (!cancelled) setNotFound(true);
@@ -81,6 +82,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   useEffect(() => {
     const handleScrollOrResize = () => {
       const scrollThreshold = isMobile ? 900 : 700;
+
       setIsPriceVisible(window.scrollY < scrollThreshold);
     };
 
@@ -147,21 +149,19 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">
-        {product.name ?? "პროდუქტი"}
-      </h1>
+      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
         <div className="flex-1 max-w-[800px] order-1 lg:order-1">
           <ImageReview images={galleryImages} productName={product.name ?? ""} />
         </div>
 
-        <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">
-          {product.name}
-        </h1>
+        <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">{product.name}</h1>
 
-        <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm
-             lg:sticky lg:top-24 lg:self-start lg:h-fit">
+        <div
+          className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm
+             lg:sticky lg:top-24 lg:self-start lg:h-fit"
+        >
           <ProductInfo
             brand={product.brand?.name ?? ""}
             condition={product.condition}
@@ -229,5 +229,4 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       />
     </div>
   );
-
 }

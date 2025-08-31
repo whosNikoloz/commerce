@@ -40,7 +40,6 @@ export function ProductInfoBottom({
   discount,
   image = "/img1.jpg",
   brand,
-  condition,
   stock,
   status,
   isComingSoon = false,

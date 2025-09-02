@@ -203,7 +203,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       .filter((f) =>
         q
           ? (f.question ?? "").toLowerCase().includes(q) ||
-            (f.answer ?? "").toLowerCase().includes(q)
+          (f.answer ?? "").toLowerCase().includes(q)
           : true,
       )
       .filter((f) => (onlyActive ? !!f.isActive : true))
@@ -369,10 +369,8 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 რიგის შენახვა
               </Button>
               <AddFaqModal onCreate={handleCreate}>
-                <Button className="gap-2" size="sm" variant="default">
-                  <Plus className="h-4 w-4" />
-                  დაამატე FAQ
-                </Button>
+                <Plus className="h-4 w-4" />
+                დაამატე FAQ
               </AddFaqModal>
             </div>
           </div>
@@ -472,11 +470,6 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                               initialAnswer={faq.answer}
                               initialFeatured={faq.isFeatured}
                               initialQuestion={faq.question}
-                              trigger={
-                                <Button size="sm" variant="outline">
-                                  Edit
-                                </Button>
-                              }
                               onSave={handleUpdate}
                             />
                             <Button
@@ -509,7 +502,6 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
         </CardContent>
       </Card>
 
-      {/* Delete confirm */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

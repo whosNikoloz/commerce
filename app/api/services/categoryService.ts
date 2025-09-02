@@ -2,7 +2,7 @@ import { apiFetch } from "../client/fetcher";
 
 import { CategoryModel } from "@/types/category";
 
-const API_BASE = "http://localhost:5007/Category";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL + "Category";
 
 export async function getAllCategories(): Promise<CategoryModel[]> {
   return apiFetch<CategoryModel[]>(`${API_BASE}/get-all-categories`);

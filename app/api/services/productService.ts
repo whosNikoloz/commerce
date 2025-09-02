@@ -4,7 +4,7 @@ import { ProductResponseModel, ProductRequestModel } from "@/types/product";
 import { FilterModel } from "@/types/filter";
 import { PagedList } from "@/types/pagination";
 
-const API_BASE = "http://localhost:5007/Product";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL + "Product";
 
 export function mapSort(sortBy: string): {
   sortColumn: string;

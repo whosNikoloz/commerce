@@ -2,7 +2,7 @@ import { apiFetch } from "../client/fetcher";
 
 import { FAQModel } from "@/types/faq";
 
-const API_BASE = "http://localhost:5007/FAQ";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL + "FAQ";
 
 export async function getAllFaqs(): Promise<FAQModel[]> {
   return apiFetch<FAQModel[]>(`${API_BASE}/get-all-faqs`);

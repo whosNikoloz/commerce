@@ -1,136 +1,116 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { TriangleAlert } from "lucide-react";
-
 import UpdateBrandModal from "./update-brad-modal";
 import AddBrandModal from "./add-brand-modal";
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { BrandModel } from "@/types/brand";
-import {
-  getAllBrands,
-  updateBrand,
-  createBrand,
-  deleteBrand,
-} from "@/app/api/services/brandService";
+
+import type { BrandModel } from "@/types/brand";
+import { getAllBrands, updateBrand, createBrand, deleteBrand } from "@/app/api/services/brandService";
 
 interface Props {
   Brands: BrandModel[];
 }
 
 export function BrandsTable({ Brands: initialBrands }: Props) {
+  // ✅ if SSR provided data, don’t show loading
   const [brands, setBrands] = useState<BrandModel[]>(initialBrands || []);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!(initialBrands && initialBrands.length > 0));
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  // 🔻 delete dialog state
+  // delete dialog state
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<BrandModel | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // ✅ keep local state in sync when server prop changes
   useEffect(() => {
     setBrands(initialBrands || []);
+    if (initialBrands?.length) setLoading(false);
   }, [initialBrands]);
 
+  // ✅ only fetch on client if SSR gave us nothing
   useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const response = await getAllBrands();
+    if (initialBrands?.length) return;
 
-        setBrands(response);
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const response = await getAllBrands();
+        if (cancelled) return;
+        setBrands(response || []);
+        setError(null);
       } catch (err) {
         console.error("Error fetching brands:", err);
-        setError("Failed to load brands.");
+        if (!cancelled) setError("Failed to load brands.");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    };
+    })();
+    return () => { cancelled = true; };
+  }, [initialBrands]);
 
-    fetchBrands();
-  }, []);
-
-  // ✅ Update (id, name, description, origin)
-  const handleUpdateBrand = async (
-    brandId: string,
-    name: string,
-    description: string,
-    origin: string,
-  ) => {
+  // —— CRUD ——
+  const handleUpdateBrand = async (brandId: string, name: string, description: string, origin: string) => {
     const current = brands.find((p) => p.id === brandId);
-
     if (!current) return;
 
-    const prevBrands = brands;
+    const prev = brands;
     const patched: BrandModel = { ...current, name, description, origin };
-
-    setBrands((prev) => prev.map((p) => (p.id === brandId ? patched : p)));
+    setBrands((list) => list.map((p) => (p.id === brandId ? patched : p)));
 
     try {
       await updateBrand(patched);
       toast.success("ბრენდი წარმატებით განახლდა.");
     } catch (err) {
       console.error("Failed to update brand", err);
+      setBrands(prev);
       toast.error("ბრენდის განახლება ვერ მოხერხდა.");
-      setBrands(prevBrands);
     }
   };
 
   const handleCreateBrand = async (name: string, description: string, origin: string) => {
     const tempId = `temp-${Date.now()}`;
-    const newBrand: BrandModel = { id: tempId, name, description, origin };
-
-    const prevBrands = brands;
-
-    setBrands((prev) => [newBrand, ...prev]);
+    const prev = brands;
+    const draft: BrandModel = { id: tempId, name, description, origin };
+    setBrands([draft, ...prev]);
 
     try {
       const createdId: string = await createBrand(name, origin, description);
-
-      setBrands((prev) => prev.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
+      setBrands((list) => list.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
       toast.success("ბრენდი წარმატებით დაემატა.");
     } catch (err) {
       console.error("Failed to create brand", err);
+      setBrands(prev);
       toast.error("ბრენდის დამატება ვერ მოხერხდა.");
-      setBrands(prevBrands);
     }
   };
 
   const handleDeleteBrand = async (brandId: string) => {
-    const prevBrands = brands;
-
+    const prev = brands;
     setDeleting(true);
-
-    setBrands((prev) => prev.filter((b) => b.id !== brandId));
+    setBrands((list) => list.filter((b) => b.id !== brandId));
 
     try {
       await deleteBrand(brandId);
       toast.success("ბრენდი წაიშალა.");
     } catch (err) {
       console.error("Failed to delete brand", err);
+      setBrands(prev);
       toast.error("ბრენდის წაშლა ვერ მოხერხდა.");
-      setBrands(prevBrands);
     } finally {
       setDeleting(false);
       setDeleteOpen(false);
@@ -138,11 +118,13 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     }
   };
 
-  const filteredBrands = brands.filter(
-    (brand) =>
-      brand.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      brand.origin?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredBrands = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return brands;
+    return brands.filter(
+      (b) => (b.name ?? "").toLowerCase().includes(q) || (b.origin ?? "").toLowerCase().includes(q),
+    );
+  }, [brands, searchTerm]);
 
   return (
     <>
@@ -160,7 +142,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
           </div>
         </CardHeader>
 
-        <CardContent className="overflow-auto max-h-[calc(100vh-240px)]">
+        <CardContent className="overflow-auto max-h=[calc(100vh-240px)]">
           {loading && <p className="p-4 text-gray-500">Loading brands...</p>}
           {error && <p className="p-4 text-red-500">{error}</p>}
 
@@ -180,9 +162,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                   <TableRow key={brand.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">
                       {brand.name}
-                      <div className="text-sm text-slate-500 dark:text-slate-400">
-                        ID: {brand.id}
-                      </div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">ID: {brand.id}</div>
                     </TableCell>
                     <TableCell>{brand.origin}</TableCell>
                     <TableCell className="max-w-[520px] truncate">{brand.description}</TableCell>
@@ -232,23 +212,14 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {deleteTarget ? (
-                <>
-                  You are about to delete <span className="font-semibold">{deleteTarget.name}</span>
-                  . ეს ქმედება შეუქცევადია და ბრენდი ამოიშლება სიიდან.
-                </>
-              ) : (
-                "ეს ქმედება შეუქცევადია."
-              )}
+                <>You are about to delete <span className="font-semibold">{deleteTarget.name}</span>. ეს ქმედება შეუქცევადია.</>
+              ) : ("ეს ქმედება შეუქცევადია.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
-
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={deleting}
-              onClick={() => {
-                setDeleteOpen(false);
-                setDeleteTarget(null);
-              }}
+              onClick={() => { setDeleteOpen(false); setDeleteTarget(null); }}
             >
               Cancel
             </AlertDialogCancel>

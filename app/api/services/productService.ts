@@ -3,8 +3,11 @@ import { apiFetch } from "../client/fetcher";
 import { ProductResponseModel, ProductRequestModel } from "@/types/product";
 import { FilterModel } from "@/types/filter";
 import { PagedList } from "@/types/pagination";
+import { FinaProductRestArrayModel, FinaProductRestModel } from "@/types/product-rest";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL + "Product";
+const API_Fina_BASE = process.env.NEXT_PUBLIC_API_URL + "FinaProductRest";
+
 
 export function mapSort(sortBy: string): {
   sortColumn: string;
@@ -37,6 +40,13 @@ export async function getProductById(id: string): Promise<ProductResponseModel> 
 
 export async function getProductsByCategory(id: string): Promise<ProductRequestModel[]> {
   return apiFetch<ProductRequestModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
+}
+
+export async function getProductRestsByIds(data: FinaProductRestArrayModel): Promise<FinaProductRestModel> {
+  return apiFetch<FinaProductRestModel>(`${API_Fina_BASE}`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 
 export async function searchProducts(

@@ -42,7 +42,7 @@ export default async function CategoriesPage() {
           Categories
         </h1>
       </div>
-      <CategoriesTable Categories={categories} />
+      <CategoriesTable initialCategories={categories} />
     </div>
   );
 }

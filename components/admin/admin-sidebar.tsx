@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags } from "@tabler/icons-react";
+import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -42,6 +42,11 @@ const links = [
     label: "Categories",
     href: "/admin/categories",
     icon: <IconTags className="h-5 w-5 text-muted-foreground" />,
+  },
+  {
+    label: "Sync",
+    href: "/admin/sync",
+    icon: <IconFileDownloadFilled className="h-5 w-5 text-muted-foreground" />,
   },
   // {
   //   label: "Shipping",

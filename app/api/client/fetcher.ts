@@ -8,31 +8,28 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     ...(options.headers as Record<string, string> | undefined),
   });
 
-  async function resolveOrigin() {
-    try {
-      if (isServer) {
-        const { headers: nextHeaders } = await import("next/headers");
-        const h = nextHeaders();
-        const host = (await h).get("x-forwarded-host") ?? (await h).get("host") ?? undefined;
-        const proto = (await h).get("x-forwarded-proto") ?? (process.env.VERCEL ? "https" : "http");
-        if (host) return { origin: `${proto}://${host}`, domain: host };
-      } else {
-        return { origin: window.location.origin, domain: window.location.host };
-      }
-    } catch {/* ignore */ }
-    const fallback = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
-    if (fallback) {
-      try {
-        const u = new URL(fallback);
-        return { origin: u.origin, domain: u.host };
-      } catch {/* ignore */ }
-    }
-    return { origin: undefined, domain: undefined };
-  }
+  // async function resolveOrigin() {
+  //   try {
+  //     if (isServer) {
+  //       const { headers: nextHeaders } = await import("next/headers");
+  //       const h = nextHeaders();
+  //       const host = (await h).get("x-forwarded-host") ?? (await h).get("host") ?? undefined;
+  //       const proto = (await h).get("x-forwarded-proto") ?? (process.env.VERCEL ? "https" : "http");
+  //       if (host) return { origin: `${proto}://${host}`, domain: host };
+  //     } else {
+  //       return { origin: window.location.origin, domain: window.location.host };
+  //     }
+  //   } catch {/* ignore */ }
+  //   const fallback = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
+  //   if (fallback) {
+  //     try {
+  //       const u = new URL(fallback);
+  //       return { origin: u.origin, domain: u.host };
+  //     } catch {/* ignore */ }
+  //   }
+  //   return { origin: undefined, domain: undefined };
+  // }
 
-  const { origin, domain } = await resolveOrigin();
-  if (domain && !headers.has("X-Domain")) headers.set("X-Domain", domain);
-  if (origin && !headers.has("X-Origin")) headers.set("X-Origin", origin);
   let token: string | null | undefined;
 
   if (isServer) {

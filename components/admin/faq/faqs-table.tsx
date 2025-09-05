@@ -84,7 +84,7 @@ function RowDraggable({
 
 export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   const [faqs, setFaqs] = useState<FAQModel[]>([]);
-  const [loading, setLoading] = useState(!initialFaqs?.length);
+  const [loading, setLoading] = useState(!(initialFaqs && initialFaqs.length > 0));
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
@@ -103,6 +103,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   useEffect(() => {
     const sorted = sortByOrder(initialFaqs || []);
 
+    console.log("Sorted", sorted);
     setFaqs(sorted);
     const map: Record<string, number> = {};
 
@@ -111,19 +112,20 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   }, [initialFaqs]);
 
   useEffect(() => {
+    if (initialFaqs?.length) return;
+
     let isCancelled = false;
 
     (async () => {
+      setLoading(true);
       try {
         const list = await getAllFaqs();
-
         if (isCancelled) return;
-        const sorted = sortByOrder(list || []);
 
+        const sorted = sortByOrder(list || []);
         setFaqs(sorted);
 
         const map: Record<string, number> = {};
-
         sorted.forEach((f, idx) => (map[f.id] = f.orderNum ?? idx + 1));
         lastSavedOrderRef.current = map;
 
@@ -139,7 +141,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [initialFaqs]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 

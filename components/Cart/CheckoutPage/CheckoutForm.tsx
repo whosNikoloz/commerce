@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { CreditCard } from "lucide-react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,15 +14,113 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 
-export default function CheckoutForm() {
+export type CheckoutFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+
+  address: string;
+  city: string;
+  state?: string;
+  zip?: string;
+
+  sameAsShipping: boolean;
+
+  billingAddress?: string;
+  billingCity?: string;
+  billingState?: string;
+  billingZip?: string;
+};
+
+export type Provider = "bog" | "tbc";
+
+export default function CheckoutForm({
+  onSubmit,
+  value,
+  onChange,
+}: {
+  onSubmit: (v: CheckoutFormValues) => Promise<void> | void;
+  value?: Provider;
+  onChange: (p: Provider) => void;
+}) {
   const [sameAsShipping, setSameAsShipping] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+
+  const [selected, setSelected] = useState<Provider>(value ?? "bog");
+
+  useEffect(() => {
+    onChange(selected);
+    if (typeof window !== "undefined") localStorage.setItem("pay_provider", selected);
+  }, [selected, onChange]);
+
+  useEffect(() => {
+    if (!value && typeof window !== "undefined") {
+      const saved = localStorage.getItem("pay_provider") as Provider | null;
+
+      if (saved === "bog" || saved === "tbc") setSelected(saved);
+    }
+  }, [value]);
+
+  const [v, setV] = useState<CheckoutFormValues>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    sameAsShipping: true,
+    billingAddress: "",
+    billingCity: "",
+    billingState: "",
+    billingZip: "",
+  });
+
+  const update = (k: keyof CheckoutFormValues) => (e: any) => {
+    setV((s) => ({ ...s, [k]: e?.target?.value ?? e }));
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit({ ...v, sameAsShipping });
+  };
+
+  const Option = ({ id, label, logoSrc }: { id: Provider; label: string; logoSrc: string }) => (
+    <button
+      className={`w-full text-left rounded-xl border p-4 transition
+          ${selected === id ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/40"}`}
+      type="button"
+      onClick={() => setSelected(id)}
+    >
+      <div className="flex items-center gap-4">
+        <div
+          className={`h-4 w-4 rounded-full border flex items-center justify-center
+              ${selected === id ? "bg-primary border-primary" : "border-muted-foreground/50"}`}
+        >
+          {selected === id && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
+        </div>
+
+        <Image
+          alt={label}
+          className="rounded bg-white object-contain dark:bg-white"
+          height={40}
+          src={logoSrc}
+          width={40}
+        />
+        <div className="flex flex-col">
+          <span className="font-medium">{label}</span>
+          <span className="text-xs text-muted-foreground">Secure hosted checkout</span>
+        </div>
+      </div>
+    </button>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Contact Information */}
+    <form className="space-y-6" onSubmit={submit}>
+      {/* Contact */}
       <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -36,25 +134,50 @@ export default function CheckoutForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" placeholder="John" />
+              <Input
+                required
+                id="firstName"
+                placeholder="John"
+                value={v.firstName}
+                onChange={update("firstName")}
+              />
             </div>
             <div>
               <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" placeholder="Doe" />
+              <Input
+                required
+                id="lastName"
+                placeholder="Doe"
+                value={v.lastName}
+                onChange={update("lastName")}
+              />
             </div>
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" placeholder="john@example.com" type="email" />
+            <Input
+              required
+              id="email"
+              placeholder="john@example.com"
+              type="email"
+              value={v.email}
+              onChange={update("email")}
+            />
           </div>
           <div>
             <Label htmlFor="phone">Phone Number</Label>
-            <Input id="phone" placeholder="+1 (555) 123-4567" type="tel" />
+            <Input
+              id="phone"
+              placeholder="+995 5XX XX XX XX"
+              type="tel"
+              value={v.phone}
+              onChange={update("phone")}
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* Shipping Address */}
+      {/* Shipping */}
       <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -67,36 +190,56 @@ export default function CheckoutForm() {
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="address">Street Address</Label>
-            <Input id="address" placeholder="123 Main Street" />
+            <Input
+              required
+              id="address"
+              placeholder="Tbilisi, Rustaveli Ave 1"
+              value={v.address}
+              onChange={update("address")}
+            />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="city">City</Label>
-              <Input id="city" placeholder="New York" />
+              <Input
+                required
+                id="city"
+                placeholder="Tbilisi"
+                value={v.city}
+                onChange={update("city")}
+              />
             </div>
             <div>
-              <Label htmlFor="state">State</Label>
-              <Select>
+              <Label htmlFor="state">State / Region</Label>
+              <Select onValueChange={(val) => setV((s) => ({ ...s, state: val }))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select state" />
+                  <SelectValue placeholder="Choose…" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="ca">California</SelectItem>
-                  <SelectItem value="tx">Texas</SelectItem>
-                  <SelectItem value="fl">Florida</SelectItem>
+                  <SelectItem value="TBS">Tbilisi</SelectItem>
+                  <SelectItem value="IMR">Imereti</SelectItem>
+                  <SelectItem value="AJ">Adjara</SelectItem>
+                  <SelectItem value="KA">Kakheti</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="zip">ZIP Code</Label>
-              <Input id="zip" placeholder="10001" />
+              <Label htmlFor="zip">ZIP / Postal Code</Label>
+              <Input id="zip" placeholder="0108" value={v.zip} onChange={update("zip")} />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Billing Address */}
+      <Card className="p-4 dark:bg-brand-muteddark bg-brand-muted">
+        <div className="mb-3 font-semibold">Choose payment provider</div>
+        <div className="grid grid-cols-1 gap-3">
+          <Option id="bog" label="Bank of Georgia" logoSrc="/logos/bog.png" />
+          <Option id="tbc" label="TBC Bank" logoSrc="/logos/tbc.png" />
+        </div>
+      </Card>
+
+      {/* Billing */}
       <Card className="dark:bg-brand-muteddark bg-brand-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -120,30 +263,40 @@ export default function CheckoutForm() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="billingAddress">Street Address</Label>
-                <Input id="billingAddress" placeholder="123 Main Street" />
+                <Input
+                  id="billingAddress"
+                  placeholder="Billing street"
+                  value={v.billingAddress}
+                  onChange={update("billingAddress")}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="billingCity">City</Label>
-                  <Input id="billingCity" placeholder="New York" />
+                  <Input
+                    id="billingCity"
+                    placeholder="City"
+                    value={v.billingCity}
+                    onChange={update("billingCity")}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="billingState">State</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ny">New York</SelectItem>
-                      <SelectItem value="ca">California</SelectItem>
-                      <SelectItem value="tx">Texas</SelectItem>
-                      <SelectItem value="fl">Florida</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    id="billingState"
+                    placeholder="State"
+                    value={v.billingState}
+                    onChange={update("billingState")}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="billingZip">ZIP Code</Label>
-                  <Input id="billingZip" placeholder="10001" />
+                  <Label htmlFor="billingZip">ZIP</Label>
+                  <Input
+                    id="billingZip"
+                    placeholder="ZIP"
+                    value={v.billingZip}
+                    onChange={update("billingZip")}
+                  />
                 </div>
               </div>
             </div>
@@ -151,63 +304,12 @@ export default function CheckoutForm() {
         </CardContent>
       </Card>
 
-      {/* Payment Method */}
-      <Card className="dark:bg-brand-muteddark bg-brand-muted">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-              4
-            </div>
-            Payment Method
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-            <div className="flex items-center space-x-2 p-4 border rounded-lg">
-              <RadioGroupItem id="card" value="card" />
-              <Label className="flex items-center gap-2 cursor-pointer" htmlFor="card">
-                <CreditCard className="h-4 w-4" />
-                Credit/Debit Card
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 p-4 border rounded-lg">
-              <RadioGroupItem id="paypal" value="paypal" />
-              <Label className="cursor-pointer" htmlFor="paypal">
-                PayPal
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 p-4 border rounded-lg">
-              <RadioGroupItem id="apple" value="apple" />
-              <Label className="cursor-pointer" htmlFor="apple">
-                Apple Pay
-              </Label>
-            </div>
-          </RadioGroup>
-
-          {paymentMethod === "card" && (
-            <div className="space-y-4 mt-4">
-              <div>
-                <Label htmlFor="cardNumber">Card Number</Label>
-                <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="expiry">Expiry Date</Label>
-                  <Input id="expiry" placeholder="MM/YY" />
-                </div>
-                <div>
-                  <Label htmlFor="cvv">CVV</Label>
-                  <Input id="cvv" placeholder="123" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="cardName">Name on Card</Label>
-                <Input id="cardName" placeholder="John Doe" />
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+      {/* Submit */}
+      <div className="flex justify-end">
+        <Button className="px-6" type="submit">
+          Continue to Payment
+        </Button>
+      </div>
+    </form>
   );
 }

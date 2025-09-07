@@ -2,43 +2,92 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-import CheckoutForm from "./CheckoutForm";
+import CheckoutForm, { CheckoutFormValues } from "./CheckoutForm";
 import OrderSummary from "./OrderSummary";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
+import { apiPost, CreateOrderPayload, PaymentProvider } from "@/lib/payment";
 
 export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // pull minimal selectors to reduce re-renders
+  const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
+  const subtotal = useCartStore((s) => s.getSubtotal());
   const clearCart = useCartStore((s) => s.clearCart);
+  const [provider, setProvider] = useState<PaymentProvider>("bog");
 
   const router = useRouter();
 
-  // redirect when cart is empty
+  const shipping = subtotal > 50 ? 0 : 9.99;
+  const tax = subtotal * 0.08;
+  const total = useMemo(() => subtotal + shipping + tax, [subtotal, shipping, tax]);
+
   useEffect(() => {
     if (cartLen === 0) router.push("/cart");
   }, [cartLen, router]);
 
   if (cartLen === 0) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (form: CheckoutFormValues) => {
+    setError(null);
     setIsProcessing(true);
+    try {
+      const payload: CreateOrderPayload & { provider: PaymentProvider } = {
+        orderId: crypto.randomUUID(),
+        currency: "GEL",
+        amount: Number(total.toFixed(2)),
+        items: cart.map((i) => ({
+          productId: i.id,
+          qty: i.quantity,
+          unitPrice: Number(i.price),
+        })),
+        customer: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone || "",
+        },
+        shippingAddress: {
+          line1: form.address,
+          city: form.city,
+          state: form.state || "",
+          zip: form.zip || "",
+          country: "GE",
+        },
+        billingAddress: form.sameAsShipping
+          ? undefined
+          : {
+              line1: form.billingAddress || "",
+              city: form.billingCity || "",
+              state: form.billingState || "",
+              zip: form.billingZip || "",
+              country: "GE",
+            },
+        metadata: { source: "nextjs-checkout", cartItems: cart.length },
+        provider,
+      };
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      const data = await apiPost<{ orderId: string; paymentUrl: string }>("/api/payment", payload);
 
-    setIsProcessing(false);
-    clearCart(); // clear after success
-    router.push("/order-confirmation/success");
+      if (data.paymentUrl) {
+        if (typeof window !== "undefined") sessionStorage.setItem("lastOrderId", data.orderId);
+        window.location.href = data.paymentUrl;
+
+        return;
+      }
+      throw new Error("paymentUrl missing");
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to start payment.");
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -56,9 +105,21 @@ export default function CheckoutPage() {
           </div>
         </div>
 
+        {error && (
+          <div className="mb-6 text-sm text-red-500 border border-red-500/30 rounded p-3">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <CheckoutForm />
-          <OrderSummary isProcessing={isProcessing} onSubmit={handleSubmit} />
+          <CheckoutForm value={provider} onChange={setProvider} onSubmit={handleSubmit} />
+          <OrderSummary
+            isProcessing={isProcessing}
+            submitButtonLabel={
+              isProcessing ? "Redirecting..." : `Pay Securely • ₾${total.toFixed(2)}`
+            }
+            totalOverride={total}
+          />
         </div>
       </div>
     </div>

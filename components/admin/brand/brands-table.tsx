@@ -1,30 +1,46 @@
 "use client";
 
+import type { BrandModel } from "@/types/brand";
+
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { TriangleAlert } from "lucide-react";
+
 import UpdateBrandModal from "./update-brad-modal";
 import AddBrandModal from "./add-brand-modal";
 
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-import type { BrandModel } from "@/types/brand";
-import { getAllBrands, updateBrand, createBrand, deleteBrand } from "@/app/api/services/brandService";
+import {
+  getAllBrands,
+  updateBrand,
+  createBrand,
+  deleteBrand,
+} from "@/app/api/services/brandService";
 
 interface Props {
   Brands: BrandModel[];
 }
 
 export function BrandsTable({ Brands: initialBrands }: Props) {
-  // ✅ if SSR provided data, don’t show loading
   const [brands, setBrands] = useState<BrandModel[]>(initialBrands || []);
   const [loading, setLoading] = useState(!(initialBrands && initialBrands.length > 0));
   const [error, setError] = useState<string | null>(null);
@@ -46,10 +62,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     if (initialBrands?.length) return;
 
     let cancelled = false;
+
     (async () => {
       try {
         setLoading(true);
         const response = await getAllBrands();
+
         if (cancelled) return;
         setBrands(response || []);
         setError(null);
@@ -60,16 +78,26 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+
+    return () => {
+      cancelled = true;
+    };
   }, [initialBrands]);
 
   // —— CRUD ——
-  const handleUpdateBrand = async (brandId: string, name: string, description: string, origin: string) => {
+  const handleUpdateBrand = async (
+    brandId: string,
+    name: string,
+    description: string,
+    origin: string,
+  ) => {
     const current = brands.find((p) => p.id === brandId);
+
     if (!current) return;
 
     const prev = brands;
     const patched: BrandModel = { ...current, name, description, origin };
+
     setBrands((list) => list.map((p) => (p.id === brandId ? patched : p)));
 
     try {
@@ -86,10 +114,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     const tempId = `temp-${Date.now()}`;
     const prev = brands;
     const draft: BrandModel = { id: tempId, name, description, origin };
+
     setBrands([draft, ...prev]);
 
     try {
       const createdId: string = await createBrand(name, origin, description);
+
       setBrands((list) => list.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
       toast.success("ბრენდი წარმატებით დაემატა.");
     } catch (err) {
@@ -101,6 +131,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
   const handleDeleteBrand = async (brandId: string) => {
     const prev = brands;
+
     setDeleting(true);
     setBrands((list) => list.filter((b) => b.id !== brandId));
 
@@ -120,7 +151,9 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
   const filteredBrands = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+
     if (!q) return brands;
+
     return brands.filter(
       (b) => (b.name ?? "").toLowerCase().includes(q) || (b.origin ?? "").toLowerCase().includes(q),
     );
@@ -142,7 +175,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
           </div>
         </CardHeader>
 
-        <CardContent className="overflow-auto max-h=[calc(100vh-240px)]">
+        <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
           {loading && <p className="p-4 text-gray-500">Loading brands...</p>}
           {error && <p className="p-4 text-red-500">{error}</p>}
 
@@ -162,7 +195,9 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                   <TableRow key={brand.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">
                       {brand.name}
-                      <div className="text-sm text-slate-500 dark:text-slate-400">ID: {brand.id}</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">
+                        ID: {brand.id}
+                      </div>
                     </TableCell>
                     <TableCell>{brand.origin}</TableCell>
                     <TableCell className="max-w-[520px] truncate">{brand.description}</TableCell>
@@ -212,14 +247,22 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {deleteTarget ? (
-                <>You are about to delete <span className="font-semibold">{deleteTarget.name}</span>. ეს ქმედება შეუქცევადია.</>
-              ) : ("ეს ქმედება შეუქცევადია.")}
+                <>
+                  You are about to delete <span className="font-semibold">{deleteTarget.name}</span>
+                  . ეს ქმედება შეუქცევადია.
+                </>
+              ) : (
+                "ეს ქმედება შეუქცევადია."
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={deleting}
-              onClick={() => { setDeleteOpen(false); setDeleteTarget(null); }}
+              onClick={() => {
+                setDeleteOpen(false);
+                setDeleteTarget(null);
+              }}
             >
               Cancel
             </AlertDialogCancel>

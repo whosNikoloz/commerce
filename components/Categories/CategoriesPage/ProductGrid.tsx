@@ -36,7 +36,7 @@ function formatCondition(c: Condition) {
 function formatPrice(p?: number) {
   if (typeof p !== "number") return "";
 
-  return `$${p.toFixed(2)}`;
+  return `${p.toFixed(2)} ₾`;
 }
 
 // ✅ Memoized card to cut re-renders
@@ -259,13 +259,11 @@ const ProductCard = memo(function ProductCard({
                     itemType="https://schema.org/Offer"
                   >
                     <meta content="USD" itemProp="priceCurrency" />
-                    <span itemProp="price">{displayPrice}</span>
+                    <span itemProp="price"> {formatPrice(displayPrice)}</span>
                   </span>
-                  {typeof originalPrice === "number" && (
-                    <span className="text-lg text-gray-400 line-through">
-                      {formatPrice(originalPrice)}
-                    </span>
-                  )}
+                  <span className="text-lg text-gray-400 line-through">
+                    {formatPrice(originalPrice)}
+                  </span>
                 </div>
 
                 <div className="flex gap-2 pt-2">

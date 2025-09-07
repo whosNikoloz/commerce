@@ -10,6 +10,7 @@ import { site } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import { locales, defaultLocale } from "@/i18n.config";
+import BackToTopShadcn from "@/components/back_to_top";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -64,7 +65,10 @@ export default async function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <LayoutWrapper>
+            {children}
+            <BackToTopShadcn threshold={320} />
+          </LayoutWrapper>
         </Providers>
       </body>
     </html>

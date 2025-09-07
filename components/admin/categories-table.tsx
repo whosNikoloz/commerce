@@ -6,7 +6,12 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -55,8 +60,7 @@ export function CategoriesTable({ initialCategories }: Props) {
     if (!q) return categories;
     return categories.filter(
       (c) =>
-        (c.name ?? "").toLowerCase().includes(q) ||
-        (c.description ?? "").toLowerCase().includes(q),
+        (c.name ?? "").toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q),
     );
   }, [categories, searchTerm]);
 
@@ -74,7 +78,7 @@ export function CategoriesTable({ initialCategories }: Props) {
         </div>
       </CardHeader>
 
-      <CardContent className="overflow-auto max-h-[calc(100vh-240px)]">
+      <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
         <Table>
           <TableHeader>
             <TableRow>

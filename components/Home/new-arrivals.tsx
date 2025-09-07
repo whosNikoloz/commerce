@@ -91,10 +91,10 @@ export function NewArrivals() {
                 {p.name ?? "Unnamed"}
               </h3>
               <p className="font-sans text-lg font-semibold text-text-light dark:text-text-lightdark">
-                {p.discountPrice ?? p.price}
+                {p.discountPrice ?? p.price} ₾
                 {p.discountPrice && (
                   <span className="ml-2 text-sm text-text-subtle dark:text-text-subtledark line-through">
-                    {p.price}
+                    {p.price} ₾
                   </span>
                 )}
               </p>

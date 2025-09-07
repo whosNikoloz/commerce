@@ -8,312 +8,303 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@heroui/input";
 import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 
-
 import type { FinaSyncStatus } from "@/types/fina";
-import { getFinaSyncStatus, syncAll, fullSync, syncCharacteristics, syncProduct } from "@/app/api/services/syncService";
+import {
+  getFinaSyncStatus,
+  syncAll,
+  fullSync,
+  syncCharacteristics,
+  syncProduct,
+} from "@/app/api/services/syncService";
 
 type LogLevel = "info" | "success" | "error";
 type LogItem = {
-    id: string;
-    t: string;          // ISO time
-    level: LogLevel;
-    msg: string;
+  id: string;
+  t: string; // ISO time
+  level: LogLevel;
+  msg: string;
 };
 
 const levelColor: Record<LogLevel, string> = {
-    info: "text-slate-600 dark:text-slate-300",
-    success: "text-emerald-600 dark:text-emerald-400",
-    error: "text-red-600 dark:text-red-400",
+  info: "text-slate-600 dark:text-slate-300",
+  success: "text-emerald-600 dark:text-emerald-400",
+  error: "text-red-600 dark:text-red-400",
 };
 
 export default function FinaSyncPanel() {
-    const [status, setStatus] = useState<FinaSyncStatus | null>(null);
-    const [busy, setBusy] = useState(false);
-    const [productId, setProductId] = useState<string>("");
+  const [status, setStatus] = useState<FinaSyncStatus | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [productId, setProductId] = useState<string>("");
 
-    // logs live in memory; if you want persistence, write to localStorage here
-    const [logs, setLogs] = useState<LogItem[]>([]);
-    const logEndRef = useRef<HTMLDivElement | null>(null);
+  // logs live in memory; if you want persistence, write to localStorage here
+  const [logs, setLogs] = useState<LogItem[]>([]);
+  const logEndRef = useRef<HTMLDivElement | null>(null);
 
-    const addLog = useCallback((msg: string, level: LogLevel = "info") => {
-        setLogs((prev) => [
-            ...prev,
-            { id: crypto.randomUUID(), t: new Date().toISOString(), level, msg },
-        ]);
-    }, []);
+  const addLog = useCallback((msg: string, level: LogLevel = "info") => {
+    setLogs((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), t: new Date().toISOString(), level, msg },
+    ]);
+  }, []);
 
-    const scrollToBottom = useCallback(() => {
-        logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, []);
+  const scrollToBottom = useCallback(() => {
+    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [logs, scrollToBottom]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [logs, scrollToBottom]);
 
-    // // Poll status every 1500ms
-    // useEffect(() => {
-    //     let cancelled = false;
-    //     let timer: any;
+  // // Poll status every 1500ms
+  // useEffect(() => {
+  //     let cancelled = false;
+  //     let timer: any;
 
-    //     const tick = async () => {
-    //         try {
-    //             const s = await getFinaSyncStatus();
-    //             if (!cancelled) setStatus(s);
-    //         } catch (e) {
-    //             // Swallow errors silently (server might 401/stop)
-    //         }
-    //     };
+  //     const tick = async () => {
+  //         try {
+  //             const s = await getFinaSyncStatus();
+  //             if (!cancelled) setStatus(s);
+  //         } catch (e) {
+  //             // Swallow errors silently (server might 401/stop)
+  //         }
+  //     };
 
-    //     // initial quick fetch
-    //     tick();
-    //     timer = setInterval(tick, 1500);
+  //     // initial quick fetch
+  //     tick();
+  //     timer = setInterval(tick, 1500);
 
-    //     return () => {
-    //         cancelled = true;
-    //         clearInterval(timer);
-    //     };
-    // }, []);
+  //     return () => {
+  //         cancelled = true;
+  //         clearInterval(timer);
+  //     };
+  // }, []);
 
-    const onSyncAll = async () => {
-        try {
-            setBusy(true);
-            addLog("Sync-All started…", "info");
-            await syncAll();
-            addLog("Sync-All finished.", "success");
-            toast.success("Sync-All finished");
-        } catch (e: any) {
-            console.error(e);
-            addLog(`Sync-All failed: ${e?.message ?? "Unknown error"}`, "error");
-            toast.error("Sync-All failed");
-        } finally {
-            setBusy(false);
-        }
-    };
+  const onSyncAll = async () => {
+    try {
+      setBusy(true);
+      addLog("Sync-All started…", "info");
+      await syncAll();
+      addLog("Sync-All finished.", "success");
+      toast.success("Sync-All finished");
+    } catch (e: any) {
+      console.error(e);
+      addLog(`Sync-All failed: ${e?.message ?? "Unknown error"}`, "error");
+      toast.error("Sync-All failed");
+    } finally {
+      setBusy(false);
+    }
+  };
 
-    const onFullSync = async () => {
-        try {
-            setBusy(true);
-            addLog("Full Sync started…", "info");
-            await fullSync();
-            addLog("Full Sync finished.", "success");
-            toast.success("Full Sync finished");
-        } catch (e: any) {
-            console.error(e);
-            addLog(`Full Sync failed: ${e?.message ?? "Unknown error"}`, "error");
-            toast.error("Full Sync failed");
-        } finally {
-            setBusy(false);
-        }
-    };
+  const onFullSync = async () => {
+    try {
+      setBusy(true);
+      addLog("Full Sync started…", "info");
+      await fullSync();
+      addLog("Full Sync finished.", "success");
+      toast.success("Full Sync finished");
+    } catch (e: any) {
+      console.error(e);
+      addLog(`Full Sync failed: ${e?.message ?? "Unknown error"}`, "error");
+      toast.error("Full Sync failed");
+    } finally {
+      setBusy(false);
+    }
+  };
 
-    const onSyncCharacteristics = async () => {
-        try {
-            setBusy(true);
-            addLog("Sync-Characteristics started…", "info");
-            await syncCharacteristics();
-            addLog("Sync-Characteristics finished.", "success");
-            toast.success("Characteristics synced");
-        } catch (e: any) {
-            console.error(e);
-            addLog(`Sync-Characteristics failed: ${e?.message ?? "Unknown error"}`, "error");
-            toast.error("Characteristics sync failed");
-        } finally {
-            setBusy(false);
-        }
-    };
+  const onSyncCharacteristics = async () => {
+    try {
+      setBusy(true);
+      addLog("Sync-Characteristics started…", "info");
+      await syncCharacteristics();
+      addLog("Sync-Characteristics finished.", "success");
+      toast.success("Characteristics synced");
+    } catch (e: any) {
+      console.error(e);
+      addLog(`Sync-Characteristics failed: ${e?.message ?? "Unknown error"}`, "error");
+      toast.error("Characteristics sync failed");
+    } finally {
+      setBusy(false);
+    }
+  };
 
-    const onSyncProduct = async () => {
-        const id = Number(productId);
-        if (!Number.isFinite(id)) {
-            toast.error("Enter a valid product ID");
-            return;
-        }
-        try {
-            setBusy(true);
-            addLog(`Sync-Product(${id}) started…`, "info");
-            await syncProduct(id);
-            addLog(`Sync-Product(${id}) finished.`, "success");
-            toast.success(`Product ${id} synced`);
-        } catch (e: any) {
-            console.error(e);
-            addLog(`Sync-Product(${id}) failed: ${e?.message ?? "Unknown error"}`, "error");
-            toast.error(`Product ${id} sync failed`);
-        } finally {
-            setBusy(false);
-        }
-    };
+  const onSyncProduct = async () => {
+    const id = Number(productId);
+    if (!Number.isFinite(id)) {
+      toast.error("Enter a valid product ID");
+      return;
+    }
+    try {
+      setBusy(true);
+      addLog(`Sync-Product(${id}) started…`, "info");
+      await syncProduct(id);
+      addLog(`Sync-Product(${id}) finished.`, "success");
+      toast.success(`Product ${id} synced`);
+    } catch (e: any) {
+      console.error(e);
+      addLog(`Sync-Product(${id}) failed: ${e?.message ?? "Unknown error"}`, "error");
+      toast.error(`Product ${id} sync failed`);
+    } finally {
+      setBusy(false);
+    }
+  };
 
-    const progressLabel = useMemo(() => {
-        if (!status) return "—";
-        const p = typeof status.progress === "number" ? `${status.progress}%` : "—";
-        const stage = status.stage ? ` • ${status.stage}` : "";
-        return `${p}${stage}`;
-    }, [status]);
+  const progressLabel = useMemo(() => {
+    if (!status) return "—";
+    const p = typeof status.progress === "number" ? `${status.progress}%` : "—";
+    const stage = status.stage ? ` • ${status.stage}` : "";
+    return `${p}${stage}`;
+  }, [status]);
 
-    return (
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-            {/* Left: Controls + Status (spans 2) */}
-            <div className="xl:col-span-2 space-y-6">
-                <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
-                    <CardHeader>
-                        <div className="flex items-center gap-2">
-                            <ListChecks className="h-5 w-5" />
-                            <div className="text-lg font-semibold">Controls</div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button
-                                className="gap-2"
-                                disabled={busy}
-                                onClick={onSyncAll}
-                                variant="secondary"
-                            >
-                                <RefreshCw className="h-4 w-4" />
-                                Sync All
-                            </Button>
-                            <Button
-                                className="gap-2"
-                                disabled={busy}
-                                onClick={onFullSync}
-                            >
-                                <Play className="h-4 w-4" />
-                                Full Sync
-                            </Button>
-                            <Button
-                                className="gap-2"
-                                disabled={busy}
-                                onClick={onSyncCharacteristics}
-                                variant="outline"
-                            >
-                                <ListChecks className="h-4 w-4" />
-                                Characteristics
-                            </Button>
-
-                            <div className="flex items-center gap-2">
-                                <Input
-                                    aria-label="Product ID"
-                                    placeholder="Product ID"
-                                    type="number"
-                                    size="sm"
-                                    value={productId}
-                                    onChange={(e) => setProductId(e.target.value)}
-                                />
-                                <Button
-                                    className="gap-2"
-                                    disabled={busy}
-                                    onClick={onSyncProduct}
-                                    variant="secondary"
-                                >
-                                    <PackageSearch className="h-4 w-4" />
-                                    Sync Product
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
-                    <CardHeader>
-                        <div className="flex items-center gap-2">
-                            <RefreshCw className="h-5 w-5" />
-                            <div className="text-lg font-semibold">Live Status</div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <div className="text-sm text-muted-foreground">
-                            {status?.running ? "Running" : "Idle"}
-                        </div>
-                        <div className="text-base font-medium">
-                            {progressLabel}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            {status?.message ?? ""}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            Started: {status?.startedAt ?? "—"}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            Finished: {status?.finishedAt ?? "—"}
-                        </div>
-                    </CardContent>
-                </Card>
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+      {/* Left: Controls + Status (spans 2) */}
+      <div className="xl:col-span-2 space-y-6">
+        <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <ListChecks className="h-5 w-5" />
+              <div className="text-lg font-semibold">Controls</div>
             </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <Button className="gap-2" disabled={busy} onClick={onSyncAll} variant="secondary">
+                <RefreshCw className="h-4 w-4" />
+                Sync All
+              </Button>
+              <Button className="gap-2" disabled={busy} onClick={onFullSync}>
+                <Play className="h-4 w-4" />
+                Full Sync
+              </Button>
+              <Button
+                className="gap-2"
+                disabled={busy}
+                onClick={onSyncCharacteristics}
+                variant="outline"
+              >
+                <ListChecks className="h-4 w-4" />
+                Characteristics
+              </Button>
 
-            {/* Right: Logger (spans 3) */}
-            <div className="xl:col-span-3">
-                <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Terminal className="h-5 w-5" />
-                                <div className="text-lg font-semibold">Activity Log</div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setLogs([])}
-                                >
-                                    Clear
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    onClick={() => {
-                                        const blob = new Blob(
-                                            [logs.map(l => `[${l.t}] ${l.level.toUpperCase()} - ${l.msg}`).join("\n")],
-                                            { type: "text/plain;charset=utf-8" }
-                                        );
-                                        const url = URL.createObjectURL(blob);
-                                        const a = document.createElement("a");
-                                        a.href = url;
-                                        a.download = `fina-sync-log-${new Date().toISOString()}.txt`;
-                                        a.click();
-                                        URL.revokeObjectURL(url);
-                                    }}
-                                >
-                                    Download
-                                </Button>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="overflow-auto max-h-[calc(100vh-260px)]">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">Time</TableHead>
-                                    <TableHead>Message</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {logs.map((l) => (
-                                    <TableRow key={l.id}>
-                                        <TableCell className="align-top text-xs text-muted-foreground">
-                                            {new Date(l.t).toLocaleString()}
-                                        </TableCell>
-                                        <TableCell className={`align-top text-sm ${levelColor[l.level]}`}>
-                                            {l.msg}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {logs.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={2} className="text-center py-8 text-slate-500">
-                                            No activity yet.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                        <div ref={logEndRef} />
-                    </CardContent>
-                </Card>
+              <div className="flex items-center gap-2">
+                <Input
+                  aria-label="Product ID"
+                  placeholder="Product ID"
+                  type="number"
+                  size="sm"
+                  value={productId}
+                  onChange={(e) => setProductId(e.target.value)}
+                />
+                <Button
+                  className="gap-2"
+                  disabled={busy}
+                  onClick={onSyncProduct}
+                  variant="secondary"
+                >
+                  <PackageSearch className="h-4 w-4" />
+                  Sync Product
+                </Button>
+              </div>
             </div>
-        </div>
-    );
+          </CardContent>
+        </Card>
+
+        <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              <div className="text-lg font-semibold">Live Status</div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              {status?.running ? "Running" : "Idle"}
+            </div>
+            <div className="text-base font-medium">{progressLabel}</div>
+            <div className="text-xs text-muted-foreground">{status?.message ?? ""}</div>
+            <div className="text-xs text-muted-foreground">Started: {status?.startedAt ?? "—"}</div>
+            <div className="text-xs text-muted-foreground">
+              Finished: {status?.finishedAt ?? "—"}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right: Logger (spans 3) */}
+      <div className="xl:col-span-3">
+        <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Terminal className="h-5 w-5" />
+                <div className="text-lg font-semibold">Activity Log</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline" onClick={() => setLogs([])}>
+                  Clear
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    const blob = new Blob(
+                      [logs.map((l) => `[${l.t}] ${l.level.toUpperCase()} - ${l.msg}`).join("\n")],
+                      { type: "text/plain;charset=utf-8" },
+                    );
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `fina-sync-log-${new Date().toISOString()}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                >
+                  Download
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[220px]">Time</TableHead>
+                  <TableHead>Message</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {logs.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell className="align-top text-xs text-muted-foreground">
+                      {new Date(l.t).toLocaleString()}
+                    </TableCell>
+                    <TableCell className={`align-top text-sm ${levelColor[l.level]}`}>
+                      {l.msg}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {logs.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center py-8 text-slate-500">
+                      No activity yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            <div ref={logEndRef} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 }

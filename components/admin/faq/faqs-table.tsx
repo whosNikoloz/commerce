@@ -205,7 +205,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       .filter((f) =>
         q
           ? (f.question ?? "").toLowerCase().includes(q) ||
-          (f.answer ?? "").toLowerCase().includes(q)
+            (f.answer ?? "").toLowerCase().includes(q)
           : true,
       )
       .filter((f) => (onlyActive ? !!f.isActive : true))
@@ -400,7 +400,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
           </div>
         </CardHeader>
 
-        <CardContent className="overflow-auto max-h-[calc(100vh-220px)]">
+        <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
           {loading && <p className="p-4 text-gray-500">იტვირთება…</p>}
           {error && <p className="p-4 text-red-500">{error}</p>}
 

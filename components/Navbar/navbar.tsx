@@ -123,7 +123,7 @@ export const Navbar = () => {
                 <div className="items-center space-x-4 hidden md:flex">
                   <CartDropdown />
                   <LanguageSwitch />
-                  {user ? (
+                  {/* {user ? (
                     <Image
                       alt="User Avatar"
                       className="rounded-full border border-gray-300"
@@ -133,7 +133,7 @@ export const Navbar = () => {
                     />
                   ) : (
                     <AuthModal IsMobile={isMobile} />
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -174,14 +174,14 @@ export const Navbar = () => {
             <ProfileIcon className="w-6 h-6" />
             <span className="text-xs">{lng === "en" ? "Chat" : "ჩათი"}</span>
           </Link>
-          {user ? (
+          {/* {user ? (
             <Link className="relative flex flex-col items-center" href={`/${lng}/profile`}>
               <Image alt="User Avatar" className="rounded-full w-6 h-6" src="/img1.jpg" />
               <span className="text-xs">{lng === "en" ? "Profile" : "პროფილი"}</span>
             </Link>
           ) : (
             <AuthModal IsMobile={isMobile} />
-          )}
+          )} */}
         </div>
       </div>
     </>

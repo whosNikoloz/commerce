@@ -1,9 +1,10 @@
-import { getBrandById } from "@/app/api/services/brandService";
-import { getCategoryById } from "@/app/api/services/categoryService";
 import { BrandModel } from "./brand";
 import { CategoryModel } from "./category";
 import { StockStatus, Condition } from "./enums";
 import { ProductFacetValueModel, ProductFacetValueResponseModel } from "./facet";
+
+import { getCategoryById } from "@/app/api/services/categoryService";
+import { getBrandById } from "@/app/api/services/brandService";
 
 export interface ProductResponseModel {
   id: string;

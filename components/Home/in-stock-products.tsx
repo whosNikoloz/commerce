@@ -110,11 +110,11 @@ export function InStockProducts() {
                 </h3>
                 <div className="flex items-center gap-2">
                   <span className="font-sans text-lg font-semibold text-text-light dark:text-text-lightdark">
-                    {p.discountPrice ?? p.price}
+                    {p.discountPrice ?? p.price} ₾
                   </span>
                   {discounted && (
                     <span className="font-sans text-sm text-text-subtle dark:text-text-subtledark line-through">
-                      {p.price}
+                      {p.price} ₾
                     </span>
                   )}
                 </div>

@@ -36,7 +36,7 @@ function formatCondition(c: Condition) {
 function formatPrice(p?: number) {
   if (typeof p !== "number") return "";
 
-  return `$${p.toFixed(2)}`;
+  return `${p.toFixed(2)} ₾`;
 }
 
 // ✅ Memoized card to cut re-renders
@@ -246,9 +246,9 @@ const ProductCard = memo(function ProductCard({
                   <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {product.name ?? "Unnamed Product"}
                   </h3>
-                  {metaLine && (
+                  {/* {metaLine && (
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{metaLine}</p>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -259,13 +259,11 @@ const ProductCard = memo(function ProductCard({
                     itemType="https://schema.org/Offer"
                   >
                     <meta content="USD" itemProp="priceCurrency" />
-                    <span itemProp="price">{displayPrice}</span>
+                    <span itemProp="price">{formatPrice(displayPrice)}</span>
                   </span>
-                  {typeof originalPrice === "number" && (
-                    <span className="text-lg text-gray-400 line-through">
-                      {formatPrice(originalPrice)}
-                    </span>
-                  )}
+                  <span className="text-lg text-gray-400 line-through">
+                    {formatPrice(originalPrice)}
+                  </span>
                 </div>
 
                 <div className="flex gap-2 pt-2">
@@ -422,13 +420,11 @@ const ProductCard = memo(function ProductCard({
                       itemType="https://schema.org/Offer"
                     >
                       <meta content="USD" itemProp="priceCurrency" />
-                      <span itemProp="price">{displayPrice}</span>
+                      <span itemProp="price">{formatPrice(displayPrice)}</span>
                     </span>
-                    {typeof originalPrice === "number" && (
-                      <span className="text-base md:text-lg text-gray-400 line-through">
-                        {formatPrice(originalPrice)}
-                      </span>
-                    )}
+                    <span className="text-base md:text-lg text-gray-400 line-through">
+                      {formatPrice(originalPrice)}
+                    </span>
                   </div>
                 </div>
 

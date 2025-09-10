@@ -16,7 +16,7 @@ export default function Loading() {
               <div>
                 <div className="h-5 w-32 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                 <div className="mt-4 space-y-2">
-                  {Array.from({ length: 6 }).map((_, i) => (
+                  {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="flex items-center justify-between">
                       <div className="h-4 w-40 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                       <div className="h-4 w-10 rounded bg-gray-300/30 dark:bg-gray-600/30" />
@@ -25,7 +25,7 @@ export default function Loading() {
                 </div>
               </div>
 
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className="space-y-3">
                   <div className="h-5 w-28 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                   <div className="space-y-2">
@@ -61,12 +61,12 @@ export default function Loading() {
             </div>
 
             <div className="flex flex-wrap gap-2 animate-pulse">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className="h-6 w-24 rounded bg-gray-300/30 dark:bg-gray-600/30" />
               ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
               {cards.map((_, i) => (
                 <div
                   key={i}
@@ -74,7 +74,6 @@ export default function Loading() {
                 >
                   <div className="animate-pulse">
                     <div className="w-full aspect-square rounded-md bg-gray-300/40 dark:bg-gray-600/40" />
-
                     <div className="mt-3 space-y-2">
                       <div className="h-4 w-3/4 rounded bg-gray-300/40 dark:bg-gray-600/40" />
                       <div className="flex items-center gap-2">

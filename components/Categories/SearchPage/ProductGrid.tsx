@@ -128,6 +128,8 @@ const ProductCard = memo(function ProductCard({
     if (emblaApi) emblaApi.scrollNext();
   };
 
+  const imgSrc = images?.[0];
+
   return (
     <article itemScope itemType="https://schema.org/Product">
       <meta content={product.name ?? "Product"} itemProp="name" />
@@ -280,166 +282,57 @@ const ProductCard = memo(function ProductCard({
             </div>
           ) : (
             <div
-              className="w-full rounded-2xl bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-sm hover:shadow-md transition"
+              className="flex flex-row items-center w-full rounded-2xl bg-slate-900 text-white  shadow-sm hover:shadow-md transition"
               role="listitem"
             >
-              <div className="grid gap-4 md:gap-6 items-startgrid-cols-1 md:[grid-template-columns:minmax(180px,240px)_1fr_auto]">
-                {/* LEFT: image carousel (with padding for dots) */}
-                <div className="relative shrink-0">
-                  <div
-                    ref={emblaRef}
-                    className="
-          relative overflow-hidden rounded-xl
-          w-full md:w-[240px] h-[170px] md:h-[190px]
-          pb-4
-        "
-                  >
-                    <div className="flex touch-pan-y h-full">
-                      {images.map((imgSrc, idx) => (
-                        <div key={idx} className="flex-[0_0_100%]">
-                          <div className="relative h-full">
-                            <Image
-                              alt={`${product.name ?? "Product image"} ${idx + 1}`}
-                              className="w-full h-full object-cover rounded-xl bg-white"
-                              height={195}
-                              priority={idx === 0}
-                              src={imgSrc}
-                              width={260}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              <div className="relative w-[100px] h-[100px] md:w-[160px] md:h-[140px] overflow-hidden rounded-xl bg-white">
+                {imgSrc && (
+                  <Image
+                    fill
+                    priority
+                    alt={product.name ?? "Product image"}
+                    className="object-contain"
+                    sizes="160px"
+                    src={imgSrc}
+                  />
+                )}
+              </div>
 
-                  {/* corner badges */}
-                  <div className="absolute left-2 top-2 z-10 flex flex-col gap-1.5">
-                    {showComingSoon && (
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow">
-                        <Clock3 className="h-3 w-3 mr-1" /> Coming Soon
-                      </Badge>
-                    )}
-                    {showNew && (
-                      <Badge className="bg-gradient-to-r from-emerald-400 to-teal-500 text-white border-0 shadow">
-                        <Sparkles className="h-3 w-3 mr-1" /> New
-                      </Badge>
-                    )}
-                    {showClearance && (
-                      <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 shadow">
-                        <Tag className="h-3 w-3 mr-1" /> Clearance
-                      </Badge>
-                    )}
-                    {discountPct > 0 && (
-                      <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 font-bold shadow">
-                        −{discountPct}%
-                      </Badge>
-                    )}
-                  </div>
+              <div className="flex justify-start items-start flex-col px-4 flex-1 ">
+                <Link
+                  prefetch
+                  className="mt-3 text-center text-sm md:text-base font-semibold leading-tight tracking-wide uppercase hover:text-blue-400 line-clamp-2"
+                  href={`/product/${product.id}`}
+                >
+                  {product.name ?? "Unnamed Product"}
+                </Link>
 
-                  {/* arrows */}
-                  {images.length > 1 && (
-                    <>
-                      <button
-                        aria-label="Previous image"
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 shadow"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          emblaApi?.scrollPrev();
-                        }}
-                      >
-                        <ChevronRight className="h-4 w-4 rotate-180" />
-                      </button>
-                      <button
-                        aria-label="Next image"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 shadow"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          emblaApi?.scrollNext();
-                        }}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
+                <span className="">
+                  {metaLine && <p className="text-xs md:text-sm text-white/70 mt-1">{metaLine}</p>}
+                </span>
 
-                      <div className="absolute inset-x-0 bottom-2 flex items-center justify-center">
-                        <div className="px-1.5 py-0.5 rounded-full bg-black/35 backdrop-blur-sm">
-                          <ul className="flex items-center gap-1">
-                            {images.map((_, i) => {
-                              const active = i === selectedImageIndex;
+                {/* PRICE */}
+                <div className="mt-2 flex items-baseline justify-center gap-2">
+                  <span className="text-xl md:text-2xl font-extrabold">
+                    {product.price.toLocaleString()} ₾
+                  </span>
 
-                              return (
-                                <li key={i}>
-                                  <button
-                                    aria-current={active ? "true" : undefined}
-                                    aria-label={`Go to image ${i + 1} of ${images.length}`}
-                                    className={[
-                                      "h-1.5 w-1.5 rounded-full transition",
-                                      active
-                                        ? "bg-white"
-                                        : "bg-white/60 hover:bg-white/80 outline-none",
-                                    ].join(" ")}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      onSelectImage(product.id, i);
-                                      emblaApi?.scrollTo(i);
-                                    }}
-                                  />
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* MIDDLE: info (no vertical centering; allow wrap) */}
-                <div className="min-w-0 flex flex-col">
-                  <Link
-                    prefetch
-                    className="block text-lg md:text-xl font-semibold leading-tight hover:text-brand-primary transition-colors line-clamp-2"
-                    href={`/product/${product.id}`}
-                  >
-                    {product.name ?? "Unnamed Product"}
-                  </Link>
-
-                  {metaLine && (
-                    <p className="mt-1 text-sm md:text-[15px] text-text-subtle dark:text-text-subtledark line-clamp-2">
-                      {metaLine}
-                    </p>
-                  )}
-
-                  <div className="mt-3 flex items-baseline gap-3">
-                    <span
-                      itemScope
-                      className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white"
-                      itemProp="offers"
-                      itemType="https://schema.org/Offer"
-                    >
-                      <meta content="USD" itemProp="priceCurrency" />
-                      <span itemProp="price">{formatPrice(displayPrice)}</span>
+                  {typeof originalPrice === "number" && originalPrice > product.price && (
+                    <span className="text-sm text-white/50 line-through">
+                      {originalPrice.toLocaleString()} ₾
                     </span>
-                    <span className="text-base md:text-lg text-gray-400 line-through">
-                      {formatPrice(originalPrice)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* RIGHT: actions */}
-                <div className="flex flex-col items-end justify-center gap-2">
-                  <Button
-                    className="min-w-[150px] h-11 px-5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
-                    disabled={!inStock || showComingSoon}
-                    onClick={() => onAdd(product.id)}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {ctaLabel}
-                  </Button>
+                  )}
                 </div>
               </div>
+
+              {/* CART BUTTON */}
+              <button
+                aria-label="Add to cart"
+                className="mt-4 inline-flex items-center justify-center h-11 w-11 rounded-xl bg-brand-primary text-white shadow-md transition"
+                onClick={() => onAdd(product.id)}
+              >
+                <ShoppingCart className="h-5 w-5" />
+              </button>
             </div>
           )}
         </CardBody>
@@ -485,7 +378,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       aria-label="Products"
       className={
         viewMode === "grid"
-          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6"
+          ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
           : "space-y-4"
       }
       role="list"

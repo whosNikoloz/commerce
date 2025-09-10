@@ -1,32 +1,58 @@
-import { NextResponse } from "next/server";
+import type { PaymentProvider } from "@/lib/payment/types";
 
-import { CreateOrderPayload, PaymentProvider } from "@/lib/payment";
+import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL!;
+import { createOrderSession } from "./webapi";
 
-type ClientBody = CreateOrderPayload & { provider: PaymentProvider };
+import { bogCreateOrder } from "@/lib/payment/bog";
+import { tbcCreatePayment } from "@/lib/payment/tbc";
 
-export async function POST(req: Request) {
+export const dynamic = "force-dynamic";
+
+export async function POST(req: NextRequest) {
   try {
-    const payload = (await req.json()) as ClientBody;
+    const body = await req.json();
+    const provider: PaymentProvider = body.provider;
 
-    const res = await fetch(`${BACKEND}/api/payment/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload), // includes provider now
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-
-      return NextResponse.json({ error: text || "Create failed" }, { status: 500 });
+    // Basic validation
+    if (!body?.orderId || !body?.amount || !Array.isArray(body?.items)) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const json = await res.json();
+    if (provider === "bog") {
+      const out = await bogCreateOrder({ payload: body, locale: "en-US" });
 
-    return NextResponse.json(json);
+      await createOrderSession({
+        orderId: body.orderId,
+        provider: "bog",
+        amount: body.amount,
+        currency: body.currency,
+        customer: body.customer,
+        cart: body.items,
+        bank: { bogOrderId: out.orderId },
+      });
+
+      return NextResponse.json({ orderId: body.orderId, paymentUrl: out.paymentUrl });
+    }
+
+    if (provider === "tbc") {
+      const out = await tbcCreatePayment({ payload: body, methods: undefined, language: "EN" });
+
+      await createOrderSession({
+        orderId: body.orderId,
+        provider: "tbc",
+        amount: body.amount,
+        currency: body.currency,
+        customer: body.customer,
+        cart: body.items,
+        bank: { tbcPayId: out.payId },
+      });
+
+      return NextResponse.json({ orderId: body.orderId, paymentUrl: out.paymentUrl });
+    }
+
+    return NextResponse.json({ error: "Unsupported provider" }, { status: 400 });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Unexpected error" }, { status: 500 });
+    return NextResponse.json({ error: e?.message ?? "Payment init failed" }, { status: 500 });
   }
 }

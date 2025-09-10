@@ -1,18 +1,18 @@
 "use client";
 
-import type React from "react";
+import type { CreateOrderPayload, PaymentProvider } from "@/lib/payment/types";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import CheckoutForm, { CheckoutFormValues } from "./CheckoutForm";
 import OrderSummary from "./OrderSummary";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
-import { apiPost, CreateOrderPayload, PaymentProvider } from "@/lib/payment";
+import { apiPost } from "@/app/api/payment";
 
 export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -22,13 +22,16 @@ export default function CheckoutPage() {
   const cartLen = useCartStore((s) => s.getCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
   const clearCart = useCartStore((s) => s.clearCart);
-  const [provider, setProvider] = useState<PaymentProvider>("bog");
 
+  const [provider, setProvider] = useState<PaymentProvider>("bog");
   const router = useRouter();
 
   const shipping = subtotal > 50 ? 0 : 9.99;
   const tax = subtotal * 0.08;
-  const total = useMemo(() => subtotal + shipping + tax, [subtotal, shipping, tax]);
+  const total = useMemo(
+    () => Number((subtotal + shipping + tax).toFixed(2)),
+    [subtotal, shipping, tax],
+  );
 
   useEffect(() => {
     if (cartLen === 0) router.push("/cart");
@@ -43,11 +46,12 @@ export default function CheckoutPage() {
       const payload: CreateOrderPayload & { provider: PaymentProvider } = {
         orderId: crypto.randomUUID(),
         currency: "GEL",
-        amount: Number(total.toFixed(2)),
+        amount: total,
         items: cart.map((i) => ({
           productId: i.id,
           qty: i.quantity,
           unitPrice: Number(i.price),
+          name: i.name, // ✅ helpful for BOG item description
         })),
         customer: {
           firstName: form.firstName,
@@ -77,13 +81,11 @@ export default function CheckoutPage() {
 
       const data = await apiPost<{ orderId: string; paymentUrl: string }>("/api/payment", payload);
 
-      if (data.paymentUrl) {
-        if (typeof window !== "undefined") sessionStorage.setItem("lastOrderId", data.orderId);
-        window.location.href = data.paymentUrl;
+      if (!data?.paymentUrl) throw new Error("paymentUrl missing");
 
-        return;
-      }
-      throw new Error("paymentUrl missing");
+      if (typeof window !== "undefined") sessionStorage.setItem("lastOrderId", data.orderId);
+      window.location.href = data.paymentUrl; // 🔁 redirect to bank page
+      // (Do NOT clear cart here; only after confirmed success.)
     } catch (e: any) {
       setError(e?.message ?? "Failed to start payment.");
       setIsProcessing(false);
@@ -94,7 +96,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Button asChild size="icon" variant="ghost">
+          <Button asChild disabled={isProcessing} size="icon" variant="ghost">
             <Link href="/cart">
               <ArrowLeft className="h-4 w-4" />
             </Link>

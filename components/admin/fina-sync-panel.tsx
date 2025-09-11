@@ -1,12 +1,13 @@
 "use client";
 
+import type { FinaSyncStatus } from "@/types/fina";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Play, RefreshCw, ListChecks, PackageSearch, Terminal } from "lucide-react";
+import { Play, RefreshCw, ListChecks, Terminal } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@heroui/input";
 import {
   Table,
   TableBody,
@@ -15,14 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import type { FinaSyncStatus } from "@/types/fina";
 import {
   getFinaSyncStatus,
   syncAll,
   fullSync,
-  syncCharacteristics,
-  syncProduct,
+  finaAuthenticate,
 } from "@/app/api/services/syncService";
 
 type LogLevel = "info" | "success" | "error";
@@ -42,9 +40,6 @@ const levelColor: Record<LogLevel, string> = {
 export default function FinaSyncPanel() {
   const [status, setStatus] = useState<FinaSyncStatus | null>(null);
   const [busy, setBusy] = useState(false);
-  const [productId, setProductId] = useState<string>("");
-
-  // logs live in memory; if you want persistence, write to localStorage here
   const [logs, setLogs] = useState<LogItem[]>([]);
   const logEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,28 +58,27 @@ export default function FinaSyncPanel() {
     scrollToBottom();
   }, [logs, scrollToBottom]);
 
-  // // Poll status every 1500ms
   // useEffect(() => {
-  //     let cancelled = false;
-  //     let timer: any;
+  //   let cancelled = false;
+  //   let timer: any;
 
-  //     const tick = async () => {
-  //         try {
-  //             const s = await getFinaSyncStatus();
-  //             if (!cancelled) setStatus(s);
-  //         } catch (e) {
-  //             // Swallow errors silently (server might 401/stop)
-  //         }
-  //     };
+  //   const tick = async () => {
+  //     try {
+  //       const s = await getFinaSyncStatus();
 
-  //     // initial quick fetch
-  //     tick();
-  //     timer = setInterval(tick, 1500);
+  //       if (!cancelled) setStatus(s);
+  //     } catch (e) {
+  //       // Swallow errors silently (server might 401/stop)
+  //     }
+  //   };
 
-  //     return () => {
-  //         cancelled = true;
-  //         clearInterval(timer);
-  //     };
+  //   tick();
+  //   timer = setInterval(tick, 1500);
+
+  //   return () => {
+  //     cancelled = true;
+  //     clearInterval(timer);
+  //   };
   // }, []);
 
   const onSyncAll = async () => {
@@ -98,6 +92,22 @@ export default function FinaSyncPanel() {
       console.error(e);
       addLog(`Sync-All failed: ${e?.message ?? "Unknown error"}`, "error");
       toast.error("Sync-All failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onAuthorization = async () => {
+    try {
+      setBusy(true);
+      addLog("Authorization started…", "info");
+      await finaAuthenticate();
+      addLog("Authorization finished.", "success");
+      toast.success("Authorization finished");
+    } catch (e: any) {
+      console.error(e);
+      addLog(`Authorization failed: ${e?.message ?? "Unknown error"}`, "error");
+      toast.error("Authorization failed");
     } finally {
       setBusy(false);
     }
@@ -119,47 +129,11 @@ export default function FinaSyncPanel() {
     }
   };
 
-  const onSyncCharacteristics = async () => {
-    try {
-      setBusy(true);
-      addLog("Sync-Characteristics started…", "info");
-      await syncCharacteristics();
-      addLog("Sync-Characteristics finished.", "success");
-      toast.success("Characteristics synced");
-    } catch (e: any) {
-      console.error(e);
-      addLog(`Sync-Characteristics failed: ${e?.message ?? "Unknown error"}`, "error");
-      toast.error("Characteristics sync failed");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const onSyncProduct = async () => {
-    const id = Number(productId);
-    if (!Number.isFinite(id)) {
-      toast.error("Enter a valid product ID");
-      return;
-    }
-    try {
-      setBusy(true);
-      addLog(`Sync-Product(${id}) started…`, "info");
-      await syncProduct(id);
-      addLog(`Sync-Product(${id}) finished.`, "success");
-      toast.success(`Product ${id} synced`);
-    } catch (e: any) {
-      console.error(e);
-      addLog(`Sync-Product(${id}) failed: ${e?.message ?? "Unknown error"}`, "error");
-      toast.error(`Product ${id} sync failed`);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const progressLabel = useMemo(() => {
     if (!status) return "—";
     const p = typeof status.progress === "number" ? `${status.progress}%` : "—";
     const stage = status.stage ? ` • ${status.stage}` : "";
+
     return `${p}${stage}`;
   }, [status]);
 
@@ -176,43 +150,18 @@ export default function FinaSyncPanel() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <Button className="gap-2" disabled={busy} onClick={onSyncAll} variant="secondary">
+              <Button className="gap-2" disabled={busy} variant="secondary" onClick={onSyncAll}>
                 <RefreshCw className="h-4 w-4" />
                 Sync All
               </Button>
-              <Button className="gap-2" disabled={busy} onClick={onFullSync}>
+              <Button className="gap-2" disabled={busy} onClick={onAuthorization}>
+                <Play className="h-4 w-4" />
+                Authorization
+              </Button>
+              {/* <Button className="gap-2" disabled={busy} onClick={onFullSync}>
                 <Play className="h-4 w-4" />
                 Full Sync
-              </Button>
-              <Button
-                className="gap-2"
-                disabled={busy}
-                onClick={onSyncCharacteristics}
-                variant="outline"
-              >
-                <ListChecks className="h-4 w-4" />
-                Characteristics
-              </Button>
-
-              <div className="flex items-center gap-2">
-                <Input
-                  aria-label="Product ID"
-                  placeholder="Product ID"
-                  type="number"
-                  size="sm"
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
-                />
-                <Button
-                  className="gap-2"
-                  disabled={busy}
-                  onClick={onSyncProduct}
-                  variant="secondary"
-                >
-                  <PackageSearch className="h-4 w-4" />
-                  Sync Product
-                </Button>
-              </div>
+              </Button> */}
             </div>
           </CardContent>
         </Card>
@@ -261,6 +210,7 @@ export default function FinaSyncPanel() {
                     );
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement("a");
+
                     a.href = url;
                     a.download = `fina-sync-log-${new Date().toISOString()}.txt`;
                     a.click();
@@ -294,7 +244,7 @@ export default function FinaSyncPanel() {
                 ))}
                 {logs.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={2} className="text-center py-8 text-slate-500">
+                    <TableCell className="text-center py-8 text-slate-500" colSpan={2}>
                       No activity yet.
                     </TableCell>
                   </TableRow>

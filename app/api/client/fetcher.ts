@@ -5,7 +5,6 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
 
   const headers = new Headers(options.headers as Record<string, string> | undefined);
 
-  // Add JSON content-type if needed
   const hasBody = options.body != null && method !== "GET" && method !== "HEAD";
   const isForm = typeof FormData !== "undefined" && options.body instanceof FormData;
 

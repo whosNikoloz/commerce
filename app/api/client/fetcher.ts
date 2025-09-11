@@ -5,6 +5,7 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
 
   const headers = new Headers(options.headers as Record<string, string> | undefined);
 
+  // Add JSON content-type if needed
   const hasBody = options.body != null && method !== "GET" && method !== "HEAD";
   const isForm = typeof FormData !== "undefined" && options.body instanceof FormData;
 
@@ -12,21 +13,18 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     headers.set("Content-Type", "application/json");
   }
 
-  let token: string | null | undefined;
-
   if (needsAuth) {
+    let token: string | null | undefined;
+
     if (isServer) {
       const { cookies } = await import("next/headers");
 
       token = (await cookies()).get("admin_token")?.value ?? null;
     } else {
       try {
-        const res = await fetch("/api/auth/token", {
-          credentials: "same-origin",
-          cache: "no-store",
-        });
+        const r = await fetch("/api/auth/token", { credentials: "same-origin", cache: "no-store" });
 
-        token = res.ok ? ((await res.json())?.token ?? null) : null;
+        token = r.ok ? ((await r.json())?.token ?? null) : null;
       } catch {
         token = null;
       }
@@ -35,28 +33,23 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
       headers.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
   }
 
-  // Optional: limit which hosts get proxied
-  const ALLOW_PROXY = ["https://ecomtest.resorter360.ge"]; // add more if needed
+  if (!headers.has("X-Client-Domain")) {
+    if (isServer) {
+      try {
+        const { headers: nextHeaders } = await import("next/headers");
+        const h = await nextHeaders();
+        const host = h.get("x-forwarded-host") ?? h.get("host");
 
-  let finalUrl = url;
-
-  if (!isServer) {
-    try {
-      const abs = new URL(url, window.location.origin);
-      const isAbsolute = /^https?:/i.test(abs.href);
-      const isCrossOrigin = isAbsolute && abs.origin !== window.location.origin;
-      const allowed = isCrossOrigin && ALLOW_PROXY.some((h) => abs.href.startsWith(h));
-
-      if (allowed) {
-        finalUrl = `/api/proxy?${new URLSearchParams({ u: abs.href }).toString()}`;
+        headers.set("X-Client-Domain", host ?? "unknown");
+      } catch {
+        headers.set("X-Client-Domain", "unknown");
       }
-      // If cross-origin but NOT allowed, you can either throw or let it attempt (and fail) with CORS
-    } catch {
-      /* keep as-is if parsing fails */
+    } else {
+      headers.set("X-Client-Domain", window.location.hostname);
     }
   }
 
-  const res = await fetch(finalUrl, {
+  const res = await fetch(url, {
     ...options,
     headers,
     credentials: isServer ? "include" : "same-origin",

@@ -1,0 +1,46 @@
+import "@/styles/globals.css";
+import type { Viewport, Metadata } from "next";
+
+import { i18nPageMetadata } from "@/lib/seo";
+import { site as siteConfig } from "@/config/site";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang: raw } = await params;
+  const lang = raw === "ka" || raw === "en" ? raw : "en"; // normalize to your supported locales
+
+  return i18nPageMetadata({
+    title: "Admin",
+    description: "Administrative dashboard.",
+    lang,
+    path: "/admin",
+    images: [siteConfig.ogImage],
+    siteName: siteConfig.name,
+    index: false, // noindex admin
+  });
+}
+
+export default function UserLayout({
+  children,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}) {
+  return (
+    <div className="flex flex-1">
+      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl  dark:bg-brand-surfacedark bg-brand-surface p-2 md:p-10  text-text-light dark:text-text-lightdark">
+        {children}
+      </div>
+    </div>
+  );
+}

@@ -1,56 +1,62 @@
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   const isServer = typeof window === "undefined";
   const method = (options.method ?? "GET").toUpperCase();
-  const needsAuth = ["POST", "PUT", "DELETE"].includes(method);
+  const needsAuth = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
 
-  const headers = new Headers({
-    "Content-Type": "application/json",
-    ...(options.headers as Record<string, string> | undefined),
-  });
+  const headers = new Headers(options.headers as Record<string, string> | undefined);
 
-  // async function resolveOrigin() {
-  //   try {
-  //     if (isServer) {
-  //       const { headers: nextHeaders } = await import("next/headers");
-  //       const h = nextHeaders();
-  //       const host = (await h).get("x-forwarded-host") ?? (await h).get("host") ?? undefined;
-  //       const proto = (await h).get("x-forwarded-proto") ?? (process.env.VERCEL ? "https" : "http");
-  //       if (host) return { origin: `${proto}://${host}`, domain: host };
-  //     } else {
-  //       return { origin: window.location.origin, domain: window.location.host };
-  //     }
-  //   } catch {/* ignore */ }
-  //   const fallback = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
-  //   if (fallback) {
-  //     try {
-  //       const u = new URL(fallback);
-  //       return { origin: u.origin, domain: u.host };
-  //     } catch {/* ignore */ }
-  //   }
-  //   return { origin: undefined, domain: undefined };
-  // }
+  const hasBody = options.body != null && method !== "GET" && method !== "HEAD";
+  const isForm = typeof FormData !== "undefined" && options.body instanceof FormData;
+
+  if (hasBody && !isForm && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
 
   let token: string | null | undefined;
 
-  if (isServer) {
-    if (needsAuth && token == null) {
+  if (needsAuth) {
+    if (isServer) {
       const { cookies } = await import("next/headers");
+
       token = (await cookies()).get("admin_token")?.value ?? null;
-    }
-  } else {
-    if (needsAuth && token == null) {
+    } else {
       try {
-        const res = await fetch("/api/auth/token", { credentials: "same-origin", cache: "no-store" });
-        token = res.ok ? (await res.json())?.token ?? null : null;
-      } catch { token = null; }
+        const res = await fetch("/api/auth/token", {
+          credentials: "same-origin",
+          cache: "no-store",
+        });
+
+        token = res.ok ? ((await res.json())?.token ?? null) : null;
+      } catch {
+        token = null;
+      }
+    }
+    if (token)
+      headers.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
+  }
+
+  // Optional: limit which hosts get proxied
+  const ALLOW_PROXY = ["https://ecomtest.resorter360.ge"]; // add more if needed
+
+  let finalUrl = url;
+
+  if (!isServer) {
+    try {
+      const abs = new URL(url, window.location.origin);
+      const isAbsolute = /^https?:/i.test(abs.href);
+      const isCrossOrigin = isAbsolute && abs.origin !== window.location.origin;
+      const allowed = isCrossOrigin && ALLOW_PROXY.some((h) => abs.href.startsWith(h));
+
+      if (allowed) {
+        finalUrl = `/api/proxy?${new URLSearchParams({ u: abs.href }).toString()}`;
+      }
+      // If cross-origin but NOT allowed, you can either throw or let it attempt (and fail) with CORS
+    } catch {
+      /* keep as-is if parsing fails */
     }
   }
 
-  if (token) {
-    headers.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
-  }
-
-  const res = await fetch(url, {
+  const res = await fetch(finalUrl, {
     ...options,
     headers,
     credentials: isServer ? "include" : "same-origin",
@@ -58,8 +64,12 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   });
 
   const ct = res.headers.get("content-type") || "";
+
   if (!res.ok) {
-    const msg = ct.includes("application/json") ? JSON.stringify(await res.json()) : await res.text();
+    const msg = ct.includes("application/json")
+      ? JSON.stringify(await res.json())
+      : await res.text();
+
     throw new Error(`Error ${res.status}: ${msg}`);
   }
 

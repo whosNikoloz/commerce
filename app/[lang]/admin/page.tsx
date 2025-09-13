@@ -26,39 +26,42 @@ const AuthData = {
       button: "Sign In",
     },
   },
-};
+} as const;
 
 export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { lang } = useParams();
+  const { lang } = useParams<{ lang?: string }>();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
+    let cancelled = false;
+
     const checkAuth = async () => {
       try {
         const res = await fetch("/api/auth/check", { method: "GET" });
         const data = await res.json();
 
-        if (data.authorized) {
-          setIsAuthorized(true);
-        } else {
-          onOpen();
+        if (!cancelled) {
+          if (data.authorized) setIsAuthorized(true);
+          else onOpen();
         }
       } catch {
-        onOpen();
+        if (!cancelled) onOpen();
       }
     };
 
     checkAuth();
-    //setIsAuthorized(true);
-  }, []);
 
-  const isMobile = useIsMobile();
+    return () => {
+      cancelled = true;
+    };
+  }, [onOpen]);
 
   const handleCloseModal = () => {
     onClose();
-    router.push(`/${lang}`);
+    router.push(`/${lang ?? "en"}`);
   };
 
   if (!isAuthorized) {
@@ -68,29 +71,40 @@ export default function AdminPage() {
     return (
       <Modal
         classNames={{
-          backdrop: "backdrop-blur-3xl",
-          base: "rounded-t-xl",
+          // Dimmed brand-aware backdrop
+          backdrop: "bg-brand-surfacedark/80 backdrop-blur-md",
+
+          // Modal surface styled with your tokens
+          base: [
+            "rounded-t-xl", // mobile top sheet look
+            "bg-brand-surface dark:bg-brand-surfacedark",
+            "text-text-light dark:text-text-lightdark",
+            "border border-brand-muted dark:border-brand-muteddark",
+            "shadow-xl",
+          ].join(" "),
+
+          // Optional: wrapper padding removal for full bleed on mobile
+          wrapper: isMobile ? "p-0" : "",
+
+          // Header & body inherit surface; we set spacing + subtle borders
+          header:
+            "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark",
+          body: "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark",
+          footer:
+            "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border-t border-brand-muted dark:border-brand-muteddark",
+          closeButton:
+            "text-text-light dark:text-text-lightdark hover:bg-brand-muted/40 dark:hover:bg-brand-muteddark/40",
         }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
         motionProps={{
           variants: {
-            enter: {
-              y: 40,
-              opacity: 0,
-              scale: 0.96,
-              transition: { duration: 0 },
-            },
+            enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
             center: {
               y: 0,
               opacity: 1,
               scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 32,
-                mass: 0.8,
-              },
+              transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 },
             },
             exit: {
               y: 40,
@@ -107,7 +121,7 @@ export default function AdminPage() {
         size={isMobile ? "full" : "sm"}
         onClose={handleCloseModal}
       >
-        <ModalContent className="bg-brand-muteddark">
+        <ModalContent>
           {() => (
             <>
               {isMobile ? (
@@ -116,7 +130,9 @@ export default function AdminPage() {
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                  <h2 className="text-2xl font-bold text-white">{loginData.title}</h2>
+                  <h2 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
+                    {loginData.title}
+                  </h2>
                 </ModalHeader>
               )}
 
@@ -138,9 +154,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light ">
+        <h1 className="text-3xl font-bold tracking-tight text-text-light dark:text-text-lightdark">
           Dashboard
         </h1>
       </div>

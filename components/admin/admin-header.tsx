@@ -45,7 +45,7 @@ export function AdminHeader() {
           <DropdownMenuTrigger asChild>
             <Button className="relative h-10 w-10 rounded-full" variant="ghost">
               <Avatar className="h-10 w-10 ring-2 ring-blue-500/20">
-                <AvatarImage alt="Admin" src="/placeholder.svg?height=40&width=40" />
+                <AvatarImage alt="Admin" src="/placeholder.png?height=40&width=40" />
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                   AD
                 </AvatarFallback>

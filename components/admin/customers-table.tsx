@@ -58,7 +58,7 @@ const initialCustomers: Customer[] = [
     name: "John Doe",
     email: "john@example.com",
     phone: "+1 (555) 123-4567",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     joinDate: "2023-06-15",
     totalOrders: 12,
     totalSpent: 1299.87,
@@ -92,7 +92,7 @@ const initialCustomers: Customer[] = [
     name: "Jane Smith",
     email: "jane@example.com",
     phone: "+1 (555) 234-5678",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     joinDate: "2023-08-22",
     totalOrders: 8,
     totalSpent: 756.43,
@@ -119,7 +119,7 @@ const initialCustomers: Customer[] = [
     name: "Bob Johnson",
     email: "bob@example.com",
     phone: "+1 (555) 345-6789",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     joinDate: "2023-12-01",
     totalOrders: 3,
     totalSpent: 234.56,
@@ -146,7 +146,7 @@ const initialCustomers: Customer[] = [
     name: "Alice Brown",
     email: "alice@example.com",
     phone: "+1 (555) 456-7890",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     joinDate: "2023-04-10",
     totalOrders: 15,
     totalSpent: 2145.32,
@@ -180,7 +180,7 @@ const initialCustomers: Customer[] = [
     name: "Charlie Wilson",
     email: "charlie@example.com",
     phone: "+1 (555) 567-8901",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/placeholder.png?height=40&width=40",
     joinDate: "2023-11-18",
     totalOrders: 1,
     totalSpent: 79.98,
@@ -337,7 +337,7 @@ export function CustomersTable() {
                         <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
                           <AvatarImage
                             alt={customer.name}
-                            src={customer.avatar || "/placeholder.svg"}
+                            src={customer.avatar || "/placeholder.png"}
                           />
                           <AvatarFallback>
                             {customer.name
@@ -409,7 +409,7 @@ export function CustomersTable() {
                                   <Avatar className="h-16 w-16 ring-2 ring-blue-500/20">
                                     <AvatarImage
                                       alt={customer.name}
-                                      src={customer.avatar || "/placeholder.svg"}
+                                      src={customer.avatar || "/placeholder.png"}
                                     />
                                     <AvatarFallback className="text-lg">
                                       {customer.name

@@ -1,53 +1,29 @@
-import { CategoryCarousel } from "@/components/Home/category-carousel";
-import { ComingSoon } from "@/components/Home/coming-soon";
-import Hero from "@/components/Home/hero";
-import { InStockProducts } from "@/components/Home/in-stock-products";
-import { Liquidated } from "@/components/Home/liquidated-products";
-import { NewArrivals } from "@/components/Home/new-arrivals";
+import { BrandPartners } from "@/components/Home/brand-partners";
+import { CategoryGrid } from "@/components/Home/category-grid";
+import { ComingSoonSection } from "@/components/Home/coming-soon-section";
+import { InStockSection } from "@/components/Home/in-stock-section";
+import { LiquidationSection } from "@/components/Home/liquidation-section";
+import { ModernHero } from "@/components/Home/modern-hero";
+import { NewsletterSignup } from "@/components/Home/newsletter-signup";
+import { PopularProducts } from "@/components/Home/popular-products";
+import { ProductCarousel } from "@/components/Home/product-carousel";
+import { StatsShowcase } from "@/components/Home/stats-showcase";
+import { VideoShowcase } from "@/components/Home/video-showcase";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen  ">
-      <main className="space-y-16">
-        <section className="relative h-[100vh] px-6">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            preload="auto"
-          >
-            <source src="/Nike.mp4" type="video/mp4" />
-          </video>
-
-          <div className="absolute inset-0 bg-black bg-opacity-60" />
-
-          <div className="relative z-10 flex items-center justify-center h-full">
-            <Hero lng="ka" />
-          </div>
-        </section>
-
-        <section className="px-4" id="shop-by-category">
-          <div className="text-center mb-8">
-            <h2 className="font-serif text-3xl font-bold dark:text-text-lightdark text-text-light mb-2">
-              Shop by Category
-            </h2>
-            <p className="font-sans dark:text-text-subtledark text-text-subtle">
-              Find exactly what you&apos;re looking for
-            </p>
-          </div>
-          <CategoryCarousel />
-        </section>
-
-        <NewArrivals />
-
-        <ComingSoon />
-
-        <Liquidated />
-
-        <InStockProducts />
-      </main>
-    </div>
+    <main className="min-h-screen mt-20 md:mt-0">
+      <ModernHero />
+      <PopularProducts />
+      <CategoryGrid />
+      <BrandPartners />
+      <ProductCarousel />
+      <InStockSection />
+      <LiquidationSection />
+      <VideoShowcase />
+      <ComingSoonSection />
+      <StatsShowcase />
+      <NewsletterSignup />
+    </main>
   );
 }

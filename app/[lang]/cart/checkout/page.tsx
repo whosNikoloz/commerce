@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import CheckoutPage from "@/components/Cart/CheckoutPage/checkout-page";
 import { i18nPageMetadata } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 import { Locale } from "@/i18n.config";
 
 export async function generateMetadata({
@@ -21,7 +20,6 @@ export async function generateMetadata({
     lang,
     path: "/checkout",
     images: ["/og/checkout-og.jpg"],
-    siteName: siteConfig.name,
     index: false,
   });
 }

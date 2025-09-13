@@ -101,6 +101,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     }
   }, []);
 
+  const handleImagesChanged = (productId: string, urls: string[]) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId
+          ? {
+              ...p,
+              images: urls,
+            }
+          : p,
+      ),
+    );
+  };
+
   // Fetch on category changes only
   useEffect(() => {
     if (!selectedCategoryId) {
@@ -275,7 +288,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               className="rounded-lg object-cover"
               priority={false}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              src={product.images?.[0] || "/placeholder.svg"}
+              src={product.images?.[0] || "/placeholder.png"}
             />
             {product.images && product.images.length > 1 && (
               <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
@@ -331,7 +344,13 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 productId={product.id}
                 onSave={handleUpdateProduct}
               />
-              <ReviewImagesModal />
+              <ReviewImagesModal
+                existing={(product.images ?? []).map((url, idx) => ({ key: idx.toString(), url }))}
+                maxFiles={8}
+                maxSizeMB={5}
+                productId={product.id}
+                onChanged={(urls) => handleImagesChanged(product.id, urls)}
+              />
             </div>
           </div>
         </div>
@@ -534,7 +553,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   alt={product.name ?? "Product"}
                                   className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                                   height={64}
-                                  src={product.images?.[0] || "/placeholder.svg"}
+                                  src={product.images?.[0] || "/placeholder.png"}
                                   width={64}
                                 />
                                 {product.images && product.images.length > 1 && (
@@ -618,7 +637,16 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   productId={product.id}
                                   onSave={handleUpdateProduct}
                                 />
-                                <ReviewImagesModal />
+                                <ReviewImagesModal
+                                  existing={(product.images ?? []).map((url, idx) => ({
+                                    key: idx.toString(),
+                                    url,
+                                  }))}
+                                  maxFiles={8}
+                                  maxSizeMB={5}
+                                  productId={product.id}
+                                  onChanged={(urls) => handleImagesChanged(product.id, urls)}
+                                />
                               </div>
                             </TableCell>
                           </TableRow>

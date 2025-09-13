@@ -1,25 +1,39 @@
 // app/robots.ts
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 
-import { site as siteConfig } from "@/config/site";
 import { locales } from "@/i18n.config";
+import { getSiteByHost } from "@/lib/getSiteByHost";
 
-export const revalidate = 3600; // refresh robots once per hour (optional)
-export const dynamic = "force-static"; // make sure it's served as static
+export const dynamic = "force-dynamic"; // read Host header per request
 
-const BASE = siteConfig.url.replace(/\/$/, "");
+// Optional: if you want different "allowed exact" URLs per tenant, put them here.
+const PER_HOST_ALLOWED_EXACT: Record<string, string[]> = {
+  // "commerce-sxvadomain.vercel.app": ["/en/category/...."],
+  // "commerce-topaz-sigma-62.vercel.app": [],
+};
 
-// Exact URLs you want indexed even though we block most query combos
-const ALLOWED_EXACT: string[] = [
-  // your filtered category page (exact match)
-  "/en/category/0198d5ef-77a7-7ea0-9d44-eaa26609d5d4?page=1&sort=featured&brand=0198eb1d-5ba1-7f41-980a-640e84ea7328&cond=0&stock=0&min=0&max=580",
-];
+function normalizeHost(host?: string) {
+  return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
+}
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const h = await headers();
+  const rawHost = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  const host = normalizeHost(rawHost);
+
+  const site = getSiteByHost(host);
+  const BASE = site.url.replace(/\/$/, "");
+
+  // Global or per-host exact allow list (avoid if you don't truly need it)
+  const allowedExact = PER_HOST_ALLOWED_EXACT[host] ?? [
+    "/en/category/0198d5ef-77a7-7ea0-9d44-eaa26609d5d4?page=1&sort=featured&brand=0198eb1d-5ba1-7f41-980a-640e84ea7328&cond=0&stock=0&min=0&max=580",
+  ];
+
   // Internal paths never meant for crawling
   const disallowCore = ["/api/", "/_next/", "/static/", "/cdn-cgi/rum"];
 
-  // Generic query patterns that create infinite variants
+  // Query patterns that explode URL variants
   const disallowQueryPatterns = [
     "*?q=*",
     "*sort=*",
@@ -49,7 +63,7 @@ export default function robots(): MetadataRoute.Robots {
     `/${l}/checkout*`,
   ]);
 
-  // Helpful allows so crawlers confidently traverse main sections
+  // Helpful allows so crawlers traverse main sections confidently
   const allowSectionPrefixes = locales.flatMap((l) => [
     `/${l}/`,
     `/${l}/category/`,
@@ -61,7 +75,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", ...allowSectionPrefixes, ...ALLOWED_EXACT],
+        allow: ["/", ...allowSectionPrefixes, ...allowedExact],
         disallow: [
           ...disallowCore,
           ...disallowQueryPatterns,
@@ -71,6 +85,6 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${BASE}/sitemap.xml`,
-    host: BASE,
+    host: BASE, // non-standard but supported by Next's type; ok to keep
   };
 }

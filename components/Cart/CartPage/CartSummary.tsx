@@ -19,7 +19,6 @@ const PROMO_CODES = {
 } as const;
 
 export default function CartSummary() {
-  // ✅ Pull only what you need from the store (minimal re-renders)
   const itemCount = useCartStore((s) => s.cart.length);
   const subtotal = useCartStore((s) => s.getSubtotal());
 
@@ -49,6 +48,7 @@ export default function CartSummary() {
 
   const applyPromoCode = () => {
     const code = promoCode.trim().toUpperCase() as keyof typeof PROMO_CODES;
+
     if (PROMO_CODES[code]) {
       setAppliedPromo(code);
       setPromoCode("");
@@ -59,30 +59,34 @@ export default function CartSummary() {
 
   return (
     <div className="space-y-6">
-      {/* Order Summary */}
-      <Card className="dark:bg-brand-muteddark bg-brand-muted">
+      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Order Summary</CardTitle>
+          <CardTitle className="text-lg text-text-light dark:text-text-lightdark">
+            Order Summary
+          </CardTitle>
         </CardHeader>
+
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
+              <span className="text-text-subtle dark:text-text-subtledark">
                 Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
               </span>
-              <span className="font-medium">{formatPrice(subtotal)}</span>
+              <span className="font-medium text-text-light dark:text-text-lightdark">
+                {formatPrice(subtotal)}
+              </span>
             </div>
 
             {appliedPromo && (
-              <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+              <div className="flex justify-between text-sm text-brand-primary dark:text-brand-primary">
                 <span>Discount ({appliedPromo})</span>
                 <span>-{formatPrice(promoDiscount)}</span>
               </div>
             )}
 
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="font-medium">
+              <span className="text-text-subtle dark:text-text-subtledark">Shipping</span>
+              <span className="font-medium text-text-light dark:text-text-lightdark">
                 {shipping === 0 ? (
                   <span className="text-green-600 dark:text-green-400">Free</span>
                 ) : (
@@ -92,62 +96,69 @@ export default function CartSummary() {
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Tax</span>
-              <span className="font-medium">{formatPrice(tax)}</span>
+              <span className="text-text-subtle dark:text-text-subtledark">Tax</span>
+              <span className="font-medium text-text-light dark:text-text-lightdark">
+                {formatPrice(tax)}
+              </span>
             </div>
 
-            <Separator />
+            <Separator className="bg-brand-muted/60 dark:bg-brand-muteddark/50" />
 
             <div className="flex justify-between font-semibold text-lg">
-              <span>Total</span>
-              <span>{formatPrice(total)}</span>
+              <span className="text-text-light dark:text-text-lightdark">Total</span>
+              <span className="text-text-light dark:text-text-lightdark">{formatPrice(total)}</span>
             </div>
           </div>
 
           {/* Free Shipping Progress */}
           {shipping > 0 && subtotal > 0 && subtotal < 50 && (
-            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+            <div className="p-3 rounded-lg bg-brand-primary/10 border border-brand-primary/30">
+              <div className="flex items-center gap-2 text-sm text-brand-primary">
                 <Truck className="h-4 w-4" />
                 <span>Add {formatPrice(50 - subtotal)} more for free shipping!</span>
               </div>
             </div>
           )}
 
-          {/* Action Buttons */}
+          {/* Actions */}
           <div className="space-y-3 pt-2">
-            <Button asChild className="w-full" size="lg">
+            <Button
+              asChild
+              className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white"
+              size="lg"
+            >
               <Link className="gap-2" href="/cart/checkout">
                 Proceed to Checkout
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
 
-            <Button asChild className="w-full bg-transparent" variant="outline">
+            <Button
+              asChild
+              className="w-full bg-transparent border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-muted/40 dark:hover:bg-brand-muteddark/30"
+              variant="outline"
+            >
               <Link href="/">Continue Shopping</Link>
             </Button>
           </div>
 
           {/* Trust Badges */}
           <div className="pt-4 space-y-2">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <Truck className="h-3 w-3" />
               <span>Free shipping on orders over $50</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <RotateCcw className="h-3 w-3" />
               <span>30-day return policy</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <Shield className="h-3 w-3" />
               <span>Secure checkout with SSL encryption</span>
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* — The Promo & Shipping Options blocks you commented out can stay as-is.
-           If you re-enable them, they don't need cart data, so no extra changes. — */}
     </div>
   );
 }

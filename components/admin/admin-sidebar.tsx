@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconUserBolt,
+  IconHome,
+  IconBox,
+  IconTags,
+  IconFileDownloadFilled,
+} from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -132,7 +139,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                     alt="Avatar"
                     className="h-7 w-7 shrink-0 rounded-full"
                     height={50}
-                    src="/img1.jpg"
+                    src="/placeholder.png"
                     width={50}
                   />
                 ),

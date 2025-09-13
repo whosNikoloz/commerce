@@ -7,8 +7,7 @@ import { cache } from "react";
 
 import { CategoriesTable } from "@/components/admin/categories-table";
 import { getAllCategories } from "@/app/api/services/categoryService";
-import { i18nPageMetadata } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
+import { i18nPageMetadataAsync } from "@/lib/seo"; // ← async SEO helper
 
 const getCategoriesCached = cache(async (): Promise<CategoryModel[]> => {
   return await getAllCategories();
@@ -21,13 +20,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "Admin • Categories",
     description: "Manage all categories in the admin dashboard.",
     lang,
     path: "/admin/categories",
-    images: [siteConfig.ogImage],
-    siteName: siteConfig.name,
     index: false, // keep admin pages out of search
   });
 }

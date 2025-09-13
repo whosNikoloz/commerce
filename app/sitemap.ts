@@ -1,16 +1,19 @@
-// app/sitemap.ts
 import type { MetadataRoute } from "next";
+
+import { headers } from "next/headers";
 
 import { getAllProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
-import { site as siteConfig } from "@/config/site";
 import { locales } from "@/i18n.config";
+import { getSiteByHost } from "@/lib/getSiteByHost"; // ← use this
 
-export const revalidate = 86400;
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = siteConfig.url.replace(/\/$/, "");
+  const h = await headers(); // ← your types require await
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  const site = getSiteByHost(host);
+  const base = site.url.replace(/\/$/, "");
   const now = new Date();
 
   const statics = ["", "/category"].flatMap((p) =>
@@ -22,7 +25,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const cats = await getAllCategories().catch(() => [] as any[]);
+  let cats: any[] = [];
+  let prods: any[] = [];
+
+  try {
+    cats = await getAllCategories();
+  } catch {}
+  try {
+    prods = await getAllProducts();
+  } catch {}
+
   const catUrls = cats.flatMap((c: any) =>
     locales.map((lng) => ({
       url: `${base}/${lng}/category/${c.id}`,
@@ -32,7 +44,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const prods = await getAllProducts().catch(() => [] as any[]);
   const prodUrls = prods.flatMap((p: any) =>
     locales.map((lng) => ({
       url: `${base}/${lng}/product/${p.id}`,

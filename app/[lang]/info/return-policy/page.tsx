@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 
 import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 
 export async function generateMetadata({
   params,
@@ -28,7 +27,6 @@ export async function generateMetadata({
     lang,
     path: "/info/return-policy",
     images: ["/og/return-og.jpg"],
-    siteName: siteConfig.name,
     index: true,
   });
 }

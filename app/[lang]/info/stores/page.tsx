@@ -12,7 +12,6 @@ import {
   ParkingMeter,
 } from "lucide-react";
 
-import { site as siteConfig } from "@/config/site";
 import { buildBreadcrumbJsonLd, buildI18nUrls, i18nPageMetadata } from "@/lib/seo";
 import StoreMapClient from "@/components/Info/stores/StoreMap.client";
 
@@ -89,7 +88,6 @@ export async function generateMetadata({
     lang,
     path: "/info/stores",
     images: ["/og/stores-og.jpg"],
-    siteName: siteConfig.name,
     index: true,
   });
 }

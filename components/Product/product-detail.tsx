@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-
 import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
 import { Specifications } from "./specifications";
@@ -13,10 +12,7 @@ import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 
-type Props = {
-  initialProduct: ProductResponseModel;
-  initialSimilar: ProductResponseModel[];
-};
+type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
 
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
@@ -29,32 +25,25 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     setSelectedFacets((prev) => {
       const pk = Object.keys(prev),
         nk = Object.keys(next);
-
       if (pk.length === nk.length && pk.every((k) => prev[k] === next[k])) return prev;
-
       return next;
     });
 
-  const [similar, setSimilar] = useState(initialSimilar);
+  const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-
     const tick = async () => {
       try {
         const fresh = await getProductById(product.id);
-
         if (!cancelled) setProduct(fresh);
       } catch {
         if (!cancelled) setNotFound(true);
       }
     };
-
-    // initial fetch + interval
     tick();
     const iv = setInterval(tick, 30_000);
-
     return () => {
       cancelled = true;
       clearInterval(iv);
@@ -72,46 +61,37 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
         : 0,
       originalPrice: product.price,
-
       selectedFacets,
     };
-
     addToCart(item);
   };
 
   useEffect(() => {
     const handleScrollOrResize = () => {
       const scrollThreshold = isMobile ? 900 : 700;
-
       setIsPriceVisible(window.scrollY < scrollThreshold);
     };
-
     handleScrollOrResize();
     window.addEventListener("scroll", handleScrollOrResize);
     window.addEventListener("resize", handleScrollOrResize);
-
     return () => {
       window.removeEventListener("scroll", handleScrollOrResize);
       window.removeEventListener("resize", handleScrollOrResize);
     };
   }, [isMobile]);
 
-  const galleryImages = useMemo(() => {
-    return (product.images ?? []).filter((u) => typeof u === "string" && u.trim());
-  }, [product.images]);
+  const galleryImages = useMemo(
+    () => (product.images ?? []).filter((u) => typeof u === "string" && u.trim()),
+    [product.images],
+  );
 
   const specs = useMemo(() => {
     if (!product.productFacetValues?.length) return [];
-
     const grouped = product.productFacetValues.reduce(
       (acc, f) => {
         const name = f.facetName ?? "";
-
-        if (!acc[name]) {
-          acc[name] = [];
-        }
+        if (!acc[name]) acc[name] = [];
         acc[name].push(f.facetValue ?? "");
-
         return acc;
       },
       {} as Record<string, string[]>,
@@ -128,27 +108,13 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     ];
   }, [product.productFacetValues]);
 
-  const similarProducts = useMemo(
-    () =>
-      similar.map((p) => ({
-        id: typeof p.id === "string" ? Number(p.id) : p.id,
-        name: p.name ?? "Unnamed",
-        price: p.discountPrice ?? p.price,
-        rating: 0,
-        image: p.images?.[0] ?? "/placeholder.png",
-      })),
-    [similar],
-  );
-
   const price = product.discountPrice ?? product.price;
   const originalPrice = product.discountPrice ? product.price : undefined;
 
-  if (notFound) {
-    return <ProductNotFound />;
-  }
+  if (notFound) return <ProductNotFound />;
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 text-text-light dark:text-text-lightdark">
       <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
@@ -158,10 +124,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
         <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">{product.name}</h1>
 
-        <div
-          className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm
-             lg:sticky lg:top-24 lg:self-start lg:h-fit"
-        >
+        <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit">
           <ProductInfo
             brand={product.brand?.name ?? ""}
             condition={product.condition}
@@ -190,6 +153,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
               "prose-ul:list-disc prose-ol:list-decimal",
               "prose-li:my-1 prose-p:my-2",
               "whitespace-pre-wrap break-words",
+              "text-text-light dark:text-text-lightdark",
             ].join(" ")}
           />
         </div>

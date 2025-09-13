@@ -154,14 +154,14 @@ const Search = ({
 
   return (
     <div className="relative w-full">
-      <div className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 cursor-pointer w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
+      <div className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
         <SearchIcon className="text-gray-500" />
         <Input
           aria-controls="search-results"
           aria-expanded={isOpen}
           aria-label="Search"
           autoComplete="off"
-          className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
+          className="w-full pl-2 py-3 bg-transparent  rounded-full text-foreground placeholder-muted-foreground outline-none ring-0  transition-all"
           id="search-input"
           placeholder="What are you looking for?"
           type="search"

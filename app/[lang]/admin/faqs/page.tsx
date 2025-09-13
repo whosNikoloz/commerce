@@ -6,9 +6,7 @@ import { cache } from "react";
 
 import { FaqsTable } from "@/components/admin/faq/faqs-table";
 import { getAllFaqs } from "@/app/api/services/faqService";
-import { i18nPageMetadata } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
-import { convertOffsetToTimes } from "framer-motion";
+import { i18nPageMetadataAsync } from "@/lib/seo"; // ← async SEO helper
 
 const getFaqsCached = cache(async (): Promise<FAQModel[]> => {
   return await getAllFaqs();
@@ -21,14 +19,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "Admin • FAQs",
     description: "Manage FAQs in the admin dashboard.",
     lang,
     path: "/admin/faqs",
-    images: [siteConfig.ogImage],
-    siteName: siteConfig.name,
-    index: false,
+    index: false, // noindex admin
   });
 }
 

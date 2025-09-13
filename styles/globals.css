@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-primary: 37 99 235; /* #2563eb */
+  --brand-primary-dark: 44 109 238; /* #2c6dee */
+  --brand-surface: 241 245 249; /* #f1f5f9 */
+  --brand-surface-dark: 2 6 23; /* #020617 */
+  --brand-muted: 226 232 240; /* #e2e8f0 */
+  --brand-muted-dark: 16 24 41; /* #101829 */
+
+  --text-light: 30 41 59; /* #1e293b */
+  --text-subtle: 100 116 139; /* #64748b */
+  --text-light-dark: 228 221 222; /* #e4ddde */
+  --text-subtle-dark: 106 119 138; /* #6a778a */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 .rich-content ul {
   list-style-type: disc;
 }

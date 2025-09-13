@@ -271,7 +271,7 @@ function OrderHistory({
                               <img
                                 alt={item.name}
                                 className="h-12 w-12 object-cover rounded"
-                                src={item.image || "/placeholder.svg"}
+                                src={item.image || "/placeholder.png"}
                               />
                               <div className="flex-1">
                                 <p className="font-medium">{item.name}</p>
@@ -390,7 +390,7 @@ function WishlistGrid() {
               <img
                 alt={item.name}
                 className="w-full h-48 object-cover rounded-md"
-                src={item.image || "/placeholder.svg"}
+                src={item.image || "/placeholder.png"}
               />
               <div>
                 <h3 className="font-semibold">{item.name}</h3>

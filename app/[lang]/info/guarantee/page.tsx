@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Shield, CheckCircle, XCircle, Wrench, Phone, FileText, AlertTriangle } from "lucide-react";
 
 import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 
 export async function generateMetadata({
   params,
@@ -19,7 +18,6 @@ export async function generateMetadata({
     lang,
     path: "/info/guarantee",
     images: ["/og/guarantee-og.jpg"],
-    siteName: siteConfig.name,
     index: true,
   });
 }

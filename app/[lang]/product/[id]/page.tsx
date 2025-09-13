@@ -5,12 +5,12 @@ import Script from "next/script";
 
 import { getProductById } from "@/app/api/services/productService";
 import {
-  i18nPageMetadata, // ⬅️ new
+  i18nPageMetadataAsync, // ← async, host-aware
   buildProductJsonLd,
   toAbsoluteImages,
-  buildI18nUrls, // ⬅️ new
+  buildI18nUrls,
+  getActiveSite, // ← resolve current site from headers
 } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 import ProductDetail from "@/components/Product/product-detail";
 
 export const dynamic = "force-dynamic";
@@ -18,62 +18,64 @@ export const dynamic = "force-dynamic";
 type DetailPageParams = { lang: string; id: string };
 type DetailPageProps = { params: Promise<DetailPageParams> };
 
-function normalizeImages(imgs: unknown): string[] {
+function normalizeImages(imgs: unknown, fallbackOg: string): string[] {
   const raw = Array.isArray(imgs) ? imgs : [];
   const list = raw
     .map((i) => (typeof i === "string" ? i : (i as any)?.url))
     .filter((s): s is string => !!s);
 
-  return list.length ? list : [siteConfig.ogImage];
+  return list.length ? list : [fallbackOg];
 }
 
+/* ========== Metadata ========== */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<DetailPageParams>;
 }): Promise<Metadata> {
   const { lang, id } = await params;
+  const site = await getActiveSite(); // per-host
   const product = await getProductById(id).catch(() => null);
 
   const path = `/product/${id}`;
 
   if (!product) {
-    return i18nPageMetadata({
+    return i18nPageMetadataAsync({
       title: "Product not found",
       description: `The product ${id} could not be found or was removed.`,
       lang,
       path,
-      images: [siteConfig.ogImage],
-      siteName: siteConfig.name,
+      images: [site.ogImage],
       index: false,
     });
   }
 
   const title = product?.name ?? "Product";
-  const description = product?.description ?? siteConfig.description;
-  const images = toAbsoluteImages(normalizeImages(product?.images));
+  const description = product?.description ?? site.description;
+  const images = toAbsoluteImages(normalizeImages(product?.images, site.ogImage), site);
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title,
     description,
     lang,
     path,
     images,
-    siteName: siteConfig.name,
     index: true,
   });
 }
 
+/* ========== Page ========== */
 export default async function ProductPage({ params }: DetailPageProps) {
   const { lang, id } = await params;
+  const site = await getActiveSite(); // per-host
   const product = await getProductById(id).catch(() => null);
 
   if (!product) return notFound();
 
   const path = `/product/${id}`;
-  const { canonical } = buildI18nUrls(path, lang); // canonical for current locale
+  const { canonical } = buildI18nUrls(path, lang, site); // canonical for current locale
 
-  const images = toAbsoluteImages(normalizeImages(product.images));
+  const images = toAbsoluteImages(normalizeImages(product.images, site.ogImage), site);
   const price = product.discountPrice ?? product.price ?? 0;
 
   const availability =
@@ -89,20 +91,21 @@ export default async function ProductPage({ params }: DetailPageProps) {
     images,
     brand: product.brand?.name,
     category: product.category?.name,
-    url: canonical, // ⬅️ use i18n canonical
+    url: canonical,
     price,
-    currency: siteConfig.currency ?? "GEL",
+    currency: site.currency ?? "GEL",
     availability,
     condition: itemCondition,
-    inLanguage: lang, // ⬅️ optional but nice
+    inLanguage: lang,
+    siteOverride: site, // optional (builders already default to DEFAULT_SITE if omitted)
   });
 
   return (
     <>
       <Script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         id="ld-product"
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ProductDetail initialProduct={product} initialSimilar={[]} />
     </>

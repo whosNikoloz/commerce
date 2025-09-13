@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Images, Trash2, Upload, X } from "lucide-react";
-import { Image as ImageIcon } from "lucide-react"; // only if you also need the icon
+// only if you also need the icon
 // eslint-disable-next-line import/order
 import {
   Modal,
@@ -21,70 +21,64 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { GoBackButton } from "@/components/go-back-button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
 //import { useToast } from "@/hooks/use-toast"
 
+type ExistingImage = { key: string; url: string };
+
+type UploadReplyItem = { key: string; url: string }; // სასურველია სერვერმა ეს დააბრუნოს
+type UploadReply = string[] | UploadReplyItem[];
+
 type ReviewImagesModalProps = {
-  onSave?: (files: File[]) => void | Promise<void>;
+  productId: string;
+  existing?: ExistingImage[];
   maxFiles?: number;
   maxSizeMB?: number;
-  defaultFiles?: File[];
+  onChanged?: (urls: string[]) => void | Promise<void>;
+  trigger?: React.ReactNode;
 };
 
-type SelectedImage = {
-  id: string;
-  file: File;
-  url: string;
-};
-
-function fileKey(f: File) {
-  return `${f.name}-${f.size}-${f.lastModified}`;
-}
+type SelectedImage = { id: string; file: File; url: string };
+const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
 
 export default function ReviewImagesModal({
-  onSave = async () => {},
+  productId,
+  existing,
   maxFiles = 8,
   maxSizeMB = 5,
-  defaultFiles,
+  onChanged,
+  trigger,
 }: ReviewImagesModalProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
-  //const EMPTY_FILES = useMemo<File[]>(() => [], []);
-  //const resolvedDefaultFiles = defaultFiles ?? EMPTY_FILES;
-
-  //const { toast } = useToast()
-  const [isDragging, setIsDragging] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const [images, setImages] = useState<SelectedImage[]>(() => {
-    return (defaultFiles ?? []).slice(0, maxFiles).map((file) => ({
-      id: crypto.randomUUID(),
-      file,
-      url: URL.createObjectURL(file),
-    }));
-  });
 
   const isMobile = useIsMobile();
 
+  // უკვე ატვირთულები + წასაშლელად მონიშვნის ტოგლი
+  const [serverImages, setServerImages] = useState<(ExistingImage & { toDelete?: boolean })[]>(() =>
+    (existing ?? []).map((i) => ({ ...i, toDelete: false })),
+  );
+
+  // ახალი, ჯერ არ ატვირთული (პრივიუებით)
+  const [images, setImages] = useState<SelectedImage[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // გახსნისას დავადეფოლტოთ existing
   useEffect(() => {
     if (!isOpen) return;
-    // Reset images from defaultFiles when opening or when defaults change
+    setServerImages((existing ?? []).map((i) => ({ ...i, toDelete: false })));
+    // ახალი პოზიტივები (pending) გავასუფთავოთ
     setImages((prev) => {
-      // Revoke existing object URLs before replacing
       prev.forEach((p) => URL.revokeObjectURL(p.url));
 
-      return (defaultFiles ?? []).slice(0, maxFiles).map((file) => ({
-        id: crypto.randomUUID(),
-        file,
-        url: URL.createObjectURL(file),
-      }));
+      return [];
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, defaultFiles, maxFiles]);
+  }, [isOpen, existing]);
 
-  // Revoke object URLs on unmount
+  // unmount cleanup
   useEffect(() => {
     return () => {
       images.forEach((img) => URL.revokeObjectURL(img.url));
@@ -92,58 +86,23 @@ export default function ReviewImagesModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleCloseModal(): void {
-    onClose();
-  }
-
   const remainingSlots = useMemo(
-    () => Math.max(0, maxFiles - images.length),
-    [images.length, maxFiles],
+    () => Math.max(0, maxFiles - (serverImages.filter((s) => !s.toDelete).length + images.length)),
+    [serverImages, images.length, maxFiles],
   );
 
   const addFiles = useCallback(
     (files: File[]) => {
       if (!files?.length) return;
 
-      const allowed = files.filter((f) => f.type.startsWith("image/"));
-      const rejectedType = files.length - allowed.length;
+      const imgsOnly = files.filter((f) => f.type.startsWith("image/"));
+      const sizeLimit = maxSizeMB * 1024 * 1024;
+      const withinSize = imgsOnly.filter((f) => f.size <= sizeLimit);
 
-      if (rejectedType > 0) {
-        // toast({
-        //     title: "Some files were skipped",
-        //     description: `${rejectedType} file(s) are not images.`,
-        //     variant: "destructive",
-        // })
-      }
-
-      // Size filtering
-      const sizeLimitBytes = maxSizeMB * 1024 * 1024;
-      const withinSize = allowed.filter((f) => f.size <= sizeLimitBytes);
-      const rejectedSize = allowed.length - withinSize.length;
-
-      if (rejectedSize > 0) {
-        // toast({
-        //     title: "File too large",
-        //     description: `${rejectedSize} file(s) exceeded ${maxSizeMB} MB.`,
-        //     variant: "destructive",
-        // })
-      }
-
-      // Deduplicate by name-size-lastModified against current queue
       const existingKeys = new Set(images.map((i) => fileKey(i.file)));
-      const deduped = withinSize.filter((f) => !existingKeys.has(fileKey(f)));
+      const dedup = withinSize.filter((f) => !existingKeys.has(fileKey(f)));
 
-      // Enforce maxFiles
-      const capacity = remainingSlots;
-
-      if (deduped.length > capacity) {
-        // toast({
-        //     title: "Limit reached",
-        //     description: `You can add up to ${maxFiles} images.`,
-        //     variant: "destructive",
-        // })
-      }
-      const toAdd = deduped.slice(0, capacity);
+      const toAdd = dedup.slice(0, remainingSlots);
 
       const newItems = toAdd.map((file) => ({
         id: crypto.randomUUID(),
@@ -151,21 +110,20 @@ export default function ReviewImagesModal({
         url: URL.createObjectURL(file),
       }));
 
-      if (newItems.length > 0) {
-        setImages((prev) => [...prev, ...newItems]);
-      }
+      if (newItems.length > 0) setImages((prev) => [...prev, ...newItems]);
     },
-    [images, maxFiles, maxSizeMB, remainingSlots], //toast
+    [images, maxSizeMB, remainingSlots],
   );
 
+  // input:file
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
 
-    if (files && files.length) addFiles(Array.from(files));
-    // reset input to allow re-selecting the same file(s)
-    e.currentTarget.value = "";
+    if (files?.length) addFiles(Array.from(files));
+    e.currentTarget.value = ""; // reselect same file(s)
   };
 
+  // DnD
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
@@ -174,22 +132,21 @@ export default function ReviewImagesModal({
 
     addFiles(files);
   };
-
   const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   };
   const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    // ensure leave from the drop area only
     if (dropRef.current && !dropRef.current.contains(e.relatedTarget as Node)) {
       setIsDragging(false);
     }
   };
 
+  // Paste
   const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const files: File[] = [];
 
-    Array.from(e.clipboardData.items).forEach((item) => {
+    Array.from(e.clipboardData?.items ?? []).forEach((item) => {
       if (item.kind === "file") {
         const f = item.getAsFile();
 
@@ -199,7 +156,8 @@ export default function ReviewImagesModal({
     if (files.length) addFiles(files);
   };
 
-  const removeImage = (id: string) => {
+  // Remove pending single
+  const removePending = (id: string) => {
     setImages((prev) => {
       const img = prev.find((p) => p.id === id);
 
@@ -209,7 +167,8 @@ export default function ReviewImagesModal({
     });
   };
 
-  const clearAll = () => {
+  // Clear all pending
+  const clearAllPending = () => {
     setImages((prev) => {
       prev.forEach((p) => URL.revokeObjectURL(p.url));
 
@@ -220,43 +179,76 @@ export default function ReviewImagesModal({
   const handleSave = async () => {
     try {
       setSaving(true);
-      await onSave(images.map((i) => i.file));
+
+      const toDelete = serverImages
+        .filter((s) => s.toDelete)
+        .map((s) => {
+          const pos = Number.parseInt(s.key as unknown as string, 10);
+
+          if (!Number.isFinite(pos)) {
+            throw new Error(`Invalid image index: ${s.key}`);
+          }
+
+          return pos;
+        })
+        .sort((a, b) => b - a);
+
+      for (const pos of toDelete) {
+        await deleteImage(productId, String(pos));
+      }
+
+      const newFiles = images.map((i) => i.file);
+      let uploaded: UploadReply = [];
+
+      if (newFiles.length) {
+        uploaded = await uploadProductImages(productId, newFiles);
+      }
+
+      const uploadedItems: UploadReplyItem[] = Array.isArray(uploaded)
+        ? typeof uploaded[0] === "string"
+          ? (uploaded as string[]).map((url, idx) => ({
+              key: `temp-${Date.now()}-${idx}`,
+              url,
+            }))
+          : (uploaded as UploadReplyItem[])
+        : [];
+
+      const kept = serverImages.filter((s) => !s.toDelete).map((k) => ({ ...k, toDelete: false }));
+      const next = [...kept, ...uploadedItems];
+
+      setServerImages(next);
+
+      images.forEach((p) => URL.revokeObjectURL(p.url));
+      setImages([]);
+
+      await onChanged?.(next.map((x) => x.url));
+
+      onClose();
     } finally {
       setSaving(false);
     }
   };
 
+  const handleCloseModal = () => onClose();
+
   return (
     <>
-      <Button size="sm" variant="outline" onClick={onOpen}>
-        <ImageIcon className="h-4 w-4" />
+      <Button size="sm" title="Manage images" variant="outline" onClick={onOpen}>
+        <Image alt="" className="hidden" height={0} src="/icons/image.svg" width={0} />
+        Images
       </Button>
 
       <Modal
-        classNames={{
-          backdrop: "backdrop-blur-3xl",
-          base: "rounded-t-xl",
-        }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
         motionProps={{
           variants: {
-            enter: {
-              y: 40,
-              opacity: 0,
-              scale: 0.96,
-              transition: { duration: 0 },
-            },
+            enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
             center: {
               y: 0,
               opacity: 1,
               scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 32,
-                mass: 0.8,
-              },
+              transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 },
             },
             exit: {
               y: 40,
@@ -273,26 +265,23 @@ export default function ReviewImagesModal({
         size={isMobile ? "full" : "3xl"}
         onClose={handleCloseModal}
       >
-        <ModalContent className="bg-brand-muted dark:bg-brand-muteddark">
+        <ModalContent className="bg-brand-muted dark:bg-brand-muteddark rounded-t-xl">
           {() => (
             <>
-              {isMobile ? (
-                <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
-                  <GoBackButton onClick={handleCloseModal} />
-                </ModalHeader>
-              ) : (
-                <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader className="flex items-center justify-between gap-2">
+                <div className="flex flex-col">
                   <p className="text-sm text-text-subtle dark:text-text-subtledark">
                     Upload up to {maxFiles} images. Max size {maxSizeMB} MB each.
                   </p>
-                  <Badge className="ml-auto" variant="secondary">
-                    {images.length} / {maxFiles}
-                  </Badge>
-                </ModalHeader>
-              )}
+                </div>
+                <Badge variant="secondary">
+                  {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                </Badge>
+              </ModalHeader>
 
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 <div className="grid gap-4">
+                  {/* Drop zone */}
                   <div
                     ref={dropRef}
                     aria-label="Upload images by clicking, dragging and dropping, or pasting"
@@ -335,33 +324,72 @@ export default function ReviewImagesModal({
                     </div>
                   </div>
 
-                  {images.length === 0 ? (
-                    <div className="rounded-lg border p-6 text-center text-muted-foreground">
-                      <div className="mx-auto mb-2 h-12 w-12 rounded-full border flex items-center justify-center">
-                        <Images className="h-6 w-6" />
-                      </div>
-                      <p className="text-sm">No images added yet.</p>
-                    </div>
-                  ) : (
+                  {serverImages.length > 0 || images.length > 0 ? (
                     <ScrollArea className="max-h-[360px] rounded-lg border">
                       <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {/* Existing images */}
+                        {serverImages.map((img) => (
+                          <figure
+                            key={img.key}
+                            className="relative group rounded-md overflow-hidden border bg-background"
+                          >
+                            <Image
+                              alt="Existing"
+                              className="h-36 w-full object-cover"
+                              height={200}
+                              src={img.url}
+                              width={200}
+                            />
+                            <div className="absolute left-2 top-2">
+                              <Badge variant={img.toDelete ? "destructive" : "secondary"}>
+                                {img.toDelete ? "Will delete" : "Existing"}
+                              </Badge>
+                            </div>
+                            <button
+                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-background/90 border opacity-0 group-hover:opacity-100 transition-opacity"
+                              title={img.toDelete ? "Undo delete" : "Delete"}
+                              type="button"
+                              onClick={() =>
+                                setServerImages((prev) =>
+                                  prev.map((s) =>
+                                    s.key === img.key ? { ...s, toDelete: !s.toDelete } : s,
+                                  ),
+                                )
+                              }
+                            >
+                              {img.toDelete ? (
+                                <X className="h-4 w-4" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </button>
+                            {img.toDelete && (
+                              <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
+                            )}
+                          </figure>
+                        ))}
+
+                        {/* Pending (new) images */}
                         {images.map((img) => (
                           <figure
                             key={img.id}
                             className="relative group rounded-md overflow-hidden border bg-background"
                           >
                             <Image
-                              alt="Selected review"
+                              alt="Pending upload"
                               className="h-36 w-full object-cover"
                               height={200}
-                              src={img.url || "/placeholder.svg"}
+                              src={img.url || "/placeholder.png"}
                               width={200}
                             />
+                            <div className="absolute left-2 top-2">
+                              <Badge variant="default">New</Badge>
+                            </div>
                             <button
                               aria-label="Remove image"
                               className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-background/90 border opacity-0 group-hover:opacity-100 transition-opacity"
                               type="button"
-                              onClick={() => removeImage(img.id)}
+                              onClick={() => removePending(img.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -369,28 +397,41 @@ export default function ReviewImagesModal({
                         ))}
                       </div>
                     </ScrollArea>
+                  ) : (
+                    <div className="rounded-lg border p-6 text-center text-muted-foreground">
+                      <div className="mx-auto mb-2 h-12 w-12 rounded-full border flex items-center justify-center">
+                        <Images className="h-6 w-6" />
+                      </div>
+                      <p className="text-sm">No images yet.</p>
+                    </div>
                   )}
                 </div>
-
-                <ModalFooter className="mt-4">
-                  {images.length > 0 && (
-                    <Button className="mr-auto" type="button" variant="ghost" onClick={clearAll}>
-                      <X className="h-4 w-4 mr-2" />
-                      Clear all
-                    </Button>
-                  )}
-                  <Button type="button" variant="outline" onClick={handleCloseModal}>
-                    Cancel
-                  </Button>
-                  <Button
-                    disabled={images.length === 0 || saving}
-                    type="button"
-                    onClick={handleSave}
-                  >
-                    {saving ? "Saving..." : "Save photos"}
-                  </Button>
-                </ModalFooter>
               </ModalBody>
+
+              <ModalFooter className="mt-4">
+                {images.length > 0 && (
+                  <Button
+                    className="mr-auto"
+                    type="button"
+                    variant="ghost"
+                    onClick={clearAllPending}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Clear pending
+                  </Button>
+                )}
+                <Button type="button" variant="outline" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={
+                    saving || (serverImages.every((s) => !s.toDelete) && images.length === 0)
+                  }
+                  onClick={handleSave}
+                >
+                  {saving ? "Saving..." : "Save photos"}
+                </Button>
+              </ModalFooter>
             </>
           )}
         </ModalContent>

@@ -16,9 +16,9 @@ export default function ProductPagination({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-1 lg:gap-2 mt-6 lg:mt-8">
+    <div className="flex items-center justify-center gap-1 lg:gap-2 mt-6 lg:mt-8 text-text-light dark:text-text-lightdark">
       <Button
-        className="lg:size-default"
+        className="lg:size-default border-brand-muted dark:border-brand-muteddark"
         disabled={currentPage === 1}
         size="sm"
         variant="outline"
@@ -36,12 +36,18 @@ export default function ProductPagination({
           page === totalPages ||
           (page >= currentPage - 1 && page <= currentPage + 1)
         ) {
+          const isActive = currentPage === page;
+
           return (
             <Button
               key={page}
-              className="w-8 lg:w-10"
+              className={`w-8 lg:w-10 ${
+                isActive
+                  ? "bg-brand-primary text-white"
+                  : "border-brand-muted dark:border-brand-muteddark"
+              }`}
               size="sm"
-              variant={currentPage === page ? "default" : "outline"}
+              variant={isActive ? "default" : "outline"}
               onClick={() => onPageChange(page)}
             >
               {page}
@@ -49,8 +55,8 @@ export default function ProductPagination({
           );
         } else if (page === currentPage - 2 || page === currentPage + 2) {
           return (
-            <span key={page} className="px-1 lg:px-2">
-              ...
+            <span key={page} className="px-1 lg:px-2 text-text-subtle dark:text-text-subtledark">
+              …
             </span>
           );
         }
@@ -59,7 +65,7 @@ export default function ProductPagination({
       })}
 
       <Button
-        className="lg:size-default"
+        className="lg:size-default border-brand-muted dark:border-brand-muteddark"
         disabled={currentPage === totalPages}
         size="sm"
         variant="outline"

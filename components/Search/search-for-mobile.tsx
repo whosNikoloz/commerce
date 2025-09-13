@@ -216,7 +216,7 @@ export default function SearchForMobile({
         </div>
       ) : (
         <button
-          className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 cursor-pointer sm:w/full w-11/12 mx-auto px-4 py-2 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
+          className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
           onClick={handleOpen}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") handleOpen();
@@ -228,7 +228,7 @@ export default function SearchForMobile({
             aria-controls="search-results"
             aria-expanded={isModalOpen}
             aria-label="Search"
-            className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
+            className="w-full pl-2 py-3 bg-transparent  rounded-full text-foreground placeholder-muted-foreground outline-none ring-0  transition-all"
             id="search-input"
             placeholder="What are you looking for?"
             type="search"
@@ -447,11 +447,13 @@ export default function SearchForMobile({
               </ModalBody>
 
               <ModalFooter>
-                <div className="md:hidden fixed bottom-1 left-1/2 z-50 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
-                  <div className="flex justify-around items-center py-2">
+                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+                  <div className="flex justify-around items-center py-2 space-x-3">
                     <Link className="flex flex-col items-center" href="/">
-                      <HomeIcon className="text-green-500 w-6 h-6" />
-                      <span className="text-xs">Home</span>
+                      <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                        Home
+                      </span>
                     </Link>
 
                     <div
@@ -464,18 +466,14 @@ export default function SearchForMobile({
                       }}
                     >
                       <SearchIcon />
-                      <span className="text-xs">Search</span>
+                      <span className="text-xs">ძებნა</span>
                     </div>
 
                     <Cartlink />
 
                     <Link className="flex flex-col items-center" href={`/en/contact`}>
-                      <ProfileIcon className="w-6 h-6" />
+                      <ProfileIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
                       <span className="text-xs">Chat</span>
-                    </Link>
-                    <Link className="flex flex-col items-center" href="/login">
-                      <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">Login</span>
                     </Link>
                   </div>
                 </div>

@@ -21,7 +21,6 @@ export default function CheckoutPage() {
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
-  const clearCart = useCartStore((s) => s.clearCart);
 
   const [provider, setProvider] = useState<PaymentProvider>("bog");
   const router = useRouter();
@@ -51,7 +50,7 @@ export default function CheckoutPage() {
           productId: i.id,
           qty: i.quantity,
           unitPrice: Number(i.price),
-          name: i.name, // ✅ helpful for BOG item description
+          name: i.name,
         })),
         customer: {
           firstName: form.firstName,
@@ -84,8 +83,7 @@ export default function CheckoutPage() {
       if (!data?.paymentUrl) throw new Error("paymentUrl missing");
 
       if (typeof window !== "undefined") sessionStorage.setItem("lastOrderId", data.orderId);
-      window.location.href = data.paymentUrl; // 🔁 redirect to bank page
-      // (Do NOT clear cart here; only after confirmed success.)
+      window.location.href = data.paymentUrl;
     } catch (e: any) {
       setError(e?.message ?? "Failed to start payment.");
       setIsProcessing(false);
@@ -93,22 +91,30 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Button asChild disabled={isProcessing} size="icon" variant="ghost">
+          <Button
+            asChild
+            className="text-text-light dark:text-text-lightdark hover:bg-brand-muted/40 dark:hover:bg-brand-muteddark/30"
+            disabled={isProcessing}
+            size="icon"
+            variant="ghost"
+          >
             <Link href="/cart">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Checkout</h1>
-            <p className="text-muted-foreground">Complete your purchase</p>
+            <h1 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
+              Checkout
+            </h1>
+            <p className="text-text-subtle dark:text-text-subtledark">Complete your purchase</p>
           </div>
         </div>
 
         {error && (
-          <div className="mb-6 text-sm text-red-500 border border-red-500/30 rounded p-3">
+          <div className="mb-6 text-sm text-red-600 border border-red-500/30 rounded p-3 bg-red-500/5">
             {error}
           </div>
         )}

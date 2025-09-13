@@ -1,8 +1,7 @@
 import "@/styles/globals.css";
 import type { Viewport, Metadata } from "next";
 
-import { i18nPageMetadata } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
+import { i18nPageMetadataAsync } from "@/lib/seo";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -17,15 +16,13 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang: raw } = await params;
-  const lang = raw === "ka" || raw === "en" ? raw : "en"; // normalize to your supported locales
+  const lang = raw === "ka" || raw === "en" ? raw : "en";
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "Admin",
     description: "Administrative dashboard.",
     lang,
     path: "/admin",
-    images: [siteConfig.ogImage],
-    siteName: siteConfig.name,
     index: false, // noindex admin
   });
 }
@@ -38,7 +35,7 @@ export default function UserLayout({
 }) {
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl  dark:bg-brand-surfacedark bg-brand-surface p-2 md:p-10  text-text-light dark:text-text-lightdark">
+      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl dark:bg-brand-surfacedark bg-brand-surface p-2 md:p-10 text-text-light dark:text-text-lightdark">
         {children}
       </div>
     </div>

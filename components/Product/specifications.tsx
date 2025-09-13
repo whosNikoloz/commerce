@@ -1,4 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface SpecificationsProps {
   specs: { facetName: string; facetValues: string[] }[];
@@ -38,8 +40,8 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
   }, [specs]);
 
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
-  const userActionRef = useRef(false); // ✅ gate emits to user actions only
-  const lastEmittedRef = useRef<Record<string, string>>({}); // avoid duplicate emits
+  const userActionRef = useRef(false);
+  const lastEmittedRef = useRef<Record<string, string>>({});
 
   // Sync local state from props (no onChange here)
   useEffect(() => {
@@ -58,41 +60,36 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
 
       next[facetName] = allowed.has(String(candidate)) ? String(candidate) : facetValues[0];
     });
-    if (!shallowEqual(selectedValues, next)) {
-      setSelectedValues(next);
-    }
+    if (!shallowEqual(selectedValues, next)) setSelectedValues(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [specs, value]); // intentionally ignore selectedValues/defaults to avoid loops
+  }, [specs, value]);
 
-  // ✅ Emit AFTER commit, and only if triggered by a user click
+  // Emit after commit and only if user-driven
   useEffect(() => {
-    if (!onChange) return;
-    if (!userActionRef.current) return;
-
+    if (!onChange || !userActionRef.current) return;
     const payload: Record<string, string> = {};
 
     Object.keys(selectedValues).forEach((name) => {
       if (multiFacetNames.has(name)) payload[name] = selectedValues[name];
     });
-
     if (!shallowEqual(lastEmittedRef.current, payload)) {
       onChange(payload);
       lastEmittedRef.current = payload;
     }
-    userActionRef.current = false; // reset
+    userActionRef.current = false;
   }, [selectedValues, multiFacetNames, onChange]);
 
   const handleSelect = (facetName: string, val: string) => {
     setSelectedValues((prev) => {
-      if (prev[facetName] === val) return prev; // no-op
-      userActionRef.current = true; // mark as user-driven
+      if (prev[facetName] === val) return prev;
+      userActionRef.current = true;
 
       return { ...prev, [facetName]: val };
     });
   };
 
   return (
-    <div className="mb-12">
+    <div className="mb-12 text-text-light dark:text-text-lightdark">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
           {specs.map((spec) => {
@@ -100,7 +97,10 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
             const selected = selectedValues[spec.facetName];
 
             return (
-              <div key={spec.facetName} className="grid grid-cols-2 border-b pb-2 items-center">
+              <div
+                key={spec.facetName}
+                className="grid grid-cols-2 border-b border-brand-muted dark:border-brand-muteddark pb-2 items-center"
+              >
                 <span className="font-medium">{spec.facetName}</span>
                 <div className="flex-1 sm:max-w-md">
                   {isMulti ? (
@@ -112,12 +112,12 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
                           <button
                             key={v}
                             aria-pressed={isSelected}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-full border-2 transition-all
-                              ${
-                                isSelected
-                                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                                  : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:text-blue-600"
-                              }`}
+                            className={[
+                              "px-3 py-1.5 text-sm font-medium rounded-full border-2 transition-all",
+                              isSelected
+                                ? "bg-brand-primary text-white border-brand-primary shadow-lg"
+                                : "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border-brand-muted dark:border-brand-muteddark hover:border-brand-primary hover:text-brand-primary",
+                            ].join(" ")}
                             type="button"
                             onClick={() => handleSelect(spec.facetName, v)}
                           >
@@ -128,7 +128,10 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
                     </div>
                   ) : (
                     <div className="text-right">
-                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                      <span
+                        className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium
+                                   bg-brand-primary/10 text-brand-primary border border-brand-primary/30"
+                      >
                         {spec.facetValues[0]}
                       </span>
                     </div>

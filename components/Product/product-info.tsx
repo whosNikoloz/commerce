@@ -15,14 +15,12 @@ interface ProductInfoProps {
   discount?: number;
   condition?: Condition;
   status?: StockStatus;
-
   stock?: number;
   isComingSoon?: boolean;
   isNewArrival?: boolean;
   isLiquidated?: boolean;
   freeShipping?: boolean;
   currency?: Currency;
-
   onAddToCart?: () => void;
   onBuyNow?: () => void;
 }
@@ -79,33 +77,43 @@ export function ProductInfo({
       : 0);
 
   const hasDiscount = !!originalPrice && originalPrice > price && computedDiscount > 0;
-
   const inStock = status === StockStatus.InStock && !isComingSoon;
   const isOut = !inStock;
 
   return (
-    <div className="space-y-6">
-      <div className="md:sticky relative md:top-20 sm:max-w-72 md:w-full p-6 rounded-lg shadow-sm border dark:bg-brand-muteddark bg-brand-muted">
-        {/* Top chips: flags & brand */}
+    <div className="space-y-6 text-text-light dark:text-text-lightdark">
+      <div
+        className="
+          md:sticky relative md:top-20 sm:max-w-72 md:w-full
+          p-6 rounded-lg shadow-sm border
+          bg-brand-muted dark:bg-brand-muteddark
+          border-brand-muted dark:border-brand-muteddark
+        "
+      >
+        {/* Flags & brand */}
         <div className="flex flex-wrap gap-2 mb-3">
           {isComingSoon && (
-            <Badge className="bg-yellow-500 text-black">
+            <Badge className="bg-brand-primary/20 text-text-light dark:text-text-lightdark border border-brand-primary/40">
               <Clock3 className="h-3 w-3 mr-1" /> მალე
             </Badge>
           )}
           {isNewArrival && (
-            <Badge className="bg-green-600 text-white">
+            <Badge className="bg-brand-primary text-white">
               <Sparkles className="h-3 w-3 mr-1" /> ახალი
             </Badge>
           )}
           {isLiquidated && (
-            <Badge className="bg-red-600 text-white">
+            <Badge className="bg-brand-primarydark text-white">
               <Tag className="h-3 w-3 mr-1" /> ლიკვიდაცია
             </Badge>
           )}
-          {brand && <Badge variant="secondary">{brand}</Badge>}
+          {brand && (
+            <Badge className="text-text-light dark:text-text-lightdark" variant="secondary">
+              {brand}
+            </Badge>
+          )}
           {typeof stock === "number" && stock <= 3 && stock > 0 && (
-            <Badge className="bg-orange-600 text-white">
+            <Badge className="bg-brand-primarydark/80 text-white">
               <PackageOpen className="h-3 w-3 mr-1" /> ბოლო {stock} ც
             </Badge>
           )}
@@ -119,10 +127,10 @@ export function ProductInfo({
           <div className="flex items-center gap-2">
             {hasDiscount && (
               <>
-                <span className="text-sm text-muted-foreground line-through leading-none">
+                <span className="text-sm text-text-subtle dark:text-text-subtledark line-through leading-none">
                   {formatPrice(originalPrice!, currency)}
                 </span>
-                <Badge className="inline-flex h-6 items-center rounded-md px-2 text-[11px] font-semibold leading-none bg-red-500 text-white">
+                <Badge className="inline-flex h-6 items-center rounded-md px-2 text-[11px] font-semibold leading-none bg-brand-primarydark text-white">
                   {"-" + computedDiscount + "%"}
                 </Badge>
               </>
@@ -133,9 +141,8 @@ export function ProductInfo({
         {/* Status + Condition */}
         <div className="mt-2 flex items-center justify-between gap-2">
           <Badge
-            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm ${
-              isOut ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
-            }`}
+            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm
+              ${isOut ? "bg-brand-primarydark text-white" : "bg-brand-primary text-white"}`}
             title={getStatusLabel(status, isComingSoon)}
           >
             {getStatusLabel(status, isComingSoon)}
@@ -143,7 +150,9 @@ export function ProductInfo({
 
           {condition != null && (
             <Badge
-              className="inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm"
+              className="inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm
+                         bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark
+                         text-text-light dark:text-text-lightdark"
               title={getConditionLabel(condition)}
             >
               {getConditionLabel(condition)}
@@ -151,13 +160,15 @@ export function ProductInfo({
           )}
         </div>
 
-        {/* Delivery info */}
+        {/* Delivery */}
         {freeShipping && (
-          <div className="mt-3 flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border">
+          <div className="mt-3 flex items-center gap-2 rounded-md border border-brand-muted dark:border-brand-muteddark px-3 py-2 text-sm bg-brand-surface/60 dark:bg-brand-surfacedark/60">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-brand-muted dark:border-brand-muteddark">
               <Truck className="h-4 w-4" />
             </span>
-            <span className="text-foreground/90">სწრაფი მიწოდება მთელ საქართველოში</span>
+            <span className="text-text-light dark:text-text-lightdark">
+              სწრაფი მიწოდება მთელ საქართველოში
+            </span>
           </div>
         )}
 
@@ -165,17 +176,20 @@ export function ProductInfo({
         <div className="md:hidden space-y-2 mt-4">
           <Button
             aria-disabled={isOut}
-            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2
+                       bg-brand-primary hover:bg-brand-primary/90 text-white py-3 rounded-md disabled:opacity-60"
             disabled={isOut}
             onClick={onAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
             <span>{isComingSoon ? "მალე" : isOut ? "ამოიწურა" : "კალათაში დამატება"}</span>
           </Button>
+
           <div className="grid grid-cols-2 gap-2">
             <Button
               aria-disabled={isOut}
-              className="w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white py-3 rounded-md disabled:opacity-60"
+              className="w-full flex items-center justify-center
+                         bg-brand-primarydark hover:bg-brand-primarydark/90 text-white py-3 rounded-md disabled:opacity-60"
               disabled={isOut}
               onClick={onBuyNow}
             >
@@ -188,17 +202,20 @@ export function ProductInfo({
         <div className="hidden md:block mt-4 space-y-3">
           <Button
             aria-disabled={isOut}
-            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2
+                       bg-brand-primary hover:bg-brand-primary/90 text-white py-3 rounded-md disabled:opacity-60"
             disabled={isOut}
             onClick={onAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
             <span>{isComingSoon ? "მალე" : isOut ? "ამოიწურა" : "დამატება"}</span>
           </Button>
+
           <div className="grid grid-cols-1 gap-2">
             <Button
               aria-disabled={isOut}
-              className="w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white py-3 rounded-md disabled:opacity-60"
+              className="w-full flex items-center justify-center
+                         bg-brand-primarydark hover:bg-brand-primarydark/90 text-white py-3 rounded-md disabled:opacity-60"
               disabled={isOut}
               onClick={onBuyNow}
             >

@@ -21,14 +21,11 @@ export type CheckoutFormValues = {
   lastName: string;
   email: string;
   phone?: string;
-
   address: string;
   city: string;
   state?: string;
   zip?: string;
-
   sameAsShipping: boolean;
-
   billingAddress?: string;
   billingCity?: string;
   billingState?: string;
@@ -47,7 +44,6 @@ export default function CheckoutForm({
   onChange: (p: Provider) => void;
 }) {
   const [sameAsShipping, setSameAsShipping] = useState(true);
-
   const [selected, setSelected] = useState<Provider>(value ?? "bog");
 
   useEffect(() => {
@@ -79,52 +75,60 @@ export default function CheckoutForm({
     billingZip: "",
   });
 
-  const update = (k: keyof CheckoutFormValues) => (e: any) => {
+  const update = (k: keyof CheckoutFormValues) => (e: any) =>
     setV((s) => ({ ...s, [k]: e?.target?.value ?? e }));
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit({ ...v, sameAsShipping });
   };
 
-  const Option = ({ id, label, logoSrc }: { id: Provider; label: string; logoSrc: string }) => (
-    <button
-      className={`w-full text-left rounded-xl border p-4 transition
-          ${selected === id ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/40"}`}
-      type="button"
-      onClick={() => setSelected(id)}
-    >
-      <div className="flex items-center gap-4">
-        <div
-          className={`h-4 w-4 rounded-full border flex items-center justify-center
-              ${selected === id ? "bg-primary border-primary" : "border-muted-foreground/50"}`}
-        >
-          {selected === id && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
-        </div>
+  const Option = ({ id, label, logoSrc }: { id: Provider; label: string; logoSrc: string }) => {
+    const active = selected === id;
 
-        <Image
-          alt={label}
-          className="rounded bg-white object-contain dark:bg-white"
-          height={40}
-          src={logoSrc}
-          width={40}
-        />
-        <div className="flex flex-col">
-          <span className="font-medium">{label}</span>
-          <span className="text-xs text-muted-foreground">Secure hosted checkout</span>
+    return (
+      <button
+        className={`w-full text-left rounded-xl p-4 transition border
+          ${
+            active
+              ? "border-brand-primary ring-2 ring-brand-primary/20"
+              : "border-brand-muted dark:border-brand-muteddark hover:border-brand-primary/50"
+          }`}
+        type="button"
+        onClick={() => setSelected(id)}
+      >
+        <div className="flex items-center gap-4">
+          <div
+            className={`h-4 w-4 rounded-full border flex items-center justify-center
+              ${active ? "bg-brand-primary border-brand-primary" : "border-text-subtle/50"}`}
+          >
+            {active && <div className="h-2 w-2 rounded-full bg-white" />}
+          </div>
+          <Image
+            alt={label}
+            className="rounded bg-white object-contain"
+            height={40}
+            src={logoSrc}
+            width={40}
+          />
+          <div className="flex flex-col">
+            <span className="font-medium text-text-light dark:text-text-lightdark">{label}</span>
+            <span className="text-xs text-text-subtle dark:text-text-subtledark">
+              Secure hosted checkout
+            </span>
+          </div>
         </div>
-      </div>
-    </button>
-  );
+      </button>
+    );
+  };
 
   return (
     <form className="space-y-6" onSubmit={submit}>
       {/* Contact */}
-      <Card className="dark:bg-brand-muteddark bg-brand-muted">
+      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+          <CardTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
+            <div className="w-6 h-6 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
               1
             </div>
             Contact Information
@@ -133,7 +137,9 @@ export default function CheckoutForm({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">First Name</Label>
+              <Label className="text-text-light dark:text-text-lightdark" htmlFor="firstName">
+                First Name
+              </Label>
               <Input
                 required
                 id="firstName"
@@ -143,7 +149,9 @@ export default function CheckoutForm({
               />
             </div>
             <div>
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label className="text-text-light dark:text-text-lightdark" htmlFor="lastName">
+                Last Name
+              </Label>
               <Input
                 required
                 id="lastName"
@@ -154,7 +162,9 @@ export default function CheckoutForm({
             </div>
           </div>
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label className="text-text-light dark:text-text-lightdark" htmlFor="email">
+              Email
+            </Label>
             <Input
               required
               id="email"
@@ -165,7 +175,9 @@ export default function CheckoutForm({
             />
           </div>
           <div>
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label className="text-text-light dark:text-text-lightdark" htmlFor="phone">
+              Phone Number
+            </Label>
             <Input
               id="phone"
               placeholder="+995 5XX XX XX XX"
@@ -178,10 +190,10 @@ export default function CheckoutForm({
       </Card>
 
       {/* Shipping */}
-      <Card className="dark:bg-brand-muteddark bg-brand-muted">
+      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+          <CardTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
+            <div className="w-6 h-6 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
               2
             </div>
             Shipping Address
@@ -189,7 +201,9 @@ export default function CheckoutForm({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="address">Street Address</Label>
+            <Label className="text-text-light dark:text-text-lightdark" htmlFor="address">
+              Street Address
+            </Label>
             <Input
               required
               id="address"
@@ -200,7 +214,9 @@ export default function CheckoutForm({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="city">City</Label>
+              <Label className="text-text-light dark:text-text-lightdark" htmlFor="city">
+                City
+              </Label>
               <Input
                 required
                 id="city"
@@ -210,7 +226,9 @@ export default function CheckoutForm({
               />
             </div>
             <div>
-              <Label htmlFor="state">State / Region</Label>
+              <Label className="text-text-light dark:text-text-lightdark" htmlFor="state">
+                State / Region
+              </Label>
               <Select onValueChange={(val) => setV((s) => ({ ...s, state: val }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose…" />
@@ -224,15 +242,20 @@ export default function CheckoutForm({
               </Select>
             </div>
             <div>
-              <Label htmlFor="zip">ZIP / Postal Code</Label>
+              <Label className="text-text-light dark:text-text-lightdark" htmlFor="zip">
+                ZIP / Postal Code
+              </Label>
               <Input id="zip" placeholder="0108" value={v.zip} onChange={update("zip")} />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="p-4 dark:bg-brand-muteddark bg-brand-muted">
-        <div className="mb-3 font-semibold">Choose payment provider</div>
+      {/* Provider */}
+      <Card className="p-4 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+        <div className="mb-3 font-semibold text-text-light dark:text-text-lightdark">
+          Choose payment provider
+        </div>
         <div className="grid grid-cols-1 gap-3">
           <Option id="bog" label="Bank of Georgia" logoSrc="/logos/bog.png" />
           <Option id="tbc" label="TBC Bank" logoSrc="/logos/tbc.png" />
@@ -240,10 +263,10 @@ export default function CheckoutForm({
       </Card>
 
       {/* Billing */}
-      <Card className="dark:bg-brand-muteddark bg-brand-muted">
+      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+          <CardTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
+            <div className="w-6 h-6 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
               3
             </div>
             Billing Address
@@ -256,13 +279,20 @@ export default function CheckoutForm({
               id="sameAsShipping"
               onCheckedChange={(checked) => setSameAsShipping(checked === true)}
             />
-            <Label htmlFor="sameAsShipping">Same as shipping address</Label>
+            <Label className="text-text-light dark:text-text-lightdark" htmlFor="sameAsShipping">
+              Same as shipping address
+            </Label>
           </div>
 
           {!sameAsShipping && (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="billingAddress">Street Address</Label>
+                <Label
+                  className="text-text-light dark:text-text-lightdark"
+                  htmlFor="billingAddress"
+                >
+                  Street Address
+                </Label>
                 <Input
                   id="billingAddress"
                   placeholder="Billing street"
@@ -272,7 +302,9 @@ export default function CheckoutForm({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="billingCity">City</Label>
+                  <Label className="text-text-light dark:text-text-lightdark" htmlFor="billingCity">
+                    City
+                  </Label>
                   <Input
                     id="billingCity"
                     placeholder="City"
@@ -281,7 +313,12 @@ export default function CheckoutForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="billingState">State</Label>
+                  <Label
+                    className="text-text-light dark:text-text-lightdark"
+                    htmlFor="billingState"
+                  >
+                    State
+                  </Label>
                   <Input
                     id="billingState"
                     placeholder="State"
@@ -290,7 +327,9 @@ export default function CheckoutForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="billingZip">ZIP</Label>
+                  <Label className="text-text-light dark:text-text-lightdark" htmlFor="billingZip">
+                    ZIP
+                  </Label>
                   <Input
                     id="billingZip"
                     placeholder="ZIP"
@@ -306,7 +345,10 @@ export default function CheckoutForm({
 
       {/* Submit */}
       <div className="flex justify-end">
-        <Button className="px-6" type="submit">
+        <Button
+          className="px-6 bg-brand-primary hover:bg-brand-primary/90 text-white"
+          type="submit"
+        >
           Continue to Payment
         </Button>
       </div>

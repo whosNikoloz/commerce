@@ -110,8 +110,13 @@ export default function ProductHeader({
     <header>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold">{title}</h1>
-          <p aria-live="polite" className="text-sm lg:text-base text-muted-foreground">
+          <h1 className="text-xl lg:text-2xl font-bold text-text-light dark:text-text-lightdark">
+            {title}
+          </h1>
+          <p
+            aria-live="polite"
+            className="text-sm lg:text-base text-text-subtle dark:text-text-subtledark"
+          >
             {productCount} products found
           </p>
         </div>
@@ -121,7 +126,7 @@ export default function ProductHeader({
             <DropdownMenuTrigger asChild>
               <Button
                 aria-label="Sort products"
-                className="min-w-[120px] lg:min-w-[140px]"
+                className="min-w-[120px] lg:min-w-[140px] text-text-light dark:text-text-lightdark border-brand-muted dark:border-brand-muteddark"
                 variant="outline"
               >
                 <span className="hidden sm:inline">Sort by</span>
@@ -129,7 +134,10 @@ export default function ProductHeader({
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
+            >
               <DropdownMenuRadioGroup value={sortBy} onValueChange={onSortChange}>
                 <DropdownMenuRadioItem value="featured">Featured</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="newest">Newest</DropdownMenuRadioItem>
@@ -140,7 +148,11 @@ export default function ProductHeader({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div aria-label="View mode" className="flex border rounded-md" role="tablist">
+          <div
+            aria-label="View mode"
+            className="flex border rounded-md border-brand-muted dark:border-brand-muteddark"
+            role="tablist"
+          >
             <Button
               aria-label="Grid view"
               aria-pressed={viewMode === "grid"}
@@ -164,7 +176,7 @@ export default function ProductHeader({
           </div>
 
           {activeFiltersCount > 0 && (
-            <Badge className="ml-1" variant="secondary">
+            <Badge className="ml-1 bg-brand-muted dark:bg-brand-muteddark" variant="secondary">
               {activeFiltersCount}
             </Badge>
           )}
@@ -174,7 +186,11 @@ export default function ProductHeader({
       {hasAnyChip && (
         <nav aria-label="Active filters" className="flex flex-wrap gap-2 mt-2">
           {brandIds.map((id) => (
-            <Badge key={`b-${id}`} className="gap-1" variant="secondary">
+            <Badge
+              key={`b-${id}`}
+              className="gap-1 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark"
+              variant="secondary"
+            >
               {brandLookup?.[id] ?? id}
               <button
                 aria-label={`Remove brand ${brandLookup?.[id] ?? id}`}
@@ -184,38 +200,44 @@ export default function ProductHeader({
               </button>
             </Badge>
           ))}
-          {/* {categoryIds.map((id) => (
-            <Badge key={`c-${id}`} className="gap-1" variant="secondary">
-              {categoryLookup?.[id] ?? id}
-              <button aria-label="Remove category" onClick={() => _removeCategory(id)}>
-                ×
-              </button>
-            </Badge>
-          ))} */}
+
           {conditions.map((c) => (
-            <Badge key={`cond-${c}`} className="gap-1" variant="secondary">
+            <Badge
+              key={`cond-${c}`}
+              className="gap-1 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark"
+              variant="secondary"
+            >
               {conditionLabel(c)}
               <button aria-label="Remove condition" onClick={() => _removeCondition(c)}>
                 ×
               </button>
             </Badge>
           ))}
+
           {hasStock && (
-            <Badge className="gap-1" variant="secondary">
+            <Badge
+              className="gap-1 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark"
+              variant="secondary"
+            >
               {stockLabel(filter.stockStatus)}
               <button aria-label="Clear stock status" onClick={_clearStock}>
                 ×
               </button>
             </Badge>
           )}
+
           {hasPrice && (
-            <Badge className="gap-1" variant="secondary">
+            <Badge
+              className="gap-1 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark"
+              variant="secondary"
+            >
               {`${filter.minPrice ?? 0}–${filter.maxPrice ?? "∞"}`}
               <button aria-label="Clear price" onClick={_clearPrice}>
                 ×
               </button>
             </Badge>
           )}
+
           {facetFilters.map((ff) => {
             const id = ff.facetValueId;
             const name = facetValueLookup?.[id] ?? id;
@@ -223,7 +245,7 @@ export default function ProductHeader({
             return (
               <Badge
                 key={`fv-${id}`}
-                className="gap-2 px-2 py-1"
+                className="gap-2 px-2 py-1 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark"
                 data-facet-id={id}
                 title={`${name} (${id})`}
                 variant="secondary"
@@ -231,7 +253,6 @@ export default function ProductHeader({
                 <div className="flex flex-col leading-tight items-start">
                   <span className="text-sm">{name}</span>
                 </div>
-
                 <button
                   aria-label={`Remove facet ${name}`}
                   className="ml-1"
@@ -243,10 +264,11 @@ export default function ProductHeader({
               </Badge>
             );
           })}
+
           {activeFiltersCount > 0 && (
             <Badge
               aria-label="Clear all filters"
-              className="gap-1 cursor-pointer"
+              className="gap-1 cursor-pointer border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
               variant="outline"
               onClick={_clearAll}
             >

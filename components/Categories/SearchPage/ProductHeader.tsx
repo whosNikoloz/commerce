@@ -43,10 +43,13 @@ export default function ProductHeader({
   onViewModeChange,
 }: ProductHeaderProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <header>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-sm lg:text-base text-muted-foreground">
+          <p
+            aria-live="polite"
+            className="text-sm lg:text-base text-text-subtle dark:text-text-subtledark"
+          >
             {productCount} products found
           </p>
         </div>
@@ -54,13 +57,20 @@ export default function ProductHeader({
         <div className="flex items-center gap-2 lg:gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="min-w-[120px] lg:min-w-[140px]" variant="outline">
+              <Button
+                aria-label="Sort products"
+                className="min-w-[120px] lg:min-w-[140px] text-text-light dark:text-text-lightdark border-brand-muted dark:border-brand-muteddark"
+                variant="outline"
+              >
                 <span className="hidden sm:inline">Sort by</span>
                 <span className="sm:hidden">Sort</span>
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
+            >
               <DropdownMenuRadioGroup value={sortBy} onValueChange={onSortChange}>
                 <DropdownMenuRadioItem value="featured">Featured</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="newest">Newest</DropdownMenuRadioItem>
@@ -71,8 +81,14 @@ export default function ProductHeader({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex border rounded-md">
+          <div
+            aria-label="View mode"
+            className="flex border rounded-md border-brand-muted dark:border-brand-muteddark"
+            role="tablist"
+          >
             <Button
+              aria-label="Grid view"
+              aria-pressed={viewMode === "grid"}
               className="rounded-r-none"
               size="sm"
               variant={viewMode === "grid" ? "default" : "ghost"}
@@ -81,6 +97,8 @@ export default function ProductHeader({
               <Grid className="h-4 w-4" />
             </Button>
             <Button
+              aria-label="List view"
+              aria-pressed={viewMode === "list"}
               className="rounded-l-none"
               size="sm"
               variant={viewMode === "list" ? "default" : "ghost"}
@@ -91,6 +109,6 @@ export default function ProductHeader({
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }

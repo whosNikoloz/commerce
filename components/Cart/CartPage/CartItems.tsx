@@ -14,9 +14,7 @@ const formatPrice = (price: number) =>
 
 const toNumber = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0));
 const percent = (o: number, c: number) => Math.max(0, Math.round(((o - c) / o) * 100));
-const monthly = (price: number, months = 24) => Math.ceil(price / months);
 
-// პატარა ჰელპერი specs-ის ლამაზი სტრიქონისთვის
 function formatSpecs(facets?: Record<string, string>) {
   if (!facets) return "";
   const entries = Object.entries(facets);
@@ -27,7 +25,6 @@ function formatSpecs(facets?: Record<string, string>) {
 }
 
 export default function CartItems() {
-  // ✅ Zustand selectors
   const cart = useCartStore((s) => s.cart);
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
@@ -47,50 +44,55 @@ export default function CartItems() {
         return (
           <Card
             key={`${item.id}-${(item as any).variantKey ?? ""}`}
-            className="p-3 sm:p-4 md:p-5 dark:bg-brand-muteddark bg-brand-muted"
+            className="p-3 sm:p-4 md:p-5 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50"
           >
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_160px_48px] md:items-center">
-              {/* მარცხენა ბლოკი */}
+              {/* left */}
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="relative shrink-0">
-                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md overflow-hidden bg-muted">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md overflow-hidden bg-brand-muted dark:bg-brand-muteddark">
                     <Image
                       fill
                       priority
                       alt={item.name}
                       className="object-cover"
                       sizes="96px"
-                      src={item.image || "/placeholder.svg"}
+                      src={item.image || "/placeholder.png"}
                     />
                   </div>
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium leading-snug line-clamp-2 text-sm sm:text-base">
+                  <h3 className="font-medium leading-snug line-clamp-2 text-sm sm:text-base text-text-light dark:text-text-lightdark">
                     {item.name}
                   </h3>
 
-                  {/* არჩეული სპეციფიკაციები — როგორც ბეჟები */}
                   {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {Object.entries(item.selectedFacets).map(([k, v]) => (
-                        <Badge key={k} className="h-5 text-[11px] px-1.5" variant="secondary">
+                        <Badge
+                          key={k}
+                          className="h-5 text-[11px] px-1.5 bg-brand-muted/60 dark:bg-brand-muteddark/50 text-text-light dark:text-text-lightdark border border-brand-muted/60 dark:border-brand-muteddark/50"
+                          variant="secondary"
+                        >
                           {k}: {v}
                         </Badge>
                       ))}
                     </div>
                   )}
 
-                  {/* მობილურის ფასი (mobile) */}
+                  {/* mobile price */}
                   <div className="mt-2 md:hidden">
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-semibold">{formatPrice(price)}</span>
+                      <span className="text-base font-semibold text-text-light dark:text-text-lightdark">
+                        {formatPrice(price)}
+                      </span>
                       {hasDiscount && (
                         <>
-                          <span className="text-sm text-muted-foreground line-through">
+                          <span className="text-sm text-text-subtle dark:text-text-subtledark line-through">
                             {formatPrice(originalPrice!)}
                           </span>
-                          <Badge className="text-[11px] px-1.5 py-0.5" variant="destructive">
+                          <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
                             -{discount}%
                           </Badge>
                         </>
@@ -100,12 +102,12 @@ export default function CartItems() {
                 </div>
               </div>
 
-              {/* რაოდენობა */}
+              {/* qty */}
               <div className="order-3 md:order-none flex md:justify-center">
-                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border">
+                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border border-brand-muted/70 dark:border-brand-muteddark/50 bg-brand-surface dark:bg-brand-surfacedark">
                   <Button
                     aria-label="Decrease"
-                    className="h-9 w-10 sm:w-9 p-0"
+                    className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"
                     disabled={quantity <= 1}
                     size="sm"
                     variant="ghost"
@@ -115,12 +117,12 @@ export default function CartItems() {
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="min-w-[2.75rem] text-center text-sm font-medium">
+                  <span className="min-w-[2.75rem] text-center text-sm font-medium text-text-light dark:text-text-lightdark">
                     {quantity}
                   </span>
                   <Button
                     aria-label="Increase"
-                    className="h-9 w-10 sm:w-9 p-0"
+                    className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"
                     size="sm"
                     variant="ghost"
                     onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)}
@@ -130,27 +132,32 @@ export default function CartItems() {
                 </div>
               </div>
 
-              {/* დესკტოპის ფასი */}
+              {/* desktop price */}
               <div className="hidden md:flex flex-col items-end gap-1">
-                <div className="text-lg font-semibold">{formatPrice(price)}</div>
+                <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+                  {formatPrice(price)}
+                </div>
                 {hasDiscount && (
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground line-through">
+                    <span className="text-sm text-text-subtle dark:text-text-subtledark line-through">
                       {formatPrice(originalPrice!)}
                     </span>
-                    <Badge className="text-xs px-2 py-0.5" variant="destructive">
+                    <Badge
+                      className="text-xs px-2 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400"
+                      variant="destructive"
+                    >
                       -{discount}%
                     </Badge>
                   </div>
                 )}
               </div>
 
-              {/* წაშლა */}
+              {/* remove */}
               <div className="order-4 md:order-none flex justify-end">
                 <div className="flex items-center gap-1">
                   <Button
                     aria-label="Remove"
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-text-subtle dark:text-text-subtledark hover:text-red-600 dark:hover:text-red-400"
                     size="icon"
                     variant="ghost"
                     onClick={() => removeFromCart(item.id, item.variantKey)}

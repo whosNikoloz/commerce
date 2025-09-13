@@ -30,7 +30,6 @@ export default function CartDropdown() {
   const quantityRef = useRef(cartLen);
   const [cartChanged, setCartChanged] = useState(false);
 
-  // small "ping" when line count changes
   useEffect(() => {
     if (cartLen > 0 && cartLen !== quantityRef.current) {
       quantityRef.current = cartLen;
@@ -71,70 +70,78 @@ export default function CartDropdown() {
         className={`absolute right-0 top-14 w-[440px] md:w-[500px] transform transition-all duration-300 ease-out z-50
         ${isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-3 pointer-events-none"}`}
       >
-        <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-white/95 dark:bg-default-50/95">
-          <CardHeader className="pb-4 pt-6 px-6 bg-gradient-to-r from-default-50/80 to-default-100/60 dark:from-default-100/30 dark:to-default-200/20">
+        {/* Card surface fully tied to brand surface */}
+        <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-brand-surface/95 dark:bg-brand-surfacedark/95">
+          {/* Header with brand-tinted gradient */}
+          <CardHeader className="pb-4 pt-6 px-6 bg-gradient-to-r from-brand-surface/80 to-brand-muted/50 dark:from-brand-surfacedark/60 dark:to-brand-muteddark/40">
             <div className="flex items-center justify-between w-full">
-              <h1 className="text-lg font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+              <h1 className="text-lg font-bold text-text-light dark:text-text-lightdark">
                 Shopping Cart
               </h1>
-              <ShadCnBadge className="bg-primary/10 text-primary-600 dark:text-primary-400">
+              <ShadCnBadge className="bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
                 {totalQuantity} items
               </ShadCnBadge>
             </div>
           </CardHeader>
 
           {cartLen === 0 ? (
-            <div className="flex flex-col items-center justify-center h-52 text-default-500 px-6">
+            <div className="flex flex-col items-center justify-center h-52 px-6">
               <div className="relative mb-4">
-                <ShoppingCartIcon className="h-16 w-16 opacity-20" />
-                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-primary/5 rounded-full" />
+                <ShoppingCartIcon className="h-16 w-16 text-text-subtle/20 dark:text-text-subtledark/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-brand-primary/5 rounded-full" />
               </div>
-              <p className="text-base font-medium">კალათა ცარიელია</p>
-              <p className="text-sm mt-1 opacity-70">დაამატეთ პროდუქტები შესყიდვისთვის</p>
+              <p className="text-base font-medium text-text-light dark:text-text-lightdark">
+                კალათა ცარიელია
+              </p>
+              <p className="text-sm mt-1 text-text-subtle dark:text-text-subtledark">
+                დაამატეთ პროდუქტები შესყიდვისთვის
+              </p>
             </div>
           ) : (
             <>
-              {/* Enhanced Scroll area */}
+              {/* Scroll area */}
               <CardBody className="px-6 py-4 max-h-[65vh] overflow-y-auto">
                 <div className="space-y-6">
                   {cart.map((item, index) => (
                     <div
                       key={`${item.id}-${item.variantKey ?? ""}`}
-                      className={`group relative ${index !== 0 ? "pt-6 border-t border-default-200/60 dark:border-default-100/15" : ""}`}
+                      className={`group relative ${
+                        index !== 0
+                          ? "pt-6 border-t border-brand-muted/60 dark:border-brand-muteddark/40"
+                          : ""
+                      }`}
                     >
                       <div className="grid grid-cols-[100px_1fr] gap-4">
-                        {/* Enhanced Product Image */}
+                        {/* Image */}
                         <div className="relative">
                           <div className="relative overflow-hidden rounded-2xl">
                             <Image
                               alt={item.name || "Product image"}
                               className="object-cover transition-transform duration-200 group-hover:scale-105"
                               height={100}
-                              src={item.image || "/placeholder.svg"}
+                              src={item.image || "/placeholder.png"}
                               width={100}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                           </div>
                         </div>
 
-                        {/* Enhanced Product Info */}
+                        {/* Info */}
                         <div className="flex flex-col justify-between min-w-0">
                           <div>
-                            <h4 className="font-semibold text-base leading-tight line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+                            <h4 className="font-semibold text-base leading-tight line-clamp-2 mb-2 text-text-light dark:text-text-lightdark group-hover:text-brand-primary transition-colors">
                               {item.name}
                             </h4>
 
-                            {/* Enhanced Facets */}
+                            {/* Facets */}
                             {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
                               <div className="flex flex-wrap gap-1.5 mb-3">
                                 {Object.entries(item.selectedFacets).map(([k, v]) => (
                                   <span
                                     key={k}
                                     className="text-xs rounded-xl px-3 py-1 font-medium
-                                      bg-gradient-to-r from-default-100 to-default-50 
-                                      text-default-700 border border-default-200/50
-                                      dark:from-default-100/30 dark:to-default-50/20 
-                                      dark:text-default-300 dark:border-default-100/20"
+                                      bg-brand-muted/30 text-text-light dark:bg-brand-muteddark/25 dark:text-text-lightdark
+                                      border border-brand-muted/50 dark:border-brand-muteddark/40"
                                   >
                                     {k}: {v}
                                   </span>
@@ -142,17 +149,17 @@ export default function CartDropdown() {
                               </div>
                             )}
 
-                            {/* Enhanced Price */}
+                            {/* Price */}
                             <div className="flex items-center gap-3 mb-3">
-                              <span className="text-lg font-bold text-primary">
+                              <span className="text-lg font-bold text-brand-primary">
                                 {fmt.format(item.price)} ₾
                               </span>
                               {item.discount > 0 && (
                                 <>
-                                  <span className="text-sm line-through text-default-400">
+                                  <span className="text-sm line-through text-text-subtle dark:text-text-subtledark">
                                     {item.originalPrice} ₾
                                   </span>
-                                  <ShadCnBadge className="bg-danger/10 text-danger-600 dark:text-danger-400 text-xs font-bold px-2">
+                                  <ShadCnBadge className="bg-danger/10 text-red-600 dark:text-red-400 border border-red-500/20 text-xs font-bold px-2">
                                     -{item.discount}%
                                   </ShadCnBadge>
                                 </>
@@ -160,13 +167,13 @@ export default function CartDropdown() {
                             </div>
                           </div>
 
-                          {/* Enhanced Controls Row */}
+                          {/* Controls */}
                           <div className="flex items-center justify-between">
-                            {/* Enhanced Quantity controls */}
-                            <div className="inline-flex items-center rounded-2xl bg-default-100/80 dark:bg-default-100/30 ring-1 ring-default-200/50 dark:ring-default-100/20 overflow-hidden">
+                            {/* Qty controls */}
+                            <div className="inline-flex items-center rounded-2xl bg-brand-muted/40 dark:bg-brand-muteddark/25 ring-1 ring-brand-muted/60 dark:ring-brand-muteddark/40 overflow-hidden">
                               <Button
                                 isIconOnly
-                                className="h-9 w-9 rounded-l-2xl border-0 bg-transparent hover:bg-default-200/60 dark:hover:bg-default-100/40 transition-colors"
+                                className="h-9 w-9 rounded-l-2xl border-0 bg-transparent hover:bg-brand-muted/60 dark:hover:bg-brand-muteddark/40 transition-colors"
                                 isDisabled={item.quantity <= 1}
                                 size="sm"
                                 variant="light"
@@ -178,31 +185,35 @@ export default function CartDropdown() {
                                   )
                                 }
                               >
-                                <span className="text-lg leading-none">–</span>
+                                <span className="text-lg leading-none text-text-light dark:text-text-lightdark">
+                                  –
+                                </span>
                               </Button>
-                              <div className="flex items-center justify-center w-12 h-9 bg-white/60 dark:bg-default-50/20 border-x border-default-200/50 dark:border-default-100/20">
-                                <span className="text-sm font-bold select-none">
+                              <div className="flex items-center justify-center w-12 h-9 bg-brand-surface/60 dark:bg-brand-surfacedark/40 border-x border-brand-muted/60 dark:border-brand-muteddark/40">
+                                <span className="text-sm font-bold select-none text-text-light dark:text-text-lightdark">
                                   {item.quantity}
                                 </span>
                               </div>
                               <Button
                                 isIconOnly
-                                className="h-9 w-9 rounded-r-2xl border-0 bg-transparent hover:bg-default-200/60 dark:hover:bg-default-100/40 transition-colors"
+                                className="h-9 w-9 rounded-r-2xl border-0 bg-transparent hover:bg-brand-muted/60 dark:hover:bg-brand-muteddark/40 transition-colors"
                                 size="sm"
                                 variant="light"
                                 onPress={() =>
                                   updateCartItem(item.id, item.quantity + 1, item.variantKey)
                                 }
                               >
-                                <span className="text-lg leading-none">+</span>
+                                <span className="text-lg leading-none text-text-light dark:text-text-lightdark">
+                                  +
+                                </span>
                               </Button>
                             </div>
 
-                            {/* Enhanced Remove Button */}
+                            {/* Remove */}
                             <Button
                               isIconOnly
                               aria-label="Remove item"
-                              className="h-9 w-9 rounded-2xl text-danger-500 hover:bg-danger/10 dark:hover:bg-danger/20 transition-all duration-200 opacity-60 group-hover:opacity-100"
+                              className="h-9 w-9 rounded-2xl text-red-500 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-all duration-200 opacity-60 group-hover:opacity-100"
                               title="Remove item"
                               variant="light"
                               onPress={() => removeFromCart(item.id, item.variantKey)}
@@ -217,37 +228,34 @@ export default function CartDropdown() {
                 </div>
               </CardBody>
 
-              {/* Enhanced Footer */}
-              <CardFooter className="sticky bottom-0 z-10 px-6 py-5 bg-gradient-to-t from-background via-background/95 to-background/80 backdrop-blur-xl border-t border-default-200/60 dark:border-default-100/15">
+              {/* Footer */}
+              <CardFooter className="sticky bottom-0 z-10 px-6 py-5 bg-gradient-to-t from-brand-surface via-brand-surface/95 to-brand-surface/80 dark:from-brand-surfacedark dark:via-brand-surfacedark/90 dark:to-brand-surfacedark/80 backdrop-blur-xl border-t border-brand-muted/60 dark:border-brand-muteddark/40">
                 <div className="w-full space-y-4">
-                  {/* Enhanced Subtotal */}
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-default-50 to-default-100/50 dark:from-default-100/20 dark:to-default-200/10 border border-default-200/30 dark:border-default-100/10">
-                    <span className="text-base font-semibold text-default-700 dark:text-default-300">
+                  {/* Subtotal */}
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-brand-surface to-brand-muted/40 dark:from-brand-surfacedark dark:to-brand-muteddark/30 border border-brand-muted/40 dark:border-brand-muteddark/30">
+                    <span className="text-base font-semibold text-text-light dark:text-text-lightdark">
                       სულ:
                     </span>
-                    <span className="text-2xl font-black bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
+                    <span className="text-2xl font-black text-brand-primary">
                       {fmt.format(subtotal)} ₾
                     </span>
                   </div>
 
-                  {/* Enhanced Action Buttons */}
+                  {/* Actions */}
                   <div className="flex gap-3">
                     <Button
                       as={Link}
-                      className="flex-1 h-12 rounded-2xl font-semibold border-2 border-default-300 dark:border-default-200/30 hover:border-default-400 dark:hover:border-default-200/50 transition-all duration-200"
+                      className="flex-1 h-12 rounded-2xl font-semibold border-2 border-brand-muted dark:border-brand-muteddark hover:border-brand-primary/70 dark:hover:border-brand-primarydark/70 text-text-light dark:text-text-lightdark transition-all duration-200"
                       href="/cart"
                       variant="bordered"
                       onPress={onClose}
                     >
                       <span>ნახვა</span>
-                      <ShadCnBadge className="ml-2 bg-default-200 dark:bg-default-300/30 text-default-700 dark:text-default-300">
+                      <ShadCnBadge className="ml-2 bg-brand-muted/70 dark:bg-brand-muteddark/40 text-text-light dark:text-text-lightdark border border-brand-muted/60 dark:border-brand-muteddark/50">
                         {totalQuantity}
                       </ShadCnBadge>
                     </Button>
-                    <Button
-                      className="flex-1 h-12 rounded-2xl font-bold bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-                      color="primary"
-                    >
+                    <Button className="flex-1 h-12 rounded-2xl font-bold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]">
                       ყიდვა
                     </Button>
                   </div>

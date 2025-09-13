@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Truck, Package, RefreshCcw, ShieldCheck } from "lucide-react";
 
 import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 
 /* ---------------- SEO (i18n-aware) ---------------- */
 export async function generateMetadata({
@@ -23,7 +22,6 @@ export async function generateMetadata({
     path: "/info/delivery",
     images: ["/og/delivery-og.jpg"],
     index: true,
-    siteName: siteConfig.name,
   });
 }
 

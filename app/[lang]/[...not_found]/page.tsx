@@ -3,8 +3,7 @@
 import NextLink from "next/link";
 import { useParams } from "next/navigation";
 import { Home } from "lucide-react";
-
-import { CategoryCarousel } from "@/components/Home/category-carousel";
+import { CategoryGrid } from "@/components/Home/category-grid";
 
 const copy = {
   en: {
@@ -31,7 +30,7 @@ export default function NotFound() {
         <p className="text-muted-foreground">{t.desc}</p>
 
         <div className="mx-auto max-w-5xl">
-          <CategoryCarousel />
+          <CategoryGrid />
         </div>
 
         <div className="mt-2 flex items-center justify-center">

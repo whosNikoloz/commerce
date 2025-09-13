@@ -32,7 +32,7 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
   const zoomLevel = 3;
-  const placeholder = "/placeholder.svg"; // make sure it exists in /public
+  const placeholder = "/placeholder.png"; // make sure it exists in /public
 
   const isMobile = useIsMobile();
 

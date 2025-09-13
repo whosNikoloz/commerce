@@ -20,10 +20,7 @@ interface LoginProps {
 export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginState, setLoginState] = useState({
-    email: "",
-    password: "",
-  });
+  const [loginState, setLoginState] = useState({ email: "", password: "" });
 
   const [loginError, setLoginError] = useState("");
   const [loginEmailError, setLoginEmailError] = useState("");
@@ -101,11 +98,7 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
       setEmailLogHasBlurred(true);
       setLogLoader(true);
 
-      // API call would go here to check if email exists
-      // For now, we'll just simulate a check delay
-      setTimeout(() => {
-        setLogLoader(false);
-      }, 1000);
+      setTimeout(() => setLogLoader(false), 1000);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -113,7 +106,7 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
 
   const handleLoginPasswordClear = async () => {
     setLoginPasswordError("");
-    setLoginState({ ...loginState, password: "" });
+    setLoginState((s) => ({ ...s, password: "" }));
   };
 
   return (
@@ -121,64 +114,73 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
       <Input
         ref={loginRef}
         classNames={{
-          input: ["text-[16px]"],
+          input: ["text-[16px] text-text-light dark:text-text-lightdark"],
           inputWrapper: [
-            "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
-            "hover:bg-gray-100 dark:hover:bg-slate-600",
+            // surface + border
+            "bg-brand-surface dark:bg-brand-surfacedark shadow-sm border-2",
+            "border-brand-muted dark:border-brand-muteddark",
+            // focus/hover accents
+            "focus-within:border-brand-primary",
+            "hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/50",
+            "transition-colors",
           ],
-          label: ["font-medium text-gray-700 dark:text-gray-200"],
+          label: ["font-medium text-text-subtle dark:text-text-subtledark"],
         }}
         endContent={
-          logEmailHasBlurred ? <InputLoadingBtn loading={Logloader} success={true} /> : <></>
+          logEmailHasBlurred ? <InputLoadingBtn loading={Logloader} success={true} /> : null
         }
         errorMessage={loginEmailError}
         isInvalid={loginEmailError !== ""}
         label={loginData.email}
-        startContent={<i className="fas fa-envelope text-blue-500" />}
+        startContent={<i className="fas fa-envelope text-brand-primary" />}
         type="email"
         value={loginState.email}
         onBlur={handleLoginEmailExists}
         onChange={(e) =>
-          setLoginState({
-            ...loginState,
+          setLoginState((s) => ({
+            ...s,
             email: e.target.value,
-          })
+          }))
         }
       />
+
       <Input
         isClearable
         classNames={{
-          input: ["text-[16px]"],
+          input: ["text-[16px] text-text-light dark:text-text-lightdark"],
           inputWrapper: [
-            "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
-            "hover:bg-gray-100 dark:hover:bg-slate-600",
+            "bg-brand-surface dark:bg-brand-surfacedark shadow-sm border-2",
+            "border-brand-muted dark:border-brand-muteddark",
+            "focus-within:border-brand-primary",
+            "hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/50",
+            "transition-colors",
           ],
-          label: ["font-medium text-gray-700 dark:text-gray-200"],
+          label: ["font-medium text-text-subtle dark:text-text-subtledark"],
         }}
         errorMessage={loginPasswordError}
         isInvalid={loginPasswordError !== ""}
         label={loginData.password}
-        startContent={<i className="fas fa-lock text-blue-500" />}
+        startContent={<i className="fas fa-lock text-brand-primary" />}
         type="password"
         value={loginState.password}
         onChange={(e) =>
-          setLoginState({
-            ...loginState,
+          setLoginState((s) => ({
+            ...s,
             password: e.target.value,
-          })
+          }))
         }
         onClear={handleLoginPasswordClear}
       />
 
       {loginError && (
-        <div className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg">
+        <div className="text-red-600 dark:text-red-400 text-sm text-center font-medium bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-2 rounded-lg">
           <i className="fas fa-exclamation-circle mr-2" />
           {loginError}
         </div>
       )}
 
       <Button
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors"
+        className="w-full bg-brand-primary hover:bg-brand-primarydark text-white font-bold py-3 rounded-lg shadow-md transition-colors"
         isLoading={isLoading}
         startContent={<i className="fas fa-sign-in-alt mr-2" />}
         onPress={handleLogin}

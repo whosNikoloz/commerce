@@ -82,7 +82,7 @@ export function NewArrivals() {
                   className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
                   height={320} // (matches h-80 ~= 320px)
                   loading="lazy"
-                  src={p?.images?.[0] ?? "/placeholder.svg"}
+                  src={p?.images?.[0] ?? "/placeholder.png"}
                   width={800} // pick the rendered size
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />

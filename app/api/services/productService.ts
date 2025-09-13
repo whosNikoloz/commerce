@@ -8,7 +8,6 @@ import { FinaProductRestArrayModel, FinaProductRestModel } from "@/types/product
 const API_BASE = process.env.NEXT_PUBLIC_API_URL + "Product";
 const API_Fina_BASE = process.env.NEXT_PUBLIC_API_URL + "FinaProductRest";
 
-
 export function mapSort(sortBy: string): {
   sortColumn: string;
   sortOrder: "asc" | "desc";
@@ -42,7 +41,9 @@ export async function getProductsByCategory(id: string): Promise<ProductRequestM
   return apiFetch<ProductRequestModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
 }
 
-export async function getProductRestsByIds(data: FinaProductRestArrayModel): Promise<FinaProductRestModel> {
+export async function getProductRestsByIds(
+  data: FinaProductRestArrayModel,
+): Promise<FinaProductRestModel> {
   return apiFetch<FinaProductRestModel>(`${API_Fina_BASE}`, {
     method: "POST",
     body: JSON.stringify(data),
@@ -139,5 +140,22 @@ export async function deleteProductById(id: string): Promise<string> {
 export async function deleteImage(id: string, key: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
     method: "DELETE",
+  });
+}
+export async function uploadProductImages(productId: string, files: File[]): Promise<string[]> {
+  if (!productId) throw new Error("productId is required");
+  if (!files || files.length === 0) throw new Error("at least one file is required");
+
+  const formData = new FormData();
+
+  formData.append("productId", productId);
+
+  files.forEach((file) => {
+    formData.append("files", file, file.name);
+  });
+
+  return apiFetch<string[]>(`${API_BASE}/images`, {
+    method: "POST",
+    body: formData,
   });
 }

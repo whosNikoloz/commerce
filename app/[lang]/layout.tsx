@@ -1,24 +1,39 @@
+// app/[lang]/layout.tsx (RootLayout)
 import "@/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 
 import clsx from "clsx";
+import { headers } from "next/headers";
 
 import { Providers } from "./providers";
 import { LayoutWrapper } from "./LayoutWrapper";
 
-import { site } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import { locales, defaultLocale } from "@/i18n.config";
 import BackToTopShadcn from "@/components/back_to_top";
+import { themeToStyle } from "@/lib/applyTheme";
+import { getTenantByHostStatic } from "@/lib/getTenantByHost";
+import { getSiteByHost } from "@/lib/getSiteByHost";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: { default: site.name, template: `%s • ${site.shortName}` },
-  description: site.description,
-  openGraph: { siteName: site.name, images: [site.ogImage] },
-  twitter: { card: "summary_large_image", images: [site.ogImage] },
-};
+function normalizeHost(host?: string) {
+  return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const h = await headers();
+  const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
+  const site = getSiteByHost(host);
+
+  return {
+    metadataBase: new URL(site.url),
+    title: { default: site.name, template: `%s • ${site.shortName}` },
+    description: site.description,
+    openGraph: { siteName: site.name, images: [site.ogImage] },
+    twitter: { card: "summary_large_image", images: [site.ogImage] },
+    icons: { icon: site.favicon },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -36,20 +51,31 @@ export default async function RootLayout({
 }) {
   const { lang } = await params;
 
-  // guard the lang to one of our supported locales
   const safeLang = (locales as readonly string[]).includes(lang)
     ? (lang as (typeof locales)[number])
     : defaultLocale;
 
+  const h = await headers();
+  const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
+  const tenant = getTenantByHostStatic(host);
+  const site = getSiteByHost(host);
+  const style = themeToStyle(tenant.theme);
+
   return (
-    <html suppressHydrationWarning lang={safeLang}>
+    <html suppressHydrationWarning lang={safeLang} style={style}>
       <head>
+        <link href={site.favicon} rel="icon" sizes="any" />
+        <link
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+          rel="stylesheet"
+        />
+        {/* JSON-LD with per-host site info */}
         <script
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd(site)) }}
           type="application/ld+json"
         />
         <script
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebsiteJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebsiteJsonLd(site)) }}
           type="application/ld+json"
         />
 
@@ -64,7 +90,10 @@ export default async function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <Providers
+          initialTenant={tenant}
+          themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
+        >
           <LayoutWrapper>
             {children}
             <BackToTopShadcn threshold={320} />

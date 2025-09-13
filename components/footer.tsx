@@ -18,6 +18,7 @@ type Social = {
   label: string;
   icon: React.ComponentType<any>;
 };
+
 const linkGroups: LinkGroup[] = [
   {
     title: "ჩვენ შესახებ",
@@ -61,22 +62,23 @@ export function Footer() {
 
   return (
     <footer className="relative mt-24">
-      <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-transparent via-slate-100/60 to-transparent dark:via-slate-800/60" />
+      {/* subtle divider glow */}
+      <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-transparent via-brand-muted/60 to-transparent dark:via-brand-muteddark/60" />
 
-      <div className="mx-auto px-4 sm:px-6 lg:px-8  max-w-7xl">
-        <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white/70 shadow-sm backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/60">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="overflow-hidden rounded-3xl border border-brand-muted/60 bg-brand-surface/70 shadow-sm backdrop-blur dark:border-brand-muteddark/60 dark:bg-brand-surfacedark/60">
           {/* Header Row */}
-          <div className="flex flex-col gap-6 border-b border-slate-200/70 p-6 md:flex-row md:items-center md:justify-between dark:border-slate-700/60">
+          <div className="flex flex-col gap-6 border-b border-brand-muted/60 p-6 md:flex-row md:items-center md:justify-between dark:border-brand-muteddark/60">
             <div className="flex items-center gap-3">
               <div
                 aria-hidden="true"
-                className="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow"
+                className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-primarydark shadow"
               />
               <div>
-                <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
+                <h3 className="font-serif text-2xl font-bold text-text-light dark:text-text-lightdark">
                   FinaDevs
                 </h3>
-                <p className="font-sans text-sm text-slate-500 dark:text-slate-300">
+                <p className="font-sans text-sm text-text-subtle dark:text-text-subtledark">
                   Premium fashion for modern lifestyle
                 </p>
               </div>
@@ -84,7 +86,7 @@ export function Footer() {
 
             <motion.button
               aria-label={`Switch to ${nextMode} mode`}
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/80 p-2 text-slate-700 shadow-sm outline-none transition hover:bg-white focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200"
+              className="inline-flex items-center justify-center rounded-full border border-brand-muted bg-brand-surface/80 p-2 text-text-light shadow-sm outline-none transition hover:bg-brand-surface focus-visible:ring-2 focus-visible:ring-brand-primary dark:border-brand-muteddark dark:bg-brand-surfacedark/80 dark:text-text-lightdark dark:hover:bg-brand-surfacedark"
               title={`გადართე ${nextMode === "dark" ? "მუქ" : "ღია"} თემაზე`}
               type="button"
               whileHover={{ scale: 1.06 }}
@@ -108,16 +110,16 @@ export function Footer() {
             {linkGroups.map((group) => (
               <nav key={group.title} aria-labelledby={`footer-${group.title}`}>
                 <h4
-                  className="mb-3 font-semibold text-slate-900 dark:text-white"
+                  className="mb-3 font-semibold text-text-light dark:text-text-lightdark"
                   id={`footer-${group.title}`}
                 >
                   {group.title}
                 </h4>
-                <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                <ul className="space-y-2 text-sm text-text-subtle dark:text-text-subtledark">
                   {group.links.map((l) => (
                     <li key={l.href}>
                       <Link
-                        className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                        className="hover:text-text-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:hover:text-text-lightdark"
                         href={l.href}
                       >
                         {l.label}
@@ -129,14 +131,16 @@ export function Footer() {
             ))}
 
             <div>
-              <h4 className="mb-3 font-semibold text-slate-900 dark:text-white">კონტაქტი</h4>
+              <h4 className="mb-3 font-semibold text-text-light dark:text-text-lightdark">
+                კონტაქტი
+              </h4>
 
               <address className="not-italic">
-                <ul className="mb-3  text-sm text-slate-600  dark:text-slate-300 flex gap-4">
-                  <li className="flex items-center gap-2 w-max">
+                <ul className="mb-3 flex gap-4 text-sm text-text-subtle dark:text-text-subtledark">
+                  <li className="flex w-max items-center gap-2">
                     <Phone aria-hidden="true" size={18} />
                     <a
-                      className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                      className="hover:text-text-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:hover:text-text-lightdark"
                       href="tel:+995577602399"
                     >
                       577 60 23 99
@@ -145,7 +149,7 @@ export function Footer() {
                   <li className="flex items-center gap-2">
                     <Mail aria-hidden="true" size={18} />
                     <a
-                      className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                      className="hover:text-text-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:hover:text-text-lightdark"
                       href="mailto:dsada@gmail.com"
                     >
                       dsada@gmail.com
@@ -154,13 +158,12 @@ export function Footer() {
                 </ul>
               </address>
 
-              <ul className="mb-4 flex items-center gap-3 text-slate-500 dark:text-slate-400">
+              <ul className="mb-4 flex items-center gap-3 text-text-subtle dark:text-text-subtledark">
                 {socials.map(({ href, label, icon: Icon }) => (
                   <li key={label}>
-                    {/* გარე ბმულებისთვის <a> + rel */}
                     <a
                       aria-label={label}
-                      className="inline-flex rounded-full p-1 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-white"
+                      className="inline-flex rounded-full p-1 hover:text-text-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:hover:text-text-lightdark"
                       href={href}
                       rel="noopener noreferrer"
                       target="_blank"
@@ -176,7 +179,7 @@ export function Footer() {
                 className="flex gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  // TODO: ჩართეთ თქვენი subscribe ლოგიკა ან API ქოლი
+                  // TODO: subscribe logic
                 }}
               >
                 <label className="sr-only" htmlFor="newsletter-email">
@@ -185,14 +188,14 @@ export function Footer() {
                 <Input
                   required
                   autoComplete="email"
-                  className="bg-white/80 placeholder:text-slate-400 dark:bg-slate-800/70"
+                  className="bg-brand-surface/80 text-text-light placeholder:text-text-subtle border border-brand-muted focus-visible:ring-brand-primary dark:bg-brand-surfacedark/70 dark:text-text-lightdark dark:placeholder:text-text-subtledark dark:border-brand-muteddark"
                   id="newsletter-email"
                   inputMode="email"
                   placeholder="you@example.com"
                   type="email"
                 />
                 <Button
-                  className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900"
+                  className="bg-brand-primary text-white hover:bg-brand-primarydark"
                   type="submit"
                 >
                   გამოიწერე
@@ -201,13 +204,12 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200/70 px-6 py-5 text-center sm:flex-row dark:border-slate-700/60">
-            <p className="font-sans text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-brand-muted/60 px-6 py-5 text-center sm:flex-row dark:border-brand-muteddark/60">
+            <p className="font-sans text-sm text-text-subtle dark:text-text-subtledark">
               © {year} StyleMove. All rights reserved.
             </p>
-            <p className="font-sans text-xs text-slate-400 dark:text-slate-500">
-              აშენებულია სიყვარულით • FinaDevs
+            <p className="font-sans text-xs text-text-subtle/80 dark:text-text-subtledark/80">
+              • FinaDevs
             </p>
           </div>
         </div>

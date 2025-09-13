@@ -61,10 +61,9 @@ export default function CategoryPage({
   const [category] = useState<CategoryWithSubs | null>(__initialCategory ?? null);
   const [brands] = useState<BrandModel[]>(__initialBrands ?? []);
   const [loading, setLoading] = useState(!__initialCategory);
-  //const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(!__initialCategory);
 
-  // products state (hydrated)
+  // products
   const [products, setProducts] = useState<ProductResponseModel[]>(__initialProducts ?? []);
   const [totalCount, setTotalCount] = useState<number>(__initialTotal ?? 0);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -93,7 +92,7 @@ export default function CategoryPage({
       setNotFound(true);
       setLoading(false);
     }
-  }, [categoryId]);
+  }, [categoryId, __initialCategory]);
 
   useEffect(() => {
     if (!category) return;
@@ -120,7 +119,7 @@ export default function CategoryPage({
       maxPrice: max ? Number(max) : undefined,
       facetFilters: facetIds.map((id) => ({ facetValueId: id })),
     });
-  }, [category?.id]);
+  }, [category?.id, params, __initialPage, __initialSort]);
 
   const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
 
@@ -177,7 +176,7 @@ export default function CategoryPage({
         if (cancelled) return;
         setProducts(res.items ?? []);
         setTotalCount(res.totalCount ?? 0);
-      } catch (e: any) {
+      } catch {
         if (cancelled) return;
         setProducts([]);
         setTotalCount(0);
@@ -190,7 +189,7 @@ export default function CategoryPage({
     return () => {
       cancelled = true;
     };
-  }, [category?.id, filter, sortBy, currentPage]);
+  }, [category?.id, filter, sortBy, currentPage, router, startTransition]);
 
   if (notFound) return <CategoryNotFound />;
   if (loading || !category) return <Loading />;
@@ -324,23 +323,19 @@ export default function CategoryPage({
 
             <div className="flex items-center justify-center gap-2">
               <button
-                className="px-3 py-2 border rounded disabled:opacity-50"
+                className="px-3 py-2 rounded border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark disabled:opacity-50"
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               >
                 Prev
               </button>
-              <span className="text-sm">
-                {currentPage} / {Math.max(1, Math.ceil(totalCount / itemsPerPage))}
+              <span className="text-sm text-text-subtle dark:text-text-subtledark">
+                {currentPage} / {totalPages}
               </span>
               <button
-                className="px-3 py-2 border rounded disabled:opacity-50"
-                disabled={currentPage >= Math.max(1, Math.ceil(totalCount / itemsPerPage))}
-                onClick={() =>
-                  setCurrentPage((p) =>
-                    Math.min(Math.max(1, Math.ceil(totalCount / itemsPerPage)), p + 1),
-                  )
-                }
+                className="px-3 py-2 rounded border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark disabled:opacity-50"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               >
                 Next
               </button>

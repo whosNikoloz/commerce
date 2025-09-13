@@ -3,7 +3,6 @@ import type { Viewport, Metadata } from "next";
 
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { i18nPageMetadata } from "@/lib/seo";
-import { site as siteConfig } from "@/config/site";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -18,16 +17,14 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang: raw } = await params;
-  const lang = raw === "ka" || raw === "en" ? raw : "en"; // normalize to your supported locales
+  const lang = raw === "ka" || raw === "en" ? raw : "en";
 
   return i18nPageMetadata({
     title: "Admin",
     description: "Administrative dashboard.",
     lang,
     path: "/admin",
-    images: [siteConfig.ogImage],
-    siteName: siteConfig.name,
-    index: false, // noindex admin
+    index: false,
   });
 }
 

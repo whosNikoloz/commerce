@@ -30,7 +30,6 @@ export default function ImageModal({
   const [isZoomed, setIsZoomed] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Embla Carousel with options
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -39,60 +38,25 @@ export default function ImageModal({
 
   const isMobile = useIsMobile();
 
-  // Reset zoom state when changing images
   useEffect(() => {
     setIsZoomed(false);
   }, [currentIndex]);
 
-  // Initialize loaded state for all images
   useEffect(() => {
-    if (isOpen) {
-      setCurrentIndex(initialIndex);
-    }
+    if (isOpen) setCurrentIndex(initialIndex);
   }, [isOpen, images.length, initialIndex]);
 
-  // Initialize Embla Carousel when it's ready
-  useEffect(() => {
-    if (emblaApi) {
-      // Make sure we start at the initial index
-      emblaApi.scrollTo(initialIndex);
-
-      // Set up an event listener to update the current index
-      const onSelect = () => {
-        setCurrentIndex(emblaApi.selectedScrollSnap());
-      };
-
-      emblaApi.on("select", onSelect);
-
-      return () => {
-        emblaApi.off("select", onSelect);
-      };
-    }
-  }, [emblaApi, initialIndex]);
-
-  // When current index changes from thumbnail click, scroll carousel
   useEffect(() => {
     if (emblaApi && emblaApi.selectedScrollSnap() !== currentIndex) {
       emblaApi.scrollTo(currentIndex);
     }
   }, [currentIndex, emblaApi]);
 
-  const handlePrevious = useCallback(() => {
-    if (emblaApi) {
-      emblaApi.scrollPrev();
-    }
-  }, [emblaApi]);
-
-  const handleNext = useCallback(() => {
-    if (emblaApi) {
-      emblaApi.scrollNext();
-    }
-  }, [emblaApi]);
+  const handlePrevious = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const handleNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   const toggleZoom = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
-    if (e) {
-      e.stopPropagation();
-    }
+    if (e) e.stopPropagation();
     setIsZoomed((prev) => !prev);
   }, []);
 
@@ -108,7 +72,7 @@ export default function ImageModal({
     [handleNext, handlePrevious, onClose, isZoomed, toggleZoom],
   );
 
-  // Advanced touch handling for mobile
+  // touch helpers
   const touchRef = useRef({
     startX: 0,
     startY: 0,
@@ -120,40 +84,26 @@ export default function ImageModal({
   });
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (isZoomed) {
-      // Let Embla handle normal touch events when not zoomed
-      if (e.touches.length === 1) {
-        // Single touch - track for swipe
-        touchRef.current.startX = e.touches[0].clientX;
-        touchRef.current.startY = e.touches[0].clientY;
-        touchRef.current.startTime = Date.now();
+    if (!isZoomed) return;
 
-        // Detect double tap (300ms window)
-        const now = new Date().getTime();
-        const timeSince = now - touchRef.current.lastTapTime;
+    if (e.touches.length === 1) {
+      touchRef.current.startX = e.touches[0].clientX;
+      touchRef.current.startY = e.touches[0].clientY;
+      touchRef.current.startTime = Date.now();
 
-        if (timeSince < 300 && timeSince > 0) {
-          toggleZoom();
-        }
+      const now = Date.now();
+      const dt = now - touchRef.current.lastTapTime;
 
-        touchRef.current.lastTapTime = now;
-      } else if (e.touches.length === 2 && isMobile) {
-        // Pinch to zoom gesture detected
-        touchRef.current.isZooming = true;
+      if (dt > 0 && dt < 300) toggleZoom();
+      touchRef.current.lastTapTime = now;
+    } else if (e.touches.length === 2 && isMobile) {
+      touchRef.current.isZooming = true;
+      const [t1, t2] = [e.touches[0], e.touches[1]];
+      const distance = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
 
-        // Calculate initial distance between two fingers
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        const distance = Math.hypot(
-          touch2.clientX - touch1.clientX,
-          touch2.clientY - touch1.clientY,
-        );
-
-        touchRef.current.initialDistance = distance;
-        touchRef.current.initialZoom = isZoomed ? 1.5 : 1;
-
-        setIsZoomed(true);
-      }
+      touchRef.current.initialDistance = distance;
+      touchRef.current.initialZoom = isZoomed ? 1.5 : 1;
+      setIsZoomed(true);
     }
   };
 
@@ -164,42 +114,40 @@ export default function ImageModal({
       isMobile &&
       imageContainerRef.current
     ) {
-      // Handle pinch zoom
-      e.preventDefault(); // Prevent page scroll
-
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
-
-      // Calculate new scale based on how fingers have moved
+      e.preventDefault();
+      const [t1, t2] = [e.touches[0], e.touches[1]];
+      const distance = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
       const newScale = (distance / touchRef.current.initialDistance) * touchRef.current.initialZoom;
+      const limited = Math.max(1, Math.min(3, newScale));
+      const img = imageContainerRef.current.querySelector("img");
 
-      // Limit scale between 1 and 3
-      const limitedScale = Math.max(1, Math.min(3, newScale));
-
-      // Apply scale
-      const image = imageContainerRef.current.querySelector("img");
-
-      if (image) {
-        image.style.transform = `scale(${limitedScale})`;
-      }
+      if (img) img.style.transform = `scale(${limited})`;
     }
   };
 
   const handleTouchEnd = () => {
-    // If was zooming (two fingers), reset state
-    if (touchRef.current.isZooming) {
-      touchRef.current.isZooming = false;
-
-      return;
-    }
+    if (touchRef.current.isZooming) touchRef.current.isZooming = false;
   };
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    emblaApi.scrollTo(initialIndex);
+
+    const onSelect = () => setCurrentIndex(emblaApi.selectedScrollSnap());
+
+    emblaApi.on("select", onSelect);
+
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, initialIndex]);
 
   return (
     <Modal
       hideCloseButton
       classNames={{
-        backdrop: "bg-black/90 backdrop-blur-md",
+        backdrop: "bg-brand-surfacedark/90 backdrop-blur-md",
         base: isMobile
           ? "max-w-full w-full h-full m-0 rounded-none"
           : "max-w-7xl rounded-2xl shadow-2xl",
@@ -212,21 +160,24 @@ export default function ImageModal({
       <ModalContent
         aria-label={`Image gallery for ${productName}`}
         aria-modal="true"
-        className="overflow-hidden outline-none h-full flex flex-col"
+        className="overflow-hidden outline-none h-full flex flex-col bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark"
         role="dialog"
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
+        {/* Top bar */}
         <div
           className={cn(
-            "sticky top-0 left-0 right-0 z-50 flex justify-end items-center px-4 py-3 to-transparent",
+            "sticky top-0 left-0 right-0 z-50 flex justify-end items-center",
+            "px-4 py-3",
             isMobile ? "py-5" : "px-6 py-4",
+            "bg-gradient-to-b from-brand-surface/90 dark:from-brand-surfacedark/90 to-transparent",
           )}
         >
           <div className="flex space-x-2">
             <button
               aria-label="Close modal"
-              className="rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="rounded-full bg-brand-surface/60 dark:bg-brand-surfacedark/60 p-2 text-text-light dark:text-text-lightdark backdrop-blur-sm transition hover:bg-brand-surface/80 dark:hover:bg-brand-surfacedark/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/50"
               onClick={onClose}
             >
               <X className={cn(isMobile ? "h-4 w-4" : "h-5 w-5")} />
@@ -234,27 +185,26 @@ export default function ImageModal({
           </div>
         </div>
 
-        {/* Main Image */}
-        <ModalBody className="p-0 bg-neutral-900 relative flex-grow flex items-center justify-center">
+        {/* Main content */}
+        <ModalBody className="p-0 relative flex-grow flex items-center justify-center bg-brand-surface dark:bg-brand-surfacedark">
           <div className="w-full h-full flex flex-col md:flex-row">
-            {/* Main Image with Embla Carousel */}
-            <div className="flex-1 flex items-center justify-center bg-black relative">
-              {/* Navigation Buttons */}
+            {/* Main viewer */}
+            <div className="flex-1 flex items-center justify-center relative bg-brand-surfacedark/5 dark:bg-brand-surfacedark">
+              {/* Nav buttons */}
               <button
-                className="absolute left-4 z-10 bg-black/40 rounded-full p-2 text-white hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="absolute left-4 z-10 rounded-full p-2 text-text-light dark:text-text-lightdark bg-brand-surface/60 dark:bg-brand-surfacedark/60 hover:bg-brand-surface/80 dark:hover:bg-brand-surfacedark/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
                 onClick={handlePrevious}
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
-
               <button
-                className="absolute right-4 z-10 bg-black/40 rounded-full p-2 text-white hover:bg-black/60 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="absolute right-4 z-10 rounded-full p-2 text-text-light dark:text-text-lightdark bg-brand-surface/60 dark:bg-brand-surfacedark/60 hover:bg-brand-surface/80 dark:hover:bg-brand-surfacedark/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
                 onClick={handleNext}
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
 
-              {/* Embla Carousel */}
+              {/* Embla */}
               <div ref={emblaRef} className="overflow-hidden w-full h-full">
                 <div className="flex h-full">
                   {images.map((image, idx) => (
@@ -283,12 +233,14 @@ export default function ImageModal({
               </div>
             </div>
 
-            {/* Thumbnails and Description */}
-            <div className="w-full md:w-[350px] p-4 flex flex-col gap-4 text-white bg-neutral-800 overflow-y-auto">
+            {/* Right rail */}
+            <aside className="w-full md:w-[350px] p-4 flex flex-col gap-4 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark overflow-y-auto">
               {!isMobile && (
                 <>
                   <div className="text-lg font-semibold">{productName}</div>
-                  <div className="text-sm text-neutral-300">{description}</div>
+                  <div className="text-sm text-text-subtle dark:text-text-subtledark">
+                    {description}
+                  </div>
                 </>
               )}
 
@@ -297,8 +249,10 @@ export default function ImageModal({
                   <button
                     key={idx}
                     className={cn(
-                      "border rounded-md transition hover:ring-2 hover:ring-white focus:outline-none",
-                      currentIndex === idx ? "ring-2 ring-white" : "opacity-70",
+                      "border rounded-md transition focus:outline-none",
+                      "border-brand-muted dark:border-brand-muteddark",
+                      "hover:ring-2 hover:ring-brand-primary/80",
+                      currentIndex === idx ? "ring-2 ring-brand-primary" : "opacity-80",
                     )}
                     onClick={() => setCurrentIndex(idx)}
                   >
@@ -313,21 +267,21 @@ export default function ImageModal({
                   </button>
                 ))}
               </div>
-            </div>
+            </aside>
           </div>
         </ModalBody>
 
         {description && isMobile && (
-          <div className="bg-white dark:bg-neutral-900 px-6 py-3 border-b border-gray-100 dark:border-neutral-800">
-            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+          <div className="px-6 py-3 border-b bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark">
+            <p className="text-text-subtle dark:text-text-subtledark text-sm leading-relaxed">
               {description}
             </p>
           </div>
         )}
 
         {isMobile && (
-          <div className="bg-white dark:bg-neutral-900 py-2 px-4 border-t border-gray-200 dark:border-neutral-800 flex justify-between items-center">
-            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          <div className="py-2 px-4 border-t bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark flex justify-between items-center">
+            <div className="text-xs font-medium text-text-light dark:text-text-lightdark">
               {currentIndex + 1} / {images.length}
             </div>
           </div>

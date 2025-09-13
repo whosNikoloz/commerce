@@ -37,7 +37,12 @@ export default function AdminLayout({
   return (
     <AdminSidebar>
       <div className="flex flex-1">
-        <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border dark:bg-brand-surfacedark bg-brand-surface p-2 md:p-10 dark:border-neutral-700 text-text-light dark:text-text-lightdark">
+        <div
+          className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border p-2 md:p-10
+                        bg-brand-surface dark:bg-brand-surfacedark
+                        border-brand-muted dark:border-brand-muteddark
+                        text-text-light dark:text-text-lightdark"
+        >
           {children}
         </div>
       </div>

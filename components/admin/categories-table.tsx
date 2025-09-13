@@ -1,5 +1,7 @@
 "use client";
 
+import type { CategoryModel } from "@/types/category";
+
 import { useEffect, useMemo, useState } from "react";
 import { Tag, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +18,6 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { updateCategory } from "@/app/api/services/categoryService";
-import type { CategoryModel } from "@/types/category";
 
 interface Props {
   initialCategories: CategoryModel[];
@@ -32,6 +33,7 @@ export function CategoriesTable({ initialCategories }: Props) {
 
   const toggleCategoryVisibility = async (categoryId: string, nextVal: boolean) => {
     const current = categories.find((p) => p.id === categoryId);
+
     if (!current) return;
 
     const prev = categories;
@@ -40,10 +42,7 @@ export function CategoriesTable({ initialCategories }: Props) {
       list.map((c) => (c.id === categoryId ? { ...c, isActive: nextVal } : c)),
     );
 
-    const payload: CategoryModel = {
-      ...current,
-      isActive: nextVal,
-    };
+    const payload: CategoryModel = { ...current, isActive: nextVal };
 
     try {
       await updateCategory(payload);
@@ -57,7 +56,9 @@ export function CategoriesTable({ initialCategories }: Props) {
 
   const filtered = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+
     if (!q) return categories;
+
     return categories.filter(
       (c) =>
         (c.name ?? "").toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q),
@@ -65,11 +66,11 @@ export function CategoriesTable({ initialCategories }: Props) {
   }, [categories, searchTerm]);
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
+    <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <input
-            className="w-full md:w-64 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder:text-slate-500"
+            className="w-full md:w-64 rounded-md border border-brand-muted dark:border-brand-muteddark bg-brand-surface dark:bg-brand-surfacedark px-3 py-2 text-sm text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark focus:outline-none focus:ring-2 focus:ring-brand-primary"
             placeholder="Search by name or description..."
             type="text"
             value={searchTerm}
@@ -80,13 +81,13 @@ export function CategoriesTable({ initialCategories }: Props) {
 
       <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-brand-surface/60 dark:bg-brand-surfacedark/60">
             <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Parent</TableHead>
-              <TableHead>Facets</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="text-text-subtle">Category</TableHead>
+              <TableHead className="text-text-subtle">Description</TableHead>
+              <TableHead className="text-text-subtle">Parent</TableHead>
+              <TableHead className="text-text-subtle">Facets</TableHead>
+              <TableHead className="text-text-subtle">Status</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -98,49 +99,61 @@ export function CategoriesTable({ initialCategories }: Props) {
               const isActive = !!category.isActive;
 
               return (
-                <TableRow key={category.id}>
+                <TableRow
+                  key={category.id}
+                  className="hover:bg-brand-surface/60 dark:hover:bg-brand-surfacedark/60"
+                >
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <Tag className="h-4 w-4 text-muted-foreground" />
+                      <Tag className="h-4 w-4 text-text-subtle" />
                       <div>
-                        <div className="font-medium">{category.name}</div>
-                        <div className="text-sm text-muted-foreground">ID: {category.id}</div>
+                        <div className="font-medium text-text-light dark:text-text-lightdark">
+                          {category.name}
+                        </div>
+                        <div className="text-sm text-text-subtle">ID: {category.id}</div>
                       </div>
                     </div>
                   </TableCell>
 
                   <TableCell className="max-w-xs">
-                    <p className="truncate">{category.description}</p>
+                    <p className="truncate text-text-light dark:text-text-lightdark">
+                      {category.description}
+                    </p>
                   </TableCell>
 
                   <TableCell>
                     {parent ? (
                       <Badge
-                        className="border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300"
+                        className="border border-brand-primary/30 text-brand-primary dark:text-brand-primary"
                         variant="outline"
                       >
                         {parent.name}
                       </Badge>
                     ) : (
-                      <span className="text-muted-foreground">-</span>
+                      <span className="text-text-subtle">-</span>
                     )}
                   </TableCell>
 
                   <TableCell>
-                    <Badge variant="secondary">{category.facets?.length ?? 0} facets</Badge>
+                    <Badge
+                      className="bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark"
+                      variant="secondary"
+                    >
+                      {category.facets?.length ?? 0} facets
+                    </Badge>
                   </TableCell>
 
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <Switch
                         checked={isActive}
-                        className="data-[state=checked]:bg-blue-600"
+                        className="data-[state=checked]:bg-brand-primary"
                         onCheckedChange={(val) => toggleCategoryVisibility(category.id, val)}
                       />
                       {isActive ? (
-                        <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        <Eye className="h-4 w-4 text-brand-primary" />
                       ) : (
-                        <EyeOff className="h-4 w-4 text-slate-400" />
+                        <EyeOff className="h-4 w-4 text-text-subtle" />
                       )}
                     </div>
                   </TableCell>
@@ -150,7 +163,7 @@ export function CategoriesTable({ initialCategories }: Props) {
 
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell className="text-center py-8 text-slate-500" colSpan={5}>
+                <TableCell className="text-center py-8 text-text-subtle" colSpan={5}>
                   ჩანაწერები ვერ მოიძებნა.
                 </TableCell>
               </TableRow>

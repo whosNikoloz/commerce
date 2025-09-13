@@ -24,15 +24,10 @@ interface UpdateProductModalProps {
   initialIsLiquidated?: boolean;
   initialIsComingSoon?: boolean;
   initialIsNewArrival?: boolean;
-
   onSave: (
     id: string,
     newDescription: string,
-    flags: {
-      isLiquidated: boolean;
-      isComingSoon: boolean;
-      isNewArrival: boolean;
-    },
+    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
   ) => void;
 }
 
@@ -51,50 +46,34 @@ export default function UpdateProductModal({
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
 
   const handleSave = () => {
-    onSave(productId, description, {
-      isLiquidated,
-      isComingSoon,
-      isNewArrival,
-    });
+    onSave(productId, description, { isLiquidated, isComingSoon, isNewArrival });
     onClose();
   };
 
   const isMobile = useIsMobile();
 
-  function handleCloseModal(): void {
-    onClose();
-  }
-
   return (
     <>
-      <Button size="sm" variant="outline" onClick={onOpen}>
+      <Button
+        className="border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+        size="sm"
+        variant="outline"
+        onClick={onOpen}
+      >
         <Edit className="h-4 w-4" />
       </Button>
       <Modal
-        classNames={{
-          backdrop: "backdrop-blur-3xl",
-          base: "rounded-t-xl",
-        }}
+        classNames={{ backdrop: "backdrop-blur-3xl", base: "rounded-t-xl" }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
         motionProps={{
           variants: {
-            enter: {
-              y: 40,
-              opacity: 0,
-              scale: 0.96,
-              transition: { duration: 0 },
-            },
+            enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
             center: {
               y: 0,
               opacity: 1,
               scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 32,
-                mass: 0.8,
-              },
+              transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 },
             },
             exit: {
               y: 40,
@@ -109,18 +88,18 @@ export default function UpdateProductModal({
         }}
         placement={isMobile ? "top" : "center"}
         size={isMobile ? "full" : "3xl"}
-        onClose={handleCloseModal}
+        onClose={onClose}
       >
-        <ModalContent className="bg-brand-muted dark:bg-brand-muteddark">
+        <ModalContent className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark">
           {() => (
             <>
               {isMobile ? (
                 <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
-                  <GoBackButton onClick={handleCloseModal} />
+                  <GoBackButton onClick={onClose} />
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                  <h2 className="text-2xl font-bold dark:text-text-lightdark text-text-light ">
+                  <h2 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
                     პროდუქტის აღწერის განახლება
                   </h2>
                 </ModalHeader>
@@ -136,7 +115,7 @@ export default function UpdateProductModal({
                         id="is-liquidated"
                         onCheckedChange={setIsLiquidated}
                       />
-                      <span className="text-sm flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                      <span className="text-sm flex items-center gap-1 text-text-light dark:text-text-lightdark">
                         <Box className="w-4 h-4" />
                         ლიკვიდირებულია
                       </span>
@@ -145,11 +124,11 @@ export default function UpdateProductModal({
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={isComingSoon}
-                        className="data-[state=checked]:bg-yellow-500"
+                        className="data-[state=checked]:bg-brand-primarydark"
                         id="is-coming-soon"
                         onCheckedChange={setIsComingSoon}
                       />
-                      <span className="text-sm flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                      <span className="text-sm flex items-center gap-1 text-text-light dark:text-text-lightdark">
                         <Clock3 className="w-4 h-4" />
                         მალე შემოვა
                       </span>
@@ -158,21 +137,27 @@ export default function UpdateProductModal({
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={isNewArrival}
-                        className="data-[state=checked]:bg-green-600"
+                        className="data-[state=checked]:bg-brand-primary"
                         id="is-new-arrival"
                         onCheckedChange={setIsNewArrival}
                       />
-                      <span className="text-sm flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                      <span className="text-sm flex items-center gap-1 text-text-light dark:text-text-lightdark">
                         <Sparkles className="w-4 h-4" />
                         ახალი პროდუქტი
                       </span>
                     </div>
                   </div>
-                  <CustomEditor value={description} onChange={setDescription} />
+
+                  <div className="rounded-md border border-brand-muted dark:border-brand-muteddark bg-brand-surface dark:bg-brand-surfacedark">
+                    <CustomEditor value={description} onChange={setDescription} />
+                  </div>
                 </div>
 
                 <ModalFooter className="mt-4">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSave}>
+                  <Button
+                    className="bg-brand-primary hover:bg-brand-primary/90 text-white"
+                    onClick={handleSave}
+                  >
                     შენახვა
                   </Button>
                 </ModalFooter>

@@ -67,7 +67,12 @@ export default function AddBrandModal({
 
   return (
     <>
-      <Button size="sm" variant="default" onClick={handleOpen}>
+      <Button
+        className="bg-brand-primary hover:bg-brand-primary/90 text-white"
+        size="sm"
+        variant="default"
+        onClick={handleOpen}
+      >
         <Plus className="h-4 w-4 mr-1" />
         დაამატე ბრენდი
       </Button>
@@ -78,22 +83,12 @@ export default function AddBrandModal({
         isOpen={isOpen}
         motionProps={{
           variants: {
-            enter: {
-              y: 40,
-              opacity: 0,
-              scale: 0.96,
-              transition: { duration: 0 },
-            },
+            enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
             center: {
               y: 0,
               opacity: 1,
               scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 32,
-                mass: 0.8,
-              },
+              transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 },
             },
             exit: {
               y: 40,
@@ -110,7 +105,7 @@ export default function AddBrandModal({
         size={isMobile ? "full" : "3xl"}
         onClose={handleClose}
       >
-        <ModalContent className="bg-brand-muted dark:bg-brand-muteddark">
+        <ModalContent className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark">
           {() => (
             <>
               {isMobile ? (
@@ -119,7 +114,7 @@ export default function AddBrandModal({
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                  <h2 className="text-2xl font-bold dark:text-text-lightdark text-text-light">
+                  <h2 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
                     ბრენდის დამატება
                   </h2>
                 </ModalHeader>
@@ -129,6 +124,13 @@ export default function AddBrandModal({
                 {/* Name */}
                 <Input
                   isRequired
+                  classNames={{
+                    label: "text-text-subtle dark:text-text-subtledark",
+                    inputWrapper:
+                      "bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark",
+                    input:
+                      "text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark",
+                  }}
                   label="ბრენდის სახელი"
                   placeholder="შეიყვანეთ ბრენდის სახელი"
                   size="lg"
@@ -139,6 +141,13 @@ export default function AddBrandModal({
 
                 {/* Origin */}
                 <Input
+                  classNames={{
+                    label: "text-text-subtle dark:text-text-subtledark",
+                    inputWrapper:
+                      "bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark",
+                    input:
+                      "text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark",
+                  }}
                   label="წარმოშობა"
                   placeholder="საქართველო / ევროკავშირი"
                   size="lg"
@@ -150,21 +159,27 @@ export default function AddBrandModal({
                 {/* Description */}
                 <div className="space-y-2">
                   <label
-                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                    className="text-sm font-medium text-text-light dark:text-text-lightdark"
                     htmlFor="description-editor"
                   >
                     აღწერა
                   </label>
-                  <CustomEditor value={description} onChange={setDescription} />
+                  <div className="rounded-md border border-brand-muted dark:border-brand-muteddark bg-brand-surface dark:bg-brand-surfacedark">
+                    <CustomEditor value={description} onChange={setDescription} />
+                  </div>
                 </div>
               </ModalBody>
 
               <ModalFooter className="gap-2">
-                <Button variant="outline" onClick={handleClose}>
+                <Button
+                  className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+                  variant="outline"
+                  onClick={handleClose}
+                >
                   გაუქმება
                 </Button>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-brand-primary hover:bg-brand-primary/90 text-white"
                   disabled={isSaveDisabled}
                   onClick={handleCreate}
                 >

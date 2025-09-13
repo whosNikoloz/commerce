@@ -16,12 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  getFinaSyncStatus,
-  syncAll,
-  fullSync,
-  finaAuthenticate,
-} from "@/app/api/services/syncService";
+import { syncAll, fullSync, finaAuthenticate } from "@/app/api/services/syncService";
 
 type LogLevel = "info" | "success" | "error";
 type LogItem = {
@@ -32,9 +27,9 @@ type LogItem = {
 };
 
 const levelColor: Record<LogLevel, string> = {
-  info: "text-slate-600 dark:text-slate-300",
-  success: "text-emerald-600 dark:text-emerald-400",
-  error: "text-red-600 dark:text-red-400",
+  info: "text-text-subtle",
+  success: "text-brand-primary",
+  error: "text-brand-primarydark",
 };
 
 export default function FinaSyncPanel() {
@@ -58,23 +53,18 @@ export default function FinaSyncPanel() {
     scrollToBottom();
   }, [logs, scrollToBottom]);
 
+  // Optional polling (left commented as in your original)
   // useEffect(() => {
   //   let cancelled = false;
   //   let timer: any;
-
   //   const tick = async () => {
   //     try {
   //       const s = await getFinaSyncStatus();
-
   //       if (!cancelled) setStatus(s);
-  //     } catch (e) {
-  //       // Swallow errors silently (server might 401/stop)
-  //     }
+  //     } catch {}
   //   };
-
   //   tick();
   //   timer = setInterval(tick, 1500);
-
   //   return () => {
   //     cancelled = true;
   //     clearInterval(timer);
@@ -141,11 +131,13 @@ export default function FinaSyncPanel() {
     <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
       {/* Left: Controls + Status (spans 2) */}
       <div className="xl:col-span-2 space-y-6">
-        <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+        <Card className="bg-brand-muted dark:bg-brand-muteddark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <ListChecks className="h-5 w-5" />
-              <div className="text-lg font-semibold">Controls</div>
+              <ListChecks className="h-5 w-5 text-text-subtle" />
+              <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+                Controls
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -166,35 +158,37 @@ export default function FinaSyncPanel() {
           </CardContent>
         </Card>
 
-        <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+        <Card className="bg-brand-muted dark:bg-brand-muteddark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <RefreshCw className="h-5 w-5" />
-              <div className="text-lg font-semibold">Live Status</div>
+              <RefreshCw className="h-5 w-5 text-text-subtle" />
+              <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+                Live Status
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="text-sm text-muted-foreground">
-              {status?.running ? "Running" : "Idle"}
+            <div className="text-sm text-text-subtle">{status?.running ? "Running" : "Idle"}</div>
+            <div className="text-base font-medium text-text-light dark:text-text-lightdark">
+              {progressLabel}
             </div>
-            <div className="text-base font-medium">{progressLabel}</div>
-            <div className="text-xs text-muted-foreground">{status?.message ?? ""}</div>
-            <div className="text-xs text-muted-foreground">Started: {status?.startedAt ?? "—"}</div>
-            <div className="text-xs text-muted-foreground">
-              Finished: {status?.finishedAt ?? "—"}
-            </div>
+            <div className="text-xs text-text-subtle">{status?.message ?? ""}</div>
+            <div className="text-xs text-text-subtle">Started: {status?.startedAt ?? "—"}</div>
+            <div className="text-xs text-text-subtle">Finished: {status?.finishedAt ?? "—"}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Right: Logger (spans 3) */}
       <div className="xl:col-span-3">
-        <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
+        <Card className="bg-brand-muted dark:bg-brand-muteddark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Terminal className="h-5 w-5" />
-                <div className="text-lg font-semibold">Activity Log</div>
+                <Terminal className="h-5 w-5 text-text-subtle" />
+                <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+                  Activity Log
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button size="sm" variant="outline" onClick={() => setLogs([])}>
@@ -225,16 +219,19 @@ export default function FinaSyncPanel() {
 
           <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-brand-surface/60 dark:bg-brand-surfacedark/60">
                 <TableRow>
-                  <TableHead className="w-[220px]">Time</TableHead>
-                  <TableHead>Message</TableHead>
+                  <TableHead className="w-[220px] text-text-subtle">Time</TableHead>
+                  <TableHead className="text-text-subtle">Message</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {logs.map((l) => (
-                  <TableRow key={l.id}>
-                    <TableCell className="align-top text-xs text-muted-foreground">
+                  <TableRow
+                    key={l.id}
+                    className="hover:bg-brand-surface/60 dark:hover:bg-brand-surfacedark/60"
+                  >
+                    <TableCell className="align-top text-xs text-text-subtle">
                       {new Date(l.t).toLocaleString()}
                     </TableCell>
                     <TableCell className={`align-top text-sm ${levelColor[l.level]}`}>
@@ -244,7 +241,7 @@ export default function FinaSyncPanel() {
                 ))}
                 {logs.length === 0 && (
                   <TableRow>
-                    <TableCell className="text-center py-8 text-slate-500" colSpan={2}>
+                    <TableCell className="text-center py-8 text-text-subtle" colSpan={2}>
                       No activity yet.
                     </TableCell>
                   </TableRow>

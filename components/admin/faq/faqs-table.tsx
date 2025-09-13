@@ -53,28 +53,25 @@ function RowDraggable({
     transition,
     isDragging: dragging,
   } = useSortable({ id: faq.id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  } as React.CSSProperties;
+  const style = { transform: CSS.Transform.toString(transform), transition } as React.CSSProperties;
 
   return (
     <TableRow
       ref={setNodeRef}
       className={[
-        "hover:bg-slate-50 dark:hover:bg-slate-800",
-        dragging || isDragging ? "opacity-70 ring-2 ring-blue-500/30" : "",
+        "hover:bg-brand-surface/60 dark:hover:bg-brand-surfacedark/60",
+        dragging || isDragging ? "opacity-70 ring-2 ring-brand-primary/30" : "",
       ].join(" ")}
       style={style}
     >
       <TableCell className="w-10 align-middle">
         <button
-          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700"
+          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-brand-surface dark:hover:bg-brand-surfacedark"
           {...attributes}
           {...listeners}
           aria-label="Drag handle"
         >
-          <GripVertical className="h-4 w-4 opacity-70" />
+          <GripVertical className="h-4 w-4 text-text-subtle" />
         </button>
       </TableCell>
       {children}
@@ -103,7 +100,6 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   useEffect(() => {
     const sorted = sortByOrder(initialFaqs || []);
 
-    console.log("Sorted", sorted);
     setFaqs(sorted);
     const map: Record<string, number> = {};
 
@@ -113,22 +109,21 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
   useEffect(() => {
     if (initialFaqs?.length) return;
-
     let isCancelled = false;
 
     (async () => {
       setLoading(true);
       try {
         const list = await getAllFaqs();
+
         if (isCancelled) return;
-
         const sorted = sortByOrder(list || []);
-        setFaqs(sorted);
 
+        setFaqs(sorted);
         const map: Record<string, number> = {};
+
         sorted.forEach((f, idx) => (map[f.id] = f.orderNum ?? idx + 1));
         lastSavedOrderRef.current = map;
-
         setError(null);
       } catch (e) {
         console.error(e);
@@ -228,7 +223,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
     setFaqs([newItem, ...faqs]);
 
     try {
-      const id = await createFaq(q, a, isActive, isFeatured); // service returns string id
+      const id = await createFaq(q, a, isActive, isFeatured);
 
       setFaqs((list) => list.map((x) => (x.id === tempId ? { ...x, id } : x)));
       toast.success("FAQ დაემატა.");
@@ -313,17 +308,24 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
   return (
     <>
-      <Card className="dark:bg-brand-muteddark bg-brand-muted backdrop-blur">
-        <CardHeader className="sticky top-0 z-10 bg-brand-muted/70 dark:bg-brand-muteddark/70 backdrop-blur border-b">
+      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60 backdrop-blur">
+        <CardHeader className="sticky top-0 z-10 bg-brand-surface/70 dark:bg-brand-surfacedark/70 backdrop-blur border-b border-brand-muted/60 dark:border-brand-muteddark/60">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex flex-1 items-center gap-3">
               <Input
                 aria-label="Search"
                 className="flex-1"
+                classNames={{
+                  label: "text-text-subtle dark:text-text-subtledark",
+                  inputWrapper:
+                    "bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark",
+                  input:
+                    "text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark",
+                }}
                 placeholder="ძებნა კითხვით ან პასუხით…"
                 size="lg"
                 startContent={
-                  <svg height="16" viewBox="0 0 24 24" width="16">
+                  <svg className="text-text-subtle" height="16" viewBox="0 0 24 24" width="16">
                     <path
                       d="m21 20l-4.35-4.35A7.5 7.5 0 1 0 9 16.5a7.47 7.47 0 0 0 4.65-1.6L18 19l3 1zM4.5 9A4.5 4.5 0 1 1 9 13.5A4.5 4.5 0 0 1 4.5 9"
                       fill="currentColor"
@@ -334,26 +336,29 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 variant="bordered"
                 onChange={(e) => setSearch(e.target.value)}
               />
+
               <div className="hidden md:flex items-center gap-5">
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={onlyActive}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-brand-primary"
                     onCheckedChange={setOnlyActive}
                   />
                   {onlyActive ? (
-                    <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <Eye className="h-4 w-4 text-brand-primary" />
                   ) : (
-                    <EyeOff className="h-4 w-4 text-slate-400" />
+                    <EyeOff className="h-4 w-4 text-text-subtle" />
                   )}
 
                   <Switch
                     checked={onlyFeatured}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-brand-primary"
                     onCheckedChange={setOnlyFeatured}
                   />
                   <Star
-                    className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-white text-white" : "text-slate-400"}`}
+                    className={`h-3.5 w-3.5 ${
+                      onlyFeatured ? "fill-white text-white" : "text-text-subtle"
+                    }`}
                   />
                 </div>
               </div>
@@ -361,7 +366,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
             <div className="flex items-center gap-2">
               <Button
-                className="gap-2"
+                className="gap-2 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
                 disabled={!orderDirty}
                 title={orderDirty ? "შეინახე ახალი რიგი" : "ცვლილება არაა"}
                 variant="secondary"
@@ -370,6 +375,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 <RefreshCw className="h-4 w-4" />
                 რიგის შენახვა
               </Button>
+
               <AddFaqModal onCreate={handleCreate}>
                 <Plus className="h-4 w-4" />
                 დაამატე FAQ
@@ -381,27 +387,27 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
           <div className="mt-3 flex md:hidden items-center justify-between">
             <Switch
               checked={onlyActive}
-              className="data-[state=checked]:bg-blue-600"
+              className="data-[state=checked]:bg-brand-primary"
               onCheckedChange={setOnlyActive}
             />
             {onlyActive ? (
-              <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <Eye className="h-4 w-4 text-brand-primary" />
             ) : (
-              <EyeOff className="h-4 w-4 text-slate-400" />
+              <EyeOff className="h-4 w-4 text-text-subtle" />
             )}
             <Switch
               checked={onlyFeatured}
-              className="data-[state=checked]:bg-blue-600"
+              className="data-[state=checked]:bg-brand-primary"
               onCheckedChange={setOnlyFeatured}
             />
             <Star
-              className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-white text-white" : "text-slate-400"}`}
+              className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-white text-white" : "text-text-subtle"}`}
             />
           </div>
         </CardHeader>
 
         <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
-          {loading && <p className="p-4 text-gray-500">იტვირთება…</p>}
+          {loading && <p className="p-4 text-text-subtle">იტვირთება…</p>}
           {error && <p className="p-4 text-red-500">{error}</p>}
 
           {!loading && !error && (
@@ -415,28 +421,36 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 strategy={verticalListSortingStrategy}
               >
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-brand-surface/60 dark:bg-brand-surfacedark/60">
                     <TableRow>
                       <TableHead className="w-10" />
-                      <TableHead>კითხვა</TableHead>
-                      <TableHead>პასუხი</TableHead>
-                      <TableHead className="min-w-[220px]">სტატუსი</TableHead>
-                      <TableHead className="text-right min-w-[180px]">ქმედებები</TableHead>
+                      <TableHead className="text-text-subtle dark:text-text-subtledark">
+                        კითხვა
+                      </TableHead>
+                      <TableHead className="text-text-subtle dark:text-text-subtledark">
+                        პასუხი
+                      </TableHead>
+                      <TableHead className="min-w-[220px] text-text-subtle dark:text-text-subtledark">
+                        სტატუსი
+                      </TableHead>
+                      <TableHead className="text-right min-w-[180px] text-text-subtle dark:text-text-subtledark">
+                        ქმედებები
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
                     {filtered.map((faq, idx) => (
                       <RowDraggable key={faq.id} faq={faq} isDragging={draggingId === faq.id}>
-                        <TableCell className="align-top font-medium text-slate-900 dark:text-slate-100 max-w-[420px]">
+                        <TableCell className="align-top font-medium text-text-light dark:text-text-lightdark max-w-[420px]">
                           <div className="line-clamp-2">{faq.question}</div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-text-subtle">
                             #{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")} • ID: {faq.id}
                           </div>
                         </TableCell>
 
                         <TableCell className="align-top max-w-[560px]">
-                          <div className="line-clamp-2 text-slate-700 dark:text-slate-300">
+                          <div className="line-clamp-2 text-text-light dark:text-text-lightdark">
                             {faq.answer}
                           </div>
                         </TableCell>
@@ -445,21 +459,21 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                           <div className="flex items-center gap-4">
                             <Switch
                               checked={!!faq.isActive}
-                              className="data-[state=checked]:bg-blue-600"
+                              className="data-[state=checked]:bg-brand-primary"
                               onCheckedChange={(v) => handleToggle(faq.id, "isActive", v)}
                             />
                             {!!faq.isActive ? (
-                              <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                              <Eye className="h-4 w-4 text-brand-primary" />
                             ) : (
-                              <EyeOff className="h-4 w-4 text-slate-400" />
+                              <EyeOff className="h-4 w-4 text-text-subtle" />
                             )}
                             <Switch
                               checked={!!faq.isFeatured}
-                              className="data-[state=checked]:bg-blue-600"
+                              className="data-[state=checked]:bg-brand-primary"
                               onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
                             />
                             <Star
-                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-white text-white" : "text-slate-400"}`}
+                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-white text-white" : "text-text-subtle"}`}
                             />
                           </div>
                         </TableCell>
@@ -491,7 +505,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
                     {filtered.length === 0 && (
                       <TableRow>
-                        <TableCell className="text-center py-8 text-slate-500" colSpan={5}>
+                        <TableCell className="text-center py-8 text-text-subtle" colSpan={5}>
                           ჩანაწერები ვერ მოიძებნა.
                         </TableCell>
                       </TableRow>
@@ -505,17 +519,20 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       </Card>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
+            <AlertDialogTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
               <TriangleAlert className="h-5 w-5 text-red-600" />
               წაშლა?
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-text-subtle dark:text-text-subtledark">
               {deleteTarget ? (
                 <>
-                  წაიშლება: <span className="font-semibold">{deleteTarget.question}</span>. ქმედება
-                  შეუქცევადია.
+                  წაიშლება:{" "}
+                  <span className="font-semibold text-text-light dark:text-text-lightdark">
+                    {deleteTarget.question}
+                  </span>
+                  . ქმედება შეუქცევადია.
                 </>
               ) : (
                 "ქმედება შეუქცევადია."
@@ -524,6 +541,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
+              className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
               disabled={deleting}
               onClick={() => {
                 setDeleteOpen(false);
@@ -533,7 +551,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
               გაუქმება
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
               disabled={deleting}
               onClick={() => deleteTarget && handleDelete(deleteTarget.id)}
             >

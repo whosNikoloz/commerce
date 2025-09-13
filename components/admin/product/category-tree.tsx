@@ -34,8 +34,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
   const toggleExpanded = (categoryId: string) => {
     const next = new Set(expanded);
 
-    if (next.has(categoryId)) next.delete(categoryId);
-    else next.add(categoryId);
+    next.has(categoryId) ? next.delete(categoryId) : next.add(categoryId);
     setExpanded(next);
   };
 
@@ -51,7 +50,6 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
   const getChildrenCount = (parentId: string | null): number =>
     categories.filter((c) => c.parentId === parentId).length;
-
   const hasChildren = (categoryId: string): boolean =>
     categories.some((c) => c.parentId === categoryId);
 
@@ -69,9 +67,8 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
       return [category.parentId, ...findParentIds(category.parentId)];
     };
-    const parentIds = findParentIds(categoryId);
 
-    parentIds.forEach((id) => next.add(id));
+    findParentIds(categoryId).forEach((id) => next.add(id));
     setExpanded(next);
   };
 
@@ -93,9 +90,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
     return (
       <div
-        className={`space-y-1 ${
-          level > 0 ? "ml-4 pl-3 border-l border-slate-200 dark:border-slate-700" : ""
-        }`}
+        className={`space-y-1 ${level > 0 ? "ml-4 pl-3 border-l border-brand-muted dark:border-brand-muteddark" : ""}`}
       >
         {visibleCats.map((cat) => {
           const isExpanded = expanded.has(cat.id);
@@ -109,13 +104,11 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
             <div key={cat.id} className="group">
               <div
                 className={[
-                  "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 relative",
+                  "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 relative border",
                   isSelected
-                    ? "bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-900/20 border border-blue-200 dark:border-blue-700 shadow-sm"
-                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent",
-                  isHighlighted && !isSelected
-                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
-                    : "",
+                    ? "bg-gradient-to-r from-brand-surface to-brand-surface/70 dark:from-brand-surfacedark dark:to-brand-surfacedark/70 border-brand-muted dark:border-brand-muteddark shadow-sm"
+                    : "hover:bg-brand-surface dark:hover:bg-brand-surfacedark border-transparent",
+                  isHighlighted && !isSelected ? "outline outline-1 outline-brand-primary/40" : "",
                 ].join(" ")}
                 role="button"
                 onClick={() => handleCategorySelect(cat.id)}
@@ -127,8 +120,8 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     className={[
                       "p-1 rounded-md transition-all duration-200",
                       isSelected
-                        ? "hover:bg-blue-200 dark:hover:bg-blue-800"
-                        : "hover:bg-slate-200 dark:hover:bg-slate-700",
+                        ? "hover:bg-brand-muted dark:hover:bg-brand-muteddark"
+                        : "hover:bg-brand-muted/70 dark:hover:bg-brand-muteddark/70",
                     ].join(" ")}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -136,14 +129,14 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     }}
                   >
                     {isExpanded ? (
-                      <ChevronDown className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+                      <ChevronDown className="h-3.5 w-3.5 text-text-subtle" />
                     ) : (
-                      <ChevronRight className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+                      <ChevronRight className="h-3.5 w-3.5 text-text-subtle" />
                     )}
                   </button>
                 ) : (
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-muted" />
                   </div>
                 )}
 
@@ -152,16 +145,16 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                   {hasChildCategories ? (
                     isExpanded ? (
                       <FolderOpen
-                        className={`h-4 w-4 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-amber-600 dark:text-amber-400"}`}
+                        className={`h-4 w-4 ${isSelected ? "text-brand-primary" : "text-text-subtle"}`}
                       />
                     ) : (
                       <Folder
-                        className={`h-4 w-4 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
+                        className={`h-4 w-4 ${isSelected ? "text-brand-primary" : "text-text-subtle"}`}
                       />
                     )
                   ) : (
                     <Tag
-                      className={`h-4 w-4 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`}
+                      className={`h-4 w-4 ${isSelected ? "text-brand-primary" : "text-text-subtle"}`}
                     />
                   )}
                 </div>
@@ -171,9 +164,9 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                   className={[
                     "flex-1 text-sm font-medium truncate",
                     isSelected
-                      ? "text-blue-900 dark:text-blue-100"
-                      : "text-slate-700 dark:text-slate-200",
-                    isHighlighted && !isSelected ? "text-yellow-800 dark:text-yellow-200" : "",
+                      ? "text-text-light dark:text-text-lightdark"
+                      : "text-text-light dark:text-text-lightdark",
+                    isHighlighted && !isSelected ? "underline decoration-brand-primary/50" : "",
                   ].join(" ")}
                   title={cat.name}
                 >
@@ -186,8 +179,8 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     className={[
                       "text-xs px-2 py-0.5 h-5 font-medium",
                       isSelected
-                        ? "bg-blue-200 text-blue-800 dark:bg-blue-800/50 dark:text-blue-200"
-                        : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
+                        ? "bg-brand-primary/15 text-brand-primary"
+                        : "bg-brand-muted text-text-subtle dark:bg-brand-muteddark",
                     ].join(" ")}
                     variant="secondary"
                   >
@@ -209,37 +202,21 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
     );
   };
 
-  // if (loading) {
-  //   return (
-  //     <Card className="lg:sticky lg:top-4">
-  //       <CardHeader className="pb-3">
-  //         <div className="flex items-center gap-2">
-  //           <Filter className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-  //           <CardTitle className="text-lg">Categories</CardTitle>
-  //         </div>
-  //       </CardHeader>
-  //       <CardContent className="space-y-2">
-  //         {[...Array(6)].map((_, i) => (
-  //           <div key={i} className="animate-pulse">
-  //             <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-lg" />
-  //           </div>
-  //         ))}
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // }
-
   const rootCategories = categories.filter((c) => c.parentId === null);
 
   return (
-    <Card className="lg:sticky lg:top-4 dark:bg-brand-muteddark bg-brand-muted">
-      {/* Header */}
+    <Card className="lg:sticky lg:top-4 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-            <CardTitle className="text-lg">Categories</CardTitle>
-            <Badge className="text-xs font-normal" variant="outline">
+            <Filter className="h-5 w-5 text-text-subtle" />
+            <CardTitle className="text-lg text-text-light dark:text-text-lightdark">
+              Categories
+            </CardTitle>
+            <Badge
+              className="text-xs font-normal bg-brand-muted text-text-subtle dark:bg-brand-muteddark"
+              variant="outline"
+            >
               {rootCategories.length}
             </Badge>
           </div>
@@ -247,7 +224,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
           {selectedCategory !== null && (
             <Button
               aria-label="Clear selection"
-              className="h-7 w-7 p-0 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              className="h-7 w-7 p-0 text-text-subtle hover:text-text-light dark:hover:text-text-lightdark"
               size="sm"
               variant="ghost"
               onClick={clearSelection}
@@ -259,9 +236,9 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle h-4 w-4" />
           <Input
-            className="pl-9 h-8 text-sm"
+            className="pl-9 h-8 text-sm bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark"
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -269,14 +246,12 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
         </div>
       </CardHeader>
 
-      {/* Tree */}
       <CardContent className="pt-0">
-        {/* On large screens, constrain height; on mobile, let it grow naturally */}
         <ScrollArea className="lg:h-[calc(100vh-320px)] pr-3">
           {categories.length === 0 ? (
             <div className="text-center py-8">
-              <Folder className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-500 dark:text-slate-400 text-sm">No categories found</p>
+              <Folder className="h-12 w-12 text-text-subtle/40 mx-auto mb-3" />
+              <p className="text-text-subtle text-sm">No categories found</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -285,18 +260,18 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                 className={[
                   "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 border",
                   selectedCategory === null
-                    ? "bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900/40 dark:to-slate-900/20 border-slate-200 dark:border-slate-700 shadow-sm"
-                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent",
+                    ? "bg-gradient-to-r from-brand-surface to-brand-surface/70 dark:from-brand-surfacedark dark:to-brand-surfacedark/70 border-brand-muted dark:border-brand-muteddark shadow-sm"
+                    : "hover:bg-brand-surface dark:hover:bg-brand-surfacedark border-transparent",
                 ].join(" ")}
                 role="button"
                 onClick={() => handleCategorySelect(null)}
               >
-                <Folder className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Folder className="h-4 w-4 text-text-subtle" />
+                <span className="text-sm font-medium text-text-light dark:text-text-lightdark">
                   All Categories
                 </span>
                 <Badge
-                  className="text-xs px-2 py-0.5 h-5 font-medium bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                  className="text-xs px-2 py-0.5 h-5 font-medium bg-brand-muted text-text-subtle dark:bg-brand-muteddark"
                   variant="secondary"
                 >
                   {rootCategories.length}

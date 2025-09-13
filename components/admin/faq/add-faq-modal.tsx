@@ -22,7 +22,7 @@ export default function AddFaqModal({
   children,
 }: {
   onCreate: (q: string, a: string, isActive: boolean, isFeatured: boolean) => Promise<void>;
-  children?: React.ReactNode; // external trigger
+  children?: React.ReactNode;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useIsMobile();
@@ -63,9 +63,15 @@ export default function AddFaqModal({
   return (
     <>
       {children ? (
-        <Button onClick={onOpen}>{children}</Button>
+        <Button className="bg-brand-primary hover:bg-brand-primary/90 text-white" onClick={onOpen}>
+          {children}
+        </Button>
       ) : (
-        <Button size="sm" variant="default" onClick={onOpen}>
+        <Button
+          className="bg-brand-primary hover:bg-brand-primary/90 text-white"
+          size="sm"
+          onClick={onOpen}
+        >
           + Add FAQ
         </Button>
       )}
@@ -98,10 +104,10 @@ export default function AddFaqModal({
         size={isMobile ? "full" : "lg"}
         onClose={onClose}
       >
-        <ModalContent className="bg-brand-muted dark:bg-brand-muteddark">
+        <ModalContent className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark">
           <>
             <ModalHeader className="flex flex-col items-center gap-1 pb-2">
-              <h2 className="text-2xl font-bold dark:text-text-lightdark text-text-light">
+              <h2 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
                 FAQ-ის დამატება
               </h2>
             </ModalHeader>
@@ -109,6 +115,13 @@ export default function AddFaqModal({
             <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)] space-y-5">
               <Input
                 isRequired
+                classNames={{
+                  label: "text-text-subtle dark:text-text-subtledark",
+                  inputWrapper:
+                    "bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark",
+                  input:
+                    "text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark",
+                }}
                 label="კითხვა"
                 placeholder="შეიყვანეთ კითხვა"
                 size="lg"
@@ -118,6 +131,13 @@ export default function AddFaqModal({
               />
               <Input
                 isRequired
+                classNames={{
+                  label: "text-text-subtle dark:text-text-subtledark",
+                  inputWrapper:
+                    "bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark",
+                  input:
+                    "text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark",
+                }}
                 label="პასუხი"
                 placeholder="შეიყვანეთ პასუხი"
                 size="lg"
@@ -129,34 +149,39 @@ export default function AddFaqModal({
                 <div className="flex justify-center items-center gap-1">
                   <Switch
                     checked={active}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-brand-primary"
                     onCheckedChange={setActive}
                   />
                   {active ? (
-                    <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <Eye className="h-4 w-4 text-brand-primary" />
                   ) : (
-                    <EyeOff className="h-4 w-4 text-slate-400" />
+                    <EyeOff className="h-4 w-4 text-text-subtle" />
                   )}
                 </div>
                 <div className="flex justify-center items-center gap-1">
                   <Switch
                     checked={featured}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-brand-primary"
                     onCheckedChange={setFeatured}
                   />
                   <Star
-                    className={`h-3.5 w-3.5 ${featured ? "fill-white text-white" : "text-slate-400"}`}
+                    className={`h-3.5 w-3.5 ${featured ? "fill-white text-white" : "text-text-subtle"}`}
                   />
                 </div>
               </div>
             </ModalBody>
 
             <ModalFooter className="gap-2">
-              <Button disabled={loading} variant="outline" onClick={onClose}>
+              <Button
+                className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+                disabled={loading}
+                variant="outline"
+                onClick={onClose}
+              >
                 გაუქმება
               </Button>
               <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-brand-primary hover:bg-brand-primary/90 text-white"
                 disabled={loading}
                 onClick={handleSave}
               >

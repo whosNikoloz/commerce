@@ -25,12 +25,27 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
   const site = getSiteByHost(host);
 
+  const base = site.url.replace(/\/$/, "");
+  const ogImageAbs = `${base}${site.ogImage}`;
+
   return {
     metadataBase: new URL(site.url),
     title: { default: site.name, template: `%s • ${site.shortName}` },
     description: site.description,
-    openGraph: { siteName: site.name, images: [site.ogImage] },
-    twitter: { card: "summary_large_image", images: [site.ogImage] },
+    openGraph: {
+      type: "website",
+      url: site.url,
+      title: site.name,
+      description: site.description,
+      siteName: site.name,
+      images: [{ url: ogImageAbs, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: site.name,
+      description: site.description,
+      images: [ogImageAbs],
+    },
     icons: { icon: site.favicon },
   };
 }

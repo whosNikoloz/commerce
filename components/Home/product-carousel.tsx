@@ -5,17 +5,19 @@ import type { ProductResponseModel } from "@/types/product";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import NextLink from "next/link";
-import { ChevronLeft, ChevronRight, Package, Clock, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Package, Clock, AlertTriangle, Heart } from "lucide-react";
 
 import { Button } from "../ui/button";
-
 import { getAllProducts } from "@/app/api/services/productService";
+import { useCartStore, CartItem } from "@/app/context/cartContext";
 
 type CarouselItem = {
   id: number | string;
   name: string;
   price: string; // "199 ₾"
   originalPrice?: string; // "249 ₾"
+  priceNum: number; // added for cart
+  origNum: number; // added for cart
   image: string;
   rating: number;
   reviews: number;
@@ -26,35 +28,29 @@ type CarouselItem = {
 function sampleArray<T>(arr: T[], n: number): T[] {
   if (n >= arr.length) return [...arr];
   const copy = [...arr];
-
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
-
   return copy.slice(0, n);
 }
 
-// პროდუქტების გარდაქმნა სლაიდის მოდელად
 function toCarouselItem(p: ProductResponseModel): CarouselItem {
   const priceNum = Number(p.discountPrice ?? p.price);
   const origNum = Number(p.price);
   const hasDiscount = p.discountPrice && priceNum < origNum;
 
-  // მაგალითური მარაგის განსაზღვრა (დაარეგულირე შენი ველებით თუ გაქვს quantity/stock)
   const qty = (p as any).quantity ?? (p as any).stock ?? 10;
   let stockStatus: CarouselItem["stockStatus"] =
     qty <= 0 ? "out-of-stock" : qty <= 3 ? "limited" : "in-stock";
   let stockCount = Math.max(0, Number(qty) || 0);
 
-  // თუ გინდა ზოგიერთის „coming-soon“ დაყენება (არასავალდებულო):
   if ((p as any).isComingSoon) {
     stockStatus = "coming-soon";
     stockCount = 0;
   }
 
-  const rating = (p as any).rating ?? (p as any).averageRating ?? 4 + Math.random() * 1; // 4.0–5.0 შორის fallback
+  const rating = (p as any).rating ?? (p as any).averageRating ?? 4 + Math.random() * 1;
   const reviews = (p as any).reviews ?? Math.floor(50 + Math.random() * 500);
 
   return {
@@ -62,8 +58,10 @@ function toCarouselItem(p: ProductResponseModel): CarouselItem {
     name: p.name ?? "Unnamed",
     price: `${priceNum} ₾`,
     originalPrice: hasDiscount ? `${origNum} ₾` : undefined,
+    priceNum,
+    origNum,
     image: p.images?.[0] ?? "/placeholder.png",
-    rating: Number(rating.toFixed(1)),
+    rating: Number(Number(rating).toFixed(1)),
     reviews,
     stockStatus,
     stockCount,
@@ -119,8 +117,8 @@ const getStockDisplay = (status: string, count: number) => {
 };
 
 type Props = {
-  count?: number; // რამდენი ელემენტი მოიტოს (ხილული = 1 სლაიდი, მაგრამ პულიდან აირჩევს n)
-  onlyDiscounted?: boolean; // მხოლოდ ფასდაკლებულები
+  count?: number;
+  onlyDiscounted?: boolean;
 };
 
 export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
@@ -130,10 +128,28 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const addToCart = useCartStore((s) => s.addToCart);
+
   const nextSlide = () => setCurrentSlide((p) => (p + 1) % items.length);
   const prevSlide = () => setCurrentSlide((p) => (p - 1 + items.length) % items.length);
   const toggleFavorite = (id: number | string) =>
     setFavorites((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const handleAddToCart = (c: CarouselItem) => {
+    const item: CartItem = {
+      id: c.id as string,
+      name: c.name,
+      price: c.priceNum,
+      originalPrice: c.origNum,
+      discount:
+        c.origNum > c.priceNum
+          ? Math.max(0, Math.round(((c.origNum - c.priceNum) / c.origNum) * 100))
+          : 0,
+      image: c.image,
+      quantity: 1,
+    };
+    addToCart(item);
+  };
 
   useEffect(() => {
     (async () => {
@@ -146,7 +162,6 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
           : all;
 
         const picked = sampleArray(filtered, count).map(toCarouselItem);
-
         setItems(picked);
         setCurrentSlide(0);
       } catch (e) {
@@ -160,11 +175,13 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
 
   if (loading) {
     return (
-      <section className="py-20 bg-brand-surface dark:bg-brand-surfacedark">
-        <div className="container mx-auto px-6">
-          <div className="h-10 w-44 rounded-lg bg-brand-muted/40 dark:bg-brand-muteddark/40 mb-4 animate-pulse" />
-          <div className="h-6 w-80 rounded bg-brand-muted/30 dark:bg-brand-muteddark/30 animate-pulse" />
-          <div className="mt-10 h-[420px] rounded-3xl border-2 border-brand-muted dark:border-brand-muteddark animate-pulse" />
+      <section className="py-16 sm:py-20 bg-brand-surface dark:bg-brand-surfacedark">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="h-8 w-44 rounded-lg bg-brand-muted/40 dark:bg-brand-muteddark/40 mb-3 animate-pulse" />
+          <div className="h-6 w-80 max-w-full rounded bg-brand-muted/30 dark:bg-brand-muteddark/30 animate-pulse" />
+          <div className="mt-8 sm:mt-10 rounded-3xl border-2 border-brand-muted dark:border-brand-muteddark overflow-hidden">
+            <div className="aspect-square md:h-[420px] animate-pulse" />
+          </div>
         </div>
       </section>
     );
@@ -173,18 +190,19 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
   if (error || !items.length) return null;
 
   return (
-    <section className="py-20 bg-brand-surface dark:bg-brand-surfacedark">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between mb-12">
+    <section className="py-16 sm:py-20 bg-brand-surface dark:bg-brand-surfacedark">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between mb-8 sm:mb-12">
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-text-light dark:text-text-lightdark mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-light dark:text-text-lightdark mb-2 sm:mb-4">
               Hot Deals
             </h2>
-            <p className="text-xl text-text-subtle dark:text-text-subtledark">
+            <p className="text-sm sm:text-base md:text-xl text-text-subtle dark:text-text-subtledark">
               Limited time offers you can&apos;t miss
             </p>
           </div>
 
+          {/* Arrows – compact on mobile, standard on md+ */}
           <div className="flex gap-2">
             <Button
               className="rounded-full bg-transparent border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
@@ -215,76 +233,147 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
               const StockIcon = stockDisplay.icon;
 
               return (
-                <div key={product.id} className="w-full flex-shrink-0 px-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    {/* Clickable visual side */}
+                <div key={product.id} className="w-full flex-shrink-0 px-1.5 sm:px-3">
+                  {/* STACK on mobile, 2-cols on md+ */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-center">
+                    {/* Visual side (clickable) */}
                     <NextLink className="relative group block" href={`/product/${product.id}`}>
-                      <Image
-                        alt={product.name}
-                        className="w-full h-96 object-cover rounded-3xl"
-                        height={480}
-                        src={product.image || "/placeholder.png"}
-                        width={400}
-                      />
-                      {/* favorite toggle stays but doesn't navigate */}
-                      <Button
-                        className="absolute top-4 right-4 bg-brand-surface/10 dark:bg-brand-surfacedark/20 backdrop-blur-md hover:bg-brand-surface/20 dark:hover:bg-brand-surfacedark/30"
-                        size="icon"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleFavorite(product.id);
-                        }}
-                      >
-                        {/* your heart svg */}
-                        ...
-                      </Button>
+                      {/* Square on mobile; taller on md+ */}
+                      <div className="relative overflow-hidden rounded-3xl">
+                        <div className="relative aspect-square md:aspect-[4/3] md:h-96">
+                          <Image
+                            alt={product.name}
+                            src={product.image || "/placeholder.png"}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                            className="object-cover"
+                          />
+                        </div>
+
+                        {/* Favorite toggle */}
+                        <Button
+                          className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-brand-surface/10 dark:bg-brand-surfacedark/20 backdrop-blur-md hover:bg-brand-surface/20 dark:hover:bg-brand-surfacedark/30 rounded-full"
+                          size="icon"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(product.id);
+                          }}
+                        >
+                          <Heart
+                            className={`w-5 h-5 ${
+                              favorites.includes(product.id)
+                                ? "fill-brand-primary text-brand-primary"
+                                : "text-white"
+                            }`}
+                          />
+                        </Button>
+                      </div>
                     </NextLink>
 
-                    {/* Text side (title also clickable) */}
-                    <div className="space-y-6">
+                    {/* Text side */}
+                    <div className="space-y-4 sm:space-y-6">
                       <NextLink className="block" href={`/product/${product.id}`}>
-                        <h3 className="text-3xl font-bold text-text-light dark:text-text-lightdark mb-2">
+                        <h3 className="text-xl sm:text-3xl font-bold text-text-light dark:text-text-lightdark mb-1 sm:mb-2 line-clamp-2">
                           {product.name}
                         </h3>
                       </NextLink>
 
-                      {/* rating, price, stock pill ... (unchanged) */}
+                      {/* Rating */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-sm sm:text-base ${
+                                i < Math.floor(product.rating)
+                                  ? "text-yellow-400"
+                                  : "text-text-subtle/40 dark:text-text-subtledark/40"
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-xs sm:text-sm text-text-subtle dark:text-text-subtledark">
+                          {product.rating.toFixed(1)} ({product.reviews})
+                        </span>
+                      </div>
 
-                      {/* CTA — NOT a link; add to cart only */}
-                      <Button
-                        className={`w-full md:w-auto px-12 py-3 rounded-full ${
-                          stockDisplay.buttonDisabled
-                            ? "bg-brand-muted dark:bg-brand-muteddark text-text-subtle dark:text-text-subtledark cursor-not-allowed"
-                            : "bg-brand-primary text-white hover:bg-brand-primary/90"
-                        }`}
-                        disabled={stockDisplay.buttonDisabled}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (!stockDisplay.buttonDisabled) {
-                            // You’ll need access to the real product object here to build a CartItem,
-                            // or refactor your toCarouselItem() to carry enough pricing data.
-                            // Example: call a passed-in addToCart(productId) or store handler.
-                          }
-                        }}
+                      {/* Price */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg sm:text-2xl font-extrabold text-brand-primary">
+                          {product.price}
+                        </span>
+                        {product.originalPrice && (
+                          <span className="text-xs sm:text-lg text-text-subtle dark:text-text-subtledark line-through">
+                            {product.originalPrice}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Stock pill */}
+                      <div
+                        className={`inline-flex items-center gap-2 border px-2.5 py-1.5 rounded-full text-xs sm:text-sm ${stockDisplay.className}`}
                       >
-                        {stockDisplay.buttonText}
-                      </Button>
+                        <StockIcon className="w-4 h-4" />
+                        {stockDisplay.text}
+                      </div>
+
+                      {/* CTA */}
+                      <div className="pt-1">
+                        <Button
+                          className={`w-full md:w-auto h-9 sm:h-10 md:h-11 px-6 sm:px-10 rounded-full text-[12px] sm:text-sm ${
+                            stockDisplay.buttonDisabled
+                              ? "bg-brand-muted dark:bg-brand-muteddark text-text-subtle dark:text-text-subtledark cursor-not-allowed"
+                              : "bg-brand-primary text-white hover:bg-brand-primary/90"
+                          }`}
+                          disabled={stockDisplay.buttonDisabled}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!stockDisplay.buttonDisabled) handleAddToCart(product);
+                          }}
+                        >
+                          {stockDisplay.buttonText}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
+
+          {/* Mobile-friendly arrows overlay (optional) */}
+          <div className="md:hidden absolute top-2 right-2 flex gap-2">
+            <Button
+              className="rounded-full bg-black/30 text-white"
+              size="icon"
+              variant="ghost"
+              onClick={prevSlide}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <Button
+              className="rounded-full bg-black/30 text-white"
+              size="icon"
+              variant="ghost"
+              onClick={nextSlide}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex justify-center mt-8 gap-2">
+        {/* Dots */}
+        <div className="flex justify-center mt-6 sm:mt-8 gap-2">
           {items.map((_, index) => (
             <button
               key={index}
-              className={`w-3 h-3 rounded-full transition-all ${
+              aria-label={`Go to slide ${index + 1}`}
+              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all ${
                 index === currentSlide
                   ? "bg-brand-primary"
                   : "bg-brand-muted/60 dark:bg-brand-muteddark/60"

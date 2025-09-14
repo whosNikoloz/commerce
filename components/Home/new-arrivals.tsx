@@ -18,9 +18,7 @@ export function NewArrivals() {
     (async () => {
       try {
         const all = await getAllProducts();
-        // show the most recent 8 flagged as new
         const filtered = all.filter((p) => p.isNewArrival).slice(0, 8);
-
         setItems(filtered);
       } catch (e) {
         console.error(e);
@@ -50,62 +48,75 @@ export function NewArrivals() {
   if (!items.length) return null;
 
   return (
-    <section className="px-4 bg-surface dark:bg-surfacedark">
+    <section className="px-4 bg-brand-surface dark:bg-brand-surfacedark">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
-            <h2 className="font-serif text-3xl font-bold text-text-light dark:text-text-lightdark mb-2">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-text-light dark:text-text-lightdark mb-1 sm:mb-2">
               New Arrivals
             </h2>
-            <p className="font-sans text-text-subtle dark:text-text-subtledark">
+            <p className="font-sans text-sm sm:text-base text-text-subtle dark:text-text-subtledark">
               Fresh styles just landed
             </p>
           </div>
           <Button
             asChild
-            className="hidden md:flex border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+            className="hidden md:flex border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white dark:border-brand-primarydark dark:text-brand-primarydark dark:hover:bg-brand-primarydark dark:hover:text-white transition-colors"
             variant="outline"
           >
             <NextLink href="/products?tab=new">View All New Items</NextLink>
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Square cards on mobile, roomy on md+ */}
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {items.map((p) => (
-            <NextLink key={p.id} className="group cursor-pointer block" href={`/product/${p.id}`}>
-              <div className="relative overflow-hidden rounded-lg bg-muted dark:bg-muteddark mb-4">
-                <Badge className="absolute top-3 left-3 z-10 bg-primary dark:bg-brand-primarydark text-white">
-                  New
-                </Badge>
-                <Image
-                  alt={p?.name ?? "Product"}
-                  className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
-                  height={320} // (matches h-80 ~= 320px)
-                  loading="lazy"
-                  src={p?.images?.[0] ?? "/placeholder.png"}
-                  width={800} // pick the rendered size
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+            <NextLink key={p.id} className="group block" href={`/product/${p.id}`}>
+              <div className="flex flex-col h-full">
+                {/* Image block */}
+                <div className="relative overflow-hidden rounded-xl bg-brand-muted dark:bg-brand-muteddark">
+                  <Badge className="absolute top-2 left-2 z-10 bg-brand-primary dark:bg-brand-primarydark text-white">
+                    New
+                  </Badge>
+
+                  {/* Square on mobile, 4:3 on md+ */}
+                  <div className="relative aspect-square md:aspect-[4/3]">
+                    <Image
+                      alt={p?.name ?? "Product"}
+                      src={p?.images?.[0] ?? "/placeholder.png"}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  </div>
+                </div>
+
+                {/* Text block */}
+                <div className="mt-2 sm:mt-3">
+                  <h3 className="font-sans font-semibold text-[13px] sm:text-sm md:text-base text-text-light dark:text-text-lightdark mb-0.5 line-clamp-1">
+                    {p.name ?? "Unnamed"}
+                  </h3>
+                  <p className="font-sans text-sm sm:text-base md:text-lg font-bold text-text-light dark:text-text-lightdark">
+                    {p.discountPrice ?? p.price} ₾
+                    {p.discountPrice && (
+                      <span className="ml-2 text-[11px] sm:text-xs md:text-sm text-text-subtle dark:text-text-subtledark line-through">
+                        {p.price} ₾
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-              <h3 className="font-sans font-medium text-text-light dark:text-text-lightdark mb-1">
-                {p.name ?? "Unnamed"}
-              </h3>
-              <p className="font-sans text-lg font-semibold text-text-light dark:text-text-lightdark">
-                {p.discountPrice ?? p.price} ₾
-                {p.discountPrice && (
-                  <span className="ml-2 text-sm text-text-subtle dark:text-text-subtledark line-through">
-                    {p.price} ₾
-                  </span>
-                )}
-              </p>
             </NextLink>
           ))}
         </div>
 
-        <div className="text-center mt-8 md:hidden">
+        {/* Mobile "View All" */}
+        <div className="text-center mt-6 md:hidden">
           <Button
             asChild
-            className="border-primary dark:border-primarydark text-primary dark:text-primarydark hover:bg-primary hover:text-white dark:hover:bg-primarydark dark:hover:text-white transition-colors"
+            className="border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white dark:border-brand-primarydark dark:text-brand-primarydark dark:hover:bg-brand-primarydark dark:hover:text-white transition-colors"
             variant="outline"
           >
             <NextLink href="/products?tab=new">View All New Items</NextLink>

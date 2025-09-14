@@ -5,7 +5,7 @@ export function SkeletonProductCard({ viewMode }: SkeletonProps) {
     return (
       <div className="animate-pulse flex items-center w-full rounded-2xl bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark p-4 border border-brand-muted dark:border-brand-muteddark shadow-sm">
         <div className="w-[100px] h-[100px] md:w-[160px] md:h-[140px] rounded-xl bg-brand-muted/40 dark:bg-brand-muteddark/40 shrink-0" />
-        <div className="flex-1 px-4 space-y-2">
+        <div className="flex-1 px-2 space-y-2">
           <div className="h-4 w-2/3 rounded bg-brand-muted/40 dark:bg-brand-muteddark/40" />
           <div className="h-3 w-1/2 rounded bg-brand-muted/30 dark:bg-brand-muteddark/30" />
           <div className="flex items-center gap-3">

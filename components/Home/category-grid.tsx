@@ -60,22 +60,24 @@ export function CategoryGrid() {
 
   if (loading) {
     return (
-      <section className="py-24 px-6 bg-brand-surface dark:bg-brand-surfacedark">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-brand-surface dark:bg-brand-surfacedark">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-bold text-text-light dark:text-text-lightdark mb-6">
+          <div className="text-center mb-8 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-light dark:text-text-lightdark mb-3 sm:mb-6">
               Shop by <span className="block text-brand-primary">Category</span>
             </h2>
-            <p className="text-xl text-text-subtle dark:text-text-subtledark max-w-2xl mx-auto">
+            <p className="text-sm sm:text-xl text-text-subtle dark:text-text-subtledark max-w-2xl mx-auto">
               იტვირთება…
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="h-80 rounded-3xl bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark animate-pulse"
-              />
+                className="rounded-3xl bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark overflow-hidden"
+              >
+                <div className="aspect-square md:h-64 animate-pulse" />
+              </div>
             ))}
           </div>
         </div>
@@ -102,18 +104,19 @@ export function CategoryGrid() {
   }
 
   return (
-    <section className="py-24 px-6 bg-brand-surface dark:bg-brand-surfacedark">
+    <section className="py-16 sm:py-24 px-4 sm:px-6 bg-brand-surface dark:bg-brand-surfacedark">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6ლ font-bold text-text-light dark:text-text-lightdark mb-6">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-light dark:text-text-lightdark mb-3 sm:mb-6">
             Shop by <span className="block text-brand-primary">Category</span>
           </h2>
-          <p className="text-xl text-text-subtle dark:text-text-subtledark max-w-2xl mx-auto">
+          <p className="text-sm sm:text-xl text-text-subtle dark:text-text-subtledark max-w-2xl mx-auto">
             Discover our carefully curated collections designed for every lifestyle
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+        {/* Square on mobile, fixed height on md+ */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
           {parents.map((parent, index) => {
             const children = childrenByParent.get(parent.id) ?? [];
             const subcats = children.slice(0, 4).map((c) => c.name ?? "—");
@@ -134,50 +137,49 @@ export function CategoryGrid() {
                 onMouseEnter={() => setHovered(parent.id)}
                 onMouseLeave={() => setHovered(null)}
               >
-                {/* Parent card is a Link */}
                 <Link
                   className="block relative overflow-hidden rounded-3xl bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/50 dark:border-brand-muteddark/50 hover:border-brand-primary/30 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-brand-primary/10"
                   href={parentHref}
                 >
-                  {/* Image */}
-                  <div className="relative h-64 overflow-hidden">
+                  {/* Image block: square on mobile, h-64 on md+ */}
+                  <div className="relative aspect-square md:h-64 overflow-hidden">
                     <Image
+                      fill
                       alt={parent.name || "კატეგორია"}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      height={256}
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
                       src={"/placeholder.png"}
-                      width={400}
                     />
-                    {/* Soft gradient tint */}
                     <div
                       className={`absolute inset-0 bg-gradient-to-br ${gradient} group-hover:opacity-80 transition-opacity duration-300`}
                     />
+
                     {/* Header strip */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-black/80 backdrop-blur-sm">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-2xl font-bold text-white">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-black/75 sm:bg-black/80 backdrop-blur-sm">
+                      <div className="flex items-center justify-between mb-2 sm:mb-3">
+                        <h3 className="text-lg sm:text-2xl font-bold text-white">
                           {parent.name || "უსახელო"}
                         </h3>
-                        <ArrowRight className="w-6 h-6 text-white transition-transform duration-300 group-hover:translate-x-2" />
+                        <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-300 group-hover:translate-x-2" />
                       </div>
-                      <p className="text-white/90 text-sm line-clamp-1">{countLabel}</p>
+                      <p className="text-white/90 text-xs sm:text-sm line-clamp-1">{countLabel}</p>
                     </div>
                   </div>
 
                   {/* Subcategories */}
-                  <div className="p-6">
+                  <div className="p-4 sm:p-6">
                     {subcats.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
                         {subcats.map((sub, subIndex) => (
                           <Link
                             key={`${parent.id}-${sub}-${subIndex}`}
-                            className="text-sm text-text-subtle dark:text-text-subtledark hover:text-brand-primary transition-colors cursor-pointer py-2 px-3 rounded-lg hover:bg-brand-primary/5 border border-transparent hover:border-brand-primary/20"
+                            className="text-[12px] sm:text-sm text-text-subtle dark:text-text-subtledark hover:text-brand-primary transition-colors cursor-pointer py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-lg hover:bg-brand-primary/5 border border-transparent hover:border-brand-primary/20"
                             href={`/category/${children[subIndex]?.id ?? parent.id}`}
                             style={{
                               animationDelay: `${index * 0.1 + subIndex * 0.05}s`,
                               opacity: hovered === parent.id ? 1 : 0.9,
                             }}
-                            onClick={(e) => e.stopPropagation()} // keep parent link from firing
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {sub}
                           </Link>
@@ -193,13 +195,13 @@ export function CategoryGrid() {
           })}
         </div>
 
-        <div className="text-center mt-16">
+        <div className="text-center mt-12 sm:mt-16">
           <Link
-            className="group inline-flex items-center gap-3 text-lg font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors"
+            className="group inline-flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors"
             href="/category"
           >
             View All Categories
-            <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-2" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-2" />
           </Link>
         </div>
       </div>

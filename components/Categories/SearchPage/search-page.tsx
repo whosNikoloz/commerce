@@ -148,7 +148,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
             />
 
             {loading ? (
-              <SkeletonProductGrid count={12} />
+              <SkeletonProductGrid count={12} onViewModeChange={setViewMode} />
             ) : (
               <ProductGrid products={products} viewMode={viewMode} />
             )}

@@ -139,7 +139,7 @@ export function ModernHero() {
           </div>
 
           {/* right */}
-          <div className="relative perspective-1000 animate-scale-in">
+          <div className="relative perspective-1000 mb-10 animate-scale-in">
             <div className="relative transform-3d">
               {/* Main product display */}
               <div className="relative w-full h-96 bg-gradient-to-br from-brand-surface to-brand-muted dark:from-brand-surfacedark dark:to-brand-muteddark rounded-3xl overflow-hidden shadow-2xl">

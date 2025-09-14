@@ -316,7 +316,7 @@ export default function CategoryPage({
             />
 
             {loadingProducts ? (
-              <SkeletonProductGrid count={12} />
+              <SkeletonProductGrid count={12} onViewModeChange={setViewMode} />
             ) : (
               <ProductGrid products={products} viewMode={viewMode} />
             )}

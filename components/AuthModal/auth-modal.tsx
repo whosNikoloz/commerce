@@ -10,7 +10,6 @@ import {
 } from "@heroui/modal";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
@@ -20,7 +19,6 @@ import LoginModal from "./login-modal";
 import RegisterModal from "./register-modal";
 import ForgotPasswordModal from "./forgot-password-modal";
 
-// Define the auth data structure
 const AuthData = {
   ka: {
     regData: {
@@ -95,7 +93,6 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   const [authMode, setAuthMode] = useState("login");
   const lng = "ka"; // This can be made dynamic if needed
   const { regData, loginData, forgotData } = AuthData[lng];
-  const router = useRouter();
 
   const handleOAuth = async (provider: string) => {
     const callbackUrl = "/user/auth/oauth";
@@ -126,7 +123,6 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         }}
       >
         <ProfileIcon />
-        <span className="text-xs">{lng === "ka" ? "შესვლა" : "Login"}</span>
       </div>
 
       <Modal
@@ -214,11 +210,29 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                 {authMode === "forgot" && <ForgotPasswordModal forgotData={forgotData} lng={lng} />}
               </ModalBody>
               <ModalFooter>
-                <div className="md:hidden fixed bottom-1 left-1/2 z-50 transform -translate-x-1/2 w-11/12 rounded-2xl bg-black text-white shadow-md">
-                  <div className="flex justify-around items-center py-2">
-                    <Link className="flex flex-col items-center" href={`/${lng}`}>
-                      <HomeIcon className="text-green-500 w-6 h-6" />
-                      <span className="text-xs">{lng === "ka" ? "Home" : "მთავარი"}</span>
+                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+                  <div className="flex justify-around items-center py-2 space-x-3">
+                    <Link className="flex flex-col items-center" href="/">
+                      <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                        Home
+                      </span>
+                    </Link>
+
+                    <div
+                      className="flex flex-col items-center bg-transparent"
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <SearchIcon />
+                      <span className="text-xs">ძებნა</span>
+                    </div>
+
+                    <Cartlink />
+
+                    <Link className="flex flex-col items-center" href={`/en/contact`}>
+                      <ProfileIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
+                      <span className="text-xs">Chat</span>
                     </Link>
 
                     <div
@@ -232,20 +246,8 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         }
                       }}
                     >
-                      <SearchIcon />
-                      <span className="text-xs">{lng === "ka" ? "Search" : "ძებნა"}</span>
+                      <ProfileIcon />
                     </div>
-
-                    <Cartlink />
-
-                    <Link className="flex flex-col items-center" href={`/${lng}/contact`}>
-                      <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">{lng === "ka" ? "Chat" : "ჩათი"}</span>
-                    </Link>
-                    <span className="flex flex-col items-center">
-                      <ProfileIcon className="w-6 h-6" />
-                      <span className="text-xs">{"en" === "en" ? "Login" : "შესვლა"}</span>
-                    </span>
                   </div>
                 </div>
               </ModalFooter>

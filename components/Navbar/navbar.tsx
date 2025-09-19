@@ -1,6 +1,5 @@
 "use client";
 
-import { Link } from "@heroui/link";
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,6 +16,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
 import { SiteConfig, DEFAULT_SITE, SITES } from "@/config/site";
+import AuthModal from "../AuthModal/auth-modal";
+import { MessageCircleIcon } from "lucide-react";
+import Link from "next/link";
+import { useUser } from "@/app/context/userContext";
 
 function getSiteByHostClient(): SiteConfig {
   if (typeof window === "undefined") return DEFAULT_SITE;
@@ -26,7 +29,7 @@ function getSiteByHostClient(): SiteConfig {
 }
 
 export const Navbar = () => {
-  const user = null;
+  const user = useUser;
   const [site, setSite] = useState<SiteConfig>(DEFAULT_SITE);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -148,6 +151,7 @@ export const Navbar = () => {
                 <div className="items-center space-x-4 hidden md:flex">
                   <CartDropdown />
                   <LanguageSwitch />
+                  <AuthModal IsMobile={isMobile} />
                 </div>
               </div>
             </div>
@@ -176,24 +180,38 @@ export const Navbar = () => {
             </span>
           </Link>
 
-          {isMobile ? (
-            <SearchForMobile
-              forBottomNav
-              isModalOpen={searchModalIsOpen}
-              searchQuery={searchQuery}
-              setSearchModalOpen={setSearchModalIsOpen}
-              setSearchQuery={setSearchQuery}
-            />
-          ) : null}
+
+          {isMobile && (
+            <div className="flex flex-col items-center">
+              <SearchForMobile
+                forBottomNav
+                isModalOpen={searchModalIsOpen}
+                searchQuery={searchQuery}
+                setSearchModalOpen={setSearchModalIsOpen}
+                setSearchQuery={setSearchQuery}
+              />
+              <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                {lng === "en" ? "Search" : "ძებნა"}
+              </span>
+            </div>
+          )}
+
 
           <Cartlink />
 
-          <Link className="flex flex-col items-center" href={`/${lng}/contact`}>
-            <ProfileIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
+          <Link className="flex flex-col items-center" href={`/${lng}/info/stores`}>
+            <MessageCircleIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
-              {lng === "en" ? "Chat" : "ჩათი"}
+              {lng === "en" ? "Chat" : "კონტაქტი"}
             </span>
           </Link>
+          <div className="flex flex-col items-center">
+            <AuthModal IsMobile={isMobile} />
+            <span className="text-xs text-text-subtle dark:text-text-subtledark">
+              {lng === "en" ? "Profile" : "პროფილი"}
+            </span>
+          </div>
+
         </div>
       </div>
     </>

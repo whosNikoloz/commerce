@@ -3,8 +3,14 @@
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
-
 import { InputLoadingBtn } from "./input-loading-button";
+
+import {
+  checkEmailLogin,
+  loginWithEmail,
+  type LoginResponse,
+} from "@/app/api/services/authService";
+import { useUser } from "@/app/context/userContext";
 
 interface LoginProps {
   loginData: {
@@ -25,81 +31,94 @@ interface LoginProps {
 
 export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
+  const { login } = useUser();
+
   const [isLoading, setIsLoading] = useState(false);
-  const [loginState, setLoginState] = useState({
-    email: "",
-    password: "",
-  });
+  const [loginState, setLoginState] = useState({ email: "", password: "" });
 
   const [loginError, setLoginError] = useState("");
   const [loginEmailError, setLoginEmailError] = useState("");
   const [loginPasswordError, setLoginPasswordError] = useState("");
 
-  const [Logloader, setLogLoader] = useState(false);
   const [logEmailHasBlurred, setEmailLogHasBlurred] = useState(false);
+  const [Logloader, setLogLoader] = useState(false);
+  const [emailExists, setEmailExists] = useState<boolean | null>(null);
 
-  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleLogin = async () => {
-    setIsLoading(true);
-    if (loginState.email === "") {
-      setLoginEmailError(lng == "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
-      setIsLoading(false);
+    setLoginError("");
+    setLoginEmailError("");
+    setLoginPasswordError("");
 
+    // basic validation
+    if (!loginState.email) {
+      setLoginEmailError(lng === "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
       return;
     }
-    if (loginState.password === "") {
+    if (!isValidEmail(loginState.email)) {
+      setLoginEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      return;
+    }
+    if (!loginState.password) {
       setLoginPasswordError(
-        lng == "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field",
+        lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field"
       );
-      setIsLoading(false);
-
       return;
     }
 
-    // API call for login would go here
-    // For now, we'll just simulate a login delay
-    setTimeout(() => {
+    setIsLoading(true);
+    try {
+      const res: LoginResponse = await loginWithEmail(
+        loginState.email,
+        loginState.password,
+      );
+
+      login(res.token);
+      // Optionally close modal or switch view:
+      // onSwitchMode("close");
+    } catch (e: any) {
+      setLoginError(typeof e?.message === "string" ? e.message : "Login failed");
+    } finally {
       setIsLoading(false);
-      // Handle successful login or error
-    }, 1000);
+    }
   };
 
   const handleLoginEmailExists = async () => {
     setLoginEmailError("");
-    const isEmailValid = validateEmail(loginState.email);
+    setEmailExists(null);
 
+    if (!loginState.email) {
+      setEmailLogHasBlurred(false);
+      return;
+    }
+    if (!isValidEmail(loginState.email)) {
+      setLoginEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      setEmailLogHasBlurred(false);
+      return;
+    }
+
+    setEmailLogHasBlurred(true);
+    setLogLoader(true);
     try {
-      if (loginState.email === "") {
-        setLoginEmailError("");
+      // ✅ check email existance via API
+      const r = await checkEmailLogin(loginState.email);
+      setEmailExists(!!r?.success);
+      if (!r?.success && r?.result) {
+        setLoginEmailError(r.result);
         setEmailLogHasBlurred(false);
-
-        return;
       }
-      if (!isEmailValid) {
-        setLoginEmailError(
-          lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email",
-        );
-        setEmailLogHasBlurred(false);
-
-        return;
-      }
-      setEmailLogHasBlurred(true);
-      setLogLoader(true);
-
-      // API call would go here to check if email exists
-      // For now, we'll just simulate a check delay
-      setTimeout(() => {
-        setLogLoader(false);
-      }, 1000);
-    } catch (error) {
-      console.error("Error:", error);
+    } catch {
+      setLoginEmailError(lng === "ka" ? "სერვერის შეცდომა" : "Server error");
+      setEmailLogHasBlurred(false);
+    } finally {
+      setLogLoader(false);
     }
   };
 
-  const handleLoginPasswordClear = async () => {
+  const handleLoginPasswordClear = () => {
     setLoginPasswordError("");
-    setLoginState({ ...loginState, password: "" });
+    setLoginState((s) => ({ ...s, password: "" }));
   };
 
   return (
@@ -115,7 +134,9 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
           label: ["font-medium text-gray-700 dark:text-gray-200"],
         }}
         endContent={
-          logEmailHasBlurred ? <InputLoadingBtn loading={Logloader} success={true} /> : <></>
+          logEmailHasBlurred ? (
+            <InputLoadingBtn loading={Logloader} success={emailExists === true} />
+          ) : null
         }
         errorMessage={loginEmailError}
         isInvalid={loginEmailError !== ""}
@@ -125,12 +146,13 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
         value={loginState.email}
         onBlur={handleLoginEmailExists}
         onChange={(e) =>
-          setLoginState({
-            ...loginState,
+          setLoginState((s) => ({
+            ...s,
             email: e.target.value,
-          })
+          }))
         }
       />
+
       <Input
         isClearable
         classNames={{
@@ -148,13 +170,14 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
         type="password"
         value={loginState.password}
         onChange={(e) =>
-          setLoginState({
-            ...loginState,
+          setLoginState((s) => ({
+            ...s,
             password: e.target.value,
-          })
+          }))
         }
         onClear={handleLoginPasswordClear}
       />
+
       <div className="flex px-1 justify-end">
         <button
           className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"

@@ -1,15 +1,31 @@
+// components/account/UserPanel.tsx
 "use client";
-import { useState } from "react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   User as UserIcon,
   Package,
@@ -29,22 +45,33 @@ import {
   Clock,
   MapPin as MapPinIcon,
 } from "lucide-react";
+import { getMyOrders, getWishlist, getOrderById, getTracking, downloadInvoiceFile } from "@/app/api/services/orderService";
+import { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/order";
 
-import type { Order, OrderItem, TrackingStep, WishlistItem } from "./helpers";
-import { StatusIcon, demoWishlist, demoOrders } from "./helpers";
+function cx(...cls: Array<string | false | null | undefined>) {
+  return cls.filter(Boolean).join(" ");
+}
+const currency = "GEL";
+const fmtMoney = (n: number) =>
+  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
+    n ?? 0
+  );
 
-// ——— tiny subcomponents kept inline to keep file-count low ———
 function UserHeader() {
   return (
     <div className="mb-8">
       <div className="flex items-center gap-4 mb-4">
         <Avatar className="h-16 w-16">
           <AvatarImage src="/diverse-user-avatars.png" />
-          <AvatarFallback>JD</AvatarFallback>
+          <AvatarFallback>U</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Welcome back, John!</h1>
-          <p className="text-muted-foreground">Manage your account and orders</p>
+          <h1 className="text-3xl font-bold text-foreground">
+            Welcome back!
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your account, orders and preferences
+          </p>
         </div>
       </div>
     </div>
@@ -68,7 +95,9 @@ function NotificationArea({
           className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
         >
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-4 w-4 items-center justify-center">✅</span>
+            <span className="inline-flex h-4 w-4 items-center justify-center">
+              ✅
+            </span>
             <span className="text-sm text-green-800">{message}</span>
           </div>
           <Button
@@ -76,6 +105,7 @@ function NotificationArea({
             size="sm"
             variant="ghost"
             onClick={() => onDismiss(orderId)}
+            aria-label="Dismiss notification"
           >
             ×
           </Button>
@@ -85,8 +115,198 @@ function NotificationArea({
   );
 }
 
-function DashboardStats() {
+function EmptyState({
+  icon,
+  title,
+  desc,
+  cta,
+}: {
+  icon?: React.ReactNode;
+  title: string;
+  desc?: string;
+  cta?: React.ReactNode;
+}) {
   return (
+    <div className="border rounded-lg p-10 text-center">
+      <div className="mx-auto mb-3 h-10 w-10 text-muted-foreground">
+        {icon}
+      </div>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {desc && <p className="text-sm text-muted-foreground mt-1">{desc}</p>}
+      {cta && <div className="mt-4">{cta}</div>}
+    </div>
+  );
+}
+
+export default function UserPanel() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // data state
+  const [paged, setPaged] = useState<{ page: number; pageSize: number; total: number }>({
+    page: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  const [orders, setOrders] = useState<(OrderSummary | OrderDetail)[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+
+  // ui state
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
+  const [errorOrders, setErrorOrders] = useState<string | null>(null);
+  const [errorWishlist, setErrorWishlist] = useState<string | null>(null);
+
+  const [expandedOrders, setExpandedOrders] = useState<string[]>([]);
+  const [orderActions, setOrderActions] = useState<Record<string, boolean>>({});
+  const [notifications, setNotifications] = useState<Record<string, string>>({});
+
+  // load orders
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingOrders(true);
+        setErrorOrders(null);
+        const res = await getMyOrders(paged.page, paged.pageSize);
+        if (!mounted) return;
+        setPaged((p) => ({ ...p, total: res.total }));
+        setOrders(res.data);
+      } catch (e: any) {
+        if (!mounted) return;
+        setErrorOrders(e?.message ?? "Failed to load orders");
+      } finally {
+        mounted && setLoadingOrders(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [paged.page, paged.pageSize]);
+
+  // load wishlist
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingWishlist(true);
+        setErrorWishlist(null);
+        const items = await getWishlist();
+        if (!mounted) return;
+        setWishlist(items);
+      } catch (e: any) {
+        if (!mounted) return;
+        setErrorWishlist(e?.message ?? "Failed to load wishlist");
+      } finally {
+        mounted && setLoadingWishlist(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const totalSpent = useMemo(
+    () =>
+      orders.reduce((acc, o) => acc + ((o as OrderDetail)?.total ?? 0), 0),
+    [orders]
+  );
+
+  const toggleOrderExpansion = (id: string) =>
+    setExpandedOrders((p) =>
+      p.includes(id) ? p.filter((x) => x !== id) : [...p, id]
+    );
+
+  // ensure details fetched on first open
+  const ensureOrderDetailLoaded = async (orderId: string) => {
+    const found = orders.find((o) => o.id === orderId);
+    const isDetail = !!(found as OrderDetail)?.orderItems;
+    if (found && !isDetail) {
+      try {
+        setOrderActions((a) => ({ ...a, [`load-${orderId}`]: true }));
+        const detail = await getOrderById(orderId);
+        setOrders((prev) => prev.map((o) => (o.id === orderId ? detail : o)));
+      } finally {
+        setOrderActions((a) => ({ ...a, [`load-${orderId}`]: false }));
+      }
+    }
+  };
+
+  const handleTrackPackage = async (
+    orderId: string,
+    trackingNumber?: string | null
+  ) => {
+    if (!trackingNumber) return;
+
+    setOrderActions((p) => ({ ...p, [`track-${orderId}`]: true }));
+    try {
+      const steps = await getTracking(trackingNumber);
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? ({ ...(o as OrderDetail), trackingSteps: steps } as OrderDetail)
+            : o
+        )
+      );
+      setNotifications((p) => ({
+        ...p,
+        [orderId]: `Tracking updated for ${trackingNumber}`,
+      }));
+    } catch (e: any) {
+      setNotifications((p) => ({
+        ...p,
+        [orderId]: `Tracking failed: ${String(e?.message || e)}`,
+      }));
+    } finally {
+      setOrderActions((p) => ({ ...p, [`track-${orderId}`]: false }));
+    }
+  };
+
+  const handleDownloadInvoice = async (orderId: string) => {
+    setOrderActions((p) => ({ ...p, [`invoice-${orderId}`]: true }));
+    try {
+      const { blobUrl, fileName } = await downloadInvoiceFile(orderId);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = fileName;
+      a.click();
+      setNotifications((p) => ({
+        ...p,
+        [orderId]: `Invoice downloaded for ${orderId}`,
+      }));
+      URL.revokeObjectURL(blobUrl);
+    } catch (e: any) {
+      setNotifications((p) => ({
+        ...p,
+        [orderId]: `Invoice failed: ${String(e?.message || e)}`,
+      }));
+    } finally {
+      setOrderActions((p) => ({ ...p, [`invoice-${orderId}`]: false }));
+    }
+  };
+
+  const handleLeaveReview = (orderId: string) =>
+    setNotifications((p) => ({
+      ...p,
+      [orderId]: `Review form opened for ${orderId}`,
+    }));
+
+  const handleViewOrder = async (orderId: string) => {
+    setActiveTab("orders");
+    await ensureOrderDetailLoaded(orderId);
+    setTimeout(() => toggleOrderExpansion(orderId), 60);
+  };
+
+  const dismissNotification = (orderId: string) =>
+    setNotifications((p) => {
+      const n = { ...p };
+      delete n[orderId];
+      return n;
+    });
+
+  // —————————————————————————————————————————————————————————————
+  // Inner sections (kept in-file to avoid extra files)
+  // —————————————————————————————————————————————————————————————
+  const DashboardStats = () => (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -94,8 +314,8 @@ function DashboardStats() {
           <Package className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">24</div>
-          <p className="text-xs text-muted-foreground">+2 from last month</p>
+          <div className="text-2xl font-bold">{paged.total}</div>
+          <p className="text-xs text-muted-foreground">All time</p>
         </CardContent>
       </Card>
       <Card>
@@ -104,8 +324,8 @@ function DashboardStats() {
           <CreditCard className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">$1,234.56</div>
-          <p className="text-xs text-muted-foreground">+15% from last month</p>
+          <div className="text-2xl font-bold">{fmtMoney(totalSpent)}</div>
+          <p className="text-xs text-muted-foreground">All time</p>
         </CardContent>
       </Card>
       <Card>
@@ -114,8 +334,8 @@ function DashboardStats() {
           <Heart className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">12</div>
-          <p className="text-xs text-muted-foreground">3 items on sale</p>
+          <div className="text-2xl font-bold">{wishlist.length}</div>
+          <p className="text-xs text-muted-foreground">Saved for later</p>
         </CardContent>
       </Card>
       <Card>
@@ -124,297 +344,496 @@ function DashboardStats() {
           <Star className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">2,450</div>
-          <p className="text-xs text-muted-foreground">Expires in 6 months</p>
+          <div className="text-2xl font-bold">—</div>
+          <p className="text-xs text-muted-foreground">Coming soon</p>
         </CardContent>
       </Card>
     </div>
   );
-}
 
-function RecentOrders({ orders, onView }: { orders: Order[]; onView: (id: string) => void }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Orders</CardTitle>
-        <CardDescription>Your latest purchases and their status</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {orders.map((order) => (
-            <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-4">
-                <Package className="h-8 w-8 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">{order.id}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {order.date} • {order.items} items
+  const RecentOrders = ({
+    orders,
+    onView,
+  }: {
+    orders: (OrderSummary | OrderDetail)[];
+    onView: (id: string) => void;
+  }) => {
+    if (loadingOrders) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Orders</CardTitle>
+            <CardDescription>Your latest purchases</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (errorOrders) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Orders</CardTitle>
+            <CardDescription>Your latest purchases</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-red-600">{errorOrders}</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (!orders.length) {
+      return (
+        <EmptyState
+          icon={<Package />}
+          title="No orders yet"
+          desc="When you place an order, it will appear here."
+        />
+      );
+    }
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Orders</CardTitle>
+          <CardDescription>Your latest purchases and their status</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {orders.slice(0, 5).map((order) => (
+              <div
+                key={order.id}
+                className="flex items-center justify-between p-4 border rounded-lg"
+              >
+                <div className="flex items-center gap-4">
+                  <Package className="h-8 w-8 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium">{order.id}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(order.date).toLocaleDateString()} • {order.items} items
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Badge
+                    variant={
+                      order.status === "Delivered"
+                        ? "default"
+                        : order.status === "Shipped"
+                          ? "secondary"
+                          : "outline"
+                    }
+                  >
+                    {order.status}
+                  </Badge>
+                  <p className="font-medium">
+                    {fmtMoney((order as OrderDetail).total ?? 0)}
                   </p>
+                  <Button size="sm" variant="outline" onClick={() => onView(order.id)}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    View
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <Badge
-                  variant={
-                    order.status === "Delivered"
-                      ? "default"
-                      : order.status === "Shipped"
-                        ? "secondary"
-                        : "outline"
-                  }
-                >
-                  {order.status}
-                </Badge>
-                <p className="font-medium">{order.total}</p>
-                <Button size="sm" variant="outline" onClick={() => onView(order.id)}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
-function OrderHistory({
-  orders,
-  expandedOrders,
-  toggle,
-  onTrack,
-  onInvoice,
-  onReview,
-  actions,
-}: {
-  orders: Order[];
-  expandedOrders: string[];
-  toggle: (id: string) => void;
-  onTrack: (id: string, tracking: string) => void;
-  onInvoice: (id: string) => void;
-  onReview: (id: string) => void;
-  actions: Record<string, boolean>;
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Order History</CardTitle>
-        <CardDescription>View and manage all your orders with detailed tracking</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {orders.map((order) => {
-            const expanded = expandedOrders.includes(order.id);
+  const OrderHistory = ({
+    orders,
+  }: {
+    orders: (OrderSummary | OrderDetail)[];
+  }) => {
+    if (loadingOrders) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Order History</CardTitle>
+            <CardDescription>All your orders</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (errorOrders) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Order History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-red-600">{errorOrders}</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (!orders.length) {
+      return (
+        <EmptyState
+          icon={<Package />}
+          title="No orders to show"
+          desc="You haven’t placed any orders yet."
+        />
+      );
+    }
 
-            return (
-              <Collapsible key={order.id} open={expanded}>
-                <div className="border rounded-lg">
-                  <CollapsibleTrigger asChild>
-                    <div
-                      className="flex items-center justify-between p-6 cursor-pointer hover:bg-muted/50 transition-colors"
-                      role="button"
-                      tabIndex={0}
-                      aria-expanded={expanded}
-                      onClick={() => toggle(order.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          toggle(order.id);
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-muted rounded-lg">
-                          <Package className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-lg">{order.id}</p>
-                          <p className="text-muted-foreground">Ordered on {order.date}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {order.items} items • {order.total}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant={
-                            order.status === "Delivered"
-                              ? "default"
-                              : order.status === "Shipped"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {order.status}
-                        </Badge>
-                        {expanded ? (
-                          <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-muted-foreground" />
+    return (
+      <Card>
+        <CardHeader className="flex items-center justify-between">
+          <div>
+            <CardTitle>Order History</CardTitle>
+            <CardDescription>
+              View and manage all your orders with detailed tracking
+            </CardDescription>
+          </div>
+          {/* Pagination controls */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={paged.page <= 1 || loadingOrders}
+              onClick={() => setPaged((p) => ({ ...p, page: Math.max(1, p.page - 1) }))}
+            >
+              Prev
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {paged.page} / {Math.max(1, Math.ceil(paged.total / paged.pageSize))}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={paged.page >= Math.ceil(paged.total / paged.pageSize) || loadingOrders}
+              onClick={() =>
+                setPaged((p) => ({ ...p, page: Math.min(p.page + 1, Math.ceil(p.total / p.pageSize)) }))
+              }
+            >
+              Next
+            </Button>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <div className="space-y-4">
+            {orders.map((order) => {
+              const expanded = expandedOrders.includes(order.id);
+              const isDetail = !!(order as OrderDetail).orderItems;
+              const detail = order as OrderDetail;
+
+              return (
+                <Collapsible key={order.id} open={expanded}>
+                  <div className="border rounded-lg">
+                    <CollapsibleTrigger asChild>
+                      <div
+                        className={cx(
+                          "flex items-center justify-between p-6 cursor-pointer transition-colors",
+                          expanded ? "bg-muted/50" : "hover:bg-muted/50"
                         )}
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-
-                  <CollapsibleContent>
-                    <div className="px-6 pb-6 space-y-6">
-                      <Separator />
-
-                      <div>
-                        <h4 className="font-semibold mb-3">Order Items</h4>
-                        <div className="space-y-3">
-                          {order.orderItems.map((item: OrderItem, idx: number) => (
-                            <div
-                              key={idx}
-                              className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg"
-                            >
-                              <img
-                                alt={item.name}
-                                className="h-12 w-12 object-cover rounded"
-                                src={item.image || "/placeholder.png"}
-                              />
-                              <div className="flex-1">
-                                <p className="font-medium">{item.name}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  Quantity: {item.quantity}
-                                </p>
-                              </div>
-                              <p className="font-semibold">{item.price}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold mb-3">Shipping Information</h4>
-                        <div className="bg-muted/30 p-4 rounded-lg space-y-2">
-                          <div className="flex items-center gap-2">
-                            <MapPinIcon className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{order.shippingAddress}</span>
+                        role="button"
+                        tabIndex={0}
+                        aria-expanded={expanded}
+                        onClick={async () => {
+                          if (!isDetail) await ensureOrderDetailLoaded(order.id);
+                          toggleOrderExpansion(order.id);
+                        }}
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            if (!isDetail) await ensureOrderDetailLoaded(order.id);
+                            toggleOrderExpansion(order.id);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-muted rounded-lg">
+                            <Package className="h-6 w-6" />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">Tracking: {order.trackingNumber}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">Expected: {order.estimatedDelivery}</span>
+                          <div>
+                            <p className="font-semibold text-lg">{order.id}</p>
+                            <p className="text-muted-foreground">
+                              Ordered on {new Date(order.date).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {order.items} items • {fmtMoney((order as OrderDetail).total ?? 0)}
+                            </p>
                           </div>
                         </div>
+                        <div className="flex items-center gap-3">
+                          <Badge
+                            variant={
+                              order.status === "Delivered"
+                                ? "default"
+                                : order.status === "Shipped"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
+                            {order.status}
+                          </Badge>
+                          {expanded ? (
+                            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                          )}
+                        </div>
                       </div>
+                    </CollapsibleTrigger>
 
-                      <div>
-                        <h4 className="font-semibold mb-3">Order Tracking</h4>
-                        <div className="space-y-4">
-                          {order.trackingSteps.map((step: TrackingStep, i: number) => (
-                            <div key={i} className="flex items-start gap-4">
-                              <div className="flex flex-col items-center">
-                                <StatusIcon completed={step.completed} status={step.status} />
-                                {i < order.trackingSteps.length - 1 && (
-                                  <div
-                                    className={`w-0.5 h-8 mt-2 ${step.completed ? "bg-green-500" : "bg-gray-200"}`}
+                    <CollapsibleContent>
+                      {isDetail ? (
+                        <div className="px-6 pb-6 space-y-6">
+                          <Separator />
+
+                          {/* Items */}
+                          <div>
+                            <h4 className="font-semibold mb-3">Order Items</h4>
+                            <div className="space-y-3">
+                              {detail.orderItems.map((item: OrderItem, idx: number) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg"
+                                >
+                                  <img
+                                    alt={item.name}
+                                    className="h-12 w-12 object-cover rounded"
+                                    src={item.image || "/placeholder.png"}
                                   />
+                                  <div className="flex-1">
+                                    <p className="font-medium">{item.name}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Qty: {item.quantity}
+                                      {item.variant ? ` • ${item.variant}` : ""}
+                                    </p>
+                                  </div>
+                                  <p className="font-semibold">{fmtMoney(item.price)}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Shipping */}
+                          <div>
+                            <h4 className="font-semibold mb-3">Shipping Information</h4>
+                            <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                              <div className="flex items-center gap-2">
+                                <MapPinIcon className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm">{detail.shippingAddress}</span>
+                              </div>
+                              {!!detail.trackingNumber && (
+                                <div className="flex items-center gap-2">
+                                  <Package className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">
+                                    Tracking: {detail.trackingNumber}
+                                  </span>
+                                </div>
+                              )}
+                              {!!detail.estimatedDelivery && (
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">
+                                    Expected: {detail.estimatedDelivery}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Tracking */}
+                          <div>
+                            <h4 className="font-semibold mb-3">Order Tracking</h4>
+                            {detail.trackingSteps.length ? (
+                              <div className="space-y-4">
+                                {detail.trackingSteps.map(
+                                  (step: TrackingStep, i: number) => (
+                                    <div key={i} className="flex items-start gap-4">
+                                      <div className="flex flex-col items-center">
+                                        <div
+                                          className={cx(
+                                            "h-4 w-4 rounded-full",
+                                            step.completed ? "bg-green-500" : "bg-gray-300"
+                                          )}
+                                        />
+                                        {i < detail.trackingSteps.length - 1 && (
+                                          <div
+                                            className={cx(
+                                              "w-0.5 h-8 mt-2",
+                                              step.completed ? "bg-green-500" : "bg-gray-200"
+                                            )}
+                                          />
+                                        )}
+                                      </div>
+                                      <div className="flex-1 pb-4">
+                                        <div className="flex items-center justify-between">
+                                          <p
+                                            className={cx(
+                                              "font-medium",
+                                              step.completed
+                                                ? "text-foreground"
+                                                : "text-muted-foreground"
+                                            )}
+                                          >
+                                            {step.status}
+                                          </p>
+                                          <p className="text-sm text-muted-foreground">
+                                            {new Date(step.date).toLocaleString()}
+                                          </p>
+                                        </div>
+                                        {step.description && (
+                                          <p className="text-sm text-muted-foreground mt-1">
+                                            {step.description}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )
                                 )}
                               </div>
-                              <div className="flex-1 pb-4">
-                                <div className="flex items-center justify-between">
-                                  <p
-                                    className={`font-medium ${step.completed ? "text-foreground" : "text-muted-foreground"}`}
-                                  >
-                                    {step.status}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground">{step.date}</p>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  {step.description}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+                            ) : (
+                              <p className="text-sm text-muted-foreground">
+                                No tracking updates yet.
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex gap-3 pt-2">
+                            <Button
+                              className="flex-1 bg-transparent"
+                              disabled={
+                                orderActions[`track-${detail.id}`] === true ||
+                                !detail.trackingNumber
+                              }
+                              variant="outline"
+                              onClick={() =>
+                                handleTrackPackage(detail.id, detail.trackingNumber)
+                              }
+                            >
+                              <Truck className="h-4 w-4 mr-2" />
+                              {orderActions[`track-${detail.id}`]
+                                ? "Tracking..."
+                                : "Track Package"}
+                            </Button>
+                            <Button
+                              className="flex-1 bg-transparent"
+                              disabled={orderActions[`invoice-${detail.id}`] === true}
+                              variant="outline"
+                              onClick={() => handleDownloadInvoice(detail.id)}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              {orderActions[`invoice-${detail.id}`]
+                                ? "Downloading..."
+                                : "Download Invoice"}
+                            </Button>
+                            {detail.status === "Delivered" && (
+                              <Button
+                                className="flex-1 bg-transparent"
+                                variant="outline"
+                                onClick={() => handleLeaveReview(detail.id)}
+                              >
+                                <Star className="h-4 w-4 mr-2" />
+                                Leave Review
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="px-6 pb-6 text-sm text-muted-foreground">
+                          {orderActions[`load-${order.id}`] ? "Loading details…" : "Open to load details"}
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
-                      <div className="flex gap-3 pt-2">
-                        <Button
-                          className="flex-1 bg-transparent"
-                          disabled={actions[`track-${order.id}`] === true}
-                          variant="outline"
-                          onClick={() => onTrack(order.id, order.trackingNumber)}
-                        >
-                          <Truck className="h-4 w-4 mr-2" />
-                          {actions[`track-${order.id}`] ? "Tracking..." : "Track Package"}
-                        </Button>
-                        <Button
-                          className="flex-1 bg-transparent"
-                          disabled={actions[`invoice-${order.id}`] === true}
-                          variant="outline"
-                          onClick={() => onInvoice(order.id)}
-                        >
-                          <Download className="h-4 w-4 mr-2" />
-                          {actions[`invoice-${order.id}`] ? "Downloading..." : "Download Invoice"}
-                        </Button>
-                        {order.status === "Delivered" && (
-                          <Button
-                            className="flex-1 bg-transparent"
-                            variant="outline"
-                            onClick={() => onReview(order.id)}
-                          >
-                            <Star className="h-4 w-4 mr-2" />
-                            Leave Review
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CollapsibleContent>
+  const WishlistGrid = () => {
+    if (loadingWishlist) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>My Wishlist</CardTitle>
+            <CardDescription>Items you&apos;ve saved for later</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (errorWishlist) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>My Wishlist</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-red-600">{errorWishlist}</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (!wishlist.length) {
+      return (
+        <EmptyState
+          icon={<Heart />}
+          title="Your wishlist is empty"
+          desc="Save products to compare and buy later."
+          cta={<Button>Add products</Button>}
+        />
+      );
+    }
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>My Wishlist</CardTitle>
+          <CardDescription>Items you&apos;ve saved for later</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {wishlist.map((item) => (
+              <div key={item.id} className="border rounded-lg p-4 space-y-4">
+                <img
+                  alt={item.name}
+                  className="w-full h-48 object-cover rounded-md"
+                  src={item.image || "/placeholder.png"}
+                />
+                <div>
+                  <h3 className="font-semibold">{item.name}</h3>
+                  <p className="text-lg font-bold text-primary">
+                    {fmtMoney(item.price)}
+                  </p>
                 </div>
-              </Collapsible>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function WishlistGrid() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>My Wishlist</CardTitle>
-        <CardDescription>Items you&apos;ve saved for later</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {demoWishlist.map((item: WishlistItem) => (
-            <div key={item.id} className="border rounded-lg p-4 space-y-4">
-              <img
-                alt={item.name}
-                className="w-full h-48 object-cover rounded-md"
-                src={item.image || "/placeholder.png"}
-              />
-              <div>
-                <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-lg font-bold text-primary">{item.price}</p>
+                <div className="flex gap-2">
+                  <Button className="flex-1">
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Add to Cart
+                  </Button>
+                  <Button size="icon" variant="outline">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button className="flex-1">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </Button>
-                <Button size="icon" variant="outline">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
-function AccountForms() {
-  return (
+  const AccountForms = () => (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
@@ -424,19 +843,19 @@ function AccountForms() {
         <CardContent className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="firstName">First Name</Label>
-            <Input defaultValue="John" id="firstName" />
+            <Input id="firstName" placeholder="Your first name" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="lastName">Last Name</Label>
-            <Input defaultValue="Doe" id="lastName" />
+            <Input id="lastName" placeholder="Your last name" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input defaultValue="john.doe@example.com" id="email" type="email" />
+            <Input id="email" type="email" placeholder="you@example.com" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="phone">Phone</Label>
-            <Input defaultValue="+1 (555) 123-4567" id="phone" />
+            <Input id="phone" placeholder="+995 5xx xxx xxx" />
           </div>
           <Button>Save Changes</Button>
         </CardContent>
@@ -455,7 +874,7 @@ function AccountForms() {
               <p className="text-sm text-muted-foreground">
                 123 Main St, Apt 4B
                 <br />
-                New York, NY 10001
+                City, ZIP
               </p>
             </div>
             <Button size="sm" variant="outline">
@@ -504,7 +923,9 @@ function AccountForms() {
               <Shield className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="font-medium">Email Notifications</p>
-                <p className="text-sm text-muted-foreground">Receive order updates</p>
+                <p className="text-sm text-muted-foreground">
+                  Receive order updates
+                </p>
               </div>
             </div>
             <Button size="sm" variant="outline">
@@ -528,63 +949,18 @@ function AccountForms() {
       </Card>
     </div>
   );
-}
 
-export function UserPanel() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [expandedOrders, setExpandedOrders] = useState<string[]>([]);
-  const [orderActions, setOrderActions] = useState<Record<string, boolean>>({});
-  const [notifications, setNotifications] = useState<Record<string, string>>({});
-  const orders: Order[] = demoOrders;
-
-  const toggleOrderExpansion = (id: string) =>
-    setExpandedOrders((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
-
-  const handleTrackPackage = (orderId: string, trackingNumber: string) => {
-    setOrderActions((p) => ({ ...p, [`track-${orderId}`]: true }));
-    setTimeout(() => {
-      setNotifications((p) => ({ ...p, [orderId]: `Tracking updated for ${trackingNumber}` }));
-      setOrderActions((p) => ({ ...p, [`track-${orderId}`]: false }));
-    }, 1500);
-  };
-
-  const handleDownloadInvoice = (orderId: string) => {
-    setOrderActions((p) => ({ ...p, [`invoice-${orderId}`]: true }));
-    setTimeout(() => {
-      const link = document.createElement("a");
-
-      link.href = `data:text/plain;charset=utf-8,Invoice for Order ${orderId}
-Date: ${new Date().toLocaleDateString()}
-Thank you for your purchase!`;
-      link.download = `invoice-${orderId}.txt`;
-      link.click();
-      setOrderActions((p) => ({ ...p, [`invoice-${orderId}`]: false }));
-      setNotifications((p) => ({ ...p, [orderId]: `Invoice downloaded for ${orderId}` }));
-    }, 1000);
-  };
-
-  const handleLeaveReview = (orderId: string) =>
-    setNotifications((p) => ({ ...p, [orderId]: `Review form opened for ${orderId}` }));
-
-  const handleViewOrder = (orderId: string) => {
-    setActiveTab("orders");
-    setTimeout(() => toggleOrderExpansion(orderId), 100);
-  };
-
-  const dismissNotification = (orderId: string) =>
-    setNotifications((p) => {
-      const n = { ...p };
-
-      delete n[orderId];
-
-      return n;
-    });
-
+  // —————————————————————————————————————————————————————————————
+  // Render
+  // —————————————————————————————————————————————————————————————
   return (
-    <div className="min-h-screen  ">
+    <div className="min-h-screen">
       <div className="container mx-auto my-20">
         <UserHeader />
-        <NotificationArea notifications={notifications} onDismiss={dismissNotification} />
+        <NotificationArea
+          notifications={notifications}
+          onDismiss={dismissNotification}
+        />
 
         <Tabs className="space-y-6" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-5 lg:w-fit">
@@ -610,33 +986,29 @@ Thank you for your purchase!`;
             </TabsTrigger>
           </TabsList>
 
+          {/* Dashboard */}
           <TabsContent className="space-y-6" value="dashboard">
             <DashboardStats />
             <RecentOrders orders={orders} onView={handleViewOrder} />
           </TabsContent>
 
+          {/* Orders */}
           <TabsContent className="space-y-6" value="orders">
-            <OrderHistory
-              actions={orderActions}
-              expandedOrders={expandedOrders}
-              orders={orders}
-              toggle={toggleOrderExpansion}
-              onInvoice={handleDownloadInvoice}
-              onReview={handleLeaveReview}
-              onTrack={handleTrackPackage}
-            />
+            <OrderHistory orders={orders} />
           </TabsContent>
 
+          {/* Wishlist */}
           <TabsContent className="space-y-6" value="wishlist">
             <WishlistGrid />
           </TabsContent>
 
+          {/* Account */}
           <TabsContent className="space-y-6" value="account">
             <AccountForms />
           </TabsContent>
 
+          {/* Support */}
           <TabsContent className="space-y-6" value="support">
-            {/* Help Center + Contact */}
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>

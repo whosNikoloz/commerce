@@ -39,12 +39,12 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
         const h = await nextHeaders();
         const host = h.get("x-forwarded-host") ?? h.get("host");
 
-        headers.set("X-Client-Domain", host ?? "unknown");
+        headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
       } catch {
         headers.set("X-Client-Domain", "unknown");
       }
     } else {
-      headers.set("X-Client-Domain", window.location.hostname);
+      headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
     }
   }
 

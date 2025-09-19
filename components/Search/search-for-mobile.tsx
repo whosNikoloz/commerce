@@ -211,9 +211,7 @@ export default function SearchForMobile({
             if (e.key === "Enter" || e.key === " ") handleOpen();
           }}
         >
-          <SearchIcon />
-          <span className="text-xs">ძებნა</span>
-        </div>
+          <SearchIcon />        </div>
       ) : (
         <button
           className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
@@ -228,12 +226,12 @@ export default function SearchForMobile({
             aria-controls="search-results"
             aria-expanded={isModalOpen}
             aria-label="Search"
-            className="w-full pl-2 py-3 bg-transparent  rounded-full text-foreground placeholder-muted-foreground outline-none ring-0  transition-all"
+            className="w-full pl-2 py-3 bg-transparent text-[16px]  rounded-full text-foreground placeholder-muted-foreground outline-none ring-0  transition-all"
             id="search-input"
             placeholder="What are you looking for?"
             type="search"
             value={searchQuery}
-            onChange={() => {}}
+            onChange={() => { }}
           />
         </button>
       )}
@@ -273,7 +271,7 @@ export default function SearchForMobile({
                     aria-expanded={isModalOpen}
                     aria-label="Search"
                     autoComplete="off"
-                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[15px]"
+                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
                     id="search-input"
                     placeholder="What are you looking for?"
                     type="search"
@@ -345,27 +343,27 @@ export default function SearchForMobile({
                       <div className="grid grid-cols-3 gap-4 w-full">
                         {loadingCats
                           ? Array.from({ length: 6 }).map((_, i) => (
-                              <Card key={i} className="p-4">
-                                <div className="animate-pulse flex flex-col items-center">
-                                  <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
-                                  <div className="h-3 w-20 bg-gray-300/50 rounded" />
-                                </div>
-                              </Card>
-                            ))
+                            <Card key={i} className="p-4">
+                              <div className="animate-pulse flex flex-col items-center">
+                                <div className="h-16 w-16 bg-gray-300/50 rounded mb-3" />
+                                <div className="h-3 w-20 bg-gray-300/50 rounded" />
+                              </div>
+                            </Card>
+                          ))
                           : categories.map((category) => (
-                              <Card
-                                key={category.id}
-                                className="cursor-pointer hover:shadow-md transition-shadow"
-                                onClick={() => goToResultsPage(category.name ?? "")}
-                              >
-                                <CardBody className="flex flex-col items-center justify-center">
-                                  {renderCatThumb(category)}
-                                  <span className="text-sm font-medium text-center line-clamp-2">
-                                    {category.name}
-                                  </span>
-                                </CardBody>
-                              </Card>
-                            ))}
+                            <Card
+                              key={category.id}
+                              className="cursor-pointer hover:shadow-md transition-shadow"
+                              onClick={() => goToResultsPage(category.name ?? "")}
+                            >
+                              <CardBody className="flex flex-col items-center justify-center">
+                                {renderCatThumb(category)}
+                                <span className="text-sm font-medium text-center line-clamp-2">
+                                  {category.name}
+                                </span>
+                              </CardBody>
+                            </Card>
+                          ))}
                       </div>
                     </div>
                   </div>

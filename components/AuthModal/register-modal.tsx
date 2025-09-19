@@ -3,8 +3,13 @@
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
-
 import { InputLoadingBtn } from "./input-loading-button";
+
+import {
+  checkEmailRegister,
+  checkUserNameRegister,
+  registerUser,
+} from "@/app/api/services/authService";
 
 interface RegisterProps {
   regData: {
@@ -26,8 +31,8 @@ interface RegisterProps {
 
 export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth }: RegisterProps) {
   const regRef = useRef<HTMLInputElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [registrationState, setRegistrationState] = useState({
     username: "",
     email: "",
@@ -47,142 +52,179 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
   const [regUserNameHasBlurred, setRegUserNameHasBlurred] = useState(false);
   const [regEmailHasBlurred, setRegEmailHasBlurred] = useState(false);
 
-  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
+
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleRegistration = async () => {
-    setIsLoading(true);
-    if (registrationState.username === "") {
-      setRegUserNameError(
-        lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field",
+    setRegError("");
+    setRegUserNameError("");
+    setRegEmailError("");
+    setRegPasswordError("");
+    setConfirmPasswordError("");
+
+    const { username, email, password, confirmPassword } = registrationState;
+
+    // Basic client-side validation
+    if (!username) {
+      setRegUserNameError(lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field");
+      return;
+    }
+    if (!email) {
+      setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      return;
+    }
+    if (!password) {
+      setRegError(lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
+      return;
+    }
+    if (password.length < 6) {
+      setRegPasswordError(
+        lng === "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols"
       );
-      setIsLoading(false);
-
       return;
     }
-    if (registrationState.email === "") {
-      setRegEmailError(lng == "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
-      setIsLoading(false);
-
-      return;
-    }
-    if (registrationState.password === "") {
-      setRegError(lng == "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
-      setIsLoading(false);
-
-      return;
-    }
-    if (registrationState.confirmPassword === "") {
+    if (!confirmPassword) {
       setConfirmPasswordError(
-        lng == "ka"
+        lng === "ka"
           ? "შეავსე პაროლის დადასტურების ველი"
-          : "Please fill in the ConfirmPassword field",
+          : "Please fill in the ConfirmPassword field"
       );
-      setIsLoading(false);
-
+      return;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError(lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match");
       return;
     }
 
-    // API call for registration would go here
-    // For now, we'll just simulate a registration delay
-    setTimeout(() => {
+    setIsLoading(true);
+    try {
+      // 🔐 Register via API
+      await registerUser(username, email, password, confirmPassword);
+
+      // Success → switch to login screen (or auto-login if your API returns a token)
+      onSwitchMode("login");
+    } catch (e: any) {
+      setRegError(typeof e?.message === "string" ? e.message : "Registration failed");
+    } finally {
       setIsLoading(false);
-      // Handle successful registration or error
-    }, 1000);
+    }
   };
 
   const handleRegisterEmailExists = async () => {
     setRegEmailError("");
-    const isEmailValid = validateEmail(registrationState.email);
+    setEmailAvailable(null);
 
+    const email = registrationState.email;
+    if (!email) {
+      setRegEmailHasBlurred(false);
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      setRegEmailHasBlurred(false);
+      return;
+    }
+
+    setRegEmailHasBlurred(true);
+    setRegemailLoader(true);
     try {
-      if (registrationState.email === "") {
-        setRegEmailError("");
+      // ✅ check availability (API returns { success: boolean } semantics)
+      const r = await checkEmailRegister(email);
+      const ok = !!r?.success;
+      setEmailAvailable(ok);
+
+      if (!ok && (r as any)?.result) {
+        // e.g. “email already exists”
+        setRegEmailError((r as any).result);
         setRegEmailHasBlurred(false);
-
-        return;
       }
-      if (!isEmailValid) {
-        setRegEmailError(lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
-        setRegEmailHasBlurred(false);
-
-        return;
-      }
-      setRegEmailHasBlurred(true);
-      setRegemailLoader(true);
-
-      // API call would go here to check if email exists
-      // For now, we'll just simulate a check delay
-      setTimeout(() => {
-        setRegemailLoader(false);
-      }, 1000);
-    } catch (error) {
-      console.error("Error:", error);
+    } catch {
+      setRegEmailError(lng === "ka" ? "სერვერის შეცდომა" : "Server error");
+      setRegEmailHasBlurred(false);
+    } finally {
+      setRegemailLoader(false);
     }
   };
 
   const handleRegisterUsernameExists = async () => {
     setRegUserNameError("");
+    setUsernameAvailable(null);
+
+    const username = registrationState.username;
+    if (!username) {
+      setRegUserNameHasBlurred(false);
+      return;
+    }
+
+    setRegUserNameHasBlurred(true);
+    setRegusernameLoader(true);
     try {
-      if (registrationState.username === "") {
-        setRegUserNameError("");
+      const r = await checkUserNameRegister(username);
+      const ok = !!r?.success;
+      setUsernameAvailable(ok);
+
+      if (!ok && (r as any)?.result) {
+        setRegUserNameError((r as any).result);
         setRegUserNameHasBlurred(false);
-
-        return;
       }
-
-      setRegUserNameHasBlurred(true);
-      setRegusernameLoader(true);
-
-      // API call would go here to check if username exists
-      // For now, we'll just simulate a check delay
-      setTimeout(() => {
-        setRegusernameLoader(false);
-      }, 1000);
-    } catch (error) {
-      console.error("Error:", error);
+    } catch {
+      setRegUserNameError(lng === "ka" ? "სერვერის შეცდომა" : "Server error");
+      setRegUserNameHasBlurred(false);
+    } finally {
+      setRegusernameLoader(false);
     }
   };
 
-  const handleRegEmailClear = async () => {
+  const handleRegEmailClear = () => {
     setRegEmailError("");
-    setRegistrationState({ ...registrationState, email: "" });
+    setRegistrationState((s) => ({ ...s, email: "" }));
+    setRegEmailHasBlurred(false);
+    setEmailAvailable(null);
   };
 
-  const handleRegUserNameClear = async () => {
+  const handleRegUserNameClear = () => {
     setRegUserNameError("");
-    setRegistrationState({ ...registrationState, username: "" });
+    setRegistrationState((s) => ({ ...s, username: "" }));
+    setRegUserNameHasBlurred(false);
+    setUsernameAvailable(null);
   };
 
   const handleBlurConfirmPassword = () => {
-    if (registrationState.confirmPassword === "") return;
-
-    if (registrationState.password !== registrationState.confirmPassword) {
-      setConfirmPasswordError(lng == "ka" ? "პარლი არემთხვევა" : "Password doesnot match");
-    } else {
-      setConfirmPasswordError("");
-    }
+    const { password, confirmPassword } = registrationState;
+    if (!confirmPassword) return;
+    setConfirmPasswordError(
+      password !== confirmPassword
+        ? lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match"
+        : ""
+    );
   };
 
   const handleBlurPassword = () => {
-    if (registrationState.password === "") return;
-
-    if (registrationState.password.length < 6) {
-      setRegPasswordError(
-        lng == "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols",
-      );
-    } else {
-      setRegPasswordError("");
-    }
+    const { password } = registrationState;
+    if (!password) return;
+    setRegPasswordError(
+      password.length < 6
+        ? (lng === "ka"
+          ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი"
+          : "Password must be more than 6 symbols")
+        : ""
+    );
   };
 
-  const handleRegConfirmPasswordClear = async () => {
+  const handleRegConfirmPasswordClear = () => {
     setConfirmPasswordError("");
-    setRegistrationState({ ...registrationState, confirmPassword: "" });
+    setRegistrationState((s) => ({ ...s, confirmPassword: "" }));
   };
 
-  const handleRegPasswordClear = async () => {
+  const handleRegPasswordClear = () => {
     setRegPasswordError("");
-    setRegistrationState({ ...registrationState, password: "" });
+    setRegistrationState((s) => ({ ...s, password: "" }));
   };
 
   return (
@@ -199,11 +241,11 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         }}
         endContent={
           regUserNameHasBlurred ? (
-            <InputLoadingBtn loading={Regusernameloader} success={true} />
-          ) : (
-            <></>
-          )
+            <InputLoadingBtn loading={Regusernameloader} success={usernameAvailable === true} />
+          ) : null
         }
+        isClearable
+        onClear={handleRegUserNameClear}
         errorMessage={regUserNameError}
         isInvalid={regUserNameError !== ""}
         label={regData.username}
@@ -212,12 +254,13 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         value={registrationState.username}
         onBlur={handleRegisterUsernameExists}
         onChange={(e) =>
-          setRegistrationState({
-            ...registrationState,
+          setRegistrationState((s) => ({
+            ...s,
             username: e.target.value,
-          })
+          }))
         }
       />
+
       <Input
         classNames={{
           input: ["text-[16px]"],
@@ -228,8 +271,12 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
           label: ["font-medium text-gray-700 dark:text-gray-200"],
         }}
         endContent={
-          regEmailHasBlurred ? <InputLoadingBtn loading={Regemailloader} success={true} /> : <></>
+          regEmailHasBlurred ? (
+            <InputLoadingBtn loading={Regemailloader} success={emailAvailable === true} />
+          ) : null
         }
+        isClearable
+        onClear={handleRegEmailClear}
         errorMessage={regEmailError}
         isInvalid={regEmailError !== ""}
         label={regData.email}
@@ -238,10 +285,10 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         value={registrationState.email}
         onBlur={handleRegisterEmailExists}
         onChange={(e) =>
-          setRegistrationState({
-            ...registrationState,
+          setRegistrationState((s) => ({
+            ...s,
             email: e.target.value,
-          })
+          }))
         }
       />
 
@@ -263,13 +310,14 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         value={registrationState.password}
         onBlur={handleBlurPassword}
         onChange={(e) =>
-          setRegistrationState({
-            ...registrationState,
+          setRegistrationState((s) => ({
+            ...s,
             password: e.target.value,
-          })
+          }))
         }
         onClear={handleRegPasswordClear}
       />
+
       <Input
         isClearable
         classNames={{
@@ -288,10 +336,10 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         value={registrationState.confirmPassword}
         onBlur={handleBlurConfirmPassword}
         onChange={(e) =>
-          setRegistrationState({
-            ...registrationState,
+          setRegistrationState((s) => ({
+            ...s,
             confirmPassword: e.target.value,
-          })
+          }))
         }
         onClear={handleRegConfirmPasswordClear}
       />

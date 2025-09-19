@@ -1,13 +1,13 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { loginUser } from "@/app/api/services/authService";
+import { loginAdmin } from "@/app/api/services/authService";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
 
   try {
-    const token = await loginUser({ email, password });
+    const token = await loginAdmin({ email, password });
 
     (await cookies()).set("admin_token", token, {
       httpOnly: true,

@@ -15,6 +15,7 @@ import BackToTopShadcn from "@/components/back_to_top";
 import { themeToStyle } from "@/lib/applyTheme";
 import { getTenantByHostStatic } from "@/lib/getTenantByHost";
 import { getSiteByHost } from "@/lib/getSiteByHost";
+import ClientUADataFix from "@/components/ClientUADataFix";
 
 function normalizeHost(host?: string) {
   return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
@@ -110,6 +111,7 @@ export default async function RootLayout({
           themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
         >
           <LayoutWrapper>
+            <ClientUADataFix />
             {children}
             <BackToTopShadcn threshold={320} />
           </LayoutWrapper>

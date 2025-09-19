@@ -142,7 +142,7 @@ export function CategoryGrid() {
                   href={parentHref}
                 >
                   {/* Image block: square on mobile, h-64 on md+ */}
-                  <div className="relative aspect-square md:h-64 overflow-hidden">
+                  <div className="relative aspect-square md:aspect-auto md:h-64 overflow-hidden">
                     <Image
                       fill
                       alt={parent.name || "კატეგორია"}

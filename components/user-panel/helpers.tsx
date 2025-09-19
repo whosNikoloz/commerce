@@ -1,6 +1,6 @@
 // components/user-panel/helpers.tsx
 
-import { WishlistItem, OrderItem, TrackingStep, OrderDetail } from "@/types/order";
+import { WishlistItem, OrderItem, TrackingStep, OrderDetail } from "@/types/orderTypes";
 
 
 // Keep your StatusIcon as-is, just export it:

@@ -46,7 +46,7 @@ import {
   MapPin as MapPinIcon,
 } from "lucide-react";
 import { getMyOrders, getWishlist, getOrderById, getTracking, downloadInvoiceFile } from "@/app/api/services/orderService";
-import { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/order";
+import { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/orderTypes";
 
 function cx(...cls: Array<string | false | null | undefined>) {
   return cls.filter(Boolean).join(" ");

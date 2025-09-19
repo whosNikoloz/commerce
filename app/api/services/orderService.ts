@@ -1,4 +1,4 @@
-import { OrderDetail, OrderSummary, PagedResult, TrackingStep, WishlistItem } from "@/types/order";
+import { OrderDetail, OrderSummary, PagedResult, TrackingStep, WishlistItem } from "@/types/orderTypes";
 import { apiFetch } from "../client/fetcher";
 import type { ApiEnvelope } from "./authService";
 

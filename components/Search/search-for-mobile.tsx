@@ -20,6 +20,7 @@ import { GoBackButton } from "../go-back-button";
 import { searchProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
@@ -59,6 +60,8 @@ export default function SearchForMobile({
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const debounceRef = useRef<number | null>(null);
+  useBodyScrollLock(isModalOpen);
+
 
   const minLen = 2;
   const pageSize = 8;
@@ -237,41 +240,39 @@ export default function SearchForMobile({
       )}
 
       <Modal
-        hideCloseButton
-        className="dark:bg-brand-muteddark bg-brand-surface"
         isOpen={isModalOpen}
-        motionProps={{
-          variants: {
-            enter: {
-              y: 0,
-              opacity: 1,
-              transition: { duration: 0.1, ease: "easeOut" },
-            },
-            exit: {
-              y: 0,
-              opacity: 0,
-              transition: { duration: 0.1, ease: "easeIn" },
-            },
-          },
-        }}
+        onClose={handleClose}
+        hideCloseButton
         placement="top"
         scrollBehavior="inside"
         size="full"
-        onClose={handleClose}
+        classNames={{
+          wrapper:
+            "h-[100lvh] max-h-[100lvh] min-h-[100lvh] p-0 m-0",
+          base:
+            "dark:bg-brand-muteddark bg-brand-surface !rounded-none h-full max-h-full " +
+            "pt-[calc(env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)]",
+          backdrop: "bg-black/40",
+        }}
+        motionProps={{
+          variants: {
+            enter: { y: 0, opacity: 1, transition: { duration: 0.12, ease: "easeOut" } },
+            exit: { y: 0, opacity: 0, transition: { duration: 0.1, ease: "easeIn" } },
+          },
+        }}
       >
         <ModalContent>
           {() => (
             <>
-              <ModalHeader className="flex items-center gap-2  pt-6 z-50">
+              <ModalHeader className="z-50 flex items-center gap-2 pt-4 px-4 shrink-0">
                 <GoBackButton onClick={handleClose} />
-                <div className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 w-full mx-auto px-4 py-2 focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
+                <div className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 w-full px-4 py-2 focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
                   <SearchIcon className="text-gray-500" />
                   <Input
                     aria-controls="search-results"
                     aria-expanded={isModalOpen}
                     aria-label="Search"
                     autoComplete="off"
-                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
                     id="search-input"
                     placeholder="What are you looking for?"
                     type="search"
@@ -280,14 +281,15 @@ export default function SearchForMobile({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        goToResultsPage(searchQuery); // ✅ saves history inside
+                        goToResultsPage(searchQuery);
                       }
                     }}
+                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
                   />
                 </div>
               </ModalHeader>
 
-              <ModalBody id="search-results">
+              <ModalBody id="search-results" className="grow overflow-y-auto min-h-0 px-4">
                 {/* === NO / SHORT QUERY VIEW === */}
                 {!hasQuery && (
                   <div className="space-y-6">
@@ -444,14 +446,12 @@ export default function SearchForMobile({
                 )}
               </ModalBody>
 
-              <ModalFooter>
-                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+              <ModalFooter className="shrink-0">
+                <div className="md:hidden z-50 fixed bottom-[calc(env(safe-area-inset-bottom)+4px)] left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
                   <div className="flex justify-around items-center py-2 space-x-3">
                     <Link className="flex flex-col items-center" href="/">
                       <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                        Home
-                      </span>
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark">Home</span>
                     </Link>
 
                     <div
@@ -459,9 +459,7 @@ export default function SearchForMobile({
                       role="button"
                       tabIndex={0}
                       onClick={handleClose}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") handleClose();
-                      }}
+                      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClose()}
                     >
                       <SearchIcon />
                       <span className="text-xs">ძებნა</span>

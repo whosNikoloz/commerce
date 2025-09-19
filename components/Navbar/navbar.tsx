@@ -93,6 +93,7 @@ export const Navbar = () => {
     };
   }, [isCategory, category, subcategory]);
 
+
   return (
     <>
       {!isMobile || !isCategory ? (
@@ -171,7 +172,7 @@ export const Navbar = () => {
         </div>
       )}
 
-      <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+      <div className="md:hidden z-50 fixed bottom-0 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
         <div className="flex justify-around items-center py-2 space-x-3">
           <Link className="flex flex-col items-center" href={`/${lng}`}>
             <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />

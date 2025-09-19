@@ -80,6 +80,7 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang={safeLang} style={style}>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link href={site.favicon} rel="icon" sizes="any" />
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"

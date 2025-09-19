@@ -18,6 +18,7 @@ import { GoBackButton } from "../go-back-button";
 import LoginModal from "./login-modal";
 import RegisterModal from "./register-modal";
 import ForgotPasswordModal from "./forgot-password-modal";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const AuthData = {
   ka: {
@@ -93,6 +94,8 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   const [authMode, setAuthMode] = useState("login");
   const lng = "ka"; // This can be made dynamic if needed
   const { regData, loginData, forgotData } = AuthData[lng];
+  useBodyScrollLock(isOpen);
+
 
   const handleOAuth = async (provider: string) => {
     const callbackUrl = "/user/auth/oauth";
@@ -127,9 +130,21 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
       <Modal
         classNames={{
-          backdrop: " backdrop-blur-sm",
-          base: "rounded-t-xl",
+          ...(IsMobile
+            ? {
+              wrapper: "!transform-none h-[100lvh] p-0 m-0",
+              base:
+                "dark:bg-brand-muteddark bg-brand-surface !rounded-none flex flex-col h-full max-h-full " +
+                "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
+              backdrop: "bg-black/40 backdrop-blur-sm",
+            }
+            : {
+              base:
+                "dark:bg-brand-muteddark bg-brand-surface rounded-xl shadow-lg",
+              backdrop: "bg-black/40",
+            }),
         }}
+
         hideCloseButton={IsMobile}
         isOpen={isOpen}
         motionProps={{

@@ -163,9 +163,9 @@ export default async function CategoryIndex({
     return (
       <>
         <Script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
           id="ld-breadcrumbs"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
         />
         <SearchPage query={q} />
       </>
@@ -230,6 +230,7 @@ export default async function CategoryIndex({
                 : Array.isArray(p.images) && p.images.length > 0
                   ? p.images[0]
                   : site.ogImage; // ← per-host fallback
+
             return {
               name: p.name,
               url: buildI18nUrls(`/product/${p.id}`, lang, site).canonical,
@@ -242,15 +243,15 @@ export default async function CategoryIndex({
   return (
     <>
       <Script
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
         id="ld-breadcrumbs"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
       />
       {listJsonLd && (
         <Script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
           id="ld-itemlist"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
         />
       )}
 

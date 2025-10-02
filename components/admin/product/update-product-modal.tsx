@@ -28,7 +28,7 @@ interface UpdateProductModalProps {
     id: string,
     newDescription: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
-  ) => void;
+  ) => void | Promise<void>;
 }
 
 export default function UpdateProductModal({
@@ -44,26 +44,41 @@ export default function UpdateProductModal({
   const [isLiquidated, setIsLiquidated] = useState(initialIsLiquidated);
   const [isComingSoon, setIsComingSoon] = useState(initialIsComingSoon);
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
-
-  const handleSave = () => {
-    onSave(productId, description, { isLiquidated, isComingSoon, isNewArrival });
-    onClose();
-  };
+  const [loading, setLoading] = useState(false);
 
   const isMobile = useIsMobile();
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      await Promise.resolve(
+        onSave(productId, description, { isLiquidated, isComingSoon, isNewArrival }),
+      );
+      onClose();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
       <Button
-        className="border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
         size="sm"
-        variant="outline"
+        title="პროდუქტის ჩასწორება"
         onClick={onOpen}
       >
         <Edit className="h-4 w-4" />
       </Button>
+
       <Modal
-        classNames={{ backdrop: "backdrop-blur-3xl", base: "rounded-t-xl" }}
+        classNames={{
+          backdrop: "bg-slate-900/80 backdrop-blur-xl",
+          base:
+            "rounded-t-2xl md:rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-800 shadow-2xl",
+          wrapper: "z-[999]",
+          closeButton: "z-50",
+        }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
         motionProps={{
@@ -90,78 +105,109 @@ export default function UpdateProductModal({
         size={isMobile ? "full" : "3xl"}
         onClose={onClose}
       >
-        <ModalContent className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark">
+        <ModalContent>
           {() => (
             <>
+              {/* დეკორატიული overlay Add/Update FAQ სტილში */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+
               {isMobile ? (
                 <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
                   <GoBackButton onClick={onClose} />
                 </ModalHeader>
               ) : (
-                <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                  <h2 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
-                    პროდუქტის აღწერის განახლება
-                  </h2>
+                <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                      <Edit className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                      <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                        პროდუქტის აღწერის განახლება
+                      </h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                        მონიშნე სექციები და ჩაასწორე ტექსტი
+                      </p>
+                    </div>
+                  </div>
                 </ModalHeader>
               )}
 
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
-                <div className="mt-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div className="flex items-center gap-2">
+                <div className="space-y-5">
+                  {/* Flag switches */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <Switch
                         checked={isLiquidated}
-                        className="data-[state=checked]:bg-red-600"
+                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-rose-500 data-[state=checked]:to-rose-600"
                         id="is-liquidated"
                         onCheckedChange={setIsLiquidated}
                       />
-                      <span className="text-sm flex items-center gap-1 text-text-light dark:text-text-lightdark">
+                      <span className="text-sm flex items-center gap-1 text-slate-800 dark:text-slate-200">
                         <Box className="w-4 h-4" />
                         ლიკვიდირებულია
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <Switch
                         checked={isComingSoon}
-                        className="data-[state=checked]:bg-brand-primarydark"
+                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-violet-500 data-[state=checked]:to-indigo-600"
                         id="is-coming-soon"
                         onCheckedChange={setIsComingSoon}
                       />
-                      <span className="text-sm flex items-center gap-1 text-text-light dark:text-text-lightdark">
+                      <span className="text-sm flex items-center gap-1 text-slate-800 dark:text-slate-200">
                         <Clock3 className="w-4 h-4" />
                         მალე შემოვა
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <Switch
                         checked={isNewArrival}
-                        className="data-[state=checked]:bg-brand-primary"
+                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
                         id="is-new-arrival"
                         onCheckedChange={setIsNewArrival}
                       />
-                      <span className="text-sm flex items-center gap-1 text-text-light dark:text-text-lightdark">
+                      <span className="text-sm flex items-center gap-1 text-slate-800 dark:text-slate-200">
                         <Sparkles className="w-4 h-4" />
                         ახალი პროდუქტი
                       </span>
                     </div>
                   </div>
 
-                  <div className="rounded-md border border-brand-muted dark:border-brand-muteddark bg-brand-surface dark:bg-brand-surfacedark">
+                  {/* Editor */}
+                  <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/80 shadow-sm">
                     <CustomEditor value={description} onChange={setDescription} />
                   </div>
                 </div>
-
-                <ModalFooter className="mt-4">
-                  <Button
-                    className="bg-brand-primary hover:bg-brand-primary/90 text-white"
-                    onClick={handleSave}
-                  >
-                    შენახვა
-                  </Button>
-                </ModalFooter>
               </ModalBody>
+
+              <ModalFooter className="gap-3 px-6 py-5 bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 relative">
+                <Button
+                  className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                  disabled={loading}
+                  variant="outline"
+                  onClick={onClose}
+                >
+                  გაუქმება
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                  disabled={loading}
+                  onClick={handleSave}
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    "შენახვა"
+                  )}
+                </Button>
+              </ModalFooter>
             </>
           )}
         </ModalContent>

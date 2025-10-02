@@ -60,6 +60,7 @@ export default function SearchForMobile({
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const debounceRef = useRef<number | null>(null);
+
   useBodyScrollLock(isModalOpen);
 
 
@@ -240,12 +241,7 @@ export default function SearchForMobile({
       )}
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={handleClose}
         hideCloseButton
-        placement="top"
-        scrollBehavior="inside"
-        size="full"
         classNames={{
           wrapper:
             "h-[100lvh] max-h-[100lvh] min-h-[100lvh] p-0 m-0",
@@ -254,12 +250,17 @@ export default function SearchForMobile({
             "pt-[calc(env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)]",
           backdrop: "bg-black/40",
         }}
+        isOpen={isModalOpen}
         motionProps={{
           variants: {
             enter: { y: 0, opacity: 1, transition: { duration: 0.12, ease: "easeOut" } },
             exit: { y: 0, opacity: 0, transition: { duration: 0.1, ease: "easeIn" } },
           },
         }}
+        placement="top"
+        scrollBehavior="inside"
+        size="full"
+        onClose={handleClose}
       >
         <ModalContent>
           {() => (
@@ -273,6 +274,7 @@ export default function SearchForMobile({
                     aria-expanded={isModalOpen}
                     aria-label="Search"
                     autoComplete="off"
+                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
                     id="search-input"
                     placeholder="What are you looking for?"
                     type="search"
@@ -284,12 +286,11 @@ export default function SearchForMobile({
                         goToResultsPage(searchQuery);
                       }
                     }}
-                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
                   />
                 </div>
               </ModalHeader>
 
-              <ModalBody id="search-results" className="grow overflow-y-auto min-h-0 px-4">
+              <ModalBody className="grow overflow-y-auto min-h-0 px-4" id="search-results">
                 {/* === NO / SHORT QUERY VIEW === */}
                 {!hasQuery && (
                   <div className="space-y-6">

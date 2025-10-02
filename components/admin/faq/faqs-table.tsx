@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { TriangleAlert, GripVertical, Plus, RefreshCw, Eye, EyeOff, Star } from "lucide-react";
+import { TriangleAlert, GripVertical, Plus, RefreshCw, Eye, EyeOff, Star, Trash2 } from "lucide-react";
 import { DndContext, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -59,19 +59,19 @@ function RowDraggable({
     <TableRow
       ref={setNodeRef}
       className={[
-        "hover:bg-brand-surface/60 dark:hover:bg-brand-surfacedark/60",
-        dragging || isDragging ? "opacity-70 ring-2 ring-brand-primary/30" : "",
+        "hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 dark:hover:from-amber-950/20 dark:hover:to-orange-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50",
+        dragging || isDragging ? "opacity-70 ring-2 ring-amber-400/50 dark:ring-amber-600/50 shadow-lg" : "",
       ].join(" ")}
       style={style}
     >
       <TableCell className="w-10 align-middle">
         <button
-          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-brand-surface dark:hover:bg-brand-surfacedark"
+          className="cursor-grab active:cursor-grabbing p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors duration-200 ring-1 ring-slate-200 dark:ring-slate-700"
           {...attributes}
           {...listeners}
           aria-label="Drag handle"
         >
-          <GripVertical className="h-4 w-4 text-text-subtle" />
+          <GripVertical className="h-4 w-4 text-slate-400" />
         </button>
       </TableCell>
       {children}
@@ -308,24 +308,25 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
   return (
     <>
-      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60 backdrop-blur">
-        <CardHeader className="sticky top-0 z-10 bg-brand-surface/70 dark:bg-brand-surfacedark/70 backdrop-blur border-b border-brand-muted/60 dark:border-brand-muteddark/60">
+      <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-lg" />
+        <CardHeader className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60 relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex flex-1 items-center gap-3">
               <Input
                 aria-label="Search"
                 className="flex-1"
                 classNames={{
-                  label: "text-text-subtle dark:text-text-subtledark",
+                  label: "text-slate-700 dark:text-slate-300 font-semibold",
                   inputWrapper:
-                    "bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark",
+                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-600 data-[focus=true]:border-amber-500 shadow-sm hover:shadow-md transition-all duration-300",
                   input:
-                    "text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark",
+                    "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                placeholder="ძებნა კითხვით ან პასუხით…"
+                placeholder="🔍 ძებნა კითხვით ან პასუხით…"
                 size="lg"
                 startContent={
-                  <svg className="text-text-subtle" height="16" viewBox="0 0 24 24" width="16">
+                  <svg className="text-slate-400" height="16" viewBox="0 0 24 24" width="16">
                     <path
                       d="m21 20l-4.35-4.35A7.5 7.5 0 1 0 9 16.5a7.47 7.47 0 0 0 4.65-1.6L18 19l3 1zM4.5 9A4.5 4.5 0 1 1 9 13.5A4.5 4.5 0 0 1 4.5 9"
                       fill="currentColor"
@@ -341,23 +342,23 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={onlyActive}
-                    className="data-[state=checked]:bg-brand-primary"
+                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
                     onCheckedChange={setOnlyActive}
                   />
                   {onlyActive ? (
-                    <Eye className="h-4 w-4 text-brand-primary" />
+                    <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <EyeOff className="h-4 w-4 text-text-subtle" />
+                    <EyeOff className="h-4 w-4 text-slate-400" />
                   )}
 
                   <Switch
                     checked={onlyFeatured}
-                    className="data-[state=checked]:bg-brand-primary"
+                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
                     onCheckedChange={setOnlyFeatured}
                   />
                   <Star
                     className={`h-3.5 w-3.5 ${
-                      onlyFeatured ? "fill-white text-white" : "text-text-subtle"
+                      onlyFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"
                     }`}
                   />
                 </div>
@@ -366,7 +367,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
             <div className="flex items-center gap-2">
               <Button
-                className="gap-2 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+                className="gap-2 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:border-amber-300 dark:hover:border-amber-600 font-semibold shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-50"
                 disabled={!orderDirty}
                 title={orderDirty ? "შეინახე ახალი რიგი" : "ცვლილება არაა"}
                 variant="secondary"
@@ -387,21 +388,21 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
           <div className="mt-3 flex md:hidden items-center justify-between">
             <Switch
               checked={onlyActive}
-              className="data-[state=checked]:bg-brand-primary"
+              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
               onCheckedChange={setOnlyActive}
             />
             {onlyActive ? (
-              <Eye className="h-4 w-4 text-brand-primary" />
+              <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <EyeOff className="h-4 w-4 text-text-subtle" />
+              <EyeOff className="h-4 w-4 text-slate-400" />
             )}
             <Switch
               checked={onlyFeatured}
-              className="data-[state=checked]:bg-brand-primary"
+              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
               onCheckedChange={setOnlyFeatured}
             />
             <Star
-              className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-white text-white" : "text-text-subtle"}`}
+              className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
             />
           </div>
         </CardHeader>
@@ -411,29 +412,32 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
           {error && <p className="p-4 text-red-500">{error}</p>}
 
           {!loading && !error && (
-            <DndContext
-              sensors={sensors}
-              onDragEnd={onDragEnd}
-              onDragStart={(e) => setDraggingId(String(e.active.id))}
-            >
-              <SortableContext
-                items={filtered.map((f) => f.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <Table>
-                  <TableHeader className="bg-brand-surface/60 dark:bg-brand-surfacedark/60">
-                    <TableRow>
+            <>
+              {/* Desktop Table View with Drag and Drop */}
+              <div className="hidden md:block">
+                <DndContext
+                  sensors={sensors}
+                  onDragEnd={onDragEnd}
+                  onDragStart={(e) => setDraggingId(String(e.active.id))}
+                >
+                  <SortableContext
+                    items={filtered.map((f) => f.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <Table>
+                  <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
+                    <TableRow className="border-b-2 border-slate-200 dark:border-slate-700">
                       <TableHead className="w-10" />
-                      <TableHead className="text-text-subtle dark:text-text-subtledark">
+                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
                         კითხვა
                       </TableHead>
-                      <TableHead className="text-text-subtle dark:text-text-subtledark">
+                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
                         პასუხი
                       </TableHead>
-                      <TableHead className="min-w-[220px] text-text-subtle dark:text-text-subtledark">
+                      <TableHead className="min-w-[220px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
                         სტატუსი
                       </TableHead>
-                      <TableHead className="text-right min-w-[180px] text-text-subtle dark:text-text-subtledark">
+                      <TableHead className="text-right min-w-[180px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
                         ქმედებები
                       </TableHead>
                     </TableRow>
@@ -442,15 +446,15 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                   <TableBody>
                     {filtered.map((faq, idx) => (
                       <RowDraggable key={faq.id} faq={faq} isDragging={draggingId === faq.id}>
-                        <TableCell className="align-top font-medium text-text-light dark:text-text-lightdark max-w-[420px]">
+                        <TableCell className="align-top font-bold text-slate-900 dark:text-slate-100 max-w-[420px]">
                           <div className="line-clamp-2">{faq.question}</div>
-                          <div className="text-xs text-text-subtle">
+                          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
                             #{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")} • ID: {faq.id}
                           </div>
                         </TableCell>
 
                         <TableCell className="align-top max-w-[560px]">
-                          <div className="line-clamp-2 text-text-light dark:text-text-lightdark">
+                          <div className="line-clamp-2 text-slate-600 dark:text-slate-400 font-medium">
                             {faq.answer}
                           </div>
                         </TableCell>
@@ -459,21 +463,21 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                           <div className="flex items-center gap-4">
                             <Switch
                               checked={!!faq.isActive}
-                              className="data-[state=checked]:bg-brand-primary"
+                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
                               onCheckedChange={(v) => handleToggle(faq.id, "isActive", v)}
                             />
                             {!!faq.isActive ? (
-                              <Eye className="h-4 w-4 text-brand-primary" />
+                              <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                             ) : (
-                              <EyeOff className="h-4 w-4 text-text-subtle" />
+                              <EyeOff className="h-4 w-4 text-slate-400" />
                             )}
                             <Switch
                               checked={!!faq.isFeatured}
-                              className="data-[state=checked]:bg-brand-primary"
+                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
                               onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
                             />
                             <Star
-                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-white text-white" : "text-text-subtle"}`}
+                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
                             />
                           </div>
                         </TableCell>
@@ -489,6 +493,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                               onSave={handleUpdate}
                             />
                             <Button
+                              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                               size="sm"
                               variant="destructive"
                               onClick={() => {
@@ -511,9 +516,102 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                       </TableRow>
                     )}
                   </TableBody>
-                </Table>
-              </SortableContext>
-            </DndContext>
+                    </Table>
+                  </SortableContext>
+                </DndContext>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-4">
+                {filtered.map((faq, idx) => (
+                  <div
+                    key={faq.id}
+                    className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  >
+                    {/* Card Header */}
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
+                          <span className="text-white font-bold text-sm">#{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-black text-slate-900 dark:text-slate-100 text-base leading-tight">{faq.question}</h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
+                            ID: {faq.id}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-4 space-y-3">
+                      <div>
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">პასუხი</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">{faq.answer}</div>
+                      </div>
+
+                      <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={!!faq.isActive}
+                            className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
+                            onCheckedChange={(v) => handleToggle(faq.id, "isActive", v)}
+                          />
+                          {!!faq.isActive ? (
+                            <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                          ) : (
+                            <EyeOff className="h-4 w-4 text-slate-400" />
+                          )}
+                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Active</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={!!faq.isFeatured}
+                            className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
+                            onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
+                          />
+                          <Star
+                            className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
+                          />
+                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Featured</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Footer */}
+                    <div className="bg-slate-50 dark:bg-slate-800/50 p-3 border-t border-slate-200 dark:border-slate-700 flex gap-2">
+                      <UpdateFaqModal
+                        faqId={faq.id}
+                        initialActive={faq.isActive}
+                        initialAnswer={faq.answer}
+                        initialFeatured={faq.isFeatured}
+                        initialQuestion={faq.question}
+                        onSave={handleUpdate}
+                      />
+                      <Button
+                        className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300 gap-2"
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          setDeleteTarget(faq);
+                          setDeleteOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+
+                {filtered.length === 0 && (
+                  <div className="flex flex-col items-center gap-3 py-12">
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold">ჩანაწერები ვერ მოიძებნა.</p>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

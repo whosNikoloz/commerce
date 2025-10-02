@@ -3,7 +3,6 @@
 import NextLink from "next/link";
 import { useParams } from "next/navigation";
 import { Home } from "lucide-react";
-import { CategoryGrid } from "@/components/Home/category-grid";
 
 const copy = {
   en: {
@@ -28,10 +27,6 @@ export default function NotFound() {
       <div className="text-center space-y-6 w-full max-w-6xl">
         <h2 className="text-2xl font-semibold">{t.title}</h2>
         <p className="text-muted-foreground">{t.desc}</p>
-
-        <div className="mx-auto max-w-5xl">
-          <CategoryGrid />
-        </div>
 
         <div className="mt-2 flex items-center justify-center">
           <NextLink

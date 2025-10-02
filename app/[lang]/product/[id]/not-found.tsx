@@ -1,19 +1,13 @@
 import Link from "next/link";
 
-import { CategoryGrid } from "@/components/Home/category-grid";
-
 export default function ProductNotFound() {
   return (
     <div className="flex min-h-[45vh] items-center justify-center bg-brand-surface dark:bg-brand-surfacedark">
       <div className="text-center space-y-4 text-text-light dark:text-text-lightdark">
         <h2 className="text-2xl font-semibold">Product not found</h2>
         <p className="text-text-subtle dark:text-text-subtledark">
-          The product you’re looking for doesn’t exist or was removed.
+          The product you&apos;re looking for doesn&apos;t exist or was removed.
         </p>
-
-        <div className="mx-auto max-w-5xl">
-          <CategoryGrid />
-        </div>
 
         <div className="mt-4 flex items-center justify-center gap-3">
           <Link

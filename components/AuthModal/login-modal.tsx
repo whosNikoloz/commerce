@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+
 import { InputLoadingBtn } from "./input-loading-button";
 
 import {
@@ -54,16 +55,19 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
     // basic validation
     if (!loginState.email) {
       setLoginEmailError(lng === "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
+
       return;
     }
     if (!isValidEmail(loginState.email)) {
       setLoginEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+
       return;
     }
     if (!loginState.password) {
       setLoginPasswordError(
         lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field"
       );
+
       return;
     }
 
@@ -90,11 +94,13 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
 
     if (!loginState.email) {
       setEmailLogHasBlurred(false);
+
       return;
     }
     if (!isValidEmail(loginState.email)) {
       setLoginEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
       setEmailLogHasBlurred(false);
+
       return;
     }
 
@@ -103,6 +109,7 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
     try {
       // ✅ check email existance via API
       const r = await checkEmailLogin(loginState.email);
+
       setEmailExists(!!r?.success);
       if (!r?.success && r?.result) {
         setLoginEmailError(r.result);

@@ -8,7 +8,6 @@ import { headers } from "next/headers";
 import { Providers } from "./providers";
 import { LayoutWrapper } from "./LayoutWrapper";
 
-import { fontSans } from "@/config/fonts";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import { locales, defaultLocale } from "@/i18n.config";
 import BackToTopShadcn from "@/components/back_to_top";
@@ -16,6 +15,7 @@ import { themeToStyle } from "@/lib/applyTheme";
 import { getTenantByHostStatic } from "@/lib/getTenantByHost";
 import { getSiteByHost } from "@/lib/getSiteByHost";
 import ClientUADataFix from "@/components/ClientUADataFix";
+import { generateFontClassNames } from "@/lib/loadTenantFonts";
 
 function normalizeHost(host?: string) {
   return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
@@ -76,11 +76,12 @@ export default async function RootLayout({
   const tenant = getTenantByHostStatic(host);
   const site = getSiteByHost(host);
   const style = themeToStyle(tenant.theme);
+  const fontClassNames = generateFontClassNames(tenant.theme);
 
   return (
     <html suppressHydrationWarning lang={safeLang} style={style}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport" />
         <link href={site.favicon} rel="icon" sizes="any" />
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -95,16 +96,11 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebsiteJsonLd(site)) }}
           type="application/ld+json"
         />
-
-        <link
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-          rel="stylesheet"
-        />
       </head>
       <body
         className={clsx(
           "min-h-screen bg-brand-muted dark:bg-brand-muteddark font-sans antialiased",
-          fontSans.variable,
+          fontClassNames,
         )}
       >
         <Providers

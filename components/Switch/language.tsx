@@ -1,6 +1,8 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import type { Locale } from "@/i18n.config";
+
+import { FC } from "react";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { SwitchProps, useSwitch } from "@heroui/switch";
 import { useIsSSR } from "@react-aria/ssr";
@@ -16,49 +18,20 @@ export interface LanguageSwitchProps {
 
 export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames }) => {
   const isSSR = useIsSSR();
-  const pathName = usePathname();
+  const pathname = usePathname();
   const router = useRouter();
-  const [lang, setLang] = useState("en"); // default language
-
-  const handleLanguageChange = (selectedLanguage: string) => {
-    if (!pathName) return "/";
-
-    if (pathName.startsWith("/" + selectedLanguage + "/")) return pathName;
-
-    const secondSlashIndex = pathName.indexOf("/", 1);
-
-    if (secondSlashIndex !== -1) {
-      const newPath = "/" + selectedLanguage + pathName.substring(secondSlashIndex);
-
-      router.push(newPath);
-
-      return newPath;
-    }
-
-    const newPath = "/" + selectedLanguage;
-
-    router.push(newPath);
-
-    return newPath;
-  };
-
-  useEffect(() => {
-    // Logic to determine the current language based on the path
-    const currentLang = pathName.split("/")[1];
-
-    setLang(currentLang === "ka" ? "ka" : "en");
-  }, [pathName]);
+  const currentLanguage: Locale = pathname?.startsWith("/ka") ? "ka" : "en";
 
   const onChange = () => {
-    const newLang = lang === "en" ? "ka" : "en";
+    const newLang: Locale = currentLanguage === "en" ? "ka" : "en";
+    const newPath = pathname?.replace(/^\/(en|ka)/, `/${newLang}`) || `/${newLang}`;
 
-    setLang(newLang);
-    handleLanguageChange(newLang);
+    router.push(newPath);
   };
 
   const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } = useSwitch({
-    isSelected: lang === "ka" || isSSR,
-    "aria-label": `Switch to ${lang === "ka" ? "English" : "Georgian"} mode`,
+    isSelected: currentLanguage === "ka" || isSSR,
+    "aria-label": `Switch to ${currentLanguage === "ka" ? "English" : "Georgian"} mode`,
     onChange,
   });
 

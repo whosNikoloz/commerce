@@ -24,9 +24,16 @@
   /* #e4ddde */
   --text-subtle-dark: 106 119 138;
   /* #6a778a */
+
+  /* Default font variables - will be overridden by tenant configuration */
+  --font-primary: system-ui, sans-serif;
+  --font-secondary: 'Courier New', monospace;
+  --font-heading: system-ui, sans-serif;
 }
 
+/* Ensure fonts inherit properly throughout the entire document */
 html {
+  font-family: var(--font-primary);
   scroll-behavior: smooth;
 }
 
@@ -132,9 +139,86 @@ html {
 @layer base {
   * {
     @apply border-border;
+    font-family: var(--font-primary);
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-primary);
+  }
+
+  /* Apply consistent typography throughout the app */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+
+  /* Ensure all text uses tenant fonts */
+  p, span, div, label, input, textarea, button, a, li, td, th {
+    font-family: var(--font-primary);
+  }
+
+  /* Code elements use secondary font */
+  code, pre, kbd, samp, .code {
+    font-family: var(--font-secondary);
+  }
+
+  /* Override HeroUI and other component library fonts */
+  .heroui-button,
+  .heroui-input,
+  .heroui-textarea,
+  .heroui-select,
+  .heroui-dropdown,
+  .heroui-modal,
+  .heroui-card,
+  [data-slot="base"],
+  [data-slot="input"],
+  [data-slot="label"] {
+    font-family: var(--font-primary) !important;
+  }
+
+  /* Override any default component library fonts */
+  [class*="heroui"],
+  [class*="nextui"],
+  [data-component],
+  button,
+  select,
+  option {
+    font-family: var(--font-primary) !important;
+  }
+
+  /* Ensure all interactive elements use tenant fonts */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  select,
+  textarea {
+    font-family: var(--font-primary) !important;
+  }
+
+  /* Georgian language support */
+  :lang(ka) {
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Enhanced text rendering for all languages */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Ensure proper line height for different scripts */
+  * {
+    line-height: 1.5;
+  }
+
+  /* Headings get better line height */
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
   }
 }

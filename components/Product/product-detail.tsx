@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+
 import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
 import { Specifications } from "./specifications";
@@ -17,7 +18,7 @@ type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResp
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
-  const addToCart = useCartStore((s) => s.addToCart);
+  const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
 
@@ -25,7 +26,9 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     setSelectedFacets((prev) => {
       const pk = Object.keys(prev),
         nk = Object.keys(next);
+
       if (pk.length === nk.length && pk.every((k) => prev[k] === next[k])) return prev;
+
       return next;
     });
 
@@ -37,13 +40,16 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     const tick = async () => {
       try {
         const fresh = await getProductById(product.id);
+
         if (!cancelled) setProduct(fresh);
       } catch {
         if (!cancelled) setNotFound(true);
       }
     };
+
     tick();
     const iv = setInterval(tick, 30_000);
+
     return () => {
       cancelled = true;
       clearInterval(iv);
@@ -63,17 +69,21 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       originalPrice: product.price,
       selectedFacets,
     };
+
     addToCart(item);
   };
 
   useEffect(() => {
     const handleScrollOrResize = () => {
       const scrollThreshold = isMobile ? 900 : 700;
+
       setIsPriceVisible(window.scrollY < scrollThreshold);
     };
+
     handleScrollOrResize();
     window.addEventListener("scroll", handleScrollOrResize);
     window.addEventListener("resize", handleScrollOrResize);
+
     return () => {
       window.removeEventListener("scroll", handleScrollOrResize);
       window.removeEventListener("resize", handleScrollOrResize);
@@ -90,8 +100,10 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     const grouped = product.productFacetValues.reduce(
       (acc, f) => {
         const name = f.facetName ?? "";
+
         if (!acc[name]) acc[name] = [];
         acc[name].push(f.facetValue ?? "");
+
         return acc;
       },
       {} as Record<string, string[]>,
@@ -140,7 +152,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             price={price}
             status={product.status}
             onAddToCart={handleAddToCart}
-            onBuyNow={() => console.log("Buy now clicked")}
+            onBuyNow={() => {}}
           />
         </div>
 
@@ -189,7 +201,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         status={product.status}
         stock={product.status}
         onAddToCart={handleAddToCart}
-        onBuyNow={() => console.log("Buy now clicked")}
+        onBuyNow={() => {}}
       />
     </div>
   );

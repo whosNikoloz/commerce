@@ -6,6 +6,8 @@ import { persist, createJSONStorage, StateStorage } from "zustand/middleware";
 import CryptoJS from "crypto-js";
 import { toast } from "sonner";
 
+import { getProductRestsByIds } from "../api/services/productService";
+
 export type CartItem = {
   discount: any;
   originalPrice?: ReactNode;
@@ -112,10 +114,10 @@ const creator: StateCreator<CartState> = (set, get) => ({
       const norm = normalizeFacets(item.selectedFacets);
       const pretty = norm
         ? " (" +
-          Object.entries(norm)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(", ") +
-          ")"
+        Object.entries(norm)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(", ") +
+        ")"
         : "";
 
       toast.success(`${item.name}${pretty} დაემატა კალათაში`);
@@ -162,37 +164,60 @@ const creator: StateCreator<CartState> = (set, get) => ({
 
   getSubtotal: () => get().cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
 
+  // checkAndAddToCart: async (item) => {
+  //   const variantKey = buildVariantKey(item.selectedFacets);
+
+  //   try {
+  //     const res =
+  //       typeof window !== "undefined"
+  //         ? await fetch("/api/check-product", {
+  //             method: "POST",
+  //             headers: { "Content-Type": "application/json" },
+  //             body: JSON.stringify({ id: item.id, variantKey }),
+  //           })
+  //         : null;
+
+  //     const ok =
+  //       !!res && res.ok
+  //         ? ((await res.json()) as { available: boolean; price?: number })
+  //         : { available: true };
+
+  //     if (!ok.available) {
+  //       toast.error("მარაგში აღარ არის");
+
+  //       return;
+  //     }
+
+  //     const merged = ok.price && ok.price > 0 ? { ...item, price: ok.price } : item;
+
+  //     get().addToCart(merged);
+  //   } catch {
+  //     toast.error("სერვერთან შემოწმება ვერ მოხერხდა");
+  //   }
+  // },
   checkAndAddToCart: async (item) => {
-    const variantKey = buildVariantKey(item.selectedFacets);
-
     try {
-      const res =
-        typeof window !== "undefined"
-          ? await fetch("/api/check-product", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id: item.id, variantKey }),
-            })
-          : null;
+      const rests = await getProductRestsByIds({ prods: [item.id] });
 
-      const ok =
-        !!res && res.ok
-          ? ((await res.json()) as { available: boolean; price?: number })
-          : { available: true };
+      if (rests.ex) {
+        toast.error("მარაგის შემოწმება ვერ მოხერხდა");
 
-      if (!ok.available) {
+        return;
+      }
+      const r = rests.summedRests.find(x => x.id === item.id);
+
+      if (!r || r.totalRest <= 0) {
         toast.error("მარაგში აღარ არის");
 
         return;
       }
 
-      const merged = ok.price && ok.price > 0 ? { ...item, price: ok.price } : item;
-
-      get().addToCart(merged);
+      get().addToCart(item);
     } catch {
-      toast.error("სერვერთან შემოწმება ვერ მოხერხდა");
+      toast.error("სერვერთან კავშირი ვერ მოხერხდა");
     }
   },
+
 });
 
 const encryptedStorage: StateStorage = {

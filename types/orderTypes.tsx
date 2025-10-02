@@ -1,4 +1,3 @@
-// types/order.ts
 export type OrderStatus =
     | "Pending"
     | "Paid"

@@ -175,9 +175,8 @@ const ProductCard = memo(function ProductCard({
                           <div className="relative overflow-hidden">
                             <Image
                               alt={`${product.name ?? "Product image"} ${idx + 1}`}
-                              className={`w-full ${
-                                viewMode === "grid" ? "aspect-square" : "h-40"
-                              } object-cover transition-transform duration-500 group-hover/image:scale-105`}
+                              className={`w-full ${viewMode === "grid" ? "aspect-square" : "h-40"
+                                } object-cover transition-transform duration-500 group-hover/image:scale-105`}
                               height={250}
                               priority={idx === 0}
                               src={src}
@@ -218,9 +217,8 @@ const ProductCard = memo(function ProductCard({
                                 <button
                                   aria-current={active ? "true" : undefined}
                                   aria-label={`Go to image ${i + 1} of ${images.length}`}
-                                  className={`h-2.5 w-2.5 rounded-full transition ${
-                                    active ? "bg-white" : "bg-white/60 hover:bg-white/80"
-                                  }`}
+                                  className={`h-2.5 w-2.5 rounded-full transition ${active ? "bg-white" : "bg-white/60 hover:bg-white/80"
+                                    }`}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -339,7 +337,7 @@ const ProductCard = memo(function ProductCard({
 });
 
 export default function ProductGrid({ products, viewMode }: ProductGridProps) {
-  const addToCart = useCartStore((s) => s.addToCart);
+  const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const [selectedImages, setSelectedImages] = useState<Record<string, number>>({});
 
   const handleAddToCart = (productId: string) => {

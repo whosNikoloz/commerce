@@ -92,7 +92,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
 
       {/* Hero Section with Gradient Background */}
       <section className="relative overflow-hidden bg-gradient-to-r from-brand-primary via-brand-primarydark to-brand-primary">
-        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute inset-0 bg-black/10" />
         <div className="container relative mx-auto px-4 py-16 md:px-6 md:py-24">
           {/* Breadcrumb */}
           <nav aria-label="breadcrumb" className="mb-8 text-sm">
@@ -152,7 +152,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
                   className="object-cover"
                   src="https://picsum.photos/id/257/900/600"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
 
               {/* Floating Stats Cards */}
@@ -225,7 +225,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 transition-opacity group-hover:opacity-5`}
-                ></div>
+                 />
 
                 <div
                   className={`mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.color} text-white shadow-lg`}
@@ -256,7 +256,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
           <div className="grid gap-8 md:grid-cols-2">
             {/* Tbilisi Card */}
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-primary to-brand-primarydark p-8 text-white">
-              <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+              <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16" />
               <div className="relative">
                 <div className="mb-4 flex items-center gap-3">
                   <MapPin className="h-6 w-6" />
@@ -283,7 +283,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
 
             {/* Regions Card */}
             <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-brand-surface p-8">
-              <div className="absolute top-0 right-0 h-32 w-32 bg-brand-surface rounded-full -mr-16 -mt-16"></div>
+              <div className="absolute top-0 right-0 h-32 w-32 bg-brand-surface rounded-full -mr-16 -mt-16" />
               <div className="relative">
                 <div className="mb-4 flex items-center gap-3">
                   <MapPin className="h-6 w-6 text-brand-primary" />
@@ -313,7 +313,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
 
       {/* CTA Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-brand-primary via-brand-primarydark to-brand-primary">
-        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute inset-0 bg-black/10" />
         <div className="container relative mx-auto px-4 py-16 text-center md:px-6 md:py-24">
           <h2 className="mb-6 text-3xl font-bold text-white md:text-4xl">მზად ხარ შეკვეთისთვის?</h2>
           <p className="mx-auto mb-8 max-w-2xl text-lg text-white/90">

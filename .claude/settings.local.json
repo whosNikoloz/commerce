@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep:*)",
+      "Bash(npx eslint:*)",
+      "Bash(xargs ls:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run dev:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(git checkout:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

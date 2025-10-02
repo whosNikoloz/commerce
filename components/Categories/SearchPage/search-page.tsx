@@ -127,7 +127,6 @@ export default function SearchPage({ query = "" }: { query?: string }) {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`;
 
-  const cards = Array.from({ length: 12 });
 
   return (
     <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>

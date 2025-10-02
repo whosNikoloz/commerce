@@ -71,9 +71,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function useUser() {
     const context = useContext(UserContext);
+
     if (!context) {
         throw new Error("useUser must be used within a UserProvider");
     }
+
     return context;
 }
 
@@ -110,6 +112,7 @@ const EncodeJwtIntoUser = (userToken: string): User => {
         decodedToken["Oauth"],
         decodedToken["joinedAt"]
     );
+
     return userData;
 };
 
@@ -120,10 +123,12 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
     useEffect(() => {
         const userJwt = localStorage.getItem("jwt");
         const userData = userJwt ? EncodeJwtIntoUser(userJwt) : null;
+
         if (userData) {
             const decodedToken: any = userJwt ? jwtDecode(userJwt) : null;
             const currentTime = new Date().getTime();
             const expirationTime = decodedToken.exp * 1000;
+
             if (currentTime < expirationTime) {
                 setUser(userData);
             } else {
@@ -135,6 +140,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
 
     const login = (userToken: string) => {
         const userData = EncodeJwtIntoUser(userToken);
+
         if (userData.userId != null) {
             setUser(userData);
         }
@@ -149,7 +155,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
     return (
         <UserContext.Provider value={{ user, login, logout }}>
             {loading ? (
-                <div className="h-screen bg-black"></div>
+                <div className="h-screen bg-black" />
             ) : (
                 children
             )}

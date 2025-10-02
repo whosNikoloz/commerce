@@ -10,22 +10,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Condition } from "@/types/enums";
 
 type ViewMode = "grid" | "list";
 
-function conditionLabel(c: Condition) {
-  switch (c) {
-    case Condition.New:
-      return "New";
-    case Condition.Used:
-      return "Used";
-    case Condition.LikeNew:
-      return "Like New";
-    default:
-      return String(c);
-  }
-}
 
 interface ProductHeaderProps {
   productCount: number;

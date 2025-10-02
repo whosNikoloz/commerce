@@ -90,7 +90,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
     return (
       <div
-        className={`space-y-1 ${level > 0 ? "ml-4 pl-3 border-l border-brand-muted dark:border-brand-muteddark" : ""}`}
+        className={`space-y-1 ${level > 0 ? "ml-4 pl-3 border-l-2 border-slate-200 dark:border-slate-700" : ""}`}
       >
         {visibleCats.map((cat) => {
           const isExpanded = expanded.has(cat.id);
@@ -104,11 +104,11 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
             <div key={cat.id} className="group">
               <div
                 className={[
-                  "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 relative border",
+                  "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 relative border-2",
                   isSelected
-                    ? "bg-gradient-to-r from-brand-surface to-brand-surface/70 dark:from-brand-surfacedark dark:to-brand-surfacedark/70 border-brand-muted dark:border-brand-muteddark shadow-sm"
-                    : "hover:bg-brand-surface dark:hover:bg-brand-surfacedark border-transparent",
-                  isHighlighted && !isSelected ? "outline outline-1 outline-brand-primary/40" : "",
+                    ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 border-orange-300 dark:border-orange-700 shadow-md"
+                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
+                  isHighlighted && !isSelected ? "ring-2 ring-orange-300 dark:ring-orange-700" : "",
                 ].join(" ")}
                 role="button"
                 onClick={() => handleCategorySelect(cat.id)}
@@ -120,8 +120,8 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     className={[
                       "p-1 rounded-md transition-all duration-200",
                       isSelected
-                        ? "hover:bg-brand-muted dark:hover:bg-brand-muteddark"
-                        : "hover:bg-brand-muted/70 dark:hover:bg-brand-muteddark/70",
+                        ? "hover:bg-orange-100 dark:hover:bg-orange-900/40"
+                        : "hover:bg-slate-100 dark:hover:bg-slate-700",
                     ].join(" ")}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -129,14 +129,14 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     }}
                   >
                     {isExpanded ? (
-                      <ChevronDown className="h-3.5 w-3.5 text-text-subtle" />
+                      <ChevronDown className={`h-3.5 w-3.5 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`} />
                     ) : (
-                      <ChevronRight className="h-3.5 w-3.5 text-text-subtle" />
+                      <ChevronRight className={`h-3.5 w-3.5 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`} />
                     )}
                   </button>
                 ) : (
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-muted" />
+                    <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-orange-500" : "bg-slate-400 dark:bg-slate-600"}`} />
                   </div>
                 )}
 
@@ -145,16 +145,16 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                   {hasChildCategories ? (
                     isExpanded ? (
                       <FolderOpen
-                        className={`h-4 w-4 ${isSelected ? "text-brand-primary" : "text-text-subtle"}`}
+                        className={`h-4 w-4 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`}
                       />
                     ) : (
                       <Folder
-                        className={`h-4 w-4 ${isSelected ? "text-brand-primary" : "text-text-subtle"}`}
+                        className={`h-4 w-4 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`}
                       />
                     )
                   ) : (
                     <Tag
-                      className={`h-4 w-4 ${isSelected ? "text-brand-primary" : "text-text-subtle"}`}
+                      className={`h-4 w-4 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`}
                     />
                   )}
                 </div>
@@ -162,11 +162,11 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                 {/* Name */}
                 <span
                   className={[
-                    "flex-1 text-sm font-medium truncate",
+                    "flex-1 text-sm font-semibold truncate",
                     isSelected
-                      ? "text-text-light dark:text-text-lightdark"
-                      : "text-text-light dark:text-text-lightdark",
-                    isHighlighted && !isSelected ? "underline decoration-brand-primary/50" : "",
+                      ? "text-orange-900 dark:text-orange-300"
+                      : "text-slate-900 dark:text-slate-100",
+                    isHighlighted && !isSelected ? "underline decoration-orange-500/50" : "",
                   ].join(" ")}
                   title={cat.name}
                 >
@@ -177,10 +177,10 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                 {childrenCount > 0 && (
                   <Badge
                     className={[
-                      "text-xs px-2 py-0.5 h-5 font-medium",
+                      "text-xs px-2 py-0.5 h-5 font-bold",
                       isSelected
-                        ? "bg-brand-primary/15 text-brand-primary"
-                        : "bg-brand-muted text-text-subtle dark:bg-brand-muteddark",
+                        ? "bg-orange-200 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300"
+                        : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
                     ].join(" ")}
                     variant="secondary"
                   >
@@ -205,16 +205,19 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
   const rootCategories = categories.filter((c) => c.parentId === null);
 
   return (
-    <Card className="lg:sticky lg:top-4 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60">
-      <CardHeader className="pb-3">
+    <Card className="lg:sticky lg:top-4 bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+      <CardHeader className="pb-3 relative">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-text-subtle" />
-            <CardTitle className="text-lg text-text-light dark:text-text-lightdark">
+            <div className="p-1.5 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg shadow-sm">
+              <Filter className="h-4 w-4 text-white" />
+            </div>
+            <CardTitle className="text-lg font-black text-slate-900 dark:text-slate-100">
               Categories
             </CardTitle>
             <Badge
-              className="text-xs font-normal bg-brand-muted text-text-subtle dark:bg-brand-muteddark"
+              className="text-xs font-bold bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800"
               variant="outline"
             >
               {rootCategories.length}
@@ -224,21 +227,21 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
           {selectedCategory !== null && (
             <Button
               aria-label="Clear selection"
-              className="h-7 w-7 p-0 text-text-subtle hover:text-text-light dark:hover:text-text-lightdark"
+              className="h-7 w-7 p-0 text-slate-500 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors"
               size="sm"
               variant="ghost"
               onClick={clearSelection}
             >
-              <X className="h-3 w-3" />
+              <X className="h-4 w-4" />
             </Button>
           )}
         </div>
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500 dark:text-orange-400 h-4 w-4" />
           <Input
-            className="pl-9 h-8 text-sm bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark"
+            className="pl-9 h-9 text-sm bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-orange-500 dark:focus:border-orange-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -246,32 +249,32 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 relative">
         <ScrollArea className="lg:h-[calc(100vh-320px)] pr-3">
           {categories.length === 0 ? (
             <div className="text-center py-8">
-              <Folder className="h-12 w-12 text-text-subtle/40 mx-auto mb-3" />
-              <p className="text-text-subtle text-sm">No categories found</p>
+              <Folder className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">No categories found</p>
             </div>
           ) : (
             <div className="space-y-2">
               {/* All Categories */}
               <div
                 className={[
-                  "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 border",
+                  "flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-300 border-2",
                   selectedCategory === null
-                    ? "bg-gradient-to-r from-brand-surface to-brand-surface/70 dark:from-brand-surfacedark dark:to-brand-surfacedark/70 border-brand-muted dark:border-brand-muteddark shadow-sm"
-                    : "hover:bg-brand-surface dark:hover:bg-brand-surfacedark border-transparent",
+                    ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 border-orange-300 dark:border-orange-700 shadow-md"
+                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
                 ].join(" ")}
                 role="button"
                 onClick={() => handleCategorySelect(null)}
               >
-                <Folder className="h-4 w-4 text-text-subtle" />
-                <span className="text-sm font-medium text-text-light dark:text-text-lightdark">
+                <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`} />
+                <span className={`text-sm font-semibold ${selectedCategory === null ? "text-orange-900 dark:text-orange-300" : "text-slate-900 dark:text-slate-100"}`}>
                   All Categories
                 </span>
                 <Badge
-                  className="text-xs px-2 py-0.5 h-5 font-medium bg-brand-muted text-text-subtle dark:bg-brand-muteddark"
+                  className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategory === null ? "bg-orange-200 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}
                   variant="secondary"
                 >
                   {rootCategories.length}

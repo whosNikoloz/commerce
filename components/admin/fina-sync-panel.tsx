@@ -27,9 +27,9 @@ type LogItem = {
 };
 
 const levelColor: Record<LogLevel, string> = {
-  info: "text-text-subtle",
-  success: "text-brand-primary",
-  error: "text-brand-primarydark",
+  info: "text-blue-600 dark:text-blue-400",
+  success: "text-emerald-600 dark:text-emerald-400",
+  error: "text-red-600 dark:text-red-400",
 };
 
 export default function FinaSyncPanel() {
@@ -131,22 +131,33 @@ export default function FinaSyncPanel() {
     <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
       {/* Left: Controls + Status (spans 2) */}
       <div className="xl:col-span-2 space-y-6">
-        <Card className="bg-brand-muted dark:bg-brand-muteddark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <ListChecks className="h-5 w-5 text-text-subtle" />
-              <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+        <Card className="bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
+          <CardHeader className="relative">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl shadow-md">
+                <ListChecks className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-xl font-black text-slate-900 dark:text-slate-100">
                 Controls
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 relative">
             <div className="grid grid-cols-2 gap-3">
-              <Button className="gap-2" disabled={busy} variant="secondary" onClick={onSyncAll}>
-                <RefreshCw className="h-4 w-4" />
+              <Button
+                className="gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                disabled={busy}
+                onClick={onSyncAll}
+              >
+                <RefreshCw className={`h-4 w-4 ${busy ? 'animate-spin' : ''}`} />
                 Sync All
               </Button>
-              <Button className="gap-2" disabled={busy} onClick={onAuthorization}>
+              <Button
+                className="gap-2 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                disabled={busy}
+                onClick={onAuthorization}
+              >
                 <Play className="h-4 w-4" />
                 Authorization
               </Button>
@@ -158,45 +169,75 @@ export default function FinaSyncPanel() {
           </CardContent>
         </Card>
 
-        <Card className="bg-brand-muted dark:bg-brand-muteddark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <RefreshCw className="h-5 w-5 text-text-subtle" />
-              <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+        <Card className="bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+          <CardHeader className="relative">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-md">
+                <RefreshCw className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-xl font-black text-slate-900 dark:text-slate-100">
                 Live Status
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="text-sm text-text-subtle">{status?.running ? "Running" : "Idle"}</div>
-            <div className="text-base font-medium text-text-light dark:text-text-lightdark">
-              {progressLabel}
+          <CardContent className="space-y-3 relative">
+            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Status</span>
+              <span className={`text-sm font-bold ${status?.running ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                {status?.running ? "Running" : "Idle"}
+              </span>
             </div>
-            <div className="text-xs text-text-subtle">{status?.message ?? ""}</div>
-            <div className="text-xs text-text-subtle">Started: {status?.startedAt ?? "—"}</div>
-            <div className="text-xs text-text-subtle">Finished: {status?.finishedAt ?? "—"}</div>
+            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Progress</span>
+              <span className="text-base font-bold text-slate-900 dark:text-slate-100">
+                {progressLabel}
+              </span>
+            </div>
+            {status?.message && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                <p className="text-xs font-medium text-blue-700 dark:text-blue-300">{status.message}</p>
+              </div>
+            )}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Started</span>
+                <span className="text-xs text-slate-600 dark:text-slate-300">{status?.startedAt ?? "—"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Finished</span>
+                <span className="text-xs text-slate-600 dark:text-slate-300">{status?.finishedAt ?? "—"}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Right: Logger (spans 3) */}
       <div className="xl:col-span-3">
-        <Card className="bg-brand-muted dark:bg-brand-muteddark border border-brand-muted dark:border-brand-muteddark backdrop-blur">
-          <CardHeader>
+        <Card className="bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+          <CardHeader className="relative">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Terminal className="h-5 w-5 text-text-subtle" />
-                <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl shadow-md">
+                  <Terminal className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-xl font-black text-slate-900 dark:text-slate-100">
                   Activity Log
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline" onClick={() => setLogs([])}>
+                <Button
+                  className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                  size="sm"
+                  onClick={() => setLogs([])}
+                >
                   Clear
                 </Button>
                 <Button
+                  className="bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                   size="sm"
-                  variant="secondary"
                   onClick={() => {
                     const blob = new Blob(
                       [logs.map((l) => `[${l.t}] ${l.level.toUpperCase()} - ${l.msg}`).join("\n")],
@@ -217,31 +258,31 @@ export default function FinaSyncPanel() {
             </div>
           </CardHeader>
 
-          <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
+          <CardContent className="overflow-auto max-h-[calc(100lvh-210px)] relative">
             <Table>
-              <TableHeader className="bg-brand-surface/60 dark:bg-brand-surfacedark/60">
-                <TableRow>
-                  <TableHead className="w-[220px] text-text-subtle">Time</TableHead>
-                  <TableHead className="text-text-subtle">Message</TableHead>
+              <TableHeader className="bg-slate-100 dark:bg-slate-800/60 sticky top-0">
+                <TableRow className="border-b-2 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+                  <TableHead className="w-[220px] text-slate-600 dark:text-slate-400 font-bold">Time</TableHead>
+                  <TableHead className="text-slate-600 dark:text-slate-400 font-bold">Message</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {logs.map((l) => (
                   <TableRow
                     key={l.id}
-                    className="hover:bg-brand-surface/60 dark:hover:bg-brand-surfacedark/60"
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors duration-200 border-b border-slate-200/50 dark:border-slate-700/50"
                   >
-                    <TableCell className="align-top text-xs text-text-subtle">
+                    <TableCell className="align-top text-xs font-medium text-slate-500 dark:text-slate-400">
                       {new Date(l.t).toLocaleString()}
                     </TableCell>
-                    <TableCell className={`align-top text-sm ${levelColor[l.level]}`}>
+                    <TableCell className={`align-top text-sm font-medium ${levelColor[l.level]}`}>
                       {l.msg}
                     </TableCell>
                   </TableRow>
                 ))}
                 {logs.length === 0 && (
                   <TableRow>
-                    <TableCell className="text-center py-8 text-text-subtle" colSpan={2}>
+                    <TableCell className="text-center py-12 text-slate-500 dark:text-slate-400 font-medium" colSpan={2}>
                       No activity yet.
                     </TableCell>
                   </TableRow>

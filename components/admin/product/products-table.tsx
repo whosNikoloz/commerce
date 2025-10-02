@@ -241,18 +241,18 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   // ——— Token-based status/condition badges ———
   const getStatusClass = (status: StockStatus) =>
     status === StockStatus.InStock
-      ? "bg-brand-primary/15 text-brand-primary dark:bg-brand-primary/20"
-      : "bg-text-subtle/15 text-text-subtle";
+      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400"
+      : "bg-slate-50 text-slate-600 dark:bg-slate-800/50 dark:text-slate-400";
 
   const getStatusLabel = (status: StockStatus) =>
     status === StockStatus.InStock ? "მარაგშია" : "არ არის მარაგში";
 
   const getConditionClass = (condition: Condition) =>
     condition === Condition.New
-      ? "bg-brand-primary/12 text-brand-primary"
+      ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
       : condition === Condition.Used
-        ? "bg-text-subtle/15 text-text-subtle"
-        : "bg-brand-primarydark/12 text-brand-primarydark";
+        ? "bg-slate-50 text-slate-600 dark:bg-slate-800/50 dark:text-slate-400"
+        : "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400";
 
   const getConditionLabel = (condition: Condition) =>
     condition === Condition.New
@@ -262,7 +262,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         : "როგორც ახალი";
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
-    <Card className="group hover:shadow-lg transition-all duration-200 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60">
+    <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-700">
       <CardContent className="p-4">
         <div className="relative mb-3">
           <div className="relative w-full h-40 sm:h-48">
@@ -275,22 +275,22 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               src={product.images?.[0] || "/placeholder.png"}
             />
             {product.images && product.images.length > 1 && (
-              <span className="absolute top-2 right-2 bg-brand-primary/90 text-white text-xs px-2 py-1 rounded-full">
+              <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
                 +{product.images.length}
               </span>
             )}
             <div className="absolute top-2 left-2">
               {product.isActive ? (
-                <Eye className="h-4 w-4 text-brand-primary" />
+                <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <EyeOff className="h-4 w-4 text-text-subtle" />
+                <EyeOff className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               )}
             </div>
           </div>
         </div>
 
         <div className="space-y-2">
-          <h3 className="font-semibold text-sm line-clamp-2 text-text-light dark:text-text-lightdark">
+          <h3 className="font-semibold text-sm line-clamp-2 text-slate-900 dark:text-slate-100">
             {product.name}
           </h3>
 
@@ -307,20 +307,20 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             <div className="font-medium">
               {product.discountPrice ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-text-subtle line-through text-sm">{product.price} ₾</span>
-                  <span className="text-brand-primarydark text-sm font-bold">
+                  <span className="text-slate-500 dark:text-slate-400 line-through text-sm">{product.price} ₾</span>
+                  <span className="text-blue-700 dark:text-blue-400 text-sm font-bold">
                     {product.discountPrice} ₾
                   </span>
                 </div>
               ) : (
-                <span className="text-brand-primarydark text-sm font-bold">{product.price} ₾</span>
+                <span className="text-blue-700 dark:text-blue-400 text-sm font-bold">{product.price} ₾</span>
               )}
             </div>
 
             <div className="flex items-center gap-1">
               <Switch
                 checked={product.isActive}
-                className="data-[state=checked]:bg-brand-primary"
+                className="data-[state=checked]:bg-blue-600"
                 onCheckedChange={() => toggleProductVisibility(product.id)}
               />
               <UpdateProductModal
@@ -358,15 +358,16 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
         {/* Main */}
         <div className="lg:col-span-3">
-          <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60">
-            <CardHeader className="pb-4">
+          <Card className="bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+            <CardHeader className="pb-4 relative">
               <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 flex-1">
                   {/* Mobile: open categories */}
                   <Sheet>
                     <SheetTrigger asChild>
                       <Button
-                        className="lg:hidden shrink-0 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+                        className="lg:hidden shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
                         size="sm"
                         variant="outline"
                       >
@@ -375,11 +376,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       </Button>
                     </SheetTrigger>
                     <SheetContent
-                      className="h-[85vh] p-0 bg-brand-surface dark:bg-brand-surfacedark"
+                      className="h-[85vh] p-0 bg-white dark:bg-slate-900"
                       side="bottom"
                     >
                       <SheetHeader className="px-6 pt-6 mb-6">
-                        <SheetTitle className="text-text-light dark:text-text-lightdark">
+                        <SheetTitle className="text-slate-900 dark:text-slate-100">
                           Categories
                         </SheetTitle>
                       </SheetHeader>
@@ -396,10 +397,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
                   {/* Search */}
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500 dark:text-orange-400 h-4 w-4" />
                     <Input
                       aria-label="Search products"
-                      className="pl-10 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark placeholder:text-text-subtle dark:placeholder:text-text-subtledark"
+                      className="pl-10 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 focus:border-orange-500 dark:focus:border-orange-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
                       placeholder="Search products..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -413,11 +414,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                     value={statusFilter}
                     onValueChange={(v: "all" | "active" | "inactive") => setStatusFilter(v)}
                   >
-                    <SelectTrigger className="w-32 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark">
+                    <SelectTrigger className="w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
                       <Filter className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
-                    <SelectContent className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark">
+                    <SelectContent className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800">
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
@@ -425,11 +426,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   </Select>
 
                   <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
-                    <SelectTrigger className="w-32 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark">
+                    <SelectTrigger className="w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
                       <SortAsc className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Sort" />
                     </SelectTrigger>
-                    <SelectContent className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark">
+                    <SelectContent className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800">
                       <SelectItem value="name">Name</SelectItem>
                       <SelectItem value="price">Price</SelectItem>
                       <SelectItem value="status">Status</SelectItem>
@@ -437,14 +438,14 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   </Select>
 
                   <Separator
-                    className="h-6 hidden md:block bg-brand-muted dark:bg-brand-muteddark"
+                    className="h-6 hidden md:block bg-slate-200 dark:bg-slate-800"
                     orientation="vertical"
                   />
 
-                  <div className="flex items-center border rounded-md overflow-hidden border-brand-muted dark:border-brand-muteddark">
+                  <div className="flex items-center border-2 rounded-lg overflow-hidden border-slate-200 dark:border-slate-700">
                     <Button
                       aria-pressed={viewMode === "table"}
-                      className="rounded-none"
+                      className={`rounded-none ${viewMode === "table" ? "bg-gradient-to-r from-orange-500 to-red-600 text-white" : "text-slate-700 dark:text-slate-300"}`}
                       size="sm"
                       variant={viewMode === "table" ? "default" : "ghost"}
                       onClick={() => setViewMode("table")}
@@ -453,7 +454,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                     </Button>
                     <Button
                       aria-pressed={viewMode === "grid"}
-                      className="rounded-none"
+                      className={`rounded-none ${viewMode === "grid" ? "bg-gradient-to-r from-orange-500 to-red-600 text-white" : "text-slate-700 dark:text-slate-300"}`}
                       size="sm"
                       variant={viewMode === "grid" ? "default" : "ghost"}
                       onClick={() => setViewMode("grid")}
@@ -465,7 +466,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               </div>
 
               {selectedCategoryId && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-text-subtle">
+                <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Package className="h-4 w-4" />
                   <span>
                     {isPending
@@ -480,11 +481,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               <div className="max-h-[calc(100vh-280px)] overflow-auto">
                 {!selectedCategoryId ? (
                   <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
-                    <Package className="h-14 w-14 text-text-subtle/40 mb-4" />
-                    <h3 className="text-base md:text-lg font-semibold text-text-subtle mb-2">
+                    <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
+                    <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
                       Select a Category
                     </h3>
-                    <p className="text-text-subtle max-w-sm">
+                    <p className="text-slate-500 dark:text-slate-400 max-w-sm">
                       Choose a category from the sidebar (or button on mobile) to view and manage
                       products.
                     </p>
@@ -492,15 +493,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 ) : loading ? (
                   <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
-                      <RefreshCw className="h-5 w-5 animate-spin text-brand-primary" />
-                      <span className="text-text-subtle">Loading products...</span>
+                      <RefreshCw className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+                      <span className="text-slate-600 dark:text-slate-400">Loading products...</span>
                     </div>
                   </div>
                 ) : error ? (
                   <div className="text-center py-12 px-6">
                     <div className="text-red-500 mb-2">{error}</div>
                     <Button
-                      className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+                      className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
                       variant="outline"
                       onClick={() => location.reload()}
                     >
@@ -509,11 +510,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   </div>
                 ) : filteredAndSortedProducts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-                    <Package className="h-14 w-14 text-text-subtle/40 mb-4" />
-                    <h3 className="text-base md:text-lg font-semibold text-text-subtle mb-2">
+                    <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
+                    <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
                       No Products Found
                     </h3>
-                    <p className="text-text-subtle max-w-sm">
+                    <p className="text-slate-500 dark:text-slate-400 max-w-sm">
                       {debouncedSearch
                         ? "Try adjusting your search terms"
                         : "No products available in this category"}
@@ -528,46 +529,46 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                     </div>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto relative">
                     <Table>
-                      <TableHeader className="bg-brand-surface/60 dark:bg-brand-surfacedark/60">
-                        <TableRow>
-                          <TableHead className="w-[72px] sm:w-[80px] text-text-subtle">
+                      <TableHeader className="bg-slate-100 dark:bg-slate-800/60 sticky top-0">
+                        <TableRow className="border-b-2 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+                          <TableHead className="w-[72px] sm:w-[80px] text-slate-700 dark:text-slate-300 font-bold">
                             Image
                           </TableHead>
-                          <TableHead className="text-text-subtle">Product</TableHead>
-                          <TableHead className="whitespace-nowrap text-text-subtle">
+                          <TableHead className="text-slate-700 dark:text-slate-300 font-bold">Product</TableHead>
+                          <TableHead className="whitespace-nowrap text-slate-700 dark:text-slate-300 font-bold">
                             Price
                           </TableHead>
-                          <TableHead className="hidden md:table-cell text-text-subtle">
+                          <TableHead className="hidden md:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             Status
                           </TableHead>
-                          <TableHead className="hidden lg:table-cell text-text-subtle">
+                          <TableHead className="hidden lg:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             Condition
                           </TableHead>
-                          <TableHead className="hidden sm:table-cell text-text-subtle">
+                          <TableHead className="hidden sm:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             Visible
                           </TableHead>
-                          <TableHead className="text-right text-text-subtle">Actions</TableHead>
+                          <TableHead className="text-right text-slate-700 dark:text-slate-300 font-bold">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredAndSortedProducts.map((product) => (
                           <TableRow
                             key={product.id}
-                            className="hover:bg-brand-surface/60 dark:hover:bg-brand-surfacedark/60"
+                            className="hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 dark:hover:from-orange-950/20 dark:hover:to-red-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
                           >
                             <TableCell>
                               <div className="relative w-16 h-16">
                                 <Image
                                   alt={product.name ?? "Product"}
-                                  className="rounded-lg object-cover ring-1 ring-brand-muted dark:ring-brand-muteddark"
+                                  className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
                                   height={64}
                                   src={product.images?.[0] || "/placeholder.png"}
                                   width={64}
                                 />
                                 {product.images && product.images.length > 1 && (
-                                  <span className="absolute -top-2 -right-2 bg-brand-primary text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
                                     +{product.images.length}
                                   </span>
                                 )}
@@ -575,10 +576,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             </TableCell>
                             <TableCell>
                               <div className="space-y-1">
-                                <div className="font-medium text-text-light dark:text-text-lightdark line-clamp-2">
+                                <div className="font-medium text-slate-900 dark:text-slate-100 line-clamp-2">
                                   {product.name}
                                 </div>
-                                <div className="text-xs text-text-subtle">ID: {product.id}</div>
+                                <div className="text-xs text-slate-500 dark:text-slate-400">ID: {product.id}</div>
                                 <div className="mt-2 flex flex-wrap gap-1 md:hidden">
                                   <Badge
                                     className={getStatusClass(product.status)}
@@ -598,15 +599,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             <TableCell className="whitespace-nowrap">
                               {product.discountPrice ? (
                                 <div className="space-y-1">
-                                  <div className="text-text-subtle line-through text-sm">
+                                  <div className="text-slate-500 dark:text-slate-400 line-through text-sm">
                                     {product.price} ₾
                                   </div>
-                                  <div className="text-brand-primarydark font-bold">
+                                  <div className="text-blue-700 dark:text-blue-400 font-bold">
                                     {product.discountPrice} ₾
                                   </div>
                                 </div>
                               ) : (
-                                <div className="text-brand-primarydark font-bold">
+                                <div className="text-blue-700 dark:text-blue-400 font-bold">
                                   {product.price} ₾
                                 </div>
                               )}
@@ -627,7 +628,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             <TableCell className="hidden sm:table-cell">
                               <Switch
                                 checked={product.isActive}
-                                className="data-[state=checked]:bg-brand-primary"
+                                className="data-[state=checked]:bg-blue-600"
                                 onCheckedChange={() => toggleProductVisibility(product.id)}
                               />
                             </TableCell>
@@ -636,7 +637,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                 <div className="sm:hidden mr-1">
                                   <Switch
                                     checked={product.isActive}
-                                    className="data-[state=checked]:bg-brand-primary"
+                                    className="data-[state=checked]:bg-blue-600"
                                     onCheckedChange={() => toggleProductVisibility(product.id)}
                                   />
                                 </div>

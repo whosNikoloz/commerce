@@ -8,6 +8,7 @@ import NextLink from "next/link";
 import { ChevronLeft, ChevronRight, Package, Clock, AlertTriangle, Heart } from "lucide-react";
 
 import { Button } from "../ui/button";
+
 import { getAllProducts } from "@/app/api/services/productService";
 import { useCartStore, CartItem } from "@/app/context/cartContext";
 
@@ -28,10 +29,13 @@ type CarouselItem = {
 function sampleArray<T>(arr: T[], n: number): T[] {
   if (n >= arr.length) return [...arr];
   const copy = [...arr];
+
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
+
   return copy.slice(0, n);
 }
 
@@ -148,6 +152,7 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
       image: c.image,
       quantity: 1,
     };
+
     addToCart(item);
   };
 
@@ -162,6 +167,7 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
           : all;
 
         const picked = sampleArray(filtered, count).map(toCarouselItem);
+
         setItems(picked);
         setCurrentSlide(0);
       } catch (e) {
@@ -242,11 +248,11 @@ export function ProductCarousel({ count = 4, onlyDiscounted = false }: Props) {
                       <div className="relative overflow-hidden rounded-3xl">
                         <div className="relative aspect-square md:aspect-[4/3] md:h-96">
                           <Image
-                            alt={product.name}
-                            src={product.image || "/placeholder.png"}
                             fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                            alt={product.name}
                             className="object-cover"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                            src={product.image || "/placeholder.png"}
                           />
                         </div>
 

@@ -103,9 +103,9 @@ export default async function ProductPage({ params }: DetailPageProps) {
   return (
     <>
       <Script
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         id="ld-product"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ProductDetail initialProduct={product} initialSimilar={[]} />
     </>

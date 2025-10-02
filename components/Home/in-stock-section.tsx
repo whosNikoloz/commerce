@@ -36,6 +36,7 @@ export function InStockSection({ pageSize = 8, sortBy = "featured" }: Props) {
         : 0,
       originalPrice: product.price,
     };
+
     addToCart(item);
   };
 
@@ -48,6 +49,7 @@ export function InStockSection({ pageSize = 8, sortBy = "featured" }: Props) {
           pageSize,
           sortBy,
         });
+
         setItems(res.items ?? []);
       } catch (e) {
         console.error(e);
@@ -123,12 +125,12 @@ export function InStockSection({ pageSize = 8, sortBy = "featured" }: Props) {
                   <div className="relative overflow-hidden">
                     <div className="relative aspect-square md:aspect-[4/3]">
                       <Image
-                        alt={p.name ?? "Product"}
-                        src={p.images?.[0] ?? "/placeholder.png"}
                         fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        alt={p.name ?? "Product"}
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        src={p.images?.[0] ?? "/placeholder.png"}
                       />
                     </div>
 

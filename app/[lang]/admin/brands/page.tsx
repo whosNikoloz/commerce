@@ -33,11 +33,14 @@ export default async function BrandsPage() {
   const brands = await getBrandsCached();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light">
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-purple-900 to-violet-900 dark:from-slate-100 dark:via-purple-100 dark:to-violet-100 bg-clip-text text-transparent">
           Brands
         </h1>
+        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
+          Manage your brand catalog and origins
+        </p>
       </div>
 
       <BrandsTable Brands={brands} />

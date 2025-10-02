@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
+
+import { headers } from "next/headers";
+
 import { i18nPageMetadataAsync, getActiveSite } from "@/lib/seo";
-import { BrandPartners } from "@/components/Home/brand-partners";
-import { CategoryGrid } from "@/components/Home/category-grid";
-import { ComingSoonSection } from "@/components/Home/coming-soon-section";
-import { InStockSection } from "@/components/Home/in-stock-section";
-import { LiquidationSection } from "@/components/Home/liquidation-section";
-import { ModernHero } from "@/components/Home/modern-hero";
-import { NewsletterSignup } from "@/components/Home/newsletter-signup";
-import { PopularProducts } from "@/components/Home/popular-products";
-import { ProductCarousel } from "@/components/Home/product-carousel";
-import { StatsShowcase } from "@/components/Home/stats-showcase";
-import { VideoShowcase } from "@/components/Home/video-showcase";
 import { Locale } from "@/i18n.config";
+import { TENANTS, DEFAULT_TENANT } from "@/config/tenat";
+import HomeRenderer from "@/components/Home/HomeRenderer";
 
 export const revalidate = 300;
 
@@ -27,7 +21,7 @@ export async function generateMetadata({
     title: site.name ?? "Home",
     description:
       site.description ??
-      "Premium products, fast delivery, secure checkout. Discover what’s new, in stock, and on sale.",
+      "Premium products, fast delivery, secure checkout. Discover what's new, in stock, and on sale.",
     lang,
     path: "/",
     images: [site.ogImage],
@@ -35,20 +29,17 @@ export async function generateMetadata({
   });
 }
 
-export default function HomePage() {
-  return (
-    <main className="min-h-screen mt-20 md:mt-0">
-      <ModernHero />
-      <PopularProducts />
-      <CategoryGrid />
-      <BrandPartners />
-      <ProductCarousel />
-      <InStockSection />
-      <LiquidationSection />
-      <VideoShowcase />
-      <ComingSoonSection />
-      <StatsShowcase />
-      <NewsletterSignup />
-    </main>
-  );
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const { lang } = await params;
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3000";
+
+  // Get tenant configuration based on host
+  const tenant = TENANTS[host] || DEFAULT_TENANT;
+
+  return <HomeRenderer locale={lang} tenant={tenant} />;
 }

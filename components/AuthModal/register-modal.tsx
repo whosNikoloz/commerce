@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+
 import { InputLoadingBtn } from "./input-loading-button";
 
 import {
@@ -69,24 +70,29 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     // Basic client-side validation
     if (!username) {
       setRegUserNameError(lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field");
+
       return;
     }
     if (!email) {
       setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
+
       return;
     }
     if (!isValidEmail(email)) {
       setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+
       return;
     }
     if (!password) {
       setRegError(lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
+
       return;
     }
     if (password.length < 6) {
       setRegPasswordError(
         lng === "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols"
       );
+
       return;
     }
     if (!confirmPassword) {
@@ -95,10 +101,12 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
           ? "შეავსე პაროლის დადასტურების ველი"
           : "Please fill in the ConfirmPassword field"
       );
+
       return;
     }
     if (password !== confirmPassword) {
       setConfirmPasswordError(lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match");
+
       return;
     }
 
@@ -121,13 +129,16 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     setEmailAvailable(null);
 
     const email = registrationState.email;
+
     if (!email) {
       setRegEmailHasBlurred(false);
+
       return;
     }
     if (!isValidEmail(email)) {
       setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
       setRegEmailHasBlurred(false);
+
       return;
     }
 
@@ -137,6 +148,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
       // ✅ check availability (API returns { success: boolean } semantics)
       const r = await checkEmailRegister(email);
       const ok = !!r?.success;
+
       setEmailAvailable(ok);
 
       if (!ok && (r as any)?.result) {
@@ -157,8 +169,10 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     setUsernameAvailable(null);
 
     const username = registrationState.username;
+
     if (!username) {
       setRegUserNameHasBlurred(false);
+
       return;
     }
 
@@ -167,6 +181,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     try {
       const r = await checkUserNameRegister(username);
       const ok = !!r?.success;
+
       setUsernameAvailable(ok);
 
       if (!ok && (r as any)?.result) {
@@ -197,6 +212,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
 
   const handleBlurConfirmPassword = () => {
     const { password, confirmPassword } = registrationState;
+
     if (!confirmPassword) return;
     setConfirmPasswordError(
       password !== confirmPassword
@@ -207,6 +223,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
 
   const handleBlurPassword = () => {
     const { password } = registrationState;
+
     if (!password) return;
     setRegPasswordError(
       password.length < 6
@@ -231,6 +248,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     <div className="space-y-3">
       <Input
         ref={regRef}
+        isClearable
         classNames={{
           input: ["text-[16px]"],
           inputWrapper: [
@@ -244,8 +262,6 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
             <InputLoadingBtn loading={Regusernameloader} success={usernameAvailable === true} />
           ) : null
         }
-        isClearable
-        onClear={handleRegUserNameClear}
         errorMessage={regUserNameError}
         isInvalid={regUserNameError !== ""}
         label={regData.username}
@@ -259,9 +275,11 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
             username: e.target.value,
           }))
         }
+        onClear={handleRegUserNameClear}
       />
 
       <Input
+        isClearable
         classNames={{
           input: ["text-[16px]"],
           inputWrapper: [
@@ -275,8 +293,6 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
             <InputLoadingBtn loading={Regemailloader} success={emailAvailable === true} />
           ) : null
         }
-        isClearable
-        onClear={handleRegEmailClear}
         errorMessage={regEmailError}
         isInvalid={regEmailError !== ""}
         label={regData.email}
@@ -290,6 +306,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
             email: e.target.value,
           }))
         }
+        onClear={handleRegEmailClear}
       />
 
       <Input

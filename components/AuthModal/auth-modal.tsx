@@ -18,6 +18,7 @@ import { GoBackButton } from "../go-back-button";
 import LoginModal from "./login-modal";
 import RegisterModal from "./register-modal";
 import ForgotPasswordModal from "./forgot-password-modal";
+
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const AuthData = {
@@ -94,6 +95,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   const [authMode, setAuthMode] = useState("login");
   const lng = "ka"; // This can be made dynamic if needed
   const { regData, loginData, forgotData } = AuthData[lng];
+
   useBodyScrollLock(isOpen);
 
 

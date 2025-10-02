@@ -22,12 +22,12 @@ export async function generateMetadata({
 
 export default async function AdminSyncPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light">
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-4xl md:text-5xl h-14 font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-cyan-900 dark:from-slate-100 dark:via-blue-100 dark:to-cyan-100 bg-clip-text text-transparent">
           Synchronization
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
           Trigger sync jobs, monitor status, and view a live activity log.
         </p>
       </div>

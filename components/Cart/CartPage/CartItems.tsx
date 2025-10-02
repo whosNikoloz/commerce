@@ -1,13 +1,15 @@
+// app/(routes)/cart/CartItems.tsx
 "use client";
 
 import Image from "next/image";
-import { Minus, Plus, Trash2 } from "lucide-react";
-
+import { Minus, Plus, Trash2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/app/context/cartContext";
 import { CartItemType } from "@/types/cart";
+import { useEffect } from "react";
+import { AvailabilityMap } from "./cart-page";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
@@ -18,18 +20,26 @@ const percent = (o: number, c: number) => Math.max(0, Math.round(((o - c) / o) *
 function formatSpecs(facets?: Record<string, string>) {
   if (!facets) return "";
   const entries = Object.entries(facets);
-
   if (!entries.length) return "";
-
   return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
 }
 
-export default function CartItems() {
+export default function CartItems({ availability = {} as AvailabilityMap }) {
   const cart = useCartStore((s) => s.cart);
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
 
-  const items = cart as Array<CartItemType & { originalPrice?: number }>;
+  const items = (cart as Array<CartItemType & { originalPrice?: number }>) ?? [];
+
+  useEffect(() => {
+    for (const it of items) {
+      const qty = toNumber(it.quantity);
+      const maxAvail = Number(availability[String(it.id)] ?? 0);
+      if (qty > maxAvail) {
+        updateCartItem(it.id, Math.max(0, maxAvail), (it as any).variantKey);
+      }
+    }
+  }, [JSON.stringify(availability)]);
 
   return (
     <div className="space-y-3">
@@ -41,10 +51,16 @@ export default function CartItems() {
         const quantity = toNumber(item.quantity);
         const specsLine = formatSpecs(item.selectedFacets);
 
+        const available = Number(availability[String(item.id)] ?? 0);
+        const outOfStock = available <= 0;
+
         return (
           <Card
             key={`${item.id}-${(item as any).variantKey ?? ""}`}
-            className="p-3 sm:p-4 md:p-5 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50"
+            className={`p-3 sm:p-4 md:p-5 bg-brand-surface dark:bg-brand-surfacedark border ${outOfStock
+              ? "border-red-300/70 dark:border-red-400/40"
+              : "border-brand-muted/60 dark:border-brand-muteddark/50"
+              }`}
           >
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_160px_48px] md:items-center">
               {/* left */}
@@ -67,9 +83,9 @@ export default function CartItems() {
                     {item.name}
                   </h3>
 
-                  {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
+                  {!!specsLine && (
                     <div className="mt-1 flex flex-wrap gap-1">
-                      {Object.entries(item.selectedFacets).map(([k, v]) => (
+                      {Object.entries(item.selectedFacets!).map(([k, v]) => (
                         <Badge
                           key={k}
                           className="h-5 text-[11px] px-1.5 bg-brand-muted/60 dark:bg-brand-muteddark/50 text-text-light dark:text-text-lightdark border border-brand-muted/60 dark:border-brand-muteddark/50"
@@ -80,6 +96,25 @@ export default function CartItems() {
                       ))}
                     </div>
                   )}
+
+                  {/* stock info */}
+                  <div className="mt-2 flex items-center gap-2">
+                    {outOfStock ? (
+                      <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
+                        არ არის მარაგში
+                      </Badge>
+                    ) : (
+                      <Badge className="text-[11px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                        მარაგი: {available} ც.
+                      </Badge>
+                    )}
+                    {quantity > available && (
+                      <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                        <AlertTriangle className="h-3.5 w-3.5" />
+                        მოთხოვნილი რაოდენობა აღემატება მარაგს — დავაკლამპე {available}-ზე
+                      </span>
+                    )}
+                  </div>
 
                   {/* mobile price */}
                   <div className="mt-2 md:hidden">
@@ -112,7 +147,7 @@ export default function CartItems() {
                     size="sm"
                     variant="ghost"
                     onClick={() =>
-                      updateCartItem(item.id, Math.max(1, quantity - 1), item.variantKey)
+                      updateCartItem(item.id, Math.max(1, quantity - 1), (item as any).variantKey)
                     }
                   >
                     <Minus className="h-4 w-4" />
@@ -125,7 +160,11 @@ export default function CartItems() {
                     className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"
                     size="sm"
                     variant="ghost"
-                    onClick={() => updateCartItem(item.id, quantity + 1, item.variantKey)}
+                    disabled={outOfStock || quantity >= available}
+                    onClick={() => {
+                      const next = Math.min(quantity + 1, available);
+                      updateCartItem(item.id, next, (item as any).variantKey);
+                    }}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -160,7 +199,7 @@ export default function CartItems() {
                     className="text-text-subtle dark:text-text-subtledark hover:text-red-600 dark:hover:text-red-400"
                     size="icon"
                     variant="ghost"
-                    onClick={() => removeFromCart(item.id, item.variantKey)}
+                    onClick={() => removeFromCart(item.id, (item as any).variantKey)}
                   >
                     <Trash2 className="h-5 w-5" />
                   </Button>

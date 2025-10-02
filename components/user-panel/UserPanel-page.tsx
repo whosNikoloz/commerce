@@ -3,6 +3,26 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  User as UserIcon,
+  Package,
+  Heart,
+  Settings,
+  Shield,
+  CreditCard,
+  MapPin,
+  Truck,
+  Star,
+  Eye,
+  Trash2,
+  ShoppingCart,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  MapPin as MapPinIcon,
+} from "lucide-react";
+
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -26,25 +46,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  User as UserIcon,
-  Package,
-  Heart,
-  Settings,
-  Shield,
-  CreditCard,
-  MapPin,
-  Truck,
-  Star,
-  Eye,
-  Trash2,
-  ShoppingCart,
-  Download,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  MapPin as MapPinIcon,
-} from "lucide-react";
 import { getMyOrders, getWishlist, getOrderById, getTracking, downloadInvoiceFile } from "@/app/api/services/orderService";
 import { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/orderTypes";
 
@@ -101,11 +102,11 @@ function NotificationArea({
             <span className="text-sm text-green-800">{message}</span>
           </div>
           <Button
+            aria-label="Dismiss notification"
             className="h-6 w-6 p-0 text-green-600 hover:text-green-800"
             size="sm"
             variant="ghost"
             onClick={() => onDismiss(orderId)}
-            aria-label="Dismiss notification"
           >
             ×
           </Button>
@@ -163,11 +164,13 @@ export default function UserPanel() {
   // load orders
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
         setLoadingOrders(true);
         setErrorOrders(null);
         const res = await getMyOrders(paged.page, paged.pageSize);
+
         if (!mounted) return;
         setPaged((p) => ({ ...p, total: res.total }));
         setOrders(res.data);
@@ -178,6 +181,7 @@ export default function UserPanel() {
         mounted && setLoadingOrders(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
@@ -186,11 +190,13 @@ export default function UserPanel() {
   // load wishlist
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
         setLoadingWishlist(true);
         setErrorWishlist(null);
         const items = await getWishlist();
+
         if (!mounted) return;
         setWishlist(items);
       } catch (e: any) {
@@ -200,6 +206,7 @@ export default function UserPanel() {
         mounted && setLoadingWishlist(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
@@ -220,10 +227,12 @@ export default function UserPanel() {
   const ensureOrderDetailLoaded = async (orderId: string) => {
     const found = orders.find((o) => o.id === orderId);
     const isDetail = !!(found as OrderDetail)?.orderItems;
+
     if (found && !isDetail) {
       try {
         setOrderActions((a) => ({ ...a, [`load-${orderId}`]: true }));
         const detail = await getOrderById(orderId);
+
         setOrders((prev) => prev.map((o) => (o.id === orderId ? detail : o)));
       } finally {
         setOrderActions((a) => ({ ...a, [`load-${orderId}`]: false }));
@@ -240,6 +249,7 @@ export default function UserPanel() {
     setOrderActions((p) => ({ ...p, [`track-${orderId}`]: true }));
     try {
       const steps = await getTracking(trackingNumber);
+
       setOrders((prev) =>
         prev.map((o) =>
           o.id === orderId
@@ -266,6 +276,7 @@ export default function UserPanel() {
     try {
       const { blobUrl, fileName } = await downloadInvoiceFile(orderId);
       const a = document.createElement("a");
+
       a.href = blobUrl;
       a.download = fileName;
       a.click();
@@ -299,7 +310,9 @@ export default function UserPanel() {
   const dismissNotification = (orderId: string) =>
     setNotifications((p) => {
       const n = { ...p };
+
       delete n[orderId];
+
       return n;
     });
 
@@ -387,9 +400,9 @@ export default function UserPanel() {
     if (!orders.length) {
       return (
         <EmptyState
+          desc="When you place an order, it will appear here."
           icon={<Package />}
           title="No orders yet"
-          desc="When you place an order, it will appear here."
         />
       );
     }
@@ -477,9 +490,9 @@ export default function UserPanel() {
     if (!orders.length) {
       return (
         <EmptyState
+          desc="You haven’t placed any orders yet."
           icon={<Package />}
           title="No orders to show"
-          desc="You haven’t placed any orders yet."
         />
       );
     }
@@ -496,9 +509,9 @@ export default function UserPanel() {
           {/* Pagination controls */}
           <div className="flex items-center gap-2">
             <Button
+              disabled={paged.page <= 1 || loadingOrders}
               size="sm"
               variant="outline"
-              disabled={paged.page <= 1 || loadingOrders}
               onClick={() => setPaged((p) => ({ ...p, page: Math.max(1, p.page - 1) }))}
             >
               Prev
@@ -507,9 +520,9 @@ export default function UserPanel() {
               Page {paged.page} / {Math.max(1, Math.ceil(paged.total / paged.pageSize))}
             </span>
             <Button
+              disabled={paged.page >= Math.ceil(paged.total / paged.pageSize) || loadingOrders}
               size="sm"
               variant="outline"
-              disabled={paged.page >= Math.ceil(paged.total / paged.pageSize) || loadingOrders}
               onClick={() =>
                 setPaged((p) => ({ ...p, page: Math.min(p.page + 1, Math.ceil(p.total / p.pageSize)) }))
               }
@@ -531,13 +544,13 @@ export default function UserPanel() {
                   <div className="border rounded-lg">
                     <CollapsibleTrigger asChild>
                       <div
+                        aria-expanded={expanded}
                         className={cx(
                           "flex items-center justify-between p-6 cursor-pointer transition-colors",
                           expanded ? "bg-muted/50" : "hover:bg-muted/50"
                         )}
                         role="button"
                         tabIndex={0}
-                        aria-expanded={expanded}
                         onClick={async () => {
                           if (!isDetail) await ensureOrderDetailLoaded(order.id);
                           toggleOrderExpansion(order.id);
@@ -787,10 +800,10 @@ export default function UserPanel() {
     if (!wishlist.length) {
       return (
         <EmptyState
+          cta={<Button>Add products</Button>}
+          desc="Save products to compare and buy later."
           icon={<Heart />}
           title="Your wishlist is empty"
-          desc="Save products to compare and buy later."
-          cta={<Button>Add products</Button>}
         />
       );
     }
@@ -851,7 +864,7 @@ export default function UserPanel() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@example.com" />
+            <Input id="email" placeholder="you@example.com" type="email" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="phone">Phone</Label>

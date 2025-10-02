@@ -19,6 +19,7 @@ export function NewArrivals() {
       try {
         const all = await getAllProducts();
         const filtered = all.filter((p) => p.isNewArrival).slice(0, 8);
+
         setItems(filtered);
       } catch (e) {
         console.error(e);
@@ -82,12 +83,12 @@ export function NewArrivals() {
                   {/* Square on mobile, 4:3 on md+ */}
                   <div className="relative aspect-square md:aspect-[4/3]">
                     <Image
-                      alt={p?.name ?? "Product"}
-                      src={p?.images?.[0] ?? "/placeholder.png"}
                       fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      alt={p?.name ?? "Product"}
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      src={p?.images?.[0] ?? "/placeholder.png"}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   </div>

@@ -37,7 +37,6 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   //     try {
   //       const { headers: nextHeaders } = await import("next/headers");
   //       const h = await nextHeaders();
-  //       const host = h.get("x-forwarded-host") ?? h.get("host");
 
   //       headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
   //     } catch {
@@ -63,6 +62,7 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
       headers.set("X-Client-Domain", window.location.hostname);
     }
   }
+
 
   const res = await fetch(url, {
     ...options,

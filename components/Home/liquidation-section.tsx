@@ -1,6 +1,7 @@
 "use client";
 
 import type { ProductResponseModel } from "@/types/product";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import NextLink from "next/link";
@@ -12,6 +13,7 @@ import { useCartStore, CartItem } from "@/app/context/cartContext";
 
 function calcDiscountPercent(price: number, discountPrice?: number | null) {
   if (discountPrice == null || discountPrice <= 0 || discountPrice >= price) return 0;
+
   return Math.round((1 - discountPrice / price) * 100);
 }
 
@@ -20,10 +22,13 @@ function timeLeftLabel(iso?: string | null) {
   const end = new Date(iso).getTime();
   const now = Date.now();
   const diffMs = end - now;
+
   if (diffMs <= 0) return "ending soon";
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const days = Math.floor(hours / 24);
+
   if (days >= 1) return `${days} day${days > 1 ? "s" : ""}`;
+
   return `${hours} hour${hours !== 1 ? "s" : ""}`;
 }
 
@@ -44,6 +49,7 @@ export function LiquidationSection() {
       discount: p.discountPrice ? calcDiscountPercent(p.price, p.discountPrice) : 0,
       originalPrice: p.price,
     };
+
     addToCart(item);
   };
 
@@ -52,6 +58,7 @@ export function LiquidationSection() {
       try {
         const all = await getAllProducts();
         const filtered = all.filter((p) => (p as any).isLiquidated).slice(0, 8);
+
         setItems(filtered);
       } catch (e) {
         console.error(e);
@@ -127,12 +134,12 @@ export function LiquidationSection() {
                   <div className="relative overflow-hidden">
                     <div className="relative aspect-square md:aspect-[4/3]">
                       <Image
-                        alt={p.name ?? "Product"}
-                        src={p.images?.[0] ?? "/placeholder.png"}
                         fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        alt={p.name ?? "Product"}
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        src={p.images?.[0] ?? "/placeholder.png"}
                       />
                     </div>
 

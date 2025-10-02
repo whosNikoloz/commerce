@@ -33,11 +33,14 @@ export default async function CategoriesPage() {
   const categories = await getCategoriesCached();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight dark:text-text-lightdark text-text-light">
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-4xl md:text-5xl h-14 font-black tracking-tight bg-gradient-to-r from-slate-900 via-emerald-900 to-teal-900 dark:from-slate-100 dark:via-emerald-100 dark:to-teal-100 bg-clip-text text-transparent">
           Categories
         </h1>
+        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
+          Organize your product hierarchy and facets
+        </p>
       </div>
       <CategoriesTable initialCategories={categories} />
     </div>

@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import { CategoryGrid } from "@/components/Home/category-grid";
-
 export default function CategoryNotFound() {
   return (
     <div className="flex min-h-[45vh] items-center justify-center mt-20">
@@ -12,12 +10,8 @@ export default function CategoryNotFound() {
           Category not found
         </h2>
         <p className="text-text-subtle dark:text-text-subtledark">
-          The category you’re looking for doesn’t exist or was removed.
+          The category you&apos;re looking for doesn&apos;t exist or was removed.
         </p>
-
-        <div className="mx-auto max-w-5xl">
-          <CategoryGrid />
-        </div>
 
         <div className="mt-4 flex items-center justify-center gap-3">
           <Link

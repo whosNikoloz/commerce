@@ -1,6 +1,7 @@
 "use client";
 
 import type { ProductResponseModel } from "@/types/product";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import NextLink from "next/link";
@@ -18,10 +19,13 @@ type PopularProductsProps = {
 function sampleArray<T>(arr: T[], n: number): T[] {
   if (n >= arr.length) return [...arr];
   const copy = [...arr];
+
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
+
   return copy.slice(0, n);
 }
 
@@ -34,6 +38,7 @@ export function PopularProducts({ count = 4, onlyDiscounted = false }: PopularPr
 
   const handleAddToCart = (productId: string) => {
     const product = items.find((p) => p.id === productId);
+
     if (!product) return;
 
     const item: CartItem = {
@@ -58,6 +63,7 @@ export function PopularProducts({ count = 4, onlyDiscounted = false }: PopularPr
         const pool = onlyDiscounted
           ? all.filter((p) => Boolean(p.discountPrice) && Number(p.discountPrice) < Number(p.price))
           : all;
+
         setItems(sampleArray(pool, count));
       } catch (e) {
         console.error(e);
@@ -120,15 +126,15 @@ export function PopularProducts({ count = 4, onlyDiscounted = false }: PopularPr
                 key={p.id}
                 className="group flex flex-col h-full bg-brand-surface dark:bg-brand-surfacedark border-2 border-brand-muted dark:border-brand-muteddark rounded-2xl overflow-hidden hover:border-brand-primary transition-all duration-300 hover:shadow-2xl"
               >
-                <NextLink href={`/product/${p.id}`} className="block min-h-0 flex-1">
+                <NextLink className="block min-h-0 flex-1" href={`/product/${p.id}`}>
                   {/* Image becomes perfect square on mobile; taller on md+ */}
                   <div className="relative aspect-square md:aspect-[4/3]">
                     <Image
-                      alt={p.name ?? "Product"}
-                      src={image}
                       fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      alt={p.name ?? "Product"}
                       className="object-cover"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      src={image}
                     />
                     {hasDiscount && (
                       <div className="absolute top-2 left-2 sm:top-3 sm:left-3">

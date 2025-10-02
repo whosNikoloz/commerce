@@ -195,17 +195,32 @@ export default function ReviewImagesModal({
 
   return (
     <>
-      <Button
-        className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
-        size="sm"
-        title="Manage images"
-        variant="outline"
-        onClick={onOpen}
-      >
-        Images
-      </Button>
+      {trigger ? (
+        <Button
+          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+          onClick={onOpen}
+        >
+          {trigger}
+        </Button>
+      ) : (
+        <Button
+          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+          size="sm"
+          title="Manage images"
+          onClick={onOpen}
+        >
+          Images
+        </Button>
+      )}
 
       <Modal
+        classNames={{
+          backdrop: "bg-slate-900/80 backdrop-blur-xl",
+          base:
+            "rounded-t-2xl md:rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-800 shadow-2xl",
+          wrapper: "z-[999]",
+          closeButton: "z-50",
+        }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
         motionProps={{
@@ -232,19 +247,28 @@ export default function ReviewImagesModal({
         size={isMobile ? "full" : "3xl"}
         onClose={handleCloseModal}
       >
-        <ModalContent className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark rounded-t-xl">
+        <ModalContent>
           {() => (
             <>
-              <ModalHeader className="flex items-center justify-between gap-2">
-                <div className="flex flex-col">
-                  <p className="text-sm text-text-subtle">
-                    Upload up to {maxFiles} images. Max size {maxSizeMB} MB each.
-                  </p>
+              {/* დეკორატიული gradient overlay — AddFaqModal-ის სტილში */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+
+              <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                    <Images className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex flex-col">
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                      Manage Product Images
+                    </h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                      Upload up to {maxFiles} images • Max {maxSizeMB}MB each
+                    </p>
+                  </div>
                 </div>
-                <Badge
-                  className="bg-brand-muted dark:bg-brand-muteddark text-text-light"
-                  variant="secondary"
-                >
+
+                <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30">
                   {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
                 </Badge>
               </ModalHeader>
@@ -256,10 +280,10 @@ export default function ReviewImagesModal({
                     ref={dropRef}
                     aria-label="Upload images by clicking, dragging and dropping, or pasting"
                     className={cn(
-                      "flex items-center justify-center rounded-lg border border-dashed p-6 transition-colors cursor-pointer outline-none",
+                      "flex items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors cursor-pointer outline-none",
                       isDragging
-                        ? "bg-brand-muted/50 border-brand-primary"
-                        : "bg-brand-muted/30 hover:bg-brand-muted/50 dark:bg-brand-muteddark/30 dark:hover:bg-brand-muteddark/50 border-brand-muted dark:border-brand-muteddark",
+                        ? "bg-amber-50/60 dark:bg-amber-900/10 border-amber-400"
+                        : "bg-white/70 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:bg-white/90 dark:hover:bg-slate-800/80",
                     )}
                     role="button"
                     tabIndex={0}
@@ -273,14 +297,14 @@ export default function ReviewImagesModal({
                     onPaste={onPaste}
                   >
                     <div className="flex flex-col items-center text-center gap-2">
-                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark">
-                        <Upload className="h-5 w-5 text-text-light dark:text-text-lightdark" />
+                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700">
+                        <Upload className="h-5 w-5 text-slate-900 dark:text-slate-100" />
                       </div>
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-text-light dark:text-text-lightdark">
-                          Drag and drop images here
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          Drag & drop images here
                         </p>
-                        <p className="text-xs text-text-subtle">
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
                           or click to browse • you can also paste images
                         </p>
                       </div>
@@ -297,13 +321,13 @@ export default function ReviewImagesModal({
                   </div>
 
                   {serverImages.length > 0 || images.length > 0 ? (
-                    <ScrollArea className="max-h-[360px] rounded-lg border border-brand-muted dark:border-brand-muteddark">
+                    <ScrollArea className="max-h-[360px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {/* Existing images */}
                         {serverImages.map((img) => (
                           <figure
                             key={img.key}
-                            className="relative group rounded-md overflow-hidden border border-brand-muted dark:border-brand-muteddark bg-brand-surface dark:bg-brand-surfacedark"
+                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           >
                             <Image
                               alt="Existing"
@@ -313,12 +337,19 @@ export default function ReviewImagesModal({
                               width={200}
                             />
                             <div className="absolute left-2 top-2">
-                              <Badge variant={img.toDelete ? "destructive" : "secondary"}>
+                              <Badge
+                                className={cn(
+                                  "border",
+                                  img.toDelete
+                                    ? "bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30"
+                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30",
+                                )}
+                              >
                                 {img.toDelete ? "Will delete" : "Existing"}
                               </Badge>
                             </div>
                             <button
-                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-brand-surface/90 dark:bg-brand-surfacedark/90 border border-brand-muted dark:border-brand-muteddark opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
                               title={img.toDelete ? "Undo delete" : "Delete"}
                               type="button"
                               onClick={() =>
@@ -336,7 +367,7 @@ export default function ReviewImagesModal({
                               )}
                             </button>
                             {img.toDelete && (
-                              <div className="absolute inset-0 bg-brand-muted/60 dark:bg-brand-muteddark/60 backdrop-blur-[1px]" />
+                              <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[1px]" />
                             )}
                           </figure>
                         ))}
@@ -345,7 +376,7 @@ export default function ReviewImagesModal({
                         {images.map((img) => (
                           <figure
                             key={img.id}
-                            className="relative group rounded-md overflow-hidden border border-brand-muted dark:border-brand-muteddark bg-brand-surface dark:bg-brand-surfacedark"
+                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           >
                             <Image
                               alt="Pending upload"
@@ -355,11 +386,13 @@ export default function ReviewImagesModal({
                               width={200}
                             />
                             <div className="absolute left-2 top-2">
-                              <Badge variant="default">New</Badge>
+                              <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                                New
+                              </Badge>
                             </div>
                             <button
                               aria-label="Remove image"
-                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-brand-surface/90 dark:bg-brand-surfacedark/90 border border-brand-muted dark:border-brand-muteddark opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
                               type="button"
                               onClick={() => removePending(img.id)}
                             >
@@ -370,30 +403,25 @@ export default function ReviewImagesModal({
                       </div>
                     </ScrollArea>
                   ) : (
-                    <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark p-6 text-center text-text-subtle">
-                      <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-brand-muted dark:border-brand-muteddark flex items-center justify-center">
-                        <Images className="h-6 w-6" />
+                    <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-6 text-center bg-white/70 dark:bg-slate-800/60">
+                      <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                        <Images className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                       </div>
-                      <p className="text-sm">No images yet.</p>
+                      <p className="text-sm text-slate-700 dark:text-slate-300">No images yet.</p>
                     </div>
                   )}
                 </div>
               </ModalBody>
 
-              <ModalFooter className="mt-4">
+              <ModalFooter className="gap-3 px-6 py-5 bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 relative">
                 {images.length > 0 && (
-                  <Button
-                    className="mr-auto"
-                    type="button"
-                    variant="ghost"
-                    onClick={clearAllPending}
-                  >
+                  <Button className="mr-auto" type="button" variant="ghost" onClick={clearAllPending}>
                     <X className="h-4 w-4 mr-2" />
                     Clear pending
                   </Button>
                 )}
                 <Button
-                  className="bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border border-brand-muted dark:border-brand-muteddark hover:bg-brand-surface/70 dark:hover:bg-brand-surfacedark/70"
+                  className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                   type="button"
                   variant="outline"
                   onClick={handleCloseModal}
@@ -401,13 +429,18 @@ export default function ReviewImagesModal({
                   Cancel
                 </Button>
                 <Button
-                  className="bg-brand-primary hover:bg-brand-primary/90 text-white"
-                  disabled={
-                    saving || (serverImages.every((s) => !s.toDelete) && images.length === 0)
-                  }
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                  disabled={saving || (serverImages.every((s) => !s.toDelete) && images.length === 0)}
                   onClick={handleSave}
                 >
-                  {saving ? "Saving..." : "Save photos"}
+                  {saving ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    "Save photos"
+                  )}
                 </Button>
               </ModalFooter>
             </>

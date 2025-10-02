@@ -15,9 +15,10 @@ import { t } from "@/lib/i18n"
 interface NewsletterAppProps {
   data: NewsletterAppData
   locale: Locale
+  template?: 1 | 2 | 3
 }
 
-export default function NewsletterApp({ data, locale }: NewsletterAppProps) {
+export default function NewsletterApp({ data, locale, template = 1 }: NewsletterAppProps) {
   const [email, setEmail] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,7 +27,7 @@ export default function NewsletterApp({ data, locale }: NewsletterAppProps) {
   }
 
   return (
-    <section className="relative py-24 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900 overflow-hidden">
+    <section className="relative py-24 bg-gradient-to-br from-tech-cyber via-brand-primary to-tech-plasma dark:from-tech-cyber/80 dark:via-brand-primarydark dark:to-tech-plasma/80 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.1),transparent_40%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.1),transparent_40%)]" />
 
@@ -38,7 +39,7 @@ export default function NewsletterApp({ data, locale }: NewsletterAppProps) {
                 <div className="bg-white/10 backdrop-blur-sm p-3 rounded-2xl">
                   <Mail className="h-8 w-8" />
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-balance">{t(data.title, locale)}</h2>
+                <h2 className="text-4xl md:text-5xl font-bold font-heading text-balance">{t(data.title, locale)}</h2>
               </div>
 
               <p className="text-xl text-white/90 leading-relaxed">{t(data.description, locale)}</p>
@@ -46,14 +47,14 @@ export default function NewsletterApp({ data, locale }: NewsletterAppProps) {
               <form className="flex flex-col sm:flex-row gap-3 pt-2" onSubmit={handleSubmit}>
                 <Input
                   required
-                  className="flex-1 bg-white/95 dark:bg-gray-950/95 backdrop-blur-sm h-14 text-base border-2 border-white/20 focus:border-white shadow-lg"
+                  className="flex-1 bg-white/95 dark:bg-brand-surfacedark/95 backdrop-blur-sm h-14 text-base border-2 border-white/20 focus:border-white shadow-lg"
                   placeholder={t(data.emailPlaceholder, locale)}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <Button
-                  className="bg-white text-purple-700 hover:bg-white/90 font-bold h-14 px-8 shadow-lg hover:shadow-xl transition-all hover:scale-105 whitespace-nowrap"
+                  className="bg-white text-brand-primary hover:bg-white/90 font-bold h-14 px-8 shadow-lg hover:shadow-xl transition-all hover:scale-105 whitespace-nowrap"
                   size="lg"
                   type="submit"
                 >

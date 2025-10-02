@@ -10,23 +10,25 @@ import { Button } from "@/components/ui/button";
 interface InfluencerHighlightProps {
   data: InfluencerHighlightData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
 export default function InfluencerHighlight({
   data,
   locale,
+  template = 3,
 }: InfluencerHighlightProps) {
   return (
-    <section className="py-16 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-950/20 dark:to-pink-950/20">
+    <section className="py-16 bg-gradient-to-br from-beauty-natural/20 to-beauty-bloom/20 dark:from-beauty-natural/10 dark:to-beauty-bloom/10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900 dark:text-white">
+        <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-4 text-foreground dark:text-foreground">
           {t(data.title, locale)}
         </h2>
 
         {data.influencer && (
           <div className="flex items-center justify-center gap-3 mb-8">
             {data.influencer.avatar && (
-              <div className="relative w-12 h-12 rounded-full overflow-hidden">
+              <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-beauty-bloom dark:border-beauty-bloom animate-beauty-pulse">
                 <Image
                   fill
                   alt={data.influencer.name}
@@ -36,10 +38,10 @@ export default function InfluencerHighlight({
               </div>
             )}
             <div className="text-center">
-              <p className="font-bold text-gray-900 dark:text-white">
+              <p className="font-bold text-foreground dark:text-foreground">
                 {data.influencer.name}
               </p>
-              <p className="text-sm text-purple-600 dark:text-purple-400 flex items-center gap-1">
+              <p className="text-sm text-beauty-bloom dark:text-beauty-bloom flex items-center gap-1">
                 <Instagram className="h-4 w-4" />
                 {data.influencer.handle}
               </p>
@@ -58,7 +60,7 @@ export default function InfluencerHighlight({
                   src={data.videoUrl}
                 /> */}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <Play className="h-16 w-16 text-white" />
+                  <Play className="h-16 w-16 text-white animate-beauty-pulse" />
                 </div>
               </div>
             </div>
@@ -67,7 +69,7 @@ export default function InfluencerHighlight({
           {data.images.slice(data.videoUrl ? 1 : 0).map((image, idx) => (
             <div
               key={idx}
-              className="aspect-square relative rounded-2xl overflow-hidden shadow-lg group"
+              className="aspect-square relative rounded-2xl overflow-hidden shadow-lg group border-2 border-beauty-spa/30 dark:border-beauty-spa/40 hover:border-beauty-spa dark:hover:border-beauty-spa transition-all duration-300"
             >
               <Image
                 fill

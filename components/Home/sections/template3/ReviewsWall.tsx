@@ -8,13 +8,14 @@ import { t, tOpt } from "@/lib/i18n";
 interface ReviewsWallProps {
   data: ReviewsWallData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
-export default function ReviewsWall({ data, locale }: ReviewsWallProps) {
+export default function ReviewsWall({ data, locale, template = 3 }: ReviewsWallProps) {
   return (
-    <section className="py-16 bg-white dark:bg-gray-950">
+    <section className="py-16 bg-background dark:bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+        <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-12 text-foreground dark:text-foreground">
           {t(data.title, locale)}
         </h2>
 
@@ -22,11 +23,11 @@ export default function ReviewsWall({ data, locale }: ReviewsWallProps) {
           {data.reviews.map((review, idx) => (
             <div
               key={idx}
-              className="break-inside-avoid bg-purple-50 dark:bg-purple-950/20 rounded-lg p-6"
+              className="break-inside-avoid bg-beauty-spa/10 dark:bg-beauty-spa/20 rounded-lg p-6 border border-beauty-spa/20 dark:border-beauty-spa/30 hover:border-beauty-spa dark:hover:border-beauty-spa transition-all duration-300"
             >
               <div className="flex items-start gap-4 mb-4">
                 {review.avatar && (
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-beauty-bloom dark:border-beauty-bloom">
                     <Image
                       fill
                       alt={review.author}
@@ -38,11 +39,11 @@ export default function ReviewsWall({ data, locale }: ReviewsWallProps) {
 
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-foreground dark:text-foreground">
                       {review.author}
                     </p>
                     {review.verified && (
-                      <BadgeCheck className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <BadgeCheck className="h-4 w-4 text-beauty-bloom dark:text-beauty-bloom" />
                     )}
                   </div>
 
@@ -51,8 +52,8 @@ export default function ReviewsWall({ data, locale }: ReviewsWallProps) {
                       <Star
                         key={starIdx}
                         className={`h-4 w-4 ${starIdx < review.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300 dark:text-gray-700"
+                            ? "fill-beauty-luxury text-beauty-luxury"
+                            : "text-muted dark:text-muted"
                           }`}
                       />
                     ))}
@@ -60,12 +61,12 @@ export default function ReviewsWall({ data, locale }: ReviewsWallProps) {
                 </div>
               </div>
 
-              <p className="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
+              <p className="text-text-light dark:text-text-lightdark mb-3 leading-relaxed">
                 &quot;{t(review.text, locale)}&quot;
               </p>
 
               {review.productName && (
-                <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                <p className="text-sm text-beauty-bloom dark:text-beauty-bloom font-medium">
                   {tOpt(review.productName, locale)}
                 </p>
               )}

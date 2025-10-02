@@ -1,8 +1,6 @@
-"use client";
-
 import type { TenantConfig, Locale } from "@/types/tenant";
 
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 
 import { getTemplateDefinition, validateHomepage } from "@/lib/templates";
 
@@ -12,35 +10,27 @@ interface HomeRendererProps {
 }
 
 export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
-  // 1) Always call hooks in a stable order
-  const validatedHomepage = useMemo(() => {
-    try {
-      return validateHomepage(
-        tenant.homepage,
-        tenant.templateId
-      ) as { sections: Array<{ enabled: boolean; order: number; type: string; data: any }> };
-    } catch (error) {
-      console.error("Homepage validation failed:", error);
+  // 1) Validate homepage configuration
+  let validatedHomepage;
+  try {
+    validatedHomepage = validateHomepage(
+      tenant.homepage,
+      tenant.templateId
+    ) as { sections: Array<{ enabled: boolean; order: number; type: string; data: any }> };
+  } catch (error) {
+    console.error("Homepage validation failed:", error);
+    validatedHomepage = null;
+  }
 
-      return null;
-    }
-  }, [tenant.homepage, tenant.templateId]);
+  // 2) Get template definition
+  const templateDefinition = getTemplateDefinition(tenant.templateId);
 
-  // Optional: memoize template definition (cheap, but safe)
-  const templateDefinition = useMemo(
-    () => getTemplateDefinition(tenant.templateId),
-    [tenant.templateId]
-  );
-
-  // 2) This hook depends on validatedHomepage but handles null safely
-  const sections = useMemo(() => {
-    const list = validatedHomepage?.sections ?? [];
-
-    return list
-      .filter((section) => section.enabled)
-      .slice() // copy before sort to be safe
-      .sort((a, b) => a.order - b.order);
-  }, [validatedHomepage?.sections]);
+  // 3) Get enabled sections sorted by order
+  const list = validatedHomepage?.sections ?? [];
+  const sections = list
+    .filter((section) => section.enabled)
+    .slice() // copy before sort to be safe
+    .sort((a, b) => a.order - b.order);
 
   // 3) Render
   if (!validatedHomepage) {
@@ -73,10 +63,10 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
           <Suspense
             key={`${section.type}-${section.order}-${index}`}
             fallback={
-              <div className="w-full h-64 animate-pulse bg-gray-100 dark:bg-gray-800" />
+              <div className="w-full h-64 animate-pulse bg-muted" />
             }
           >
-            <Component data={section.data} locale={locale} />
+            <Component data={section.data} locale={locale} template={tenant.templateId} />
           </Suspense>
         );
       })}

@@ -12,11 +12,13 @@ import { Input } from "@/components/ui/input";
 interface NewsletterBeautyProps {
   data: NewsletterData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
 export default function NewsletterBeauty({
   data,
   locale,
+  template = 3,
 }: NewsletterBeautyProps) {
   const [email, setEmail] = useState("");
 
@@ -26,18 +28,18 @@ export default function NewsletterBeauty({
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-purple-600 via-pink-600 to-purple-800 dark:from-purple-900 dark:via-pink-900 dark:to-purple-950">
+    <section className="py-16 bg-gradient-to-br from-beauty-bloom via-beauty-luxury to-beauty-spa dark:from-beauty-bloom/80 dark:via-beauty-luxury/80 dark:to-beauty-spa/80">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center text-white">
-          <div className="inline-block bg-white/20 p-4 rounded-full mb-6">
+          <div className="inline-block bg-white/20 p-4 rounded-full mb-6 animate-beauty-pulse">
             <Sparkles className="h-10 w-10" />
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
             {t(data.title, locale)}
           </h2>
 
-          <p className="text-lg text-purple-100 mb-8">
+          <p className="text-lg text-white/90 dark:text-white/80 mb-8">
             {t(data.description, locale)}
           </p>
 
@@ -47,7 +49,7 @@ export default function NewsletterBeauty({
           >
             <Input
               required
-              className="flex-1 bg-white dark:bg-gray-950"
+              className="flex-1 bg-white dark:bg-background text-foreground dark:text-foreground"
               placeholder={t(data.emailPlaceholder, locale)}
               type="email"
               value={email}
@@ -63,7 +65,7 @@ export default function NewsletterBeauty({
           </form>
 
           {data.privacyNote && (
-            <p className="text-sm text-purple-200 mt-4">
+            <p className="text-sm text-white/80 dark:text-white/70 mt-4">
               {tOpt(data.privacyNote, locale)}
             </p>
           )}

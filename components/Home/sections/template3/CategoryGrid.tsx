@@ -1,52 +1,92 @@
-import type { CategoryGridData, Locale } from "@/types/tenant";
-import { t } from "@/lib/i18n";
-import Link from "next/link";
-import Image from "next/image";
+import type { CategoryGridData, Locale } from "@/types/tenant"
+
+import { CategoryCard, CategoryCardSkeleton } from "../ui/CategoryCard"
+import { SectionContainer } from "../ui/SectionContainer"
+
+import { t } from "@/lib/i18n"
+import { getAllCategories } from "@/app/api/services/categoryService"
+import { searchProductsByFilter } from "@/app/api/services/productService"
 
 interface CategoryGridProps {
-  data: CategoryGridData;
-  locale: Locale;
+  data: CategoryGridData
+  locale: Locale
+  template?: 1 | 2 | 3
 }
 
-export default function CategoryGrid({ data, locale }: CategoryGridProps) {
-  return (
-    <section className="py-16 bg-purple-50 dark:bg-purple-950/10">
+export default async function CategoryGrid({ data, locale, template = 3 }: CategoryGridProps) {
+  let categoriesWithCounts = null
+  let error = null
+
+  try {
+    const categories = await getAllCategories()
+    const topLevelCategories = categories.filter(c => !c.parentId && c.isActive)
+
+    const categoriesWithData = await Promise.all(
+      topLevelCategories.slice(0, 8).map(async (category) => {
+        try {
+          const result = await searchProductsByFilter({
+            filter: { categoryIds: [category.id] },
+            pageSize: 1,
+            page: 1
+          })
+
+          return {
+            category,
+            productCount: result.totalCount || 0,
+            imageUrl: data.categories.find(c =>
+              t(c.name, locale).toLowerCase() === category.name?.toLowerCase()
+            )?.imageUrl || "/placeholder.svg"
+          }
+        } catch {
+          return { category, productCount: 0, imageUrl: "/placeholder.svg" }
+        }
+      })
+    )
+
+    categoriesWithCounts = categoriesWithData
+  } catch (e) {
+    error = e as Error
+    console.error("Failed to load categories:", e)
+  }
+
+  const loadingSkeleton = (
+    <div className="py-16 bg-beauty-spa/10 dark:bg-beauty-luxury/10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+        <div className="h-10 bg-muted rounded-lg w-96 mx-auto mb-12 animate-pulse" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <CategoryCardSkeleton key={idx} template={template} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <SectionContainer
+      className="py-16 bg-beauty-spa/10 dark:bg-beauty-luxury/10"
+      emptyMessage="No categories available"
+      error={error}
+      isEmpty={!categoriesWithCounts || categoriesWithCounts.length === 0}
+      loadingSkeleton={loadingSkeleton}
+    >
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground font-heading">
           {t(data.title, locale)}
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {data.categories.map((category, idx) => (
-            <Link
-              key={idx}
-              href={category.href}
-              className="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white dark:bg-gray-900"
-            >
-              <div className="aspect-square relative">
-                <Image
-                  src={category.imageUrl}
-                  alt={t(category.name, locale)}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-900/30 to-transparent" />
-              </div>
-
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <h3 className="text-xl font-bold mb-1">
-                  {t(category.name, locale)}
-                </h3>
-                {category.productCount && (
-                  <p className="text-sm text-purple-200">
-                    {category.productCount} products
-                  </p>
-                )}
-              </div>
-            </Link>
+          {categoriesWithCounts?.map(({ category, productCount, imageUrl }) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              imageUrl={imageUrl}
+              productCount={productCount}
+              template={template}
+            />
           ))}
         </div>
       </div>
-    </section>
-  );
+    </SectionContainer>
+  )
 }

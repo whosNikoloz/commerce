@@ -5,16 +5,18 @@ import { Star, Shield } from "lucide-react";
 interface ReviewsWarrantyProps {
   data: ReviewsWarrantyData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
 export default function ReviewsWarranty({
   data,
   locale,
+  template = 2,
 }: ReviewsWarrantyProps) {
   return (
-    <section className="py-16 bg-white dark:bg-gray-950">
+    <section className="py-16 bg-background dark:bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+        <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-12 text-foreground">
           {t(data.title, locale)}
         </h2>
 
@@ -23,7 +25,8 @@ export default function ReviewsWarranty({
             {data.reviews.map((review, idx) => (
               <div
                 key={idx}
-                className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-6"
+                className="bg-home-comfort/20 dark:bg-home-elegant/20 rounded-lg p-6 animate-home-sway"
+                style={{ animationDelay: `${idx * 0.15}s` }}
               >
                 <div className="flex items-center gap-1 mb-3">
                   {Array.from({ length: 5 }).map((_, starIdx) => (
@@ -31,22 +34,22 @@ export default function ReviewsWarranty({
                       key={starIdx}
                       className={`h-5 w-5 ${
                         starIdx < review.rating
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300 dark:text-gray-700"
+                          ? "fill-home-warm text-home-warm"
+                          : "text-muted dark:text-muted-foreground"
                       }`}
                     />
                   ))}
                 </div>
 
-                <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                <p className="text-text-light dark:text-text-lightdark mb-4 leading-relaxed">
                   &quot;{t(review.text, locale)}&quot;
                 </p>
 
-                <div className="border-t border-emerald-200 dark:border-emerald-900 pt-4">
-                  <p className="font-semibold text-gray-900 dark:text-white">
+                <div className="border-t border-home-comfort/30 dark:border-home-elegant/30 pt-4">
+                  <p className="font-semibold text-foreground">
                     {review.author}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-text-subtle dark:text-text-subtledark">
                     {new Date(review.date).toLocaleDateString(locale)}
                   </p>
                 </div>
@@ -54,12 +57,12 @@ export default function ReviewsWarranty({
             ))}
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 dark:from-emerald-900 dark:to-emerald-950 rounded-lg p-8 text-white">
+          <div className="bg-gradient-to-br from-home-warm to-home-modern dark:from-home-elegant dark:to-home-modern rounded-lg p-8 text-white">
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-white/20 p-3 rounded-full">
+              <div className="bg-white/20 p-3 rounded-full animate-home-sway">
                 <Shield className="h-8 w-8" />
               </div>
-              <h3 className="text-2xl font-bold">
+              <h3 className="text-2xl font-heading font-bold">
                 {t(data.warrantyInfo.title, locale)}
               </h3>
             </div>
@@ -68,7 +71,7 @@ export default function ReviewsWarranty({
               {data.warrantyInfo.details.map((detail, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <Shield className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <span className="text-emerald-50">{t(detail, locale)}</span>
+                  <span className="text-home-comfort/90">{t(detail, locale)}</span>
                 </li>
               ))}
             </ul>

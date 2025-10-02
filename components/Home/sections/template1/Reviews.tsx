@@ -7,13 +7,14 @@ import { t, tOpt } from "@/lib/i18n";
 interface ReviewsProps {
   data: ReviewsData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
-export default function Reviews({ data, locale }: ReviewsProps) {
+export default function Reviews({ data, locale, template = 1 }: ReviewsProps) {
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900">
+    <section className="py-16 bg-brand-surface dark:bg-brand-surfacedark">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+        <h2 className="text-3xl md:text-4xl font-bold font-heading text-center mb-12 text-text-light dark:text-text-lightdark">
           {t(data.title, locale)}
         </h2>
 
@@ -21,7 +22,7 @@ export default function Reviews({ data, locale }: ReviewsProps) {
           {data.reviews.map((review, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-gray-950 rounded-lg p-6 shadow-md"
+              className="bg-card dark:bg-card rounded-lg p-6 shadow-md border border-border"
             >
               <div className="flex items-center gap-1 mb-3">
                 {Array.from({ length: 5 }).map((_, starIdx) => (
@@ -29,26 +30,26 @@ export default function Reviews({ data, locale }: ReviewsProps) {
                     key={starIdx}
                     className={`h-5 w-5 ${
                       starIdx < review.rating
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-gray-300 dark:text-gray-700"
+                        ? "fill-tech-neon text-tech-neon"
+                        : "text-brand-muted dark:text-brand-muteddark"
                     }`}
                   />
                 ))}
               </div>
 
-              <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+              <p className="text-text-subtle dark:text-text-subtledark mb-4 leading-relaxed">
                 &quot;{t(review.text, locale)}&quot;
               </p>
 
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
-                <p className="font-semibold text-gray-900 dark:text-white">
+              <div className="border-t border-border pt-4">
+                <p className="font-semibold text-text-light dark:text-text-lightdark">
                   {review.author}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-text-subtle dark:text-text-subtledark mt-1">
                   {new Date(review.date).toLocaleDateString(locale)}
                 </p>
                 {review.productName && (
-                  <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                  <p className="text-sm text-brand-primary dark:text-brand-primary mt-1">
                     {tOpt(review.productName, locale)}
                   </p>
                 )}

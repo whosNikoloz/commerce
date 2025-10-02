@@ -212,7 +212,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           },
         },
         {
-          type: "ProductRailLaptops",
+          type: "ProductRail",
           enabled: true,
           order: 5,
           data: {
@@ -224,13 +224,14 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "სამუშაოსთვის და თამაშისთვის",
               en: "For work & play",
             },
-            category: "laptops",
             limit: 4,
             viewAllHref: "/category/laptops",
+            filterBy: {},
+            sortBy: "featured",
           },
         },
         {
-          type: "ProductRailPhones",
+          type: "ProductRail",
           enabled: true,
           order: 6,
           data: {
@@ -242,9 +243,12 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "ახალი მოდელები",
               en: "Newest models",
             },
-            category: "phones",
             limit: 4,
             viewAllHref: "/category/phones",
+            filterBy: {
+              isNewArrival: true,
+            },
+            sortBy: "newest",
           },
         },
         {
@@ -663,7 +667,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           },
         },
         {
-          type: "ProductRailNewArrivals",
+          type: "ProductRail",
           enabled: true,
           order: 4,
           data: {
@@ -675,13 +679,16 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "უახლესი კოლექციები",
               en: "Latest collections",
             },
-            category: "new-arrivals",
             limit: 4,
             viewAllHref: "/category/new-arrivals",
+            filterBy: {
+              isNewArrival: true,
+            },
+            sortBy: "newest",
           },
         },
         {
-          type: "ProductRailBestSofas",
+          type: "ProductRail",
           enabled: true,
           order: 5,
           data: {
@@ -693,9 +700,10 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "პოპულარული მოდელები",
               en: "Most popular",
             },
-            category: "sofas",
             limit: 4,
             viewAllHref: "/category/sofas",
+            filterBy: {},
+            sortBy: "rating",
           },
         },
         {
@@ -1097,7 +1105,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           },
         },
         {
-          type: "ProductRailLaptops",
+          type: "ProductRail",
           enabled: true,
           order: 5,
           data: {
@@ -1109,13 +1117,14 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "სამუშაოსა და თამაშისთვის",
               en: "Work & gaming",
             },
-            category: "laptops",
             limit: 4,
             viewAllHref: "/category/laptops",
+            filterBy: {},
+            sortBy: "featured",
           },
         },
         {
-          type: "ProductRailPhones",
+          type: "ProductRail",
           enabled: true,
           order: 6,
           data: {
@@ -1127,9 +1136,12 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "ახალი მოდელები",
               en: "Newest models",
             },
-            category: "phones",
             limit: 4,
             viewAllHref: "/category/phones",
+            filterBy: {
+              isNewArrival: true,
+            },
+            sortBy: "newest",
           },
         },
         {
@@ -1218,7 +1230,7 @@ export const TENANTS: Record<string, TenantConfig> = {
         {
           type: "Reviews",
           enabled: true,
-          order: 8,
+          order: 9,
           data: {
             title: {
               ka: "შეფასებები",
@@ -1266,7 +1278,7 @@ export const TENANTS: Record<string, TenantConfig> = {
         {
           type: "TrustBadges",
           enabled: true,
-          order: 9,
+          order: 10,
           data: {
             badges: [
               {
@@ -1319,7 +1331,7 @@ export const TENANTS: Record<string, TenantConfig> = {
         {
           type: "NewsletterApp",
           enabled: true,
-          order: 10,
+          order: 11,
           data: {
             title: {
               ka: "საინტერესო სიახლეები",
@@ -1341,6 +1353,28 @@ export const TENANTS: Record<string, TenantConfig> = {
               ios: "https://apps.apple.com",
               android: "https://play.google.com",
             },
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 8,
+          data: {
+            title: {
+              ka: "ლიკვიდირებული",
+              en: "Liquided",
+            },
+            subtitle: {
+              ka: "ახალი შემოსული",
+              en: "Just arrived",
+            },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: {
+              isLiquidated: true,
+            },
+            sortBy: "featured",
+            customName: "Liquided",
           },
         },
       ],

@@ -12,9 +12,10 @@ import { Input } from "@/components/ui/input";
 interface NewsletterProps {
   data: NewsletterData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
-export default function Newsletter({ data, locale }: NewsletterProps) {
+export default function Newsletter({ data, locale, template = 2 }: NewsletterProps) {
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,18 +24,18 @@ export default function Newsletter({ data, locale }: NewsletterProps) {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-emerald-600 to-emerald-800 dark:from-emerald-900 dark:to-emerald-950">
+    <section className="py-16 bg-gradient-to-br from-home-warm to-home-modern dark:from-home-elegant dark:to-home-modern">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center text-white">
-          <div className="inline-block bg-white/20 p-4 rounded-full mb-6">
+          <div className="inline-block bg-white/20 p-4 rounded-full mb-6 animate-home-sway">
             <Mail className="h-10 w-10" />
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
             {t(data.title, locale)}
           </h2>
 
-          <p className="text-lg text-emerald-100 mb-8">
+          <p className="text-lg text-home-comfort/90 dark:text-home-comfort mb-8">
             {t(data.description, locale)}
           </p>
 
@@ -44,7 +45,7 @@ export default function Newsletter({ data, locale }: NewsletterProps) {
           >
             <Input
               required
-              className="flex-1 bg-white dark:bg-gray-950"
+              className="flex-1 bg-white dark:bg-background"
               placeholder={t(data.emailPlaceholder, locale)}
               type="email"
               value={email}
@@ -60,7 +61,7 @@ export default function Newsletter({ data, locale }: NewsletterProps) {
           </form>
 
           {data.privacyNote && (
-            <p className="text-sm text-emerald-200 mt-4">
+            <p className="text-sm text-home-comfort/80 mt-4">
               {tOpt(data.privacyNote, locale)}
             </p>
           )}

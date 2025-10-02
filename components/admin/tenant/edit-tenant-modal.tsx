@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { Button } from "@heroui/button";
-import { IconEdit } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTrash, IconChevronUp, IconChevronDown } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 import SectionContentEditor from "./section-content-editor";
@@ -45,8 +45,7 @@ const T1_TYPES = new Set<Template1SectionInstance["type"]>([
   "CategoryGrid",
   "BrandStrip",
   "DealCountdown",
-  "ProductRailLaptops",
-  "ProductRailPhones",
+  "ProductRail",
   "ComparisonBlock",
   "Reviews",
   "TrustBadges",
@@ -56,8 +55,7 @@ const T2_TYPES = new Set<Template2SectionInstance["type"]>([
   "HeroLifestyle",
   "CategoryGrid",
   "ConfiguratorBlock",
-  "ProductRailNewArrivals",
-  "ProductRailBestSofas",
+  "ProductRail",
   "CustomerGallery",
   "BrandStory",
   "ReviewsWarranty",
@@ -67,7 +65,7 @@ const T3_TYPES = new Set<Template3SectionInstance["type"]>([
   "HeroBanner",
   "CategoryGrid",
   "ReviewsWall",
-  "ProductRailBestRated",
+  "ProductRail",
   "BundlePromo",
   "InfluencerHighlight",
   "NewsletterBeauty",
@@ -186,6 +184,62 @@ export default function EditTenantModal({
     setSections((prev) =>
       prev.map((section, i) => (i === selectedSection.index ? { ...section, data: updatedData } : section)),
     );
+  };
+
+  const addProductRail = () => {
+    const maxOrder = sections.length > 0 ? Math.max(...sections.map(s => s.order)) : 0;
+    const newSection: AnySectionInstance = {
+      type: "ProductRail",
+      enabled: true,
+      order: maxOrder + 1,
+      data: {
+        title: { ka: "ახალი პროდუქტები", en: "New Products" },
+        subtitle: { ka: "ახალი შემოსული", en: "Just arrived" },
+        limit: 4,
+        viewAllHref: "/products",
+        filterBy: {},
+        sortBy: "featured",
+      },
+    } as any;
+    setSections((prev) => [...prev, newSection]);
+    toast.success("Product Rail section added");
+  };
+
+  const deleteSection = (index: number) => {
+    setSections((prev) => prev.filter((_, i) => i !== index));
+    toast.success("Section deleted");
+  };
+
+  const moveSectionUp = (index: number) => {
+    if (index === 0) return;
+    setSections((prev) => {
+      const newSections = [...prev];
+      const temp = newSections[index - 1];
+      newSections[index - 1] = newSections[index];
+      newSections[index] = temp;
+
+      // Update order numbers
+      newSections[index - 1].order = index;
+      newSections[index].order = index + 1;
+
+      return newSections;
+    });
+  };
+
+  const moveSectionDown = (index: number) => {
+    setSections((prev) => {
+      if (index === prev.length - 1) return prev;
+      const newSections = [...prev];
+      const temp = newSections[index + 1];
+      newSections[index + 1] = newSections[index];
+      newSections[index] = temp;
+
+      // Update order numbers
+      newSections[index].order = index + 1;
+      newSections[index + 1].order = index + 2;
+
+      return newSections;
+    });
   };
 
   const handleSubmit = async () => {
@@ -705,6 +759,20 @@ export default function EditTenantModal({
 
                 {/* SECTIONS TAB */}
                 <TabsContent className="pt-4" value="sections">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {sections.filter((s) => s.enabled).length} of {sections.length} sections enabled
+                    </p>
+                    <Button
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-md"
+                      size="sm"
+                      startContent={<IconPlus className="h-4 w-4" />}
+                      onPress={addProductRail}
+                    >
+                      Add Product Rail
+                    </Button>
+                  </div>
+
                   <ScrollArea className="h-[400px] pr-4">
                     <div className="space-y-3">
                       {sortedSections.map((section, index) => {
@@ -733,13 +801,39 @@ export default function EditTenantModal({
                                 {section.order}
                               </div>
                               <div>
-                                <h5 className="font-medium">{getSectionLabel(section.type)}</h5>
+                                <h5 className="font-medium">
+                                  {section.type === "ProductRail" && (section.data as any).customName
+                                    ? (section.data as any).customName
+                                    : getSectionLabel(section.type)}
+                                </h5>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                                   {section.type}
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
+                              <div className="flex flex-col gap-1">
+                                <Button
+                                  isIconOnly
+                                  className="h-6 w-6 min-w-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-30"
+                                  isDisabled={originalIndex === 0}
+                                  size="sm"
+                                  variant="flat"
+                                  onPress={() => originalIndex !== -1 && moveSectionUp(originalIndex)}
+                                >
+                                  <IconChevronUp className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  isIconOnly
+                                  className="h-6 w-6 min-w-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-30"
+                                  isDisabled={originalIndex === sections.length - 1}
+                                  size="sm"
+                                  variant="flat"
+                                  onPress={() => originalIndex !== -1 && moveSectionDown(originalIndex)}
+                                >
+                                  <IconChevronDown className="h-3 w-3" />
+                                </Button>
+                              </div>
                               <Button
                                 isIconOnly
                                 className="h-8 w-8 min-w-8 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -749,6 +843,17 @@ export default function EditTenantModal({
                               >
                                 <IconEdit className="h-4 w-4" />
                               </Button>
+                              {section.type === "ProductRail" && (
+                                <Button
+                                  isIconOnly
+                                  className="h-8 w-8 min-w-8 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400"
+                                  size="sm"
+                                  variant="flat"
+                                  onPress={() => originalIndex !== -1 && deleteSection(originalIndex)}
+                                >
+                                  <IconTrash className="h-4 w-4" />
+                                </Button>
+                              )}
                               <Switch
                                 checked={enabled}
                                 className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-orange-600"
@@ -765,9 +870,7 @@ export default function EditTenantModal({
 
                   <div className="mt-4 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/20 p-3">
                     <p className="text-xs text-amber-800 dark:text-amber-200">
-                      <strong>Tip:</strong> Disabled sections won’t appear on the homepage but their
-                      configuration is preserved. {sections.filter((s) => s.enabled).length} of{" "}
-                      {sections.length} sections enabled.
+                      <strong>Tip:</strong> Use the "Add Product Rail" button to add custom product sections with any filters you want (liquidated, new arrivals, categories, brands, etc).
                     </p>
                   </div>
                 </TabsContent>

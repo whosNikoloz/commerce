@@ -233,23 +233,197 @@ export default function SectionContentEditor({
           </div>
         );
 
-      case "ProductRailLaptops":
-      case "ProductRailPhones":
-      case "ProductRailNewArrivals":
-      case "ProductRailBestSofas":
-      case "ProductRailBestRated":
+      case "ProductRail":
         return (
           <div className="space-y-6">
+            <div className="space-y-2">
+              <Label>Custom Name (Admin Only)</Label>
+              <Input
+                placeholder="e.g., Liquidated Laptops, Premium Phones"
+                value={data.customName || ""}
+                onChange={(e) => updateSimpleField(["customName"], e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                This name is only shown in admin panel to help you identify this section
+              </p>
+            </div>
+
             {renderLocalizedInput("Title", ["title"], data.title)}
             {data.subtitle && renderLocalizedInput("Subtitle", ["subtitle"], data.subtitle)}
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Input
-                placeholder="laptops, phones, etc."
-                value={data.category || ""}
-                onChange={(e) => updateSimpleField(["category"], e.target.value)}
-              />
+
+            <div className="space-y-4 rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+              <h4 className="font-semibold text-sm">Product Filters</h4>
+
+              <div className="space-y-2">
+                <Label>Category IDs (comma-separated, optional)</Label>
+                <Input
+                  placeholder="cat-uuid-1, cat-uuid-2"
+                  value={data.filterBy?.categoryIds?.join(", ") || ""}
+                  onChange={(e) => {
+                    const categoryIds = e.target.value.split(",").map(id => id.trim()).filter(Boolean);
+                    const newFilterBy = { ...(data.filterBy || {}), categoryIds: categoryIds.length > 0 ? categoryIds : undefined };
+                    updateSimpleField(["filterBy"], newFilterBy);
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">Get category IDs from your database or category management</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Brand IDs (comma-separated, optional)</Label>
+                <Input
+                  placeholder="brand-uuid-1, brand-uuid-2"
+                  value={data.filterBy?.brandIds?.join(", ") || ""}
+                  onChange={(e) => {
+                    const brandIds = e.target.value.split(",").map(id => id.trim()).filter(Boolean);
+                    const newFilterBy = { ...(data.filterBy || {}), brandIds: brandIds.length > 0 ? brandIds : undefined };
+                    updateSimpleField(["filterBy"], newFilterBy);
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">Get brand IDs from your database or brand management</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Condition (optional)</Label>
+                <select
+                  multiple
+                  className="w-full px-3 py-2 rounded border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                  value={data.filterBy?.condition?.map(String) || []}
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+                    const newFilterBy = { ...(data.filterBy || {}), condition: selectedOptions.length > 0 ? selectedOptions : undefined };
+                    updateSimpleField(["filterBy"], newFilterBy);
+                  }}
+                >
+                  <option value="0">New (0)</option>
+                  <option value="1">Used (1)</option>
+                  <option value="2">Like New (2)</option>
+                </select>
+                <p className="text-xs text-muted-foreground">Hold Ctrl/Cmd to select multiple. Values are enum numbers from Condition enum.</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Stock Status (optional)</Label>
+                <select
+                  className="w-full px-3 py-2 rounded border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                  value={data.filterBy?.stockStatus !== undefined ? String(data.filterBy.stockStatus) : ""}
+                  onChange={(e) => {
+                    const newFilterBy = { ...(data.filterBy || {}), stockStatus: e.target.value ? parseInt(e.target.value) : undefined };
+                    updateSimpleField(["filterBy"], newFilterBy);
+                  }}
+                >
+                  <option value="">All</option>
+                  <option value="0">In Stock (0)</option>
+                  <option value="1">Out of Stock (1)</option>
+                </select>
+                <p className="text-xs text-muted-foreground">Values are enum numbers from StockStatus enum.</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={data.filterBy?.isNewArrival || false}
+                      onChange={(e) => {
+                        const newFilterBy = { ...(data.filterBy || {}), isNewArrival: e.target.checked || undefined };
+                        updateSimpleField(["filterBy"], newFilterBy);
+                      }}
+                    />
+                    New Arrivals
+                  </Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={data.filterBy?.isLiquidated || false}
+                      onChange={(e) => {
+                        const newFilterBy = { ...(data.filterBy || {}), isLiquidated: e.target.checked || undefined };
+                        updateSimpleField(["filterBy"], newFilterBy);
+                      }}
+                    />
+                    Liquidated
+                  </Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={data.filterBy?.isComingSoon || false}
+                      onChange={(e) => {
+                        const newFilterBy = { ...(data.filterBy || {}), isComingSoon: e.target.checked || undefined };
+                        updateSimpleField(["filterBy"], newFilterBy);
+                      }}
+                    />
+                    Coming Soon
+                  </Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={data.filterBy?.hasDiscount || false}
+                      onChange={(e) => {
+                        const newFilterBy = { ...(data.filterBy || {}), hasDiscount: e.target.checked || undefined };
+                        updateSimpleField(["filterBy"], newFilterBy);
+                      }}
+                    />
+                    Has Discount
+                  </Label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Min Price (optional)</Label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={data.filterBy?.minPrice || ""}
+                    onChange={(e) => {
+                      const newFilterBy = { ...(data.filterBy || {}), minPrice: e.target.value ? parseFloat(e.target.value) : undefined };
+                      updateSimpleField(["filterBy"], newFilterBy);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Max Price (optional)</Label>
+                  <Input
+                    type="number"
+                    placeholder="9999"
+                    value={data.filterBy?.maxPrice || ""}
+                    onChange={(e) => {
+                      const newFilterBy = { ...(data.filterBy || {}), maxPrice: e.target.value ? parseFloat(e.target.value) : undefined };
+                      updateSimpleField(["filterBy"], newFilterBy);
+                    }}
+                  />
+                </div>
+              </div>
             </div>
+
+            <div className="space-y-2">
+              <Label>Sort By</Label>
+              <select
+                className="w-full px-3 py-2 rounded border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                value={data.sortBy || "featured"}
+                onChange={(e) => updateSimpleField(["sortBy"], e.target.value)}
+              >
+                <option value="featured">Featured</option>
+                <option value="newest">Newest</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Rating</option>
+                <option value="name">Name</option>
+              </select>
+            </div>
+
             <div className="space-y-2">
               <Label>Product Limit</Label>
               <Input

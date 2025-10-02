@@ -75,11 +75,24 @@ const DealCountdownDataSchema = z.object({
 });
 
 const ProductRailDataSchema = z.object({
+  customName: z.string().optional(),
   title: LocalizedTextSchema,
   subtitle: LocalizedTextSchema.optional(),
-  category: z.string(),
   limit: z.number(),
   viewAllHref: z.string(),
+  filterBy: z.object({
+    categoryIds: z.array(z.string()).optional(),
+    brandIds: z.array(z.string()).optional(),
+    condition: z.array(z.number()).optional(), // Condition enum values: 0=New, 1=Used, 2=LikeNew
+    stockStatus: z.number().optional(), // StockStatus enum values: 0=InStock, 1=OutOfStock
+    isNewArrival: z.boolean().optional(),
+    isLiquidated: z.boolean().optional(),
+    isComingSoon: z.boolean().optional(),
+    hasDiscount: z.boolean().optional(),
+    minPrice: z.number().optional(),
+    maxPrice: z.number().optional(),
+  }).optional(),
+  sortBy: z.enum(["featured", "newest", "price-low", "price-high", "rating", "name"]).optional(),
 });
 
 const ComparisonBlockDataSchema = z.object({
@@ -164,13 +177,7 @@ const Template1SectionSchema = z.discriminatedUnion("type", [
     data: DealCountdownDataSchema,
   }),
   z.object({
-    type: z.literal("ProductRailLaptops"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: ProductRailDataSchema,
-  }),
-  z.object({
-    type: z.literal("ProductRailPhones"),
+    type: z.literal("ProductRail"),
     enabled: z.boolean(),
     order: z.number(),
     data: ProductRailDataSchema,
@@ -316,13 +323,7 @@ const Template2SectionSchema = z.discriminatedUnion("type", [
     data: ConfiguratorBlockDataSchema,
   }),
   z.object({
-    type: z.literal("ProductRailNewArrivals"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: ProductRailDataSchema,
-  }),
-  z.object({
-    type: z.literal("ProductRailBestSofas"),
+    type: z.literal("ProductRail"),
     enabled: z.boolean(),
     order: z.number(),
     data: ProductRailDataSchema,
@@ -448,7 +449,7 @@ const Template3SectionSchema = z.discriminatedUnion("type", [
     data: ReviewsWallDataSchema,
   }),
   z.object({
-    type: z.literal("ProductRailBestRated"),
+    type: z.literal("ProductRail"),
     enabled: z.boolean(),
     order: z.number(),
     data: ProductRailDataSchema,
@@ -507,13 +508,10 @@ const BrandStrip = lazy(
   () => import("@/components/Home/sections/template1/BrandStrip")
 );
 const DealCountdown = lazy(
-  () => import("@/components/Home/sections/template1/DealCountdown")
+  () => import("@/components/Home/sections/template1/DealCountdownWrapper")
 );
-const ProductRailLaptops = lazy(
-  () => import("@/components/Home/sections/template1/ProductRailLaptops")
-);
-const ProductRailPhones = lazy(
-  () => import("@/components/Home/sections/template1/ProductRailPhones")
+const ProductRail = lazy(
+  () => import("@/components/Home/sections/ui/ProductRail")
 );
 const ComparisonBlock = lazy(
   () => import("@/components/Home/sections/template1/ComparisonBlock")
@@ -538,14 +536,6 @@ const CategoryGridT2 = lazy(
 const ConfiguratorBlock = lazy(
   () => import("@/components/Home/sections/template2/ConfiguratorBlock")
 );
-const ProductRailNewArrivals = lazy(
-  () =>
-    import("@/components/Home/sections/template2/ProductRailNewArrivals")
-);
-const ProductRailBestSofas = lazy(
-  () =>
-    import("@/components/Home/sections/template2/ProductRailBestSofas")
-);
 const CustomerGallery = lazy(
   () => import("@/components/Home/sections/template2/CustomerGallery")
 );
@@ -569,10 +559,6 @@ const CategoryGridT3 = lazy(
 const ReviewsWall = lazy(
   () => import("@/components/Home/sections/template3/ReviewsWall")
 );
-const ProductRailBestRated = lazy(
-  () =>
-    import("@/components/Home/sections/template3/ProductRailBestRated")
-);
 const BundlePromo = lazy(
   () => import("@/components/Home/sections/template3/BundlePromo")
 );
@@ -589,8 +575,7 @@ export const TEMPLATE_1_ALLOWED_SECTIONS = [
   "CategoryGrid",
   "BrandStrip",
   "DealCountdown",
-  "ProductRailLaptops",
-  "ProductRailPhones",
+  "ProductRail",
   "ComparisonBlock",
   "Reviews",
   "TrustBadges",
@@ -608,8 +593,7 @@ export const template1Definition: TemplateDefinition<
     CategoryGrid: CategoryGridT1,
     BrandStrip,
     DealCountdown,
-    ProductRailLaptops,
-    ProductRailPhones,
+    ProductRail,
     ComparisonBlock,
     Reviews,
     TrustBadges,
@@ -622,8 +606,7 @@ export const TEMPLATE_2_ALLOWED_SECTIONS = [
   "HeroLifestyle",
   "CategoryGrid",
   "ConfiguratorBlock",
-  "ProductRailNewArrivals",
-  "ProductRailBestSofas",
+  "ProductRail",
   "CustomerGallery",
   "BrandStory",
   "ReviewsWarranty",
@@ -640,8 +623,7 @@ export const template2Definition: TemplateDefinition<
     HeroLifestyle,
     CategoryGrid: CategoryGridT2,
     ConfiguratorBlock,
-    ProductRailNewArrivals,
-    ProductRailBestSofas,
+    ProductRail,
     CustomerGallery,
     BrandStory,
     ReviewsWarranty,
@@ -654,7 +636,7 @@ export const TEMPLATE_3_ALLOWED_SECTIONS = [
   "HeroBanner",
   "CategoryGrid",
   "ReviewsWall",
-  "ProductRailBestRated",
+  "ProductRail",
   "BundlePromo",
   "InfluencerHighlight",
   "NewsletterBeauty",
@@ -670,7 +652,7 @@ export const template3Definition: TemplateDefinition<
     HeroBanner,
     CategoryGrid: CategoryGridT3,
     ReviewsWall,
-    ProductRailBestRated,
+    ProductRail,
     BundlePromo,
     InfluencerHighlight,
     NewsletterBeauty,

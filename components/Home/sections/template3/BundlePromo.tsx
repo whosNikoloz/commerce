@@ -1,4 +1,5 @@
 import type { BundlePromoData, Locale } from "@/types/tenant";
+import type { ProductResponseModel } from "@/types/product";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -6,57 +7,89 @@ import { Package } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { t, tOpt } from "@/lib/i18n";
+import { searchProductsByFilter } from "@/app/api/services/productService";
 
 interface BundlePromoProps {
   data: BundlePromoData;
   locale: Locale;
+  template?: 1 | 2 | 3;
 }
 
-export default function BundlePromo({ data, locale }: BundlePromoProps) {
+export default async function BundlePromo({ data, locale, template = 3 }: BundlePromoProps) {
+  let products: ProductResponseModel[] = []
+
+  try {
+    // Fetch random products for bundles
+    const result = await searchProductsByFilter({
+      filter: {},
+      pageSize: 9, // 3 products per bundle × 3 bundles
+      page: 1,
+      sortBy: "featured"
+    })
+    products = result.items || []
+  } catch (e) {
+    console.error("Failed to load bundle products:", e)
+  }
+
+  // Create bundles from fetched products (3 products per bundle)
+  const bundles = []
+  for (let i = 0; i < Math.min(3, Math.floor(products.length / 3)); i++) {
+    const bundleProducts = products.slice(i * 3, (i * 3) + 3)
+    const totalPrice = bundleProducts.reduce((sum, p) => sum + (p.discountPrice || p.price), 0)
+    const bundlePrice = Math.round(totalPrice * 0.85) // 15% bundle discount
+
+    bundles.push({
+      name: `Bundle ${i + 1}`,
+      products: bundleProducts,
+      price: bundlePrice,
+      originalPrice: totalPrice,
+      savings: `Save $${totalPrice - bundlePrice}`
+    })
+  }
   return (
-    <section className="py-16 bg-white dark:bg-gray-950">
+    <section className="py-16 bg-background dark:bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 px-4 py-2 rounded-full mb-4">
-            <Package className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+          <div className="inline-flex items-center gap-2 bg-beauty-luxury/10 dark:bg-beauty-luxury/20 px-4 py-2 rounded-full mb-4 animate-beauty-pulse">
+            <Package className="h-5 w-5 text-beauty-luxury dark:text-beauty-luxury" />
+            <span className="text-sm font-semibold text-beauty-luxury dark:text-beauty-luxury">
               Special Bundle Deals
             </span>
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground dark:text-foreground mb-4">
             {t(data.title, locale)}
           </h2>
 
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-text-subtle dark:text-text-subtledark max-w-2xl mx-auto">
             {t(data.description, locale)}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {data.bundles.map((bundle, idx) => (
+          {bundles.map((bundle, idx) => (
             <div
               key={idx}
-              className="border-2 border-purple-200 dark:border-purple-800 rounded-xl overflow-hidden hover:border-purple-400 dark:hover:border-purple-600 transition-all duration-300"
+              className="border-2 border-beauty-bloom/30 dark:border-beauty-bloom/40 rounded-xl overflow-hidden hover:border-beauty-bloom dark:hover:border-beauty-bloom transition-all duration-300 hover:shadow-lg"
             >
-              <div className="bg-purple-50 dark:bg-purple-950/20 p-4 border-b border-purple-200 dark:border-purple-800">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {t(bundle.name, locale)}
+              <div className="bg-beauty-natural/10 dark:bg-beauty-natural/20 p-4 border-b border-beauty-bloom/20 dark:border-beauty-bloom/30">
+                <h3 className="text-xl font-heading font-bold text-foreground dark:text-foreground">
+                  {bundle.name}
                 </h3>
               </div>
 
-              <div className="p-6">
+              <div className="p-6 bg-card dark:bg-card">
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   {bundle.products.map((product, productIdx) => (
                     <div
-                      key={productIdx}
-                      className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900"
+                      key={product.id}
+                      className="aspect-square relative rounded-lg overflow-hidden bg-muted dark:bg-muted"
                     >
                       <Image
                         fill
-                        alt={t(product.name, locale)}
+                        alt={product.name || "Product"}
                         className="object-cover"
-                        src={product.image}
+                        src={product.images?.[0] || "/placeholder.svg"}
                       />
                     </div>
                   ))}
@@ -65,34 +98,34 @@ export default function BundlePromo({ data, locale }: BundlePromoProps) {
                 <div className="space-y-2 mb-4">
                   {bundle.products.map((product, productIdx) => (
                     <p
-                      key={productIdx}
-                      className="text-sm text-gray-700 dark:text-gray-300"
+                      key={product.id}
+                      className="text-sm text-text-light dark:text-text-lightdark truncate"
                     >
-                      • {t(product.name, locale)}
+                      • {product.name}
                     </p>
                   ))}
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+                <div className="border-t border-border dark:border-border pt-4">
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                    <span className="text-3xl font-bold text-beauty-bloom dark:text-beauty-bloom">
                       ${bundle.price}
                     </span>
                     {bundle.originalPrice && (
-                      <span className="text-lg text-gray-500 line-through">
+                      <span className="text-lg text-muted-foreground dark:text-muted-foreground line-through">
                         ${bundle.originalPrice}
                       </span>
                     )}
                   </div>
 
                   {bundle.savings && (
-                    <p className="text-sm text-green-600 dark:text-green-400 font-semibold mb-4">
-                      {tOpt(bundle.savings, locale)}
+                    <p className="text-sm text-beauty-natural dark:text-beauty-natural font-semibold mb-4">
+                      {bundle.savings}
                     </p>
                   )}
 
                   <Button asChild className="w-full">
-                    <Link href={bundle.href}>Add Bundle to Cart</Link>
+                    <Link href={`/search`}>View Bundle Products</Link>
                   </Button>
                 </div>
               </div>

@@ -36,8 +36,7 @@ export type Template1SectionType =
   | "CategoryGrid"
   | "BrandStrip"
   | "DealCountdown"
-  | "ProductRailLaptops"
-  | "ProductRailPhones"
+  | "ProductRail"
   | "ComparisonBlock"
   | "Reviews"
   | "TrustBadges"
@@ -85,11 +84,25 @@ export type DealCountdownData = {
 };
 
 export type ProductRailData = {
+  customName?: string; // Optional custom name to identify this rail in admin (e.g., "Liquidated Laptops", "Premium Phones")
   title: LocalizedText;
   subtitle?: LocalizedText;
-  category: string;
   limit: number;
   viewAllHref: string;
+  // Filter options - use any combination
+  filterBy?: {
+    categoryIds?: string[]; // Filter by category IDs
+    brandIds?: string[]; // Filter by brand IDs
+    condition?: number[]; // Filter by condition enum (0=New, 1=Used, 2=LikeNew)
+    stockStatus?: number; // Filter by stock status enum (0=InStock, 1=OutOfStock)
+    isNewArrival?: boolean; // Filter for new arrivals
+    isLiquidated?: boolean; // Filter for liquidated items
+    isComingSoon?: boolean; // Filter for coming soon items
+    hasDiscount?: boolean; // Filter for items with discount
+    minPrice?: number;
+    maxPrice?: number;
+  };
+  sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
 };
 
 export type ComparisonBlockData = {
@@ -140,8 +153,7 @@ export type Template2SectionType =
   | "HeroLifestyle"
   | "CategoryGrid"
   | "ConfiguratorBlock"
-  | "ProductRailNewArrivals"
-  | "ProductRailBestSofas"
+  | "ProductRail"
   | "CustomerGallery"
   | "BrandStory"
   | "ReviewsWarranty"
@@ -216,7 +228,7 @@ export type Template3SectionType =
   | "HeroBanner"
   | "CategoryGrid"
   | "ReviewsWall"
-  | "ProductRailBestRated"
+  | "ProductRail"
   | "BundlePromo"
   | "InfluencerHighlight"
   | "NewsletterBeauty";
@@ -278,8 +290,7 @@ export type Template1SectionInstance =
   | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
   | { type: "BrandStrip"; enabled: boolean; order: number; data: BrandStripData }
   | { type: "DealCountdown"; enabled: boolean; order: number; data: DealCountdownData }
-  | { type: "ProductRailLaptops"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "ProductRailPhones"; enabled: boolean; order: number; data: ProductRailData }
+  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "ComparisonBlock"; enabled: boolean; order: number; data: ComparisonBlockData }
   | { type: "Reviews"; enabled: boolean; order: number; data: ReviewsData }
   | { type: "TrustBadges"; enabled: boolean; order: number; data: TrustBadgesData }
@@ -289,8 +300,7 @@ export type Template2SectionInstance =
   | { type: "HeroLifestyle"; enabled: boolean; order: number; data: HeroLifestyleData }
   | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
   | { type: "ConfiguratorBlock"; enabled: boolean; order: number; data: ConfiguratorBlockData }
-  | { type: "ProductRailNewArrivals"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "ProductRailBestSofas"; enabled: boolean; order: number; data: ProductRailData }
+  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "CustomerGallery"; enabled: boolean; order: number; data: CustomerGalleryData }
   | { type: "BrandStory"; enabled: boolean; order: number; data: BrandStoryData }
   | { type: "ReviewsWarranty"; enabled: boolean; order: number; data: ReviewsWarrantyData }
@@ -300,7 +310,7 @@ export type Template3SectionInstance =
   | { type: "HeroBanner"; enabled: boolean; order: number; data: HeroBannerData }
   | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
   | { type: "ReviewsWall"; enabled: boolean; order: number; data: ReviewsWallData }
-  | { type: "ProductRailBestRated"; enabled: boolean; order: number; data: ProductRailData }
+  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "BundlePromo"; enabled: boolean; order: number; data: BundlePromoData }
   | { type: "InfluencerHighlight"; enabled: boolean; order: number; data: InfluencerHighlightData }
   | { type: "NewsletterBeauty"; enabled: boolean; order: number; data: NewsletterData };

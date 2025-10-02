@@ -5,6 +5,7 @@ import { Shield, Truck, CreditCard, Headphones } from "lucide-react"
 interface TrustBadgesProps {
   data: TrustBadgesData
   locale: Locale
+  template?: 1 | 2 | 3
 }
 
 const iconMap: Record<string, any> = {
@@ -14,7 +15,7 @@ const iconMap: Record<string, any> = {
   headphones: Headphones,
 }
 
-export default function TrustBadges({ data, locale }: TrustBadgesProps) {
+export default function TrustBadges({ data, locale, template = 1 }: TrustBadgesProps) {
   return (
     <section className="py-16 border-y border-border bg-background">
       <div className="container mx-auto px-4">
@@ -24,11 +25,15 @@ export default function TrustBadges({ data, locale }: TrustBadgesProps) {
 
             return (
               <div key={idx} className="flex flex-col items-center text-center group">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 p-5 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <Icon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <div className="bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-primary/10 dark:to-brand-primary/20 p-5 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                  <Icon className="h-8 w-8 text-brand-primary dark:text-brand-primary" />
                 </div>
-                <h3 className="font-bold text-base text-foreground mb-2">{t(badge.title, locale)}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{t(badge.description, locale)}</p>
+                <h3 className="font-bold font-heading text-base text-text-light dark:text-text-lightdark mb-2">
+                  {t(badge.title, locale)}
+                </h3>
+                <p className="text-sm text-text-subtle dark:text-text-subtledark leading-relaxed">
+                  {t(badge.description, locale)}
+                </p>
               </div>
             )
           })}

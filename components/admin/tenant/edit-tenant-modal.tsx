@@ -9,6 +9,7 @@ import type {
 } from "@/types/tenant";
 
 import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import {
   Modal,
   ModalContent,
@@ -27,6 +28,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getDefaultSectionsForTemplate, TEMPLATE_1_ALLOWED_SECTIONS, TEMPLATE_2_ALLOWED_SECTIONS, TEMPLATE_3_ALLOWED_SECTIONS } from "@/lib/templates";
 
 interface EditTenantModalProps {
   isOpen: boolean;
@@ -89,6 +91,7 @@ export default function EditTenantModal({
 }: EditTenantModalProps) {
   const isMobile = useIsMobile();
 
+  const [templateId, setTemplateId] = useState<1 | 2 | 3>(config.templateId as 1 | 2 | 3);
   const [themeColor, setThemeColor] = useState(config.themeColor);
   const [themeMode, setThemeMode] = useState<"light" | "dark">(config.theme.mode);
 
@@ -111,6 +114,7 @@ export default function EditTenantModal({
   );
 
   const [loading, setLoading] = useState(false);
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
   // Inline editor state
   const contentEditor = useDisclosure();
@@ -136,6 +140,7 @@ export default function EditTenantModal({
   // Reset when opening
   useEffect(() => {
     if (!isOpen) return;
+    setTemplateId(config.templateId as 1 | 2 | 3);
     setThemeColor(config.themeColor);
     setThemeMode(config.theme.mode);
     setBrandColors(config.theme.brand);
@@ -181,6 +186,7 @@ export default function EditTenantModal({
 
   const handleSaveContent = (updatedData: any) => {
     if (selectedSection === null) return;
+    console.log("Saving section content:", selectedSection.index, updatedData);
     setSections((prev) =>
       prev.map((section, i) => (i === selectedSection.index ? { ...section, data: updatedData } : section)),
     );
@@ -204,6 +210,28 @@ export default function EditTenantModal({
     setSections((prev) => [...prev, newSection]);
     toast.success("Product Rail section added");
   };
+
+  const addSection = (sectionType: string) => {
+    const maxOrder = sections.length > 0 ? Math.max(...sections.map(s => s.order)) : 0;
+    const defaultSections = getDefaultSectionsForTemplate(templateId);
+    const defaultSection = defaultSections.find(s => s.type === sectionType);
+
+    if (defaultSection) {
+      const newSection = {
+        ...defaultSection,
+        order: maxOrder + 1,
+      };
+      setSections((prev) => [...prev, newSection as any]);
+      toast.success(`${sectionType} section added`);
+      setShowAddSectionModal(false);
+    } else {
+      toast.error(`Could not add ${sectionType} section`);
+    }
+  };
+
+  const availableSections = templateId === 1 ? TEMPLATE_1_ALLOWED_SECTIONS :
+    templateId === 2 ? TEMPLATE_2_ALLOWED_SECTIONS :
+    TEMPLATE_3_ALLOWED_SECTIONS;
 
   const deleteSection = (index: number) => {
     setSections((prev) => prev.filter((_, i) => i !== index));
@@ -253,9 +281,23 @@ export default function EditTenantModal({
       };
       const primaryRGB = hexToRGB(themeColor);
 
+      // Clean sections: remove brands array from BrandStrip sections (keep title) only for API payload
+      const cleanSections = sections.map((section) => {
+        if (section.type === "BrandStrip") {
+          // Only keep title, remove brands
+          return {
+            ...section,
+            data: {
+              title: section.data.title,
+            },
+          };
+        }
+        return section;
+      });
+
       let updatedConfig: TenantConfig;
 
-      if (config.templateId === 1) {
+      if (templateId === 1) {
         updatedConfig = {
           templateId: 1,
           themeColor,
@@ -267,10 +309,10 @@ export default function EditTenantModal({
           },
           homepage: {
             templateId: 1,
-            sections: sections.filter(isT1),
+            sections: cleanSections.filter(isT1) as Template1SectionInstance[],
           },
         };
-      } else if (config.templateId === 2) {
+      } else if (templateId === 2) {
         updatedConfig = {
           templateId: 2,
           themeColor,
@@ -282,7 +324,7 @@ export default function EditTenantModal({
           },
           homepage: {
             templateId: 2,
-            sections: sections.filter(isT2),
+            sections: cleanSections.filter(isT2) as Template2SectionInstance[],
           },
         };
       } else {
@@ -297,7 +339,7 @@ export default function EditTenantModal({
           },
           homepage: {
             templateId: 3,
-            sections: sections.filter(isT3),
+            sections: cleanSections.filter(isT3) as Template3SectionInstance[],
           },
         };
       }
@@ -339,6 +381,7 @@ export default function EditTenantModal({
   const getSectionLabel = (type: string) => type.replace(/([A-Z])/g, " $1").trim();
 
   return (
+    <>
     <Modal
       className="max-w-3xl"
       classNames={{
@@ -348,8 +391,8 @@ export default function EditTenantModal({
         wrapper: "z-[998]",
         closeButton: "z-50",
       }}
-      hideCloseButton={contentEditor.isOpen}
-      isDismissable={!contentEditor.isOpen}
+      hideCloseButton={contentEditor.isOpen || showAddSectionModal}
+      isDismissable={!contentEditor.isOpen && !showAddSectionModal}
       isOpen={isOpen}
       placement={isMobile ? "top" : "center"}
       scrollBehavior="inside"
@@ -450,7 +493,21 @@ export default function EditTenantModal({
                     <div className="space-y-6">
                       {/* Mode & Primary Color */}
                       <div className="space-y-4">
-                        <h4 className="font-semibold text-sm">General</h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-sm">General</h4>
+                          <Button
+                            className="h-7 text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setThemeColor(config.themeColor);
+                              setThemeMode(config.theme.mode);
+                              toast.success("General settings reset");
+                            }}
+                          >
+                            Reset
+                          </Button>
+                        </div>
                         <div>
                           <label className="text-sm font-medium mb-2 block">Theme Mode</label>
                           <Tabs value={themeMode} onValueChange={handleThemeModeChange}>
@@ -475,7 +532,20 @@ export default function EditTenantModal({
 
                       {/* Brand Colors */}
                       <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <h4 className="font-semibold text-sm">Brand Colors</h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-sm">Brand Colors</h4>
+                          <Button
+                            className="h-7 text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setBrandColors(config.theme.brand);
+                              toast.success("Brand colors reset");
+                            }}
+                          >
+                            Reset
+                          </Button>
+                        </div>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
                             <div className="flex-1">
@@ -589,7 +659,20 @@ export default function EditTenantModal({
 
                       {/* Text Colors */}
                       <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <h4 className="font-semibold text-sm">Text Colors</h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-sm">Text Colors</h4>
+                          <Button
+                            className="h-7 text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setTextColors(config.theme.text);
+                              toast.success("Text colors reset");
+                            }}
+                          >
+                            Reset
+                          </Button>
+                        </div>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
                             <div className="flex-1">
@@ -701,7 +784,26 @@ export default function EditTenantModal({
 
                       {/* Fonts */}
                       <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <h4 className="font-semibold text-sm">Typography</h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-sm">Typography</h4>
+                          <Button
+                            className="h-7 text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setFonts(
+                                config.theme.fonts || {
+                                  primary: "Inter, system-ui, sans-serif",
+                                  secondary: "Inter, system-ui, sans-serif",
+                                  heading: "Inter, system-ui, sans-serif",
+                                }
+                              );
+                              toast.success("Typography reset");
+                            }}
+                          >
+                            Reset
+                          </Button>
+                        </div>
                         <div className="space-y-3">
                           {["primary", "secondary", "heading"].map((k) => (
                             <div key={k}>
@@ -744,17 +846,206 @@ export default function EditTenantModal({
 
                 {/* TEMPLATE TAB */}
                 <TabsContent className="pt-4" value="template">
-                  <div className="rounded-lg border-2 border-slate-200 dark:border-slate-700 p-4 bg-white/80 dark:bg-slate-900/70">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">Current Template</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          {getTemplateLabel(config.templateId)}
+                  <ScrollArea className="h-[500px] pr-4">
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-sm">Select Template</h4>
+                        <div className="grid grid-cols-1 gap-4">
+                          {/* Template 1 */}
+                          <div
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                              templateId === 1
+                                ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
+                                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
+                            }`}
+                            onClick={() => {
+                              setTemplateId(1);
+                              setSections(getDefaultSectionsForTemplate(1) as AnySectionInstance[]);
+                              toast.success("Template 1 selected - Default sections loaded");
+                            }}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div
+                                    className={`text-xl font-bold ${
+                                      templateId === 1 ? "text-amber-600" : "text-slate-400"
+                                    }`}
+                                  >
+                                    #1
+                                  </div>
+                                  <h5 className="font-semibold text-lg">Tech / Electronics</h5>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                                  Modern e-commerce template for electronics, gadgets, and tech products
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                    Hero with Search
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                                    Deal Countdown
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                    Product Comparison
+                                  </span>
+                                </div>
+                              </div>
+                              {templateId === 1 && (
+                                <div className="ml-3">
+                                  <div className="h-6 w-6 rounded-full bg-amber-500 flex items-center justify-center">
+                                    <svg
+                                      className="w-4 h-4 text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        d="M5 13l4 4L19 7"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Template 2 */}
+                          <div
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                              templateId === 2
+                                ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
+                                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
+                            }`}
+                            onClick={() => {
+                              setTemplateId(2);
+                              setSections(getDefaultSectionsForTemplate(2) as AnySectionInstance[]);
+                              toast.success("Template 2 selected - Default sections loaded");
+                            }}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div
+                                    className={`text-xl font-bold ${
+                                      templateId === 2 ? "text-amber-600" : "text-slate-400"
+                                    }`}
+                                  >
+                                    #2
+                                  </div>
+                                  <h5 className="font-semibold text-lg">Home / Furniture</h5>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                                  Elegant template for furniture, home decor, and lifestyle products
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                    Lifestyle Hero
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
+                                    Product Configurator
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
+                                    Customer Gallery
+                                  </span>
+                                </div>
+                              </div>
+                              {templateId === 2 && (
+                                <div className="ml-3">
+                                  <div className="h-6 w-6 rounded-full bg-amber-500 flex items-center justify-center">
+                                    <svg
+                                      className="w-4 h-4 text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        d="M5 13l4 4L19 7"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Template 3 */}
+                          <div
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                              templateId === 3
+                                ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
+                                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
+                            }`}
+                            onClick={() => {
+                              setTemplateId(3);
+                              setSections(getDefaultSectionsForTemplate(3) as AnySectionInstance[]);
+                              toast.success("Template 3 selected - Default sections loaded");
+                            }}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div
+                                    className={`text-xl font-bold ${
+                                      templateId === 3 ? "text-amber-600" : "text-slate-400"
+                                    }`}
+                                  >
+                                    #3
+                                  </div>
+                                  <h5 className="font-semibold text-lg">Beauty / Health</h5>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                                  Stylish template for beauty, cosmetics, and wellness products
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
+                                    Banner Hero
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                                    Bundle Promos
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                    Influencer Spotlight
+                                  </span>
+                                </div>
+                              </div>
+                              {templateId === 3 && (
+                                <div className="ml-3">
+                                  <div className="h-6 w-6 rounded-full bg-amber-500 flex items-center justify-center">
+                                    <svg
+                                      className="w-4 h-4 text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        d="M5 13l4 4L19 7"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/20 p-4">
+                        <p className="text-sm text-amber-800 dark:text-amber-200">
+                          <strong>⚠️ Warning:</strong> Changing the template will reset your sections to the default layout for the new template. Make sure to save any important customizations first.
                         </p>
                       </div>
-                      <div className="text-2xl font-bold text-amber-600">#{config.templateId}</div>
                     </div>
-                  </div>
+                  </ScrollArea>
                 </TabsContent>
 
                 {/* SECTIONS TAB */}
@@ -767,9 +1058,9 @@ export default function EditTenantModal({
                       className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-md"
                       size="sm"
                       startContent={<IconPlus className="h-4 w-4" />}
-                      onPress={addProductRail}
+                      onPress={() => setShowAddSectionModal(true)}
                     >
-                      Add Product Rail
+                      Add Section
                     </Button>
                   </div>
 
@@ -870,7 +1161,7 @@ export default function EditTenantModal({
 
                   <div className="mt-4 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/20 p-3">
                     <p className="text-xs text-amber-800 dark:text-amber-200">
-                      <strong>Tip:</strong> Use the "Add Product Rail" button to add custom product sections with any filters you want (liquidated, new arrivals, categories, brands, etc).
+                      <strong>Tip:</strong> Click &quot;Add Section&quot; to add any section type available for this template. You can add multiple ProductRail sections with different filters (liquidated, new arrivals, categories, brands, etc).
                     </p>
                   </div>
                 </TabsContent>
@@ -905,5 +1196,60 @@ export default function EditTenantModal({
         )}
       </ModalContent>
     </Modal>
+
+    {/* Add Section Modal - Using portal to render outside DOM hierarchy */}
+    {showAddSectionModal && isOpen && typeof document !== 'undefined' && createPortal(
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+        style={{ zIndex: 999999 }}
+        onClick={() => setShowAddSectionModal(false)}
+      >
+        <div
+          className="relative max-w-md w-full mx-4 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border-2 border-slate-200 dark:border-slate-800 p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              Add Section
+            </h3>
+            <button
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              onClick={() => setShowAddSectionModal(false)}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M6 18L18 6M6 6l12 12"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                />
+              </svg>
+            </button>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            Select a section type to add to your homepage:
+          </p>
+          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+            {availableSections.map((sectionType) => (
+              <button
+                key={sectionType}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-green-500 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950/20 transition-all"
+                onClick={() => addSection(sectionType)}
+              >
+                <IconPlus className="h-5 w-5 text-green-600" />
+                <span className="font-medium">{getSectionLabel(sectionType)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>,
+      document.body
+    )}
+    </>
   );
 }

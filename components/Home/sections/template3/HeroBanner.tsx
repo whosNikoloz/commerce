@@ -13,7 +13,7 @@ interface HeroBannerProps {
 
 export default function HeroBanner({ data, locale, template = 3 }: HeroBannerProps) {
   return (
-    <section className="relative h-[500px] md:h-[650px] overflow-hidden">
+    <section className="relative h-[500px] md:h-[650px] overflow-hidden group">
       <picture>
         {data.mobileBackgroundImage && (
           <source
@@ -22,38 +22,48 @@ export default function HeroBanner({ data, locale, template = 3 }: HeroBannerPro
           />
         )}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
           style={{ backgroundImage: `url(${data.backgroundImage})` }}
         />
       </picture>
 
-      <div className="absolute inset-0 bg-gradient-to-r from-beauty-natural/80 via-transparent to-transparent dark:from-beauty-luxury/70" />
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
 
-      <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-        <div className="max-w-xl text-white animate-beauty-pulse">
+      <div className="relative z-10 container mx-auto px-6 md:px-8 h-full flex items-center">
+        <div className="max-w-xl text-white space-y-6">
           {data.badge && (
-            <div className="inline-block bg-beauty-bloom px-4 py-1.5 rounded-full text-sm font-semibold mb-4 text-white shadow-lg">
+            <div className="inline-block bg-brand-primary/10 border border-brand-primary/20 px-4 py-1.5 rounded-full text-sm font-semibold text-brand-primary backdrop-blur-sm">
               {tOpt(data.badge, locale)}
             </div>
           )}
 
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight font-heading text-balance">
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             {t(data.headline, locale)}
           </h1>
 
           {data.subheadline && (
-            <p className="text-xl md:text-2xl mb-8 text-text-light dark:text-text-lightdark text-pretty">
+            <p className="text-lg md:text-xl text-white/90">
               {tOpt(data.subheadline, locale)}
             </p>
           )}
 
           {data.cta && (
-            <Button asChild className="text-lg px-8 bg-beauty-bloom hover:bg-beauty-luxury transition-all hover:scale-105 shadow-xl" size="lg">
-              <Link href={data.cta.href}>{t(data.cta.label, locale)}</Link>
-            </Button>
+            <div className="pt-2">
+              <Button
+                asChild
+                className="bg-brand-primary hover:bg-brand-primary/90 text-white font-semibold"
+                size="lg"
+              >
+                <Link href={data.cta.href}>{t(data.cta.label, locale)}</Link>
+              </Button>
+            </div>
           )}
         </div>
       </div>
+
+      {/* Bottom Fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 }

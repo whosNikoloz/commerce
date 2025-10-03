@@ -63,11 +63,6 @@ export type CategoryGridData = {
 
 export type BrandStripData = {
   title?: LocalizedText;
-  brands: Array<{
-    name: string;
-    logoUrl: string;
-    href?: string;
-  }>;
 };
 
 export type DealCountdownData = {

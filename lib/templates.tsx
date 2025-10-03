@@ -56,7 +56,7 @@ const BrandStripDataSchema = z.object({
       logoUrl: z.string(),
       href: z.string().optional(),
     })
-  ),
+  ).optional(),
 });
 
 const DealCountdownDataSchema = z.object({
@@ -689,4 +689,337 @@ export function validateHomepage(homepage: any, templateId: 1 | 2 | 3) {
   }
 
   return result.data;
+}
+
+// ===== Default sections for each template =====
+export function getDefaultSectionsForTemplate(templateId: 1 | 2 | 3): any[] {
+  switch (templateId) {
+    case 1:
+      return [
+        {
+          type: "HeroWithSearch",
+          enabled: true,
+          order: 1,
+          data: {
+            headline: { ka: "ახალი კოლექცია", en: "New Collection" },
+            subheadline: { ka: "საუკეთესო ფასებით", en: "Best prices" },
+            searchPlaceholder: { ka: "ძიება...", en: "Search..." },
+            promoBadge: { ka: "🔥 ახალი", en: "🔥 New" },
+            imageUrl: "/hero/hero-tech.jpg",
+          },
+        },
+        {
+          type: "CategoryGrid",
+          enabled: true,
+          order: 2,
+          data: {
+            title: { ka: "კატეგორიები", en: "Categories" },
+            categories: [
+              {
+                name: { ka: "ლეპტოპები", en: "Laptops" },
+                imageUrl: "/cat-laptops.jpg",
+                href: "/category/laptops",
+                productCount: 150,
+              },
+              {
+                name: { ka: "სმარტფონები", en: "Smartphones" },
+                imageUrl: "/cat-phones.jpg",
+                href: "/category/phones",
+                productCount: 230,
+              },
+            ],
+          },
+        },
+        {
+          type: "BrandStrip",
+          enabled: true,
+          order: 3,
+          data: {
+            title: { ka: "ბრენდები", en: "Brands" },
+          },
+        },
+        {
+          type: "DealCountdown",
+          enabled: true,
+          order: 4,
+          data: {
+            title: { ka: "დღის შეთავაზება", en: "Deal of the Day" },
+            endsAtISO: new Date(Date.now() + 86400000).toISOString(),
+            dealItems: [],
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 5,
+          data: {
+            title: { ka: "პოპულარული", en: "Popular" },
+            subtitle: { ka: "ტოპ პროდუქტები", en: "Top products" },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: {},
+            sortBy: "featured",
+          },
+        },
+        {
+          type: "ComparisonBlock",
+          enabled: true,
+          order: 6,
+          data: {
+            title: { ka: "შეადარე", en: "Compare" },
+            description: { ka: "იპოვე სწორი არჩევანი", en: "Find the right choice" },
+            products: [],
+          },
+        },
+        {
+          type: "Reviews",
+          enabled: true,
+          order: 7,
+          data: {
+            title: { ka: "შეფასებები", en: "Reviews" },
+            reviews: [],
+          },
+        },
+        {
+          type: "TrustBadges",
+          enabled: true,
+          order: 8,
+          data: {
+            badges: [
+              {
+                icon: "shield",
+                title: { ka: "უსაფრთხო გადახდა", en: "Secure Payment" },
+                description: { ka: "SSL დაცვა", en: "SSL Protection" },
+              },
+            ],
+          },
+        },
+        {
+          type: "NewsletterApp",
+          enabled: true,
+          order: 9,
+          data: {
+            title: { ka: "გამოწერა", en: "Subscribe" },
+            description: { ka: "სიახლეები და შეთავაზებები", en: "News & Offers" },
+            emailPlaceholder: { ka: "ელფოსტა", en: "Email" },
+            ctaLabel: { ka: "გამოწერა", en: "Subscribe" },
+          },
+        },
+      ];
+    case 2:
+      return [
+        {
+          type: "HeroLifestyle",
+          enabled: true,
+          order: 1,
+          data: {
+            headline: { ka: "თბილი სახლი", en: "Warm Home" },
+            subheadline: { ka: "კომფორტი და სტილი", en: "Comfort & Style" },
+            imageUrl: "/hero-furniture.jpg",
+            overlayOpacity: 0.3,
+          },
+        },
+        {
+          type: "CategoryGrid",
+          enabled: true,
+          order: 2,
+          data: {
+            title: { ka: "კატეგორიები", en: "Categories" },
+            categories: [
+              {
+                name: { ka: "სალონი", en: "Living Room" },
+                imageUrl: "/cat-living.jpg",
+                href: "/category/living-room",
+                productCount: 100,
+              },
+              {
+                name: { ka: "საძინებელი", en: "Bedroom" },
+                imageUrl: "/cat-bedroom.jpg",
+                href: "/category/bedroom",
+                productCount: 80,
+              },
+            ],
+          },
+        },
+        {
+          type: "ConfiguratorBlock",
+          enabled: true,
+          order: 3,
+          data: {
+            title: { ka: "შექმენი შენი დივანი", en: "Build Your Sofa" },
+            description: { ka: "აირჩიე ზომა, მასალა და ფერი", en: "Choose size, material & color" },
+            steps: [
+              {
+                label: { ka: "ზომა", en: "Size" },
+                options: [
+                  { ka: "2 ადგილიანი", en: "2-Seater" },
+                  { ka: "3 ადგილიანი", en: "3-Seater" },
+                ],
+              },
+              {
+                label: { ka: "მასალა", en: "Material" },
+                options: [
+                  { ka: "ტყავი", en: "Leather" },
+                  { ka: "ქსოვილი", en: "Fabric" },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: { ka: "ახალი ჩამოსვლები", en: "New Arrivals" },
+            subtitle: { ka: "უახლესი კოლექცია", en: "Latest collection" },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: { isNewArrival: true },
+            sortBy: "newest",
+          },
+        },
+        {
+          type: "CustomerGallery",
+          enabled: true,
+          order: 5,
+          data: {
+            title: { ka: "გალერეა", en: "Gallery" },
+            subtitle: { ka: "თქვენი სივრცე", en: "Your space" },
+            images: [
+              {
+                url: "/gallery-1.jpg",
+                caption: { ka: "თანამედროვე სალონი", en: "Modern living room" },
+                author: "@user1",
+              },
+            ],
+          },
+        },
+        {
+          type: "BrandStory",
+          enabled: true,
+          order: 6,
+          data: {
+            title: { ka: "ჩვენი ისტორია", en: "Our Story" },
+            story: { ka: "<p>ჩვენი ისტორია</p>", en: "<p>Our story</p>" },
+            imageUrl: "/brand-story.jpg",
+          },
+        },
+        {
+          type: "ReviewsWarranty",
+          enabled: true,
+          order: 7,
+          data: {
+            title: { ka: "შეფასებები", en: "Reviews" },
+            reviews: [],
+            warrantyInfo: {
+              title: { ka: "გარანტია", en: "Warranty" },
+              details: [
+                { ka: "5 წლიანი გარანტია", en: "5-Year Warranty" },
+              ],
+            },
+          },
+        },
+        {
+          type: "Newsletter",
+          enabled: true,
+          order: 8,
+          data: {
+            title: { ka: "გამოწერა", en: "Subscribe" },
+            description: { ka: "სიახლეები", en: "Latest news" },
+            emailPlaceholder: { ka: "ელფოსტა", en: "Email" },
+            ctaLabel: { ka: "გამოწერა", en: "Subscribe" },
+          },
+        },
+      ];
+    case 3:
+      return [
+        {
+          type: "HeroBanner",
+          enabled: true,
+          order: 1,
+          data: {
+            headline: { ka: "სილამაზე", en: "Beauty" },
+            subheadline: { ka: "ბუნებრივი კოსმეტიკა", en: "Natural cosmetics" },
+            backgroundImage: "/hero-beauty.jpg",
+          },
+        },
+        {
+          type: "CategoryGrid",
+          enabled: true,
+          order: 2,
+          data: {
+            title: { ka: "კატეგორიები", en: "Categories" },
+            categories: [
+              {
+                name: { ka: "კოსმეტიკა", en: "Cosmetics" },
+                imageUrl: "/cat-cosmetics.jpg",
+                href: "/category/cosmetics",
+                productCount: 200,
+              },
+              {
+                name: { ka: "მოვლა", en: "Skincare" },
+                imageUrl: "/cat-skincare.jpg",
+                href: "/category/skincare",
+                productCount: 150,
+              },
+            ],
+          },
+        },
+        {
+          type: "ReviewsWall",
+          enabled: true,
+          order: 3,
+          data: {
+            title: { ka: "შეფასებები", en: "Reviews" },
+            reviews: [],
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: { ka: "პოპულარული", en: "Popular" },
+            subtitle: { ka: "ბესტსელერები", en: "Bestsellers" },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: {},
+            sortBy: "featured",
+          },
+        },
+        {
+          type: "BundlePromo",
+          enabled: true,
+          order: 5,
+          data: {
+            title: { ka: "ბანდლები", en: "Bundles" },
+            description: { ka: "შეინახე მეტი", en: "Save more" },
+            bundles: [],
+          },
+        },
+        {
+          type: "InfluencerHighlight",
+          enabled: true,
+          order: 6,
+          data: {
+            title: { ka: "ინფლუენსერები", en: "Influencers" },
+            images: [],
+          },
+        },
+        {
+          type: "NewsletterBeauty",
+          enabled: true,
+          order: 7,
+          data: {
+            title: { ka: "გამოწერა", en: "Subscribe" },
+            description: { ka: "სილამაზის რჩევები", en: "Beauty tips" },
+            emailPlaceholder: { ka: "ელფოსტა", en: "Email" },
+            ctaLabel: { ka: "გამოწერა", en: "Subscribe" },
+          },
+        },
+      ];
+    default:
+      return [];
+  }
 }

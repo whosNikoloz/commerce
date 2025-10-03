@@ -1,5 +1,5 @@
 {
-  "name": "next-app-template",
+  "name": "dynamic_ecommerce",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -71,6 +71,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "crypto-js": "^4.2.0",
+    "embla-carousel": "^8.6.0",
+    "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.12",
     "intl-messageformat": "^10.5.0",

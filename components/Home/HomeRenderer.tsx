@@ -12,6 +12,7 @@ interface HomeRendererProps {
 export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
   // 1) Validate homepage configuration
   let validatedHomepage;
+
   try {
     validatedHomepage = validateHomepage(
       tenant.homepage,
@@ -66,7 +67,7 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
               <div className="w-full h-64 animate-pulse bg-muted" />
             }
           >
-            <Component data={section.data} locale={locale} template={tenant.templateId} />
+            <Component data={section.data} locale={locale} />
           </Suspense>
         );
       })}

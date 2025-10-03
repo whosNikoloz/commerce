@@ -515,12 +515,9 @@ export default function SectionContentEditor({
         return (
           <div className="space-y-6">
             {data.title && renderLocalizedInput("Title", ["title"], data.title)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
-              <p className="text-sm text-text-subtle dark:text-text-subtledark">
-                <strong>Note:</strong> Brand items editing requires advanced interface.
-              </p>
-              <p className="mt-2 text-xs text-text-subtle dark:text-text-subtledark">
-                Current brands: {data.brands?.length || 0}
+            <div className="rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/20 p-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                <strong>Note:</strong> Brand data is loaded from the server. Only the section title can be edited here.
               </p>
             </div>
           </div>

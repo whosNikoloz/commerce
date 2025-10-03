@@ -1,9 +1,11 @@
 import type { ComparisonBlockData, Locale } from "@/types/tenant"
 import type { ProductResponseModel } from "@/types/product"
-import { t, tOpt } from "@/lib/i18n"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Check } from "lucide-react"
+
+import { t, tOpt } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { searchProductsByFilter } from "@/app/api/services/productService"
 import { getAllCategories } from "@/app/api/services/categoryService"
@@ -29,11 +31,13 @@ export default async function ComparisonBlock({ data, locale, template = 1 }: Co
         page: 1,
         sortBy: "featured"
       })
+
       products = result.items || []
     }
   } catch (e) {
     console.error("Failed to load comparison products:", e)
   }
+
   return (
     <section className="py-20 bg-brand-surface dark:bg-brand-surfacedark">
       <div className="container mx-auto px-4">
@@ -56,10 +60,10 @@ export default async function ComparisonBlock({ data, locale, template = 1 }: Co
             >
               <div className="aspect-square relative bg-brand-muted dark:bg-brand-muteddark overflow-hidden">
                 <Image
-                  src={product.images?.[0] || "/placeholder.svg"}
-                  alt={product.name || "Product"}
                   fill
+                  alt={product.name || "Product"}
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  src={product.images?.[0] || "/placeholder.svg"}
                 />
               </div>
 
@@ -76,9 +80,9 @@ export default async function ComparisonBlock({ data, locale, template = 1 }: Co
                       </div>
                       <span className="text-text-subtle dark:text-text-subtledark leading-relaxed">
                         <strong className="text-text-light dark:text-text-lightdark font-semibold">
-                          {facet.facet?.name}:
+                          {facet.facetName}:
                         </strong>{" "}
-                        {facet.values?.join(", ")}
+                        {/* {facet.values?.join(", ")} */}
                       </span>
                     </div>
                   ))}

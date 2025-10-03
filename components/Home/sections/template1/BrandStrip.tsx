@@ -1,8 +1,10 @@
 import type { BrandStripData, Locale } from "@/types/tenant"
-import { tOpt } from "@/lib/i18n"
-import { getAllBrands } from "@/app/api/services/brandService"
+
 import { BrandCard, BrandCardSkeleton } from "../ui/BrandCard"
 import { SectionContainer } from "../ui/SectionContainer"
+
+import { tOpt } from "@/lib/i18n"
+import { getAllBrands } from "@/app/api/services/brandService"
 
 interface BrandStripProps {
   data: BrandStripData
@@ -16,14 +18,11 @@ export default async function BrandStrip({ data, locale, template = 1 }: BrandSt
 
   try {
     const brands = await getAllBrands()
-    const activeBrands = brands.slice(0, 12)
 
-    // Merge with predefined logo URLs from data
-    brandsData = activeBrands.map(brand => {
-      const predefinedBrand = data.brands.find(b => b.name === brand.name)
+    brandsData = brands.map(brand => {
       return {
         brand,
-        logoUrl: predefinedBrand?.logoUrl || "/placeholder.svg"
+        logoUrl: "/placeholder.svg"
       }
     })
   } catch (e) {
@@ -46,30 +45,37 @@ export default async function BrandStrip({ data, locale, template = 1 }: BrandSt
     </div>
   )
 
+  // Duplicate brands for infinite scroll effect
+  const duplicatedBrands = brandsData ? [...brandsData, ...brandsData] : []
+
   return (
     <SectionContainer
+      className="py-16 border-y border-border"
+      emptyMessage="No brands available"
       error={error}
       isEmpty={!brandsData || brandsData.length === 0}
-      emptyMessage="No brands available"
       loadingSkeleton={loadingSkeleton}
-      className="py-16 bg-muted/30 border-y border-border"
     >
       <div className="container mx-auto px-4">
         {data.title && (
-          <h2 className="text-3xl font-bold text-center mb-12 text-foreground font-heading">
+          <h2 className="text-2xl md:text-3xl font-semibold text-center mb-10 text-foreground">
             {tOpt(data.title, locale)}
           </h2>
         )}
 
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-8 md:gap-12 items-center">
-          {brandsData?.map(({ brand, logoUrl }) => (
-            <BrandCard
-              key={brand.id}
-              brand={brand}
-              logoUrl={logoUrl}
-              template={template}
-            />
-          ))}
+        {/* Auto-scrolling carousel */}
+        <div className="relative overflow-hidden">
+          <div className="flex gap-12 md:gap-16 animate-scroll hover:pause-animation">
+            {duplicatedBrands.map(({ brand, logoUrl }, index) => (
+              <div key={`${brand.id}-${index}`} className="flex-shrink-0">
+                <BrandCard
+                  brand={brand}
+                  logoUrl={logoUrl}
+                  template={template}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </SectionContainer>

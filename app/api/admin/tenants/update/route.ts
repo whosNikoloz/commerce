@@ -115,9 +115,24 @@ export async function PUT(req: Request) {
 
     await fs.writeFile(configPath, newContent, "utf-8");
 
+    // Clear the module cache to force reload on next request
+    try {
+      const configModule = require.resolve("@/config/tenat");
+      delete require.cache[configModule];
+
+      // Also clear any related cached modules
+      Object.keys(require.cache).forEach(key => {
+        if (key.includes("tenat") || key.includes("config")) {
+          delete require.cache[key];
+        }
+      });
+    } catch (e) {
+      console.warn("Could not clear module cache:", e);
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Tenant updated successfully in local config file!",
+      message: "Tenant updated successfully! Please hard refresh (Ctrl+Shift+R) or restart dev server to see changes.",
     });
   } catch (error: any) {
     console.error("Error updating tenant:", error);

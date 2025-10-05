@@ -6,7 +6,7 @@ import type { TenantConfig } from "@/types/tenant";
 
 
 export const TENANTS: Record<string, TenantConfig> = {
-  "commerce-topaz-sigma-62.vercel.app": {
+  "commerce-sxvadomain.vercel.app": {
     templateId: 1,
     themeColor: "#2563eb",
     theme: {
@@ -431,7 +431,7 @@ export const TENANTS: Record<string, TenantConfig> = {
     },
   },
 
-  "commerce-sxvadomain.vercel.app": {
+  "commerce-topaz-sigma-62.vercel.app": {
     templateId: 4,
     themeColor: "#22c55e",
     theme: {

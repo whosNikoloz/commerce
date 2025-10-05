@@ -4,9 +4,6 @@ import type { TenantConfig } from "@/types/tenant";
 // fresher content copy, and future-proofed countdown dates (Asia/Tbilisi, UTC+4).
 // Keep the same section structure so it matches existing components.
 
-const FUTURE_DEAL_END_1 = new Date("2025-10-05T20:00:00+04:00").toISOString();
-const FUTURE_DEAL_END_2 = new Date("2025-10-07T12:00:00+04:00").toISOString();
-const FUTURE_DEAL_END_LOCAL = new Date("2025-10-04T23:59:59+04:00").toISOString();
 
 export const TENANTS: Record<string, TenantConfig> = {
   "commerce-topaz-sigma-62.vercel.app": {
@@ -904,45 +901,64 @@ export const TENANTS: Record<string, TenantConfig> = {
           order: 1,
           data: {
             headline: {
-              ka: "იყიდეთ კატეგორიის მიხედვით",
-              en: "Shop by Category",
+              ka: "შეიძინეთ ონლაინ",
+              en: "Shop Online",
             },
             subheadline: {
-              ka: "აღმოაჩინეთ ყველაფერი რაც გჭირდებათ",
-              en: "Discover everything you need",
+              ka: "აღმოაჩინეთ საუკეთესო პროდუქტები",
+              en: "Discover the Best Products",
             },
-            categories: [
+            description: {
+              ka: "ათასობით პროდუქტი, სწრაფი მიწოდება და უმაღლესი ხარისხი",
+              en: "Thousands of products, fast delivery and premium quality",
+            },
+            badge: {
+              ka: "🔥 ახალი კოლექცია",
+              en: "🔥 New Collection",
+            },
+            backgroundImage: "/hero_client.jpg",
+            primaryCta: {
+              label: {
+                ka: "იყიდე ახლა",
+                en: "Shop Now",
+              },
+              href: "/products",
+            },
+            stats: [
               {
-                name: {
-                  ka: "ელექტრონიკა",
-                  en: "Electronics",
+                value: "10,000+",
+                label: {
+                  ka: "პროდუქტი",
+                  en: "Products",
                 },
-                imageUrl: "/cat-electronics.jpg",
-                href: "/category/electronics",
               },
               {
-                name: {
-                  ka: "ტანსაცმელი",
-                  en: "Fashion",
+                value: "50,000+",
+                label: {
+                  ka: "კმაყოფილი მომხმარებელი",
+                  en: "Happy Customers",
                 },
-                imageUrl: "/cat-fashion.jpg",
-                href: "/category/fashion",
               },
               {
-                name: {
-                  ka: "სახლი და ბაღი",
-                  en: "Home & Garden",
+                value: "24/7",
+                label: {
+                  ka: "მხარდაჭერა",
+                  en: "Support",
                 },
-                imageUrl: "/cat-home.jpg",
-                href: "/category/home",
+              },
+            ],
+            features: [
+              {
+                ka: "✓ უფასო მიწოდება 100₾+ შენაძენზე",
+                en: "✓ Free shipping on orders 100₾+",
               },
               {
-                name: {
-                  ka: "სპორტი",
-                  en: "Sports",
-                },
-                imageUrl: "/cat-sports.jpg",
-                href: "/category/sports",
+                ka: "✓ 30 დღიანი დაბრუნების გარანტია",
+                en: "✓ 30-day return guarantee",
+              },
+              {
+                ka: "✓ უსაფრთხო გადახდა",
+                en: "✓ Secure payment",
               },
             ],
           },
@@ -963,6 +979,27 @@ export const TENANTS: Record<string, TenantConfig> = {
               ka: "🔥 ახალი",
               en: "🔥 New",
             },
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: {
+              ka: "ახალი ჩამოსვლები",
+              en: "New Arrivals",
+            },
+            subtitle: {
+              ka: "უახლესი კოლექცია",
+              en: "Latest collection",
+            },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: {
+              isNewArrival: true,
+            },
+            sortBy: "newest",
           },
         },
         {
@@ -1017,6 +1054,38 @@ export const TENANTS: Record<string, TenantConfig> = {
                 productCount: 200,
               },
             ],
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: {
+              ka: "ახალი ჩამოსვლები",
+              en: "New Arrivals",
+            },
+            subtitle: {
+              ka: "უახლესი კოლექცია",
+              en: "Latest collection",
+            },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: {
+              isNewArrival: true,
+            },
+            sortBy: "newest",
+          },
+        },
+        {
+          type: "BrandStrip",
+          enabled: true,
+          order: 6,
+          data: {
+            title: {
+              ka: "ცნობილი ბრენდები",
+              en: "Featured Brands test",
+            },
           },
         },
       ],

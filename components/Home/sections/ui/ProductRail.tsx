@@ -89,7 +89,7 @@ export default async function ProductRail({
   }
 
   const loadingSkeleton = (
-    <div className={className || "py-20 bg-muted/20"}>
+    <div className={className || "py-20 "}>
       <div className="container mx-auto px-4">
         <div className="h-12 bg-muted rounded-lg w-64 mb-10 animate-pulse" />
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -118,7 +118,7 @@ export default async function ProductRail({
       isEmpty={!products || products.length === 0}
       emptyMessage={getEmptyMessage()}
       loadingSkeleton={loadingSkeleton}
-      className={className || "py-20 bg-muted/20"}
+      className={className || "py-20 "}
     >
       <div className="container mx-auto px-4">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10 gap-4">

@@ -23,15 +23,16 @@ export function BrandCard({
 }: {
   brand: BrandModel
   logoUrl?: string
-  template?: 1 | 2 | 3
+  template?: 1 | 2 | 3 | 4
   className?: string
 }) {
   const href = `/brands/${brand.id}`
 
-  const wrapperStyles: Record<1 | 2 | 3, string> = {
+  const wrapperStyles: Record<1 | 2 | 3 | 4, string> = {
     1: "relative h-16 md:h-20 grayscale hover:grayscale-0 opacity-50 hover:opacity-100 transition-all duration-500 hover:scale-110",
     2: "relative h-20 md:h-24 opacity-60 hover:opacity-100 transition-all duration-700 hover:scale-105 filter hover:drop-shadow-lg",
     3: "relative h-16 md:h-20 grayscale-[50%] hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-500 hover:scale-110",
+    4: "relative h-20 md:h-24 lg:h-28 grayscale-[30%] hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-500 hover:scale-110 hover:drop-shadow-2xl",
   }
 
   return (
@@ -43,11 +44,12 @@ export function BrandCard({
   )
 }
 
-export function BrandCardSkeleton({ template = 1 }: { template?: 1 | 2 | 3 }) {
-  const wrapperStyles: Record<1 | 2 | 3, string> = {
+export function BrandCardSkeleton({ template = 1 }: { template?: 1 | 2 | 3 | 4 }) {
+  const wrapperStyles: Record<1 | 2 | 3 | 4, string> = {
     1: "h-16 md:h-20",
     2: "h-20 md:h-24",
     3: "h-16 md:h-20",
+    4: "h-20 md:h-24 lg:h-28",
   }
 
   return <div className={cn(wrapperStyles[template], "bg-muted rounded animate-pulse w-full")} />
@@ -57,7 +59,7 @@ export function BrandCardSkeleton({ template = 1 }: { template?: 1 | 2 | 3 }) {
 export interface BrandsCarouselProps {
   brands: BrandModel[]
   getLogoUrl?: (b: BrandModel) => string | undefined
-  template?: 1 | 2 | 3
+  template?: 1 | 2 | 3 | 4
   className?: string
   /** autoplay in ms, set 0/false to disable */
   autoplayMs?: number | false

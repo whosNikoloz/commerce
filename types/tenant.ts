@@ -232,6 +232,7 @@ export type Template3SectionType =
 export type Template4SectionType =
   | "HeroCategoryGrid"
   | "CommercialBanner"
+  | "BrandStrip"
   | "CategoryCarousel"
   | "ProductRail";
 
@@ -290,13 +291,15 @@ export type InfluencerHighlightData = {
 export type HeroCategoryGridData = {
   headline: LocalizedText;
   subheadline?: LocalizedText;
-  categories: Array<{
-    name: LocalizedText;
-    imageUrl: string;
-    href: string;
-    badge?: LocalizedText;
+  description?: LocalizedText;
+  badge?: LocalizedText;
+  backgroundImage?: string;
+  primaryCta?: { label: LocalizedText; href: string };
+  stats?: Array<{
+    value: string;
+    label: LocalizedText;
   }>;
-  cta?: { label: LocalizedText; href: string };
+  features?: Array<LocalizedText>;
 };
 
 export type CommercialBannerData = {
@@ -373,6 +376,7 @@ export type Template3SectionInstance =
 export type Template4SectionInstance =
   | { type: "HeroCategoryGrid"; enabled: boolean; order: number; data: HeroCategoryGridData }
   | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
+  | { type: "BrandStrip"; enabled: boolean; order: number; data: BrandStripData }
   | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData }
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData };
 

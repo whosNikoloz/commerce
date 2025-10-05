@@ -32,36 +32,36 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
       headers.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
   }
 
-  if (!headers.has("X-Client-Domain")) {
-    if (isServer) {
-      try {
-        const { headers: nextHeaders } = await import("next/headers");
-        const h = await nextHeaders();
-
-        headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
-      } catch {
-        headers.set("X-Client-Domain", "unknown");
-      }
-    } else {
-      headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
-    }
-  }
-
   // if (!headers.has("X-Client-Domain")) {
   //   if (isServer) {
   //     try {
   //       const { headers: nextHeaders } = await import("next/headers");
   //       const h = await nextHeaders();
-  //       const host = h.get("x-forwarded-host") ?? h.get("host");
 
-  //       headers.set("X-Client-Domain", host ?? "unknown");
+  //       headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
   //     } catch {
   //       headers.set("X-Client-Domain", "unknown");
   //     }
   //   } else {
-  //     headers.set("X-Client-Domain", window.location.hostname);
+  //     headers.set("X-Client-Domain", "commerce-topaz-sigma-62.vercel.app");
   //   }
   // }
+
+  if (!headers.has("X-Client-Domain")) {
+    if (isServer) {
+      try {
+        const { headers: nextHeaders } = await import("next/headers");
+        const h = await nextHeaders();
+        const host = h.get("x-forwarded-host") ?? h.get("host");
+
+        headers.set("X-Client-Domain", host ?? "unknown");
+      } catch {
+        headers.set("X-Client-Domain", "unknown");
+      }
+    } else {
+      headers.set("X-Client-Domain", window.location.hostname);
+    }
+  }
 
 
   const res = await fetch(url, {

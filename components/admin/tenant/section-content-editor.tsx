@@ -514,10 +514,10 @@ export default function SectionContentEditor({
       case "BrandStrip":
         return (
           <div className="space-y-6">
-            {data.title && renderLocalizedInput("Title", ["title"], data.title)}
+            {renderLocalizedInput("Title (optional)", ["title"], data.title || { ka: "", en: "" })}
             <div className="rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/20 p-4">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>Note:</strong> Brand data is loaded from the server. Only the section title can be edited here.
+                <strong>Note:</strong> Brands are automatically fetched from your database. Use the title field above to add an optional heading for this section.
               </p>
             </div>
           </div>
@@ -631,6 +631,110 @@ export default function SectionContentEditor({
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Influencer details and images editing requires advanced
                 interface.
+              </p>
+            </div>
+          </div>
+        );
+
+      case "HeroCategoryGrid":
+        return (
+          <div className="space-y-6">
+            {renderLocalizedInput("Headline", ["headline"], data.headline)}
+            {renderLocalizedInput("Subheadline", ["subheadline"], data.subheadline, true)}
+            {renderLocalizedInput("Description", ["description"], data.description, true)}
+            {renderLocalizedInput("Badge", ["badge"], data.badge)}
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <IconPhoto className="h-4 w-4" />
+                Background Image URL
+              </Label>
+              <Input
+                placeholder="https://example.com/hero-bg.jpg"
+                value={data.backgroundImage || ""}
+                onChange={(e) => updateSimpleField(["backgroundImage"], e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+              <h4 className="font-semibold text-sm">Primary CTA</h4>
+              {renderLocalizedInput("Button Label", ["primaryCta", "label"], data.primaryCta?.label || { ka: "", en: "" })}
+              <div className="space-y-2">
+                <Label>Button Link</Label>
+                <Input
+                  placeholder="/products"
+                  value={data.primaryCta?.href || ""}
+                  onChange={(e) => updateSimpleField(["primaryCta", "href"], e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+              <p className="text-sm text-text-subtle dark:text-text-subtledark">
+                <strong>Note:</strong> Stats and Features arrays require advanced editing. Categories are automatically fetched from database.
+              </p>
+              <p className="mt-2 text-xs text-text-subtle dark:text-text-subtledark">
+                Current stats: {data.stats?.length || 0} | Current features: {data.features?.length || 0}
+              </p>
+            </div>
+          </div>
+        );
+
+      case "CommercialBanner":
+        return (
+          <div className="space-y-6">
+            {renderLocalizedInput("Alt Text", ["alt"], data.alt)}
+            {data.badge && renderLocalizedInput("Badge (optional)", ["badge"], data.badge)}
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <IconPhoto className="h-4 w-4" />
+                Desktop Image URL
+              </Label>
+              <Input
+                placeholder="https://example.com/banner.jpg"
+                value={data.imageUrl || ""}
+                onChange={(e) => updateSimpleField(["imageUrl"], e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <IconPhoto className="h-4 w-4" />
+                Mobile Image URL (optional)
+              </Label>
+              <Input
+                placeholder="https://example.com/banner-mobile.jpg"
+                value={data.mobileImageUrl || ""}
+                onChange={(e) => updateSimpleField(["mobileImageUrl"], e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                If not provided, desktop image will be used on mobile
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Banner Link</Label>
+              <Input
+                placeholder="/category/deals"
+                value={data.href || ""}
+                onChange={(e) => updateSimpleField(["href"], e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      case "CategoryCarousel":
+        return (
+          <div className="space-y-6">
+            {renderLocalizedInput("Title", ["title"], data.title)}
+            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+              <p className="text-sm text-text-subtle dark:text-text-subtledark">
+                <strong>Note:</strong> Category carousel items editing requires advanced interface. Contact
+                developer for category management.
+              </p>
+              <p className="mt-2 text-xs text-text-subtle dark:text-text-subtledark">
+                Current categories: {data.categories?.length || 0}
               </p>
             </div>
           </div>

@@ -77,6 +77,7 @@ const T3_TYPES = new Set<Template3SectionInstance["type"]>([
 const T4_TYPES = new Set<Template4SectionInstance["type"]>([
   "HeroCategoryGrid",
   "CommercialBanner",
+  "BrandStrip",
   "CategoryCarousel",
   "ProductRail",
 ]);

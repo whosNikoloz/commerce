@@ -52,13 +52,6 @@ const CategoryGridDataSchema = z.object({
 
 const BrandStripDataSchema = z.object({
   title: LocalizedTextSchema.optional(),
-  brands: z.array(
-    z.object({
-      name: z.string(),
-      logoUrl: z.string(),
-      href: z.string().optional(),
-    })
-  ).optional(),
 });
 
 const DealCountdownDataSchema = z.object({
@@ -485,20 +478,24 @@ const Template3HomepageSchema = z.object({
 const HeroCategoryGridDataSchema = z.object({
   headline: LocalizedTextSchema,
   subheadline: LocalizedTextSchema.optional(),
-  categories: z.array(
-    z.object({
-      name: LocalizedTextSchema,
-      imageUrl: z.string(),
-      href: z.string(),
-      badge: LocalizedTextSchema.optional(),
-    })
-  ),
-  cta: z
+  description: LocalizedTextSchema.optional(),
+  badge: LocalizedTextSchema.optional(),
+  backgroundImage: z.string().optional(),
+  primaryCta: z
     .object({
       label: LocalizedTextSchema,
       href: z.string(),
     })
     .optional(),
+  stats: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: LocalizedTextSchema,
+      })
+    )
+    .optional(),
+  features: z.array(LocalizedTextSchema).optional(),
 });
 
 const CommercialBannerDataSchema = z.object({
@@ -557,16 +554,22 @@ const Template4SectionSchema = z.discriminatedUnion("type", [
     data: CommercialBannerDataSchema,
   }),
   z.object({
+    type: z.literal("BrandStrip"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: BrandStripDataSchema,
+  }),
+  z.object({
     type: z.literal("CategoryCarousel"),
     enabled: z.boolean(),
     order: z.number(),
     data: CategoryCarouselDataSchema,
   }),
   z.object({
-    type: z.literal("ProductGrid"),
+    type: z.literal("ProductRail"),
     enabled: z.boolean(),
     order: z.number(),
-    data: ProductGridDataSchema,
+    data: ProductRailDataSchema,
   }),
 ]);
 
@@ -672,6 +675,9 @@ const HeroCategoryGrid = lazy(
 const CommercialBanner = lazy(
   () => import("@/components/Home/sections/template4/CommercialBanner")
 );
+const BrandStripT4 = lazy(
+  () => import("@/components/Home/sections/template4/BrandStrip")
+);
 const CategoryCarousel = lazy(
   () => import("@/components/Home/sections/template4/CategoryCarousel")
 );
@@ -770,6 +776,7 @@ export const template3Definition: TemplateDefinition<
 export const TEMPLATE_4_ALLOWED_SECTIONS = [
   "HeroCategoryGrid",
   "CommercialBanner",
+  "BrandStrip",
   "CategoryCarousel",
   "ProductRail",
 ] as const;
@@ -783,6 +790,7 @@ export const template4Definition: TemplateDefinition<
   registry: {
     HeroCategoryGrid,
     CommercialBanner,
+    BrandStrip: BrandStripT4,
     CategoryCarousel,
     ProductRail,
   },
@@ -1157,29 +1165,21 @@ export function getDefaultSectionsForTemplate(templateId: 1 | 2 | 3 | 4): any[] 
           enabled: true,
           order: 1,
           data: {
-            headline: { ka: "იყიდეთ კატეგორიის მიხედვით", en: "Shop by Category" },
-            subheadline: { ka: "აღმოაჩინეთ ყველაფერი რაც გჭირდებათ", en: "Discover everything you need" },
-            categories: [
-              {
-                name: { ka: "ელექტრონიკა", en: "Electronics" },
-                imageUrl: "/cat-electronics.jpg",
-                href: "/category/electronics",
-              },
-              {
-                name: { ka: "ტანსაცმელი", en: "Fashion" },
-                imageUrl: "/cat-fashion.jpg",
-                href: "/category/fashion",
-              },
-              {
-                name: { ka: "სახლი და ბაღი", en: "Home & Garden" },
-                imageUrl: "/cat-home.jpg",
-                href: "/category/home",
-              },
-              {
-                name: { ka: "სპორტი", en: "Sports" },
-                imageUrl: "/cat-sports.jpg",
-                href: "/category/sports",
-              },
+            headline: { ka: "შეიძინეთ ონლაინ", en: "Shop Online" },
+            subheadline: { ka: "აღმოაჩინეთ საუკეთესო პროდუქტები", en: "Discover the Best Products" },
+            description: { ka: "ათასობით პროდუქტი, სწრაფი მიწოდება და უმაღლესი ხარისხი", en: "Thousands of products, fast delivery and premium quality" },
+            badge: { ka: "🔥 ახალი კოლექცია", en: "🔥 New Collection" },
+            backgroundImage: "/hero-bg.jpg",
+            primaryCta: { label: { ka: "იყიდე ახლა", en: "Shop Now" }, href: "/category" },
+            stats: [
+              { value: "10,000+", label: { ka: "პროდუქტი", en: "Products" } },
+              { value: "50,000+", label: { ka: "კმაყოფილი მომხმარებელი", en: "Happy Customers" } },
+              { value: "24/7", label: { ka: "მხარდაჭერა", en: "Support" } },
+            ],
+            features: [
+              { ka: "✓ უფასო მიწოდება 100₾+ შენაძენზე", en: "✓ Free shipping on orders 100₾+" },
+              { ka: "✓ 30 დღიანი დაბრუნების გარანტია", en: "✓ 30-day return guarantee" },
+              { ka: "✓ უსაფრთხო გადახდა", en: "✓ Secure payment" },
             ],
           },
         },
@@ -1193,6 +1193,14 @@ export function getDefaultSectionsForTemplate(templateId: 1 | 2 | 3 | 4): any[] 
             href: "/category/deals",
             alt: { ka: "სპეციალური შეთავაზება", en: "Special Offer" },
             badge: { ka: "🔥 ახალი", en: "🔥 New" },
+          },
+        },
+        {
+          type: "BrandStrip",
+          enabled: true,
+          order: 3,
+          data: {
+            title: { ka: "ცნობილი ბრენდები", en: "Featured Brands" },
           },
         },
         {

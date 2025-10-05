@@ -432,202 +432,116 @@ export const TENANTS: Record<string, TenantConfig> = {
   },
 
   "commerce-sxvadomain.vercel.app": {
-    templateId: 2,
-    themeColor: "#10b981",
+    templateId: 4,
+    themeColor: "#22c55e",
     theme: {
       mode: "dark",
       brand: {
-        primary: "16 185 129",
-        primaryDark: "5 150 105",
-        surface: "240 253 244",
-        surfaceDark: "6 20 13",
-        muted: "209 250 229",
-        mutedDark: "19 78 74",
+        primary: "34 197 94",
+        primaryDark: "34 197 94",
+        surface: "248 250 252",
+        surfaceDark: "31 50 33",
+        muted: "226 232 240",
+        mutedDark: "195 65 9",
       },
       text: {
-        light: "236 253 245",
-        subtle: "165 180 189",
-        lightDark: "248 250 252",
-        subtleDark: "134 239 172",
+        light: "30 41 59",
+        subtle: "100 116 139",
+        lightDark: "226 232 240",
+        subtleDark: "148 163 184",
       },
       fonts: {
-        primary: "Inter, FiraGO, system-ui, sans-serif",
+        primary: "\"Lato\", sans-serif",
         secondary: "Inter, FiraGO, system-ui, sans-serif",
-        heading: "Playfair Display, Georgia, FiraGO, serif",
+        heading: "Poppins, Inter, FiraGO, system-ui, sans-serif",
       },
     },
     homepage: {
-      templateId: 2,
+      templateId: 4,
       sections: [
         {
-          type: "HeroLifestyle",
+          type: "HeroCategoryGrid",
           enabled: true,
           order: 1,
           data: {
             headline: {
-              ka: "შექმენი თბილი სახლი",
-              en: "Create a Warm Home",
+              ka: "შეიძინეთ ონლაინ",
+              en: "Shop Online",
             },
             subheadline: {
-              ka: "ელეგანტური დიზაინი ყოველდღიურ კომფორტში",
-              en: "Elegant design for everyday comfort",
+              ka: "აღმოაჩინეთ საუკეთესო პროდუქტები",
+              en: "Discover the Best Products",
             },
-            imageUrl: "/hero-furniture.jpg",
-            overlayOpacity: 0.35,
-            cta: {
+            description: {
+              ka: "ათასობით პროდუქტი, სწრაფი მიწოდება და უმაღლესი ხარისხი",
+              en: "Thousands of products, fast delivery and premium quality",
+            },
+            badge: {
+              ka: "🔥 ახალი კოლექცია",
+              en: "🔥 New Collection",
+            },
+            backgroundImage: "/hero_client.jpg",
+            primaryCta: {
               label: {
-                ka: "ახლავე ნახე",
+                ka: "იყიდე ახლა",
                 en: "Shop Now",
               },
-              href: "/categories",
+              href: "/products",
             },
-            secondaryCta: {
-              label: {
-                ka: "კოლექციები",
-                en: "Collections",
+            stats: [
+              {
+                value: "10,000+",
+                label: {
+                  ka: "პროდუქტი",
+                  en: "Products",
+                },
               },
-              href: "/collections",
-            },
+              {
+                value: "50,000+",
+                label: {
+                  ka: "კმაყოფილი მომხმარებელი",
+                  en: "Happy Customers",
+                },
+              },
+              {
+                value: "24/7",
+                label: {
+                  ka: "მხარდაჭერა",
+                  en: "Support",
+                },
+              },
+            ],
+            features: [
+              {
+                ka: "✓ უფასო მიწოდება 100₾+ შენაძენზე",
+                en: "✓ Free shipping on orders 100₾+",
+              },
+              {
+                ka: "✓ 30 დღიანი დაბრუნების გარანტია",
+                en: "✓ 30-day return guarantee",
+              },
+              {
+                ka: "✓ უსაფრთხო გადახდა",
+                en: "✓ Secure payment",
+              },
+            ],
           },
         },
         {
-          type: "CategoryGrid",
+          type: "CommercialBanner",
           enabled: true,
           order: 2,
           data: {
-            title: {
-              ka: "კატეგორიები",
-              en: "Shop by Category",
+            imageUrl: "/banners/promo-1.jpg",
+            mobileImageUrl: "/banners/promo-1-mobile.jpg",
+            href: "/category/deals",
+            alt: {
+              ka: "სპეციალური შეთავაზება",
+              en: "Special Offer",
             },
-            categories: [
-              {
-                name: {
-                  ka: "სალონი",
-                  en: "Living Room",
-                },
-                imageUrl: "/cat-living.jpg",
-                href: "/category/living-room",
-                productCount: 132,
-              },
-              {
-                name: {
-                  ka: "საძინებელი",
-                  en: "Bedroom",
-                },
-                imageUrl: "/cat-bedroom.jpg",
-                href: "/category/bedroom",
-                productCount: 104,
-              },
-              {
-                name: {
-                  ka: "სამზარეულო",
-                  en: "Kitchen",
-                },
-                imageUrl: "/cat-kitchen.jpg",
-                href: "/category/kitchen",
-                productCount: 82,
-              },
-              {
-                name: {
-                  ka: "გარეთ",
-                  en: "Outdoor",
-                },
-                imageUrl: "/cat-outdoor.jpg",
-                href: "/category/outdoor",
-                productCount: 62,
-              },
-            ],
-          },
-        },
-        {
-          type: "ConfiguratorBlock",
-          enabled: true,
-          order: 3,
-          data: {
-            title: {
-              ka: "შექმენი შენი დივანი",
-              en: "Build Your Sofa",
-            },
-            description: {
-              ka: "აირჩიე ზომა, მასალა და ფერი",
-              en: "Choose size, material & color",
-            },
-            steps: [
-              {
-                label: {
-                  ka: "ზომა",
-                  en: "Size",
-                },
-                options: [
-                  {
-                    ka: "2 ადგილიანი",
-                    en: "2‑Seater",
-                  },
-                  {
-                    ka: "3 ადგილიანი",
-                    en: "3‑Seater",
-                  },
-                  {
-                    ka: "L-ფორმა",
-                    en: "L‑Shape",
-                  },
-                  {
-                    ka: "U-ფორმა",
-                    en: "U‑Shape",
-                  },
-                ],
-              },
-              {
-                label: {
-                  ka: "მასალა",
-                  en: "Material",
-                },
-                options: [
-                  {
-                    ka: "ტყავი",
-                    en: "Leather",
-                  },
-                  {
-                    ka: "ქსოვილი",
-                    en: "Fabric",
-                  },
-                  {
-                    ka: "ხავერდი",
-                    en: "Velvet",
-                  },
-                ],
-              },
-              {
-                label: {
-                  ka: "ფერი",
-                  en: "Color",
-                },
-                options: [
-                  {
-                    ka: "ნაცრისფერი",
-                    en: "Grey",
-                  },
-                  {
-                    ka: "ლურჯი",
-                    en: "Blue",
-                  },
-                  {
-                    ka: "ბეჟი",
-                    en: "Beige",
-                  },
-                  {
-                    ka: "მწვანე",
-                    en: "Green",
-                  },
-                ],
-              },
-            ],
-            cta: {
-              label: {
-                ka: "განაგრძეთ",
-                en: "Continue",
-              },
-              href: "/configurator",
+            badge: {
+              ka: "🔥 ახალი",
+              en: "🔥 New",
             },
           },
         },
@@ -641,11 +555,11 @@ export const TENANTS: Record<string, TenantConfig> = {
               en: "New Arrivals",
             },
             subtitle: {
-              ka: "უახლესი კოლექციები",
-              en: "Latest collections",
+              ka: "უახლესი კოლექცია",
+              en: "Latest collection",
             },
             limit: 4,
-            viewAllHref: "/category/new-arrivals",
+            viewAllHref: "/products",
             filterBy: {
               isNewArrival: true,
             },
@@ -653,213 +567,88 @@ export const TENANTS: Record<string, TenantConfig> = {
           },
         },
         {
-          type: "ProductRail",
+          type: "CommercialBanner",
+          enabled: true,
+          order: 4,
+          data: {
+            imageUrl: "/banners/promo-2.jpg",
+            mobileImageUrl: "/banners/promo-2-mobile.jpg",
+            href: "/category/new-arrivals",
+            alt: {
+              ka: "ახალი ჩამოსვლები",
+              en: "New Arrivals",
+            },
+          },
+        },
+        {
+          type: "CategoryCarousel",
           enabled: true,
           order: 5,
           data: {
             title: {
-              ka: "საუკეთესო დივნები",
-              en: "Best Sofas",
+              ka: "პოპულარული კატეგორიები",
+              en: "Popular Categories",
             },
-            subtitle: {
-              ka: "პოპულარული მოდელები",
-              en: "Most popular",
-            },
-            limit: 4,
-            viewAllHref: "/category/sofas",
-            filterBy: {},
-            sortBy: "rating",
+            categories: [
+              {
+                name: {
+                  ka: "ტელეფონები",
+                  en: "Phones",
+                },
+                imageUrl: "/cat-phones.jpg",
+                href: "/category/phones",
+                productCount: 150,
+              },
+              {
+                name: {
+                  ka: "ლეპტოპები",
+                  en: "Laptops",
+                },
+                imageUrl: "/cat-laptops.jpg",
+                href: "/category/laptops",
+                productCount: 80,
+              },
+              {
+                name: {
+                  ka: "აქსესუარები",
+                  en: "Accessories",
+                },
+                imageUrl: "/cat-accessories.jpg",
+                href: "/category/accessories",
+                productCount: 200,
+              },
+            ],
           },
         },
         {
-          type: "CustomerGallery",
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: {
+              ka: "ახალი ჩამოსვლები",
+              en: "New Arrivals",
+            },
+            subtitle: {
+              ka: "უახლესი კოლექცია",
+              en: "Latest collection",
+            },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: {
+              isNewArrival: true,
+            },
+            sortBy: "newest",
+          },
+        },
+        {
+          type: "BrandStrip",
           enabled: true,
           order: 6,
           data: {
             title: {
-              ka: "გალერეა",
-              en: "Customer Gallery",
-            },
-            subtitle: {
-              ka: "გაუზიარეთ თქვენი სივრცე #MyHomeStyle",
-              en: "Share your space #MyHomeStyle",
-            },
-            hashtag: {
-              ka: "#MyHomeStyle",
-              en: "#MyHomeStyle",
-            },
-            images: [
-              {
-                url: "/gallery-1.jpg",
-                caption: {
-                  ka: "თანამედროვე სალონი",
-                  en: "Modern living room",
-                },
-                author: "@home_decor_lover",
-              },
-              {
-                url: "/gallery-2.jpg",
-                caption: {
-                  ka: "კომფორტული საძინებელი",
-                  en: "Cozy bedroom",
-                },
-                author: "@interior_style",
-              },
-              {
-                url: "/gallery-3.jpg",
-                caption: {
-                  ka: "მინიმალისტური სამზარეულო",
-                  en: "Minimalist kitchen",
-                },
-                author: "@design_hub",
-              },
-              {
-                url: "/gallery-4.jpg",
-                caption: {
-                  ka: "ბაღის კუთხე",
-                  en: "Outdoor corner",
-                },
-                author: "@garden_design",
-              },
-            ],
-          },
-        },
-        {
-          type: "BrandStory",
-          enabled: true,
-          order: 7,
-          data: {
-            title: {
-              ka: "ჩვენი ისტორია",
-              en: "Our Story",
-            },
-            story: {
-              ka: "<p>უკვე 20 წელია ვქმნით ხარისხიან ავეჯს საქართველოში. ჩვენი მიზანია — სახლი, სადაც მართლაც კარგად იგრძნობთ თავს.</p><p>თითოეული პროდუქტი მზადდება გამოცდილი ოსტატების მიერ საუკეთესო მასალებით.</p>",
-              en: "<p>For 20 years, we've crafted quality furniture in Georgia. Our goal is a home where you truly feel good.</p><p>Each piece is made by master craftsmen using premium materials.</p>",
-            },
-            imageUrl: "/brand-story.jpg",
-            stats: [
-              {
-                value: "20+",
-                label: {
-                  ka: "წელი გამოცდილება",
-                  en: "Years Experience",
-                },
-              },
-              {
-                value: "50K+",
-                label: {
-                  ka: "კმაყოფილი კლიენტი",
-                  en: "Happy Customers",
-                },
-              },
-              {
-                value: "500+",
-                label: {
-                  ka: "პროდუქტი",
-                  en: "Products",
-                },
-              },
-            ],
-          },
-        },
-        {
-          type: "ReviewsWarranty",
-          enabled: true,
-          order: 8,
-          data: {
-            title: {
-              ka: "ჩვენზე ამბობენ",
-              en: "What They Say",
-            },
-            reviews: [
-              {
-                author: "ნინო ბერიძე",
-                rating: 5,
-                text: {
-                  ka: "საუკეთესო ხარისხი და მომსახურება!",
-                  en: "Best quality & service!",
-                },
-                date: "2025-01-14",
-              },
-              {
-                author: "დავით გორგილაძე",
-                rating: 5,
-                text: {
-                  ka: "ძალიან კომფორტული დივანი.",
-                  en: "Very comfortable sofa.",
-                },
-                date: "2025-01-10",
-              },
-              {
-                author: "თამარ გვარამია",
-                rating: 5,
-                text: {
-                  ka: "მშვენიერი დიზაინი და მასალები.",
-                  en: "Beautiful design & materials.",
-                },
-                date: "2025-01-08",
-              },
-              {
-                author: "გიორგი წერეთელი",
-                rating: 4,
-                text: {
-                  ka: "რეკომენდებულია!",
-                  en: "Highly recommended!",
-                },
-                date: "2025-01-05",
-              },
-            ],
-            warrantyInfo: {
-              title: {
-                ka: "გარანტია და მხარდაჭერა",
-                en: "Warranty & Support",
-              },
-              details: [
-                {
-                  ka: "5 წლიანი გარანტია",
-                  en: "5‑Year Warranty",
-                },
-                {
-                  ka: "უფასო მიწოდება",
-                  en: "Free Delivery",
-                },
-                {
-                  ka: "30 დღიანი დაბრუნება",
-                  en: "30‑Day Returns",
-                },
-                {
-                  ka: "24/7 მხარდაჭერა",
-                  en: "24/7 Support",
-                },
-              ],
-            },
-          },
-        },
-        {
-          type: "Newsletter",
-          enabled: true,
-          order: 9,
-          data: {
-            title: {
-              ka: "იყავით კურსში",
-              en: "Stay Updated",
-            },
-            description: {
-              ka: "პროექტები, რჩევები და ფასდაკლებები თქვენს ელფოსტაზე",
-              en: "Ideas, tips & deals in your inbox",
-            },
-            emailPlaceholder: {
-              ka: "თქვენი ელ.ფოსტა",
-              en: "Your email",
-            },
-            ctaLabel: {
-              ka: "გამოწერა",
-              en: "Subscribe",
-            },
-            privacyNote: {
-              ka: "თქვენი მონაცემები დაცულია",
-              en: "Your data is protected",
+              ka: "ცნობილი ბრენდები",
+              en: "Featured Brands test",
             },
           },
         },
@@ -875,8 +664,8 @@ export const TENANTS: Record<string, TenantConfig> = {
       brand: {
         primary: "34 197 94",
         primaryDark: "34 197 94",
-        surface: "248 250 252",
-        surfaceDark: "31 50 33",
+        surface: "177 189 200",
+        surfaceDark: "47 91 51",
         muted: "226 232 240",
         mutedDark: "195 65 9",
       },

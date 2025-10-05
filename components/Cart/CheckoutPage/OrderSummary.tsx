@@ -30,7 +30,7 @@ export default function OrderSummary({
   const total = typeof totalOverride === "number" ? totalOverride : subtotal + shipping + tax;
 
   return (
-    <Card className="sticky top-20 h-min bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+    <Card className="sticky top-20 h-min bg-card border border-border/50 shadow-xl">
       <CardHeader>
         <CardTitle className="text-text-light dark:text-text-lightdark">Order Summary</CardTitle>
       </CardHeader>

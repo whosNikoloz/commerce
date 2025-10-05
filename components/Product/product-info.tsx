@@ -81,56 +81,58 @@ export function ProductInfo({
   const isOut = !inStock;
 
   return (
-    <div className="space-y-6 text-text-light dark:text-text-lightdark">
+    <div className="space-y-6">
       <div
         className="
           md:sticky relative md:top-20 sm:max-w-72 md:w-full
-          p-6 rounded-lg shadow-sm border
-          bg-brand-muted dark:bg-brand-muteddark
-          border-brand-muted dark:border-brand-muteddark
+          p-6 rounded-2xl border-2 border-border/50
+          bg-gradient-to-br from-card to-card/90 backdrop-blur-sm
+          shadow-2xl shadow-black/10 dark:shadow-black/30
+          hover:shadow-3xl hover:shadow-brand-primary/10
+          transition-shadow duration-300
         "
       >
         {/* Flags & brand */}
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap gap-2 mb-4">
           {isComingSoon && (
-            <Badge className="bg-brand-primary/20 text-text-light dark:text-text-lightdark border border-brand-primary/40">
+            <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0 shadow-lg">
               <Clock3 className="h-3 w-3 mr-1" /> მალე
             </Badge>
           )}
           {isNewArrival && (
-            <Badge className="bg-brand-primary text-white">
+            <Badge className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg">
               <Sparkles className="h-3 w-3 mr-1" /> ახალი
             </Badge>
           )}
           {isLiquidated && (
-            <Badge className="bg-brand-primarydark text-white">
+            <Badge className="bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-lg font-bold">
               <Tag className="h-3 w-3 mr-1" /> ლიკვიდაცია
             </Badge>
           )}
           {brand && (
-            <Badge className="text-text-light dark:text-text-lightdark" variant="secondary">
+            <Badge className="bg-muted/50 text-foreground border border-border/50 shadow-sm" variant="secondary">
               {brand}
             </Badge>
           )}
           {typeof stock === "number" && stock <= 3 && stock > 0 && (
-            <Badge className="bg-brand-primarydark/80 text-white">
+            <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg animate-pulse">
               <PackageOpen className="h-3 w-3 mr-1" /> ბოლო {stock} ც
             </Badge>
           )}
         </div>
 
         {/* Price row */}
-        <div className="min-w-0 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-          <span className="text-2xl font-extrabold leading-none">
+        <div className="min-w-0 flex flex-wrap items-center justify-between gap-x-2 gap-y-2 p-4 rounded-xl bg-gradient-to-r from-brand-primary/5 to-brand-primary/10 border border-brand-primary/20">
+          <span className="text-3xl font-extrabold leading-none text-foreground">
             {formatPrice(price, currency)}
           </span>
           <div className="flex items-center gap-2">
             {hasDiscount && (
               <>
-                <span className="text-sm text-text-subtle dark:text-text-subtledark line-through leading-none">
+                <span className="text-sm text-muted-foreground line-through leading-none">
                   {formatPrice(originalPrice!, currency)}
                 </span>
-                <Badge className="inline-flex h-6 items-center rounded-md px-2 text-[11px] font-semibold leading-none bg-brand-primarydark text-white">
+                <Badge className="inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-bold leading-none bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg">
                   {"-" + computedDiscount + "%"}
                 </Badge>
               </>
@@ -139,20 +141,20 @@ export function ProductInfo({
         </div>
 
         {/* Status + Condition */}
-        <div className="mt-2 flex items-center justify-between gap-2">
+        <div className="mt-4 flex items-center justify-between gap-2">
           <Badge
-            className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm
-              ${isOut ? "bg-brand-primarydark text-white" : "bg-brand-primary text-white"}`}
+            className={`inline-flex h-8 items-center rounded-full px-4 text-xs font-semibold leading-none shadow-lg
+              ${isOut ? "bg-gradient-to-r from-slate-500 to-slate-600 text-white" : "bg-gradient-to-r from-emerald-500 to-teal-600 text-white"}`}
             title={getStatusLabel(status, isComingSoon)}
           >
+            {inStock && <div className="h-2 w-2 rounded-full bg-white animate-pulse mr-2" />}
             {getStatusLabel(status, isComingSoon)}
           </Badge>
 
           {condition != null && (
             <Badge
-              className="inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold leading-none shadow-sm
-                         bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted dark:border-brand-muteddark
-                         text-text-light dark:text-text-lightdark"
+              className="inline-flex h-8 items-center rounded-full px-4 text-xs font-semibold leading-none shadow-md
+                         bg-muted/50 border border-border/50 text-foreground"
               title={getConditionLabel(condition)}
             >
               {getConditionLabel(condition)}
@@ -162,22 +164,27 @@ export function ProductInfo({
 
         {/* Delivery */}
         {freeShipping && (
-          <div className="mt-3 flex items-center gap-2 rounded-md border border-brand-muted dark:border-brand-muteddark px-3 py-2 text-sm bg-brand-surface/60 dark:bg-brand-surfacedark/60">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-brand-muted dark:border-brand-muteddark">
-              <Truck className="h-4 w-4" />
+          <div className="mt-4 flex items-center gap-3 rounded-xl border-2 border-border/50 px-4 py-3 text-sm bg-gradient-to-r from-blue-500/5 to-cyan-500/5 shadow-md">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg">
+              <Truck className="h-4 w-4 text-white" />
             </span>
-            <span className="text-text-light dark:text-text-lightdark">
+            <span className="text-foreground font-medium">
               სწრაფი მიწოდება მთელ საქართველოში
             </span>
           </div>
         )}
 
         {/* Actions (mobile) */}
-        <div className="md:hidden space-y-2 mt-4">
+        <div className="md:hidden space-y-3 mt-6">
           <Button
             aria-disabled={isOut}
             className="w-full flex items-center justify-center gap-2
-                       bg-brand-primary hover:bg-brand-primary/90 text-white py-3 rounded-md disabled:opacity-60"
+                       bg-gradient-to-r from-brand-primary to-brand-primary/90
+                       hover:from-brand-primary/90 hover:to-brand-primary/80
+                       text-white py-3 rounded-xl font-semibold shadow-lg shadow-brand-primary/30
+                       hover:shadow-xl hover:shadow-brand-primary/40 transition-all duration-300
+                       hover:scale-[1.02] active:scale-[0.98]
+                       disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isOut}
             onClick={onAddToCart}
           >
@@ -189,7 +196,12 @@ export function ProductInfo({
             <Button
               aria-disabled={isOut}
               className="w-full flex items-center justify-center
-                         bg-brand-primarydark hover:bg-brand-primarydark/90 text-white py-3 rounded-md disabled:opacity-60"
+                         bg-gradient-to-r from-indigo-600 to-purple-600
+                         hover:from-indigo-500 hover:to-purple-500
+                         text-white py-3 rounded-xl font-semibold shadow-lg shadow-purple-500/30
+                         hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300
+                         hover:scale-[1.02] active:scale-[0.98]
+                         disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isOut}
               onClick={onBuyNow}
             >
@@ -199,11 +211,16 @@ export function ProductInfo({
         </div>
 
         {/* Actions (desktop) */}
-        <div className="hidden md:block mt-4 space-y-3">
+        <div className="hidden md:block mt-6 space-y-3">
           <Button
             aria-disabled={isOut}
             className="w-full flex items-center justify-center gap-2
-                       bg-brand-primary hover:bg-brand-primary/90 text-white py-3 rounded-md disabled:opacity-60"
+                       bg-gradient-to-r from-brand-primary to-brand-primary/90
+                       hover:from-brand-primary/90 hover:to-brand-primary/80
+                       text-white py-3 rounded-xl font-semibold shadow-lg shadow-brand-primary/30
+                       hover:shadow-xl hover:shadow-brand-primary/40 transition-all duration-300
+                       hover:scale-[1.02] active:scale-[0.98]
+                       disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isOut}
             onClick={onAddToCart}
           >
@@ -215,7 +232,12 @@ export function ProductInfo({
             <Button
               aria-disabled={isOut}
               className="w-full flex items-center justify-center
-                         bg-brand-primarydark hover:bg-brand-primarydark/90 text-white py-3 rounded-md disabled:opacity-60"
+                         bg-gradient-to-r from-indigo-600 to-purple-600
+                         hover:from-indigo-500 hover:to-purple-500
+                         text-white py-3 rounded-xl font-semibold shadow-lg shadow-purple-500/30
+                         hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300
+                         hover:scale-[1.02] active:scale-[0.98]
+                         disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isOut}
               onClick={onBuyNow}
             >

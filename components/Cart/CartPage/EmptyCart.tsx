@@ -20,7 +20,7 @@ export default function EmptyCart() {
   const t = (key: string) => translations[key] || key;
 
   return (
-    <div className="min-h-screen bg-brand-surface dark:bg-brand-surfacedark">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 rounded-lg bg-brand-primary/10">
@@ -31,7 +31,7 @@ export default function EmptyCart() {
           </h1>
         </div>
 
-        <Card className="text-center py-16 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+        <Card className="text-center py-16 bg-card border border-border/50 shadow-lg">
           <CardContent className="space-y-6">
             <div className="relative">
               <div className="w-24 h-24 mx-auto rounded-full bg-brand-muted dark:bg-brand-muteddark flex items-center justify-center">

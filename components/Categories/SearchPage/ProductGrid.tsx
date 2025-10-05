@@ -337,7 +337,7 @@ const ProductCard = memo(function ProductCard({
 });
 
 export default function ProductGrid({ products, viewMode }: ProductGridProps) {
-  const addToCart = useCartStore((s) => s.checkAndAddToCart);
+  const addToCart = useCartStore((s) => s.addToCart);
   const [selectedImages, setSelectedImages] = useState<Record<string, number>>({});
 
   const handleAddToCart = (productId: string) => {

@@ -71,9 +71,9 @@ export default function CartDropdown() {
         ${isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-3 pointer-events-none"}`}
       >
         {/* Card surface fully tied to brand surface */}
-        <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-brand-surface/95 dark:bg-brand-surfacedark/95">
+        <Card className="overflow-hidden rounded-3xl border-0 shadow-2xl backdrop-blur-xl bg-card/95 dark:bg-carddark/95">
           {/* Header with brand-tinted gradient */}
-          <CardHeader className="pb-4 pt-6 px-6 bg-gradient-to-r from-brand-surface/80 to-brand-muted/50 dark:from-brand-surfacedark/60 dark:to-brand-muteddark/40">
+          <CardHeader className="pb-4 pt-6 px-6 bg-gradient-to-r from-card/80 to-muted/20">
             <div className="flex items-center justify-between w-full">
               <h1 className="text-lg font-bold text-text-light dark:text-text-lightdark">
                 Shopping Cart
@@ -189,7 +189,7 @@ export default function CartDropdown() {
                                   –
                                 </span>
                               </Button>
-                              <div className="flex items-center justify-center w-12 h-9 bg-brand-surface/60 dark:bg-brand-surfacedark/40 border-x border-brand-muted/60 dark:border-brand-muteddark/40">
+                              <div className="flex items-center justify-center w-12 h-9 bg-card/60 dark:bg-carddark/40 border-x border-brand-muted/60 dark:border-brand-muteddark/40">
                                 <span className="text-sm font-bold select-none text-text-light dark:text-text-lightdark">
                                   {item.quantity}
                                 </span>
@@ -229,10 +229,10 @@ export default function CartDropdown() {
               </CardBody>
 
               {/* Footer */}
-              <CardFooter className="sticky bottom-0 z-10 px-6 py-5 bg-gradient-to-t from-brand-surface via-brand-surface/95 to-brand-surface/80 dark:from-brand-surfacedark dark:via-brand-surfacedark/90 dark:to-brand-surfacedark/80 backdrop-blur-xl border-t border-brand-muted/60 dark:border-brand-muteddark/40">
+              <CardFooter className="sticky bottom-0 z-10 px-6 py-5 bg-gradient-to-t from-card via-card/95 to-card/80 backdrop-blur-xl border-t border-brand-muted/60 dark:border-brand-muteddark/40">
                 <div className="w-full space-y-4">
                   {/* Subtotal */}
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-brand-surface to-brand-muted/40 dark:from-brand-surfacedark dark:to-brand-muteddark/30 border border-brand-muted/40 dark:border-brand-muteddark/30">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-card to-muted/20 border border-brand-muted/40 dark:border-brand-muteddark/30">
                     <span className="text-base font-semibold text-text-light dark:text-text-lightdark">
                       სულ:
                     </span>

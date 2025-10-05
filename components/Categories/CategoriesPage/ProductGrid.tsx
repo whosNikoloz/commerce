@@ -133,32 +133,32 @@ const ProductCard = memo(function ProductCard({
       <meta content={product.name ?? "Product"} itemProp="name" />
       {images?.[0] && <meta content={images[0]} itemProp="image" />}
 
-      <Card className="group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60">
+      <Card className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-card border border-border/40 hover:border-brand-primary/30 backdrop-blur-sm">
         <CardBody className={viewMode === "grid" ? "p-0" : "gap-4"}>
           {viewMode === "grid" ? (
             <div className="relative">
               <div
                 aria-live="polite"
-                className="relative overflow-hidden rounded-t-2xl group/image"
+                className="relative overflow-hidden rounded-t-2xl group/image bg-gradient-to-br from-muted/30 to-muted/10"
               >
-                <div className="absolute left-3 top-3 z-20 flex flex-col gap-2">
+                <div className="absolute left-2 sm:left-3 top-2 sm:top-3 z-20 flex flex-col gap-1.5 sm:gap-2">
                   {showComingSoon && (
-                    <Badge className="bg-gradient-to-r from-brand-primary to-brand-primarydark text-white border-0 shadow-lg backdrop-blur-sm">
-                      <Clock3 className="h-3 w-3 mr-1" /> Coming Soon
+                    <Badge className="bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-700 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-semibold">
+                      <Clock3 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> Coming Soon
                     </Badge>
                   )}
                   {showNew && (
-                    <Badge className="bg-gradient-to-r from-emerald-400 to-teal-500 text-white border-0 shadow-lg backdrop-blur-sm">
-                      <Sparkles className="h-3 w-3 mr-1" /> New
+                    <Badge className="bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-semibold">
+                      <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> NEW
                     </Badge>
                   )}
                   {showClearance && (
-                    <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 shadow-lg backdrop-blur-sm">
-                      <Tag className="h-3 w-3 mr-1" /> Clearance
+                    <Badge className="bg-gradient-to-r from-orange-500 via-red-600 to-pink-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
+                      <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> CLEARANCE
                     </Badge>
                   )}
                   {discountPct > 0 && (
-                    <Badge className="bg-gradient-to-r from-brand-primary to-brand-primarydark text-white border-0 shadow-lg backdrop-blur-sm font-bold">
+                    <Badge className="bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
                       −{discountPct}%
                     </Badge>
                   )}
@@ -233,40 +233,65 @@ const ProductCard = memo(function ProductCard({
                 )}
               </div>
 
-              <div className="p-4 space-y-3">
-                <div>
-                  <h3 className="font-semibold text-text-light dark:text-text-lightdark text-lg leading-tight line-clamp-2 group-hover:text-brand-primary transition-colors">
-                    {product.name ?? "Unnamed Product"}
-                  </h3>
+              <div className="p-3 sm:p-4 space-y-2 bg-gradient-to-b from-background/50 to-background">
+                {/* Meta & Title - Grouped tightly */}
+                <div className="space-y-1">
                   {metaLine && (
-                    <p className="text-sm text-text-subtle dark:text-text-subtledark mt-1">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-medium truncate">
                       {metaLine}
                     </p>
                   )}
+                  <h3 className="font-semibold text-foreground text-sm sm:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-brand-primary transition-colors duration-300">
+                    {product.name ?? "Unnamed Product"}
+                  </h3>
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Price - Close to title, key decision point */}
+                <div className="flex items-baseline gap-2">
                   <span
                     itemScope
-                    className="font-bold text-2xl text-text-light dark:text-text-lightdark"
+                    className="font-bold text-xl sm:text-2xl lg:text-3xl text-foreground bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text"
                     itemProp="offers"
                     itemType="https://schema.org/Offer"
                   >
                     <meta content="USD" itemProp="priceCurrency" />
                     <span itemProp="price">{formatPrice(displayPrice)}</span>
                   </span>
-                  <span className="text-lg text-text-subtle dark:text-text-subtledark line-through">
-                    {formatPrice(originalPrice)}
-                  </span>
+                  {originalPrice && (
+                    <span className="text-sm sm:text-base text-muted-foreground/70 line-through">
+                      {formatPrice(originalPrice)}
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                {/* Stock Status - Minimal spacing from price */}
+                <div className="flex items-center gap-1.5">
+                  {inStock ? (
+                    <>
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
+                      <span className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                        In Stock
+                      </span>
+                    </>
+                  ) : showComingSoon ? (
+                    <span className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
+                      Coming Soon
+                    </span>
+                  ) : (
+                    <span className="text-[10px] sm:text-xs text-muted-foreground">
+                      Out of Stock
+                    </span>
+                  )}
+                </div>
+
+                {/* CTA Button - Tight spacing for quick action */}
+                <div className="pt-1">
                   <Button
-                    className="flex-1 bg-gradient-to-r from-brand-primary to-brand-primarydark hover:opacity-95 text-white border-0 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                    className="w-full bg-gradient-to-r from-brand-primary via-brand-primary to-brand-primary/90 hover:from-brand-primary/90 hover:via-brand-primary/80 hover:to-brand-primary/70 text-white border-0 rounded-xl font-semibold shadow-lg shadow-brand-primary/25 hover:shadow-2xl hover:shadow-brand-primary/40 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] text-xs sm:text-sm h-9 sm:h-10"
                     disabled={!inStock || showComingSoon}
                     onClick={() => onAdd(product.id)}
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     {ctaLabel}
                   </Button>
                 </div>
@@ -274,57 +299,105 @@ const ProductCard = memo(function ProductCard({
             </div>
           ) : (
             <div
-              className="flex flex-row items-center w-full rounded-2xl bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark  shadow-sm hover:shadow-md transition"
+              className="flex flex-row items-center gap-3 sm:gap-4 w-full p-3 sm:p-4 rounded-2xl bg-card border border-border/40 hover:border-brand-primary/30 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
               role="listitem"
             >
-              <div className="relative w-[100px] h-[100px] md:w-[160px] md:h-[140px] overflow-hidden rounded-xl bg-brand-surface dark:bg-brand-surfacedark">
+              {/* Image Container */}
+              <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm">
                 {imgSrc && (
                   <Image
                     fill
                     priority
                     alt={product.name ?? "Product image"}
-                    className="object-contain"
-                    sizes="160px"
+                    className="object-cover transition-transform duration-300 hover:scale-110"
+                    sizes="(max-width: 640px) 80px, (max-width: 768px) 112px, 144px"
                     src={imgSrc}
                   />
                 )}
+
+                {/* Badge overlay for list view */}
+                {(showNew || showClearance || showComingSoon || discountPct > 0) && (
+                  <div className="absolute left-1 top-1 z-10">
+                    {showComingSoon && (
+                      <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0 shadow-lg text-[8px] sm:text-[10px] px-1 py-0.5">
+                        <Clock3 className="h-2 w-2 mr-0.5" /> Soon
+                      </Badge>
+                    )}
+                    {showNew && !showComingSoon && (
+                      <Badge className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg text-[8px] sm:text-[10px] px-1 py-0.5">
+                        <Sparkles className="h-2 w-2 mr-0.5" /> NEW
+                      </Badge>
+                    )}
+                    {discountPct > 0 && (
+                      <Badge className="bg-gradient-to-r from-red-600 to-pink-600 text-white border-0 shadow-lg text-[8px] sm:text-[10px] px-1 py-0.5 font-bold mt-1">
+                        -{discountPct}%
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div className="flex justify-start items-start flex-col px-4 flex-1">
-                <Link
-                  prefetch
-                  className="mt-3 text-center text-sm md:text-base font-semibold leading-tight tracking-wide uppercase hover:text-brand-primary line-clamp-2"
-                  href={`/product/${product.id}`}
-                >
-                  {product.name ?? "Unnamed Product"}
-                </Link>
+              {/* Content */}
+              <div className="flex flex-col justify-center flex-1 min-w-0 space-y-1.5">
+                {/* Meta & Title - Grouped for clarity */}
+                <div className="space-y-0.5">
+                  {metaLine && (
+                    <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide truncate">
+                      {metaLine}
+                    </p>
+                  )}
+                  <Link
+                    prefetch
+                    className="text-sm sm:text-base md:text-lg font-semibold leading-tight hover:text-brand-primary transition-colors line-clamp-2 block"
+                    href={`/product/${product.id}`}
+                  >
+                    {product.name ?? "Unnamed Product"}
+                  </Link>
+                </div>
 
-                {metaLine && (
-                  <p className="text-xs md:text-sm text-text-subtle dark:text-text-subtledark mt-1">
-                    {metaLine}
-                  </p>
-                )}
-
-                <div className="mt-2 flex items-baseline justify-center gap-2">
-                  <span className="text-xl md:text-2xl font-extrabold text-text-light dark:text-text-lightdark">
-                    {product.price.toLocaleString()} ₾
+                {/* Price - Minimal spacing from title */}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                    {formatPrice(displayPrice)}
                   </span>
+                  {originalPrice && (
+                    <span className="text-xs sm:text-sm text-muted-foreground/70 line-through">
+                      {formatPrice(originalPrice)}
+                    </span>
+                  )}
+                </div>
 
-                  {typeof originalPrice === "number" && originalPrice > product.price && (
-                    <span className="text-sm text-text-subtle dark:text-text-subtledark line-through">
-                      {originalPrice.toLocaleString()} ₾
+                {/* Stock indicator - Close to price */}
+                <div className="flex items-center gap-1.5">
+                  {inStock ? (
+                    <>
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
+                      <span className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                        In Stock
+                      </span>
+                    </>
+                  ) : showComingSoon ? (
+                    <span className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
+                      Coming Soon
+                    </span>
+                  ) : (
+                    <span className="text-[10px] sm:text-xs text-muted-foreground">
+                      Out of Stock
                     </span>
                   )}
                 </div>
               </div>
 
-              <button
+              {/* Add to Cart Button */}
+              <Button
+                size="icon"
                 aria-label="Add to cart"
-                className="mt-4 inline-flex items-center justify-center h-11 w-11 rounded-xl bg-brand-primary text-white shadow-md transition hover:opacity-95"
+                disabled={!inStock || showComingSoon}
+                className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-brand-primary to-brand-primary/90 hover:from-brand-primary/90 hover:to-brand-primary/80 text-white shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/40 transition-all duration-300 hover:scale-110 active:scale-95"
                 onClick={() => onAdd(product.id)}
               >
-                <ShoppingCart className="h-5 w-5" />
-              </button>
+                <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
             </div>
           )}
         </CardBody>
@@ -334,7 +407,7 @@ const ProductCard = memo(function ProductCard({
 });
 
 export default function ProductGrid({ products, viewMode }: ProductGridProps) {
-  const addToCart = useCartStore((s) => s.checkAndAddToCart);
+  const addToCart = useCartStore((s) => s.addToCart);
   const [selectedImages, setSelectedImages] = useState<Record<string, number>>({});
 
   const handleAddToCart = (productId: string) => {

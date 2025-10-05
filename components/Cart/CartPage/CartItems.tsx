@@ -57,9 +57,9 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
         return (
           <Card
             key={`${item.id}-${(item as any).variantKey ?? ""}`}
-            className={`p-3 sm:p-4 md:p-5 bg-brand-surface dark:bg-brand-surfacedark border ${outOfStock
-              ? "border-red-300/70 dark:border-red-400/40"
-              : "border-brand-muted/60 dark:border-brand-muteddark/50"
+            className={`p-3 sm:p-4 md:p-5 rounded-2xl bg-gradient-to-br from-card to-card/90 border-2 shadow-lg transition-all duration-300 ${outOfStock
+              ? "border-red-500/50 shadow-red-500/10"
+              : "border-border/50 hover:border-brand-primary/30 hover:shadow-xl"
               }`}
           >
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_160px_48px] md:items-center">
@@ -88,7 +88,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
                       {Object.entries(item.selectedFacets!).map(([k, v]) => (
                         <Badge
                           key={k}
-                          className="h-5 text-[11px] px-1.5 bg-brand-muted/60 dark:bg-brand-muteddark/50 text-text-light dark:text-text-lightdark border border-brand-muted/60 dark:border-brand-muteddark/50"
+                          className="h-5 text-[11px] px-2 bg-brand-primary/10 text-brand-primary border border-brand-primary/30 shadow-sm rounded-full"
                           variant="secondary"
                         >
                           {k}: {v}
@@ -139,7 +139,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
 
               {/* qty */}
               <div className="order-3 md:order-none flex md:justify-center">
-                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border border-brand-muted/70 dark:border-brand-muteddark/50 bg-brand-surface dark:bg-brand-surfacedark">
+                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border border-brand-muted/70 dark:border-brand-muteddark/50 bg-card">
                   <Button
                     aria-label="Decrease"
                     className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"

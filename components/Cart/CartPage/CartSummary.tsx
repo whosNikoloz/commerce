@@ -59,7 +59,7 @@ export default function CartSummary() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+      <Card className="bg-card border border-border/50 shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-text-light dark:text-text-lightdark">
             Order Summary

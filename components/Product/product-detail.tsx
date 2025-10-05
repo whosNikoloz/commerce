@@ -18,7 +18,7 @@ type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResp
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
   const [product, setProduct] = useState(initialProduct);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
-  const addToCart = useCartStore((s) => s.checkAndAddToCart);
+  const addToCart = useCartStore((s) => s.addToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
 

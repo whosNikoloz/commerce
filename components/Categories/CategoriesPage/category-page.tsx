@@ -321,23 +321,28 @@ export default function CategoryPage({
               <ProductGrid products={products} viewMode={viewMode} />
             )}
 
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-3 py-8">
               <button
-                className="px-3 py-2 rounded border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark disabled:opacity-50"
+                className="group px-5 py-3 rounded-xl border-2 border-border/50 bg-card hover:border-brand-primary hover:bg-brand-primary hover:text-white text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border/50 disabled:hover:bg-card disabled:hover:text-foreground font-semibold shadow-md hover:shadow-lg hover:shadow-brand-primary/20 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2"
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               >
-                Prev
+                <span className="text-xl">←</span>
+                <span>Prev</span>
               </button>
-              <span className="text-sm text-text-subtle dark:text-text-subtledark">
-                {currentPage} / {totalPages}
-              </span>
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 shadow-md">
+                <span className="text-sm font-semibold text-foreground">Page</span>
+                <span className="text-lg font-bold text-brand-primary">{currentPage}</span>
+                <span className="text-sm text-muted-foreground">of</span>
+                <span className="text-lg font-bold text-brand-primary">{totalPages}</span>
+              </div>
               <button
-                className="px-3 py-2 rounded border border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark disabled:opacity-50"
+                className="group px-5 py-3 rounded-xl border-2 border-border/50 bg-card hover:border-brand-primary hover:bg-brand-primary hover:text-white text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border/50 disabled:hover:bg-card disabled:hover:text-foreground font-semibold shadow-md hover:shadow-lg hover:shadow-brand-primary/20 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2"
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               >
-                Next
+                <span>Next</span>
+                <span className="text-xl">→</span>
               </button>
             </div>
           </div>

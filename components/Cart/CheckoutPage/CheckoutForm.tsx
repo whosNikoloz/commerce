@@ -125,7 +125,7 @@ export default function CheckoutForm({
   return (
     <form className="space-y-6" onSubmit={submit}>
       {/* Contact */}
-      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+      <Card className="bg-card border border-border/50 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
             <div className="w-6 h-6 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
@@ -190,7 +190,7 @@ export default function CheckoutForm({
       </Card>
 
       {/* Shipping */}
-      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+      <Card className="bg-card border border-border/50 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
             <div className="w-6 h-6 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
@@ -252,7 +252,7 @@ export default function CheckoutForm({
       </Card>
 
       {/* Provider */}
-      <Card className="p-4 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+      <Card className="p-4 bg-card border border-border/50 shadow-lg">
         <div className="mb-3 font-semibold text-text-light dark:text-text-lightdark">
           Choose payment provider
         </div>
@@ -263,7 +263,7 @@ export default function CheckoutForm({
       </Card>
 
       {/* Billing */}
-      <Card className="bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/50">
+      <Card className="bg-card border border-border/50 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
             <div className="w-6 h-6 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">

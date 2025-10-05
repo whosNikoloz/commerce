@@ -72,28 +72,16 @@ export default function AdminPage() {
       <Modal
         classNames={{
           // Dimmed brand-aware backdrop
-          backdrop: "bg-brand-surfacedark/80 backdrop-blur-md",
+          backdrop: "backdrop-blur-md",
 
           // Modal surface styled with your tokens
           base: [
             "rounded-t-xl", // mobile top sheet look
-            "bg-brand-surface dark:bg-brand-surfacedark",
             "text-text-light dark:text-text-lightdark",
-            "border border-brand-muted dark:border-brand-muteddark",
             "shadow-xl",
           ].join(" "),
 
-          // Optional: wrapper padding removal for full bleed on mobile
           wrapper: isMobile ? "p-0" : "",
-
-          // Header & body inherit surface; we set spacing + subtle borders
-          header:
-            "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark",
-          body: "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark",
-          footer:
-            "bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark border-t border-brand-muted dark:border-brand-muteddark",
-          closeButton:
-            "text-text-light dark:text-text-lightdark hover:bg-brand-muted/40 dark:hover:bg-brand-muteddark/40",
         }}
         hideCloseButton={isMobile}
         isOpen={isOpen}

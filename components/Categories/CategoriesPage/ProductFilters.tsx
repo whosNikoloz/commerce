@@ -173,23 +173,26 @@ function SidebarContent({
     <div className="space-y-6">
       {/* Categories */}
       <div>
-        <h2 className="text-lg font-semibold mb-4 text-text-light dark:text-text-lightdark">
+        <h2 className="text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
+          <span className="w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
           Categories
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {subcategories.map((sub) => (
             <Link
               key={sub.id}
               prefetch
-              className="flex items-center justify-between w-full p-2 text-left rounded-md transition-colors
-                         text-text-light dark:text-text-lightdark
-                         hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/50
-                         border border-transparent hover:border-brand-muted/70 dark:hover:border-brand-muteddark/70"
+              className="group flex items-center justify-between w-full px-3 py-2.5 text-left rounded-xl transition-all duration-200
+                         text-foreground hover:text-brand-primary
+                         hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10
+                         border border-transparent hover:border-brand-primary/20
+                         hover:shadow-md hover:shadow-brand-primary/5
+                         hover:translate-x-1"
               href={buildSubHref(sub)}
             >
-              <span className="text-sm">{sub.name}</span>
-              <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                ({(sub as any).count ?? 0})
+              <span className="text-sm font-medium group-hover:font-semibold transition-all">{sub.name}</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-all">
+                {(sub as any).count ?? 0}
               </span>
             </Link>
           ))}
@@ -198,9 +201,12 @@ function SidebarContent({
 
       <Accordion collapsible className="w-full" type="single">
         {/* Price */}
-        <AccordionItem value="price">
-          <AccordionTrigger className="text-text-light dark:text-text-lightdark">
-            Price Range
+        <AccordionItem value="price" className="border-b border-border/50">
+          <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
+            <span className="flex items-center gap-2">
+              <span className="text-brand-primary">💰</span>
+              Price Range
+            </span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-4">
@@ -235,9 +241,12 @@ function SidebarContent({
         </AccordionItem>
 
         {/* Brands */}
-        <AccordionItem value="brands">
-          <AccordionTrigger className="text-text-light dark:text-text-lightdark">
-            Brands
+        <AccordionItem value="brands" className="border-b border-border/50">
+          <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
+            <span className="flex items-center gap-2">
+              <span className="text-brand-primary">🏷️</span>
+              Brands
+            </span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
@@ -265,9 +274,12 @@ function SidebarContent({
         </AccordionItem>
 
         {/* Stock */}
-        <AccordionItem value="stock">
-          <AccordionTrigger className="text-text-light dark:text-text-lightdark">
-            Stock
+        <AccordionItem value="stock" className="border-b border-border/50">
+          <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
+            <span className="flex items-center gap-2">
+              <span className="text-brand-primary">📦</span>
+              Stock
+            </span>
           </AccordionTrigger>
           <AccordionContent>
             <RadioGroup
@@ -300,9 +312,12 @@ function SidebarContent({
         </AccordionItem>
 
         {/* Condition */}
-        <AccordionItem value="condition">
-          <AccordionTrigger className="text-text-light dark:text-text-lightdark">
-            Condition
+        <AccordionItem value="condition" className="border-b border-border/50">
+          <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
+            <span className="flex items-center gap-2">
+              <span className="text-brand-primary">✨</span>
+              Condition
+            </span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
@@ -335,9 +350,12 @@ function SidebarContent({
 
         {/* Dynamic facets */}
         {facets.map((f) => (
-          <AccordionItem key={f.id} value={`facet-${f.id}`}>
-            <AccordionTrigger className="text-text-light dark:text-text-lightdark">
-              {f.name}
+          <AccordionItem key={f.id} value={`facet-${f.id}`} className="border-b border-border/50">
+            <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
+              <span className="flex items-center gap-2">
+                <span className="text-brand-primary">🔍</span>
+                {f.name}
+              </span>
             </AccordionTrigger>
             <AccordionContent>
               <FacetBlock
@@ -352,7 +370,7 @@ function SidebarContent({
       </Accordion>
 
       <Button
-        className="w-full border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/50"
+        className="w-full border-2 border-brand-primary/30 text-brand-primary hover:bg-brand-primary hover:text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:shadow-brand-primary/20 transition-all duration-300 hover:scale-[1.02]"
         variant="outline"
         onClick={clearFilters}
       >
@@ -371,8 +389,10 @@ export default function ProductFilters(props: ProductFiltersProps) {
       <aside
         aria-label="Filters"
         className="hidden lg:block sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto
-                   border border-brand-muted dark:border-brand-muteddark
-                   rounded-lg bg-brand-surface dark:bg-brand-surfacedark p-6 shadow-sm"
+                   border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6
+                   shadow-xl shadow-black/5 dark:shadow-black/20
+                   hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30
+                   transition-shadow duration-300"
       >
         <SidebarContent {...props} />
       </aside>
@@ -381,15 +401,13 @@ export default function ProductFilters(props: ProductFiltersProps) {
       <Sheet>
         <SheetTrigger asChild>
           <Button
-            className="lg:hidden relative bg-brand-surface dark:bg-brand-surfacedark
-                       border border-brand-muted dark:border-brand-muteddark
-                       text-text-light dark:text-text-lightdark"
+            className="lg:hidden relative border-2 border-border/50 hover:border-brand-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
             variant="outline"
           >
             <Filter className="h-4 w-4 mr-2" />
             Filters
             {activeFiltersCount > 0 && (
-              <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs bg-brand-primary text-white">
+              <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-gradient-to-br from-brand-primary to-brand-primary/80 text-white shadow-lg">
                 {activeFiltersCount}
               </Badge>
             )}

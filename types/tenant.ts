@@ -228,6 +228,13 @@ export type Template3SectionType =
   | "InfluencerHighlight"
   | "NewsletterBeauty";
 
+// ===== Template 4: Casual Ecommerce =====
+export type Template4SectionType =
+  | "HeroCategoryGrid"
+  | "CommercialBanner"
+  | "CategoryCarousel"
+  | "ProductRail";
+
 export type HeroBannerData = {
   headline: LocalizedText;
   subheadline?: LocalizedText;
@@ -279,6 +286,59 @@ export type InfluencerHighlightData = {
   cta?: { label: LocalizedText; href: string };
 };
 
+// ===== Template 4 Section Data Types =====
+export type HeroCategoryGridData = {
+  headline: LocalizedText;
+  subheadline?: LocalizedText;
+  categories: Array<{
+    name: LocalizedText;
+    imageUrl: string;
+    href: string;
+    badge?: LocalizedText;
+  }>;
+  cta?: { label: LocalizedText; href: string };
+};
+
+export type CommercialBannerData = {
+  imageUrl: string;
+  mobileImageUrl?: string;
+  href: string;
+  alt: LocalizedText;
+  badge?: LocalizedText;
+};
+
+export type CategoryCarouselData = {
+  title: LocalizedText;
+  categories: Array<{
+    name: LocalizedText;
+    imageUrl: string;
+    href: string;
+    productCount?: number;
+  }>;
+};
+
+export type ProductGridData = {
+  customName?: string;
+  title: LocalizedText;
+  subtitle?: LocalizedText;
+  columns?: 2 | 3 | 4; // Grid column count
+  limit: number;
+  viewAllHref: string;
+  filterBy?: {
+    categoryIds?: string[];
+    brandIds?: string[];
+    condition?: number[];
+    stockStatus?: number;
+    isNewArrival?: boolean;
+    isLiquidated?: boolean;
+    isComingSoon?: boolean;
+    hasDiscount?: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+  };
+  sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
+};
+
 // ===== Section instances with discriminated unions =====
 export type Template1SectionInstance =
   | { type: "HeroWithSearch"; enabled: boolean; order: number; data: HeroWithSearchData }
@@ -310,6 +370,12 @@ export type Template3SectionInstance =
   | { type: "InfluencerHighlight"; enabled: boolean; order: number; data: InfluencerHighlightData }
   | { type: "NewsletterBeauty"; enabled: boolean; order: number; data: NewsletterData };
 
+export type Template4SectionInstance =
+  | { type: "HeroCategoryGrid"; enabled: boolean; order: number; data: HeroCategoryGridData }
+  | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
+  | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData }
+  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData };
+
 // ===== Homepage config per template =====
 export type Template1Homepage = {
   templateId: 1;
@@ -326,7 +392,12 @@ export type Template3Homepage = {
   sections: Template3SectionInstance[];
 };
 
-export type Homepage = Template1Homepage | Template2Homepage | Template3Homepage;
+export type Template4Homepage = {
+  templateId: 4;
+  sections: Template4SectionInstance[];
+};
+
+export type Homepage = Template1Homepage | Template2Homepage | Template3Homepage | Template4Homepage;
 
 // ===== Updated TenantConfig =====
 export type TenantConfig =
@@ -347,4 +418,10 @@ export type TenantConfig =
     themeColor: string;
     theme: ThemeVars;
     homepage: Template3Homepage;
+  }
+  | {
+    templateId: 4;
+    themeColor: string;
+    theme: ThemeVars;
+    homepage: Template4Homepage;
   };

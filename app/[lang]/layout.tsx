@@ -1,4 +1,3 @@
-// app/[lang]/layout.tsx (RootLayout)
 import "@/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 
@@ -99,7 +98,7 @@ export default async function RootLayout({
       </head>
       <body
         className={clsx(
-          "min-h-screen bg-brand-muted dark:bg-brand-muteddark font-sans antialiased",
+          "min-h-screen bg-brand-surface dark:bg-brand-surfacedark font-sans antialiased",
           fontClassNames,
         )}
       >

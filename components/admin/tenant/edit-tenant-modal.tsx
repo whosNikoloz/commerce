@@ -5,6 +5,7 @@ import type {
   Template1SectionInstance,
   Template2SectionInstance,
   Template3SectionInstance,
+  Template4SectionInstance,
   TenantConfig,
 } from "@/types/tenant";
 
@@ -28,7 +29,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getDefaultSectionsForTemplate, TEMPLATE_1_ALLOWED_SECTIONS, TEMPLATE_2_ALLOWED_SECTIONS, TEMPLATE_3_ALLOWED_SECTIONS } from "@/lib/templates";
+import { getDefaultSectionsForTemplate, TEMPLATE_1_ALLOWED_SECTIONS, TEMPLATE_2_ALLOWED_SECTIONS, TEMPLATE_3_ALLOWED_SECTIONS, TEMPLATE_4_ALLOWED_SECTIONS } from "@/lib/templates";
 
 interface EditTenantModalProps {
   isOpen: boolean;
@@ -40,7 +41,8 @@ interface EditTenantModalProps {
 type AnySectionInstance =
   | Template1SectionInstance
   | Template2SectionInstance
-  | Template3SectionInstance;
+  | Template3SectionInstance
+  | Template4SectionInstance;
 
 const T1_TYPES = new Set<Template1SectionInstance["type"]>([
   "HeroWithSearch",
@@ -72,6 +74,12 @@ const T3_TYPES = new Set<Template3SectionInstance["type"]>([
   "InfluencerHighlight",
   "NewsletterBeauty",
 ]);
+const T4_TYPES = new Set<Template4SectionInstance["type"]>([
+  "HeroCategoryGrid",
+  "CommercialBanner",
+  "CategoryCarousel",
+  "ProductRail",
+]);
 
 function isT1(s: AnySectionInstance): s is Template1SectionInstance {
   return T1_TYPES.has(s.type as any);
@@ -82,6 +90,9 @@ function isT2(s: AnySectionInstance): s is Template2SectionInstance {
 function isT3(s: AnySectionInstance): s is Template3SectionInstance {
   return T3_TYPES.has(s.type as any);
 }
+function isT4(s: AnySectionInstance): s is Template4SectionInstance {
+  return T4_TYPES.has(s.type as any);
+}
 
 export default function EditTenantModal({
   isOpen,
@@ -91,7 +102,7 @@ export default function EditTenantModal({
 }: EditTenantModalProps) {
   const isMobile = useIsMobile();
 
-  const [templateId, setTemplateId] = useState<1 | 2 | 3>(config.templateId as 1 | 2 | 3);
+  const [templateId, setTemplateId] = useState<1 | 2 | 3 | 4>(config.templateId as 1 | 2 | 3 | 4);
   const [themeColor, setThemeColor] = useState(config.themeColor);
   const [themeMode, setThemeMode] = useState<"light" | "dark">(config.theme.mode);
 
@@ -127,20 +138,23 @@ export default function EditTenantModal({
   // helpers
   const rgbToHex = (rgb: string): string => {
     const parts = rgb.split(" ").map((n) => parseInt(n.trim(), 10));
+
     if (parts.length !== 3 || parts.some(isNaN)) return "#000000";
+
     return "#" + parts.map((n) => n.toString(16).padStart(2, "0")).join("");
   };
   const hexToRgb = (hex: string): string => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
+
     return `${r} ${g} ${b}`;
   };
 
   // Reset when opening
   useEffect(() => {
     if (!isOpen) return;
-    setTemplateId(config.templateId as 1 | 2 | 3);
+    setTemplateId(config.templateId as 1 | 2 | 3 | 4);
     setThemeColor(config.themeColor);
     setThemeMode(config.theme.mode);
     setBrandColors(config.theme.brand);
@@ -174,6 +188,7 @@ export default function EditTenantModal({
     const originalIndex = sections.findIndex(
       (s) => s.type === section.type && s.order === section.order,
     );
+
     if (originalIndex !== -1) {
       setSelectedSection({
         index: originalIndex,
@@ -207,6 +222,7 @@ export default function EditTenantModal({
         sortBy: "featured",
       },
     } as any;
+
     setSections((prev) => [...prev, newSection]);
     toast.success("Product Rail section added");
   };
@@ -221,6 +237,7 @@ export default function EditTenantModal({
         ...defaultSection,
         order: maxOrder + 1,
       };
+
       setSections((prev) => [...prev, newSection as any]);
       toast.success(`${sectionType} section added`);
       setShowAddSectionModal(false);
@@ -231,7 +248,8 @@ export default function EditTenantModal({
 
   const availableSections = templateId === 1 ? TEMPLATE_1_ALLOWED_SECTIONS :
     templateId === 2 ? TEMPLATE_2_ALLOWED_SECTIONS :
-    TEMPLATE_3_ALLOWED_SECTIONS;
+    templateId === 3 ? TEMPLATE_3_ALLOWED_SECTIONS :
+    TEMPLATE_4_ALLOWED_SECTIONS;
 
   const deleteSection = (index: number) => {
     setSections((prev) => prev.filter((_, i) => i !== index));
@@ -243,6 +261,7 @@ export default function EditTenantModal({
     setSections((prev) => {
       const newSections = [...prev];
       const temp = newSections[index - 1];
+
       newSections[index - 1] = newSections[index];
       newSections[index] = temp;
 
@@ -259,6 +278,7 @@ export default function EditTenantModal({
       if (index === prev.length - 1) return prev;
       const newSections = [...prev];
       const temp = newSections[index + 1];
+
       newSections[index + 1] = newSections[index];
       newSections[index] = temp;
 
@@ -277,6 +297,7 @@ export default function EditTenantModal({
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
+
         return `${r} ${g} ${b}`;
       };
       const primaryRGB = hexToRGB(themeColor);
@@ -292,6 +313,7 @@ export default function EditTenantModal({
             },
           };
         }
+
         return section;
       });
 
@@ -327,7 +349,7 @@ export default function EditTenantModal({
             sections: cleanSections.filter(isT2) as Template2SectionInstance[],
           },
         };
-      } else {
+      } else if (templateId === 3) {
         updatedConfig = {
           templateId: 3,
           themeColor,
@@ -340,6 +362,21 @@ export default function EditTenantModal({
           homepage: {
             templateId: 3,
             sections: cleanSections.filter(isT3) as Template3SectionInstance[],
+          },
+        };
+      } else {
+        updatedConfig = {
+          templateId: 4,
+          themeColor,
+          theme: {
+            mode: themeMode,
+            brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
+            text: textColors,
+            fonts,
+          },
+          homepage: {
+            templateId: 4,
+            sections: cleanSections.filter(isT4) as Template4SectionInstance[],
           },
         };
       }
@@ -852,12 +889,13 @@ export default function EditTenantModal({
                         <h4 className="font-semibold text-sm">Select Template</h4>
                         <div className="grid grid-cols-1 gap-4">
                           {/* Template 1 */}
-                          <div
+                          <button
                             className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
                               templateId === 1
                                 ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
                                 : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
                             }`}
+                            type="button"
                             onClick={() => {
                               setTemplateId(1);
                               setSections(getDefaultSectionsForTemplate(1) as AnySectionInstance[]);
@@ -911,21 +949,23 @@ export default function EditTenantModal({
                                 </div>
                               )}
                             </div>
-                          </div>
+                          </button>
 
                           {/* Template 2 */}
-                          <div
-                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                          <button
+                            className={`relative w-full text-left rounded-lg border-2 p-4 transition-all ${
                               templateId === 2
                                 ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
                                 : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
                             }`}
+                            type="button"
                             onClick={() => {
                               setTemplateId(2);
                               setSections(getDefaultSectionsForTemplate(2) as AnySectionInstance[]);
                               toast.success("Template 2 selected - Default sections loaded");
                             }}
                           >
+
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
@@ -973,15 +1013,16 @@ export default function EditTenantModal({
                                 </div>
                               )}
                             </div>
-                          </div>
+                          </button>
 
                           {/* Template 3 */}
-                          <div
-                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                          <button
+                            className={`relative w-full text-left rounded-lg border-2 p-4 transition-all cursor-pointer ${
                               templateId === 3
                                 ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
                                 : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
                             }`}
+                            type="button"
                             onClick={() => {
                               setTemplateId(3);
                               setSections(getDefaultSectionsForTemplate(3) as AnySectionInstance[]);
@@ -1035,7 +1076,70 @@ export default function EditTenantModal({
                                 </div>
                               )}
                             </div>
-                          </div>
+                          </button>
+
+                          {/* Template 4 */}
+                          <button
+                            className={`relative w-full text-left rounded-lg border-2 p-4 transition-all cursor-pointer ${
+                              templateId === 4
+                                ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
+                                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-amber-300 dark:hover:border-amber-700"
+                            }`}
+                            type="button"
+                            onClick={() => {
+                              setTemplateId(4);
+                              setSections(getDefaultSectionsForTemplate(4) as AnySectionInstance[]);
+                              toast.success("Template 4 selected - Default sections loaded");
+                            }}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div
+                                    className={`text-xl font-bold ${
+                                      templateId === 4 ? "text-amber-600" : "text-slate-400"
+                                    }`}
+                                  >
+                                    #4
+                                  </div>
+                                  <h5 className="font-semibold text-lg">Casual Ecommerce</h5>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                                  Modern casual template with category grids, commercial banners, and product showcases
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                    Category Hero
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                    Banners
+                                  </span>
+                                  <span className="text-xs px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                                    Product Grid
+                                  </span>
+                                </div>
+                              </div>
+                              {templateId === 4 && (
+                                <div className="ml-3">
+                                  <div className="h-6 w-6 rounded-full bg-amber-500 flex items-center justify-center">
+                                    <svg
+                                      className="w-4 h-4 text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        d="M5 13l4 4L19 7"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </button>
                         </div>
                       </div>
 
@@ -1200,13 +1304,24 @@ export default function EditTenantModal({
     {/* Add Section Modal - Using portal to render outside DOM hierarchy */}
     {showAddSectionModal && isOpen && typeof document !== 'undefined' && createPortal(
       <div
+        aria-label="Close modal"
         className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+        role="button"
         style={{ zIndex: 999999 }}
-        onClick={() => setShowAddSectionModal(false)}
+        tabIndex={0}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setShowAddSectionModal(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+            setShowAddSectionModal(false);
+          }
+        }}
       >
         <div
+          aria-modal="true"
           className="relative max-w-md w-full mx-4 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border-2 border-slate-200 dark:border-slate-800 p-6"
-          onClick={(e) => e.stopPropagation()}
+          role="dialog"
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">

@@ -83,7 +83,7 @@ export function Footer() {
   return (
     <footer className="relative mt-24">
       {/* subtle divider glow */}
-      <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-transparent via-brand-muted/60 to-transparent dark:via-brand-mutedDark/60" />
+      {/* <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-transparent via-brand-muted/60 to-transparent dark:via-brand-mutedDark/60" /> */}
 
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="overflow-hidden rounded-3xl border border-brand-muted/60 bg-brand-surface/70 shadow-sm backdrop-blur dark:border-brand-mutedDark/60 dark:bg-brand-surfaceDark/60">

@@ -871,7 +871,7 @@ export const TENANTS: Record<string, TenantConfig> = {
   },
 
   "localhost:3000": {
-    templateId: 3,
+    templateId: 4,
     themeColor: "#22c55e",
     theme: {
       mode: "dark",
@@ -896,135 +896,127 @@ export const TENANTS: Record<string, TenantConfig> = {
       },
     },
     homepage: {
-      templateId: 3,
+      templateId: 4,
       sections: [
         {
-          type: "HeroBanner",
+          type: "HeroCategoryGrid",
           enabled: true,
           order: 1,
           data: {
             headline: {
-              ka: "სილამაზე",
-              en: "Beauty",
+              ka: "იყიდეთ კატეგორიის მიხედვით",
+              en: "Shop by Category",
             },
             subheadline: {
-              ka: "ბუნებრივი კოსმეტიკა",
-              en: "Natural cosmetics",
-            },
-            backgroundImage: "/hero-beauty.jpg",
-          },
-        },
-        {
-          type: "CategoryGrid",
-          enabled: true,
-          order: 2,
-          data: {
-            title: {
-              ka: "კატეგორიები",
-              en: "Categories",
+              ka: "აღმოაჩინეთ ყველაფერი რაც გჭირდებათ",
+              en: "Discover everything you need",
             },
             categories: [
               {
                 name: {
-                  ka: "კოსმეტიკა",
-                  en: "Cosmetics",
+                  ka: "ელექტრონიკა",
+                  en: "Electronics",
                 },
-                imageUrl: "/cat-cosmetics.jpg",
-                href: "/category/cosmetics",
-                productCount: 200,
+                imageUrl: "/cat-electronics.jpg",
+                href: "/category/electronics",
               },
               {
                 name: {
-                  ka: "მოვლა",
-                  en: "Skincare",
+                  ka: "ტანსაცმელი",
+                  en: "Fashion",
                 },
-                imageUrl: "/cat-skincare.jpg",
-                href: "/category/skincare",
-                productCount: 150,
+                imageUrl: "/cat-fashion.jpg",
+                href: "/category/fashion",
+              },
+              {
+                name: {
+                  ka: "სახლი და ბაღი",
+                  en: "Home & Garden",
+                },
+                imageUrl: "/cat-home.jpg",
+                href: "/category/home",
+              },
+              {
+                name: {
+                  ka: "სპორტი",
+                  en: "Sports",
+                },
+                imageUrl: "/cat-sports.jpg",
+                href: "/category/sports",
               },
             ],
           },
         },
         {
-          type: "ReviewsWall",
+          type: "CommercialBanner",
           enabled: true,
-          order: 3,
+          order: 2,
           data: {
-            title: {
-              ka: "შეფასებები",
-              en: "Reviews",
+            imageUrl: "/banners/promo-1.jpg",
+            mobileImageUrl: "/banners/promo-1-mobile.jpg",
+            href: "/category/deals",
+            alt: {
+              ka: "სპეციალური შეთავაზება",
+              en: "Special Offer",
             },
-            reviews: [],
+            badge: {
+              ka: "🔥 ახალი",
+              en: "🔥 New",
+            },
           },
         },
         {
-          type: "ProductRail",
+          type: "CommercialBanner",
           enabled: true,
           order: 4,
           data: {
-            title: {
-              ka: "პოპულარული",
-              en: "Popular",
+            imageUrl: "/banners/promo-2.jpg",
+            mobileImageUrl: "/banners/promo-2-mobile.jpg",
+            href: "/category/new-arrivals",
+            alt: {
+              ka: "ახალი ჩამოსვლები",
+              en: "New Arrivals",
             },
-            subtitle: {
-              ka: "ბესტსელერები",
-              en: "Bestsellers",
-            },
-            limit: 4,
-            viewAllHref: "/products",
-            filterBy: {},
-            sortBy: "featured",
           },
         },
         {
-          type: "BundlePromo",
+          type: "CategoryCarousel",
           enabled: true,
           order: 5,
           data: {
             title: {
-              ka: "ბანდლები",
-              en: "Bundles",
+              ka: "პოპულარული კატეგორიები",
+              en: "Popular Categories",
             },
-            description: {
-              ka: "შეინახე მეტი",
-              en: "Save more",
-            },
-            bundles: [],
-          },
-        },
-        {
-          type: "InfluencerHighlight",
-          enabled: true,
-          order: 6,
-          data: {
-            title: {
-              ka: "ინფლუენსერები",
-              en: "Influencers",
-            },
-            images: [],
-          },
-        },
-        {
-          type: "NewsletterBeauty",
-          enabled: true,
-          order: 7,
-          data: {
-            title: {
-              ka: "გამოწერა",
-              en: "Subscribe",
-            },
-            description: {
-              ka: "სილამაზის რჩევები",
-              en: "Beauty tips",
-            },
-            emailPlaceholder: {
-              ka: "ელფოსტა",
-              en: "Email",
-            },
-            ctaLabel: {
-              ka: "გამოწერა",
-              en: "Subscribe",
-            },
+            categories: [
+              {
+                name: {
+                  ka: "ტელეფონები",
+                  en: "Phones",
+                },
+                imageUrl: "/cat-phones.jpg",
+                href: "/category/phones",
+                productCount: 150,
+              },
+              {
+                name: {
+                  ka: "ლეპტოპები",
+                  en: "Laptops",
+                },
+                imageUrl: "/cat-laptops.jpg",
+                href: "/category/laptops",
+                productCount: 80,
+              },
+              {
+                name: {
+                  ka: "აქსესუარები",
+                  en: "Accessories",
+                },
+                imageUrl: "/cat-accessories.jpg",
+                href: "/category/accessories",
+                productCount: 200,
+              },
+            ],
           },
         },
       ],

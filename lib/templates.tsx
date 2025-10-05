@@ -3,9 +3,11 @@ import type {
   Template1SectionType,
   Template2SectionType,
   Template3SectionType,
+  Template4SectionType,
   Template1SectionInstance,
   Template2SectionInstance,
   Template3SectionInstance,
+  Template4SectionInstance,
 } from "@/types/tenant";
 
 import { z } from "zod";
@@ -479,6 +481,100 @@ const Template3HomepageSchema = z.object({
   sections: z.array(Template3SectionSchema),
 });
 
+// ===== Template 4 Zod Schemas =====
+const HeroCategoryGridDataSchema = z.object({
+  headline: LocalizedTextSchema,
+  subheadline: LocalizedTextSchema.optional(),
+  categories: z.array(
+    z.object({
+      name: LocalizedTextSchema,
+      imageUrl: z.string(),
+      href: z.string(),
+      badge: LocalizedTextSchema.optional(),
+    })
+  ),
+  cta: z
+    .object({
+      label: LocalizedTextSchema,
+      href: z.string(),
+    })
+    .optional(),
+});
+
+const CommercialBannerDataSchema = z.object({
+  imageUrl: z.string(),
+  mobileImageUrl: z.string().optional(),
+  href: z.string(),
+  alt: LocalizedTextSchema,
+  badge: LocalizedTextSchema.optional(),
+});
+
+const CategoryCarouselDataSchema = z.object({
+  title: LocalizedTextSchema,
+  categories: z.array(
+    z.object({
+      name: LocalizedTextSchema,
+      imageUrl: z.string(),
+      href: z.string(),
+      productCount: z.number().optional(),
+    })
+  ),
+});
+
+const ProductGridDataSchema = z.object({
+  customName: z.string().optional(),
+  title: LocalizedTextSchema,
+  subtitle: LocalizedTextSchema.optional(),
+  columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  limit: z.number(),
+  viewAllHref: z.string(),
+  filterBy: z.object({
+    categoryIds: z.array(z.string()).optional(),
+    brandIds: z.array(z.string()).optional(),
+    condition: z.array(z.number()).optional(),
+    stockStatus: z.number().optional(),
+    isNewArrival: z.boolean().optional(),
+    isLiquidated: z.boolean().optional(),
+    isComingSoon: z.boolean().optional(),
+    hasDiscount: z.boolean().optional(),
+    minPrice: z.number().optional(),
+    maxPrice: z.number().optional(),
+  }).optional(),
+  sortBy: z.enum(["featured", "newest", "price-low", "price-high", "rating", "name"]).optional(),
+});
+
+const Template4SectionSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("HeroCategoryGrid"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: HeroCategoryGridDataSchema,
+  }),
+  z.object({
+    type: z.literal("CommercialBanner"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CommercialBannerDataSchema,
+  }),
+  z.object({
+    type: z.literal("CategoryCarousel"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CategoryCarouselDataSchema,
+  }),
+  z.object({
+    type: z.literal("ProductGrid"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: ProductGridDataSchema,
+  }),
+]);
+
+const Template4HomepageSchema = z.object({
+  templateId: z.literal(4),
+  sections: z.array(Template4SectionSchema),
+});
+
 // ===== Template Registry Type =====
 export type SectionComponent<T = any> = ComponentType<{
   data: T;
@@ -567,6 +663,17 @@ const InfluencerHighlight = lazy(
 );
 const NewsletterBeauty = lazy(
   () => import("@/components/Home/sections/template3/NewsletterBeauty")
+);
+
+// Template 4
+const HeroCategoryGrid = lazy(
+  () => import("@/components/Home/sections/template4/HeroCategoryGrid")
+);
+const CommercialBanner = lazy(
+  () => import("@/components/Home/sections/template4/CommercialBanner")
+);
+const CategoryCarousel = lazy(
+  () => import("@/components/Home/sections/template4/CategoryCarousel")
 );
 
 // ===== Template 1 Definition =====
@@ -659,9 +766,31 @@ export const template3Definition: TemplateDefinition<
   },
 };
 
+// ===== Template 4 Definition =====
+export const TEMPLATE_4_ALLOWED_SECTIONS = [
+  "HeroCategoryGrid",
+  "CommercialBanner",
+  "CategoryCarousel",
+  "ProductRail",
+] as const;
+
+export const template4Definition: TemplateDefinition<
+  Template4SectionType,
+  Template4SectionInstance
+> = {
+  allowedSections: TEMPLATE_4_ALLOWED_SECTIONS,
+  schema: Template4HomepageSchema,
+  registry: {
+    HeroCategoryGrid,
+    CommercialBanner,
+    CategoryCarousel,
+    ProductRail,
+  },
+};
+
 // ===== Main template getter =====
 export function getTemplateDefinition(
-  templateId: 1 | 2 | 3
+  templateId: 1 | 2 | 3 | 4
 ): TemplateDefinition {
   switch (templateId) {
     case 1:
@@ -670,13 +799,15 @@ export function getTemplateDefinition(
       return template2Definition;
     case 3:
       return template3Definition;
+    case 4:
+      return template4Definition;
     default:
       throw new Error(`Unknown templateId: ${templateId}`);
   }
 }
 
 // ===== Validation helper =====
-export function validateHomepage(homepage: any, templateId: 1 | 2 | 3) {
+export function validateHomepage(homepage: any, templateId: 1 | 2 | 3 | 4) {
   const definition = getTemplateDefinition(templateId);
   const result = definition.schema.safeParse(homepage);
 
@@ -692,7 +823,7 @@ export function validateHomepage(homepage: any, templateId: 1 | 2 | 3) {
 }
 
 // ===== Default sections for each template =====
-export function getDefaultSectionsForTemplate(templateId: 1 | 2 | 3): any[] {
+export function getDefaultSectionsForTemplate(templateId: 1 | 2 | 3 | 4): any[] {
   switch (templateId) {
     case 1:
       return [
@@ -1016,6 +1147,117 @@ export function getDefaultSectionsForTemplate(templateId: 1 | 2 | 3): any[] {
             description: { ka: "სილამაზის რჩევები", en: "Beauty tips" },
             emailPlaceholder: { ka: "ელფოსტა", en: "Email" },
             ctaLabel: { ka: "გამოწერა", en: "Subscribe" },
+          },
+        },
+      ];
+    case 4:
+      return [
+        {
+          type: "HeroCategoryGrid",
+          enabled: true,
+          order: 1,
+          data: {
+            headline: { ka: "იყიდეთ კატეგორიის მიხედვით", en: "Shop by Category" },
+            subheadline: { ka: "აღმოაჩინეთ ყველაფერი რაც გჭირდებათ", en: "Discover everything you need" },
+            categories: [
+              {
+                name: { ka: "ელექტრონიკა", en: "Electronics" },
+                imageUrl: "/cat-electronics.jpg",
+                href: "/category/electronics",
+              },
+              {
+                name: { ka: "ტანსაცმელი", en: "Fashion" },
+                imageUrl: "/cat-fashion.jpg",
+                href: "/category/fashion",
+              },
+              {
+                name: { ka: "სახლი და ბაღი", en: "Home & Garden" },
+                imageUrl: "/cat-home.jpg",
+                href: "/category/home",
+              },
+              {
+                name: { ka: "სპორტი", en: "Sports" },
+                imageUrl: "/cat-sports.jpg",
+                href: "/category/sports",
+              },
+            ],
+          },
+        },
+        {
+          type: "CommercialBanner",
+          enabled: true,
+          order: 2,
+          data: {
+            imageUrl: "/banners/promo-1.jpg",
+            mobileImageUrl: "/banners/promo-1-mobile.jpg",
+            href: "/category/deals",
+            alt: { ka: "სპეციალური შეთავაზება", en: "Special Offer" },
+            badge: { ka: "🔥 ახალი", en: "🔥 New" },
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: { ka: "ახალი ჩამოსვლები", en: "New Arrivals" },
+            subtitle: { ka: "უახლესი კოლექცია", en: "Latest collection" },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: { isNewArrival: true },
+            sortBy: "newest",
+          },
+        },
+        {
+          type: "CommercialBanner",
+          enabled: true,
+          order: 4,
+          data: {
+            imageUrl: "/banners/promo-2.jpg",
+            mobileImageUrl: "/banners/promo-2-mobile.jpg",
+            href: "/category/new-arrivals",
+            alt: { ka: "ახალი ჩამოსვლები", en: "New Arrivals" },
+          },
+        },
+        {
+          type: "CategoryCarousel",
+          enabled: true,
+          order: 5,
+          data: {
+            title: { ka: "პოპულარული კატეგორიები", en: "Popular Categories" },
+            categories: [
+              {
+                name: { ka: "ტელეფონები", en: "Phones" },
+                imageUrl: "/cat-phones.jpg",
+                href: "/category/phones",
+                productCount: 150,
+              },
+              {
+                name: { ka: "ლეპტოპები", en: "Laptops" },
+                imageUrl: "/cat-laptops.jpg",
+                href: "/category/laptops",
+                productCount: 80,
+              },
+              {
+                name: { ka: "აქსესუარები", en: "Accessories" },
+                imageUrl: "/cat-accessories.jpg",
+                href: "/category/accessories",
+                productCount: 200,
+              },
+            ],
+          },
+        },
+        {
+          type: "ProductRail",
+          enabled: true,
+          order: 4,
+          data: {
+            title: { ka: "ახალი ჩამოსვლები", en: "New Arrivals" },
+            subtitle: { ka: "უახლესი კოლექცია", en: "Latest collection" },
+            limit: 4,
+            viewAllHref: "/products",
+            filterBy: { isNewArrival: true },
+            sortBy: "newest",
           },
         },
       ];

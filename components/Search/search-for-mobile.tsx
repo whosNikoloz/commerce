@@ -12,6 +12,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@herou
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@headlessui/react";
 import { motion } from "framer-motion";
+import { MessageCircleIcon } from "lucide-react";
 
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
@@ -246,7 +247,7 @@ export default function SearchForMobile({
           wrapper:
             "h-[100lvh] max-h-[100lvh] min-h-[100lvh] p-0 m-0",
           base:
-            "dark:bg-brand-muteddark bg-brand-surface !rounded-none h-full max-h-full " +
+            "dark:bg-gray-900 bg-white !rounded-none h-full max-h-full " +
             "pt-[calc(env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)]",
           backdrop: "bg-black/40",
         }}
@@ -265,16 +266,16 @@ export default function SearchForMobile({
         <ModalContent>
           {() => (
             <>
-              <ModalHeader className="z-50 flex items-center gap-2 pt-4 px-4 shrink-0">
+              <ModalHeader className="z-50 flex items-center  pt-4 pb-3 shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                 <GoBackButton onClick={handleClose} />
-                <div className="flex items-center gap-1 bg-white rounded-full shadow-md border border-gray-300 w-full px-4 py-2 focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
-                  <SearchIcon className="text-gray-500" />
+                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg w-full px-3 py-2.5 focus-within:bg-gray-50 dark:focus-within:bg-gray-750 transition-colors">
+                  <SearchIcon className="text-gray-400 dark:text-gray-500 w-5 h-5 flex-shrink-0" />
                   <Input
                     aria-controls="search-results"
                     aria-expanded={isModalOpen}
                     aria-label="Search"
                     autoComplete="off"
-                    className="w-full h-full bg-white border-none focus:outline-none text-gray-700 text-[16px]"
+                    className="w-full bg-transparent border-none focus:outline-none text-gray-900 dark:text-gray-100 text-[16px] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                     id="search-input"
                     placeholder="What are you looking for?"
                     type="search"
@@ -290,7 +291,7 @@ export default function SearchForMobile({
                 </div>
               </ModalHeader>
 
-              <ModalBody className="grow overflow-y-auto min-h-0 px-4" id="search-results">
+              <ModalBody className="grow overflow-y-auto min-h-0 px-4 py-4" id="search-results">
                 {/* === NO / SHORT QUERY VIEW === */}
                 {!hasQuery && (
                   <div className="space-y-6">
@@ -448,9 +449,9 @@ export default function SearchForMobile({
               </ModalBody>
 
               <ModalFooter className="shrink-0">
-                <div className="md:hidden z-50 fixed bottom-[calc(env(safe-area-inset-bottom)+4px)] left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+                <div className="md:hidden z-50 fixed bottom-0 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
                   <div className="flex justify-around items-center py-2 space-x-3">
-                    <Link className="flex flex-col items-center" href="/">
+                    <Link className="flex flex-col items-center" href="/en">
                       <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
                       <span className="text-xs text-text-subtle dark:text-text-subtledark">Home</span>
                     </Link>
@@ -462,15 +463,15 @@ export default function SearchForMobile({
                       onClick={handleClose}
                       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClose()}
                     >
-                      <SearchIcon />
-                      <span className="text-xs">ძებნა</span>
+                      <SearchIcon className="w-6 h-6" />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark">Search</span>
                     </div>
 
                     <Cartlink />
 
-                    <Link className="flex flex-col items-center" href={`/en/contact`}>
-                      <ProfileIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
-                      <span className="text-xs">Chat</span>
+                    <Link className="flex flex-col items-center" href={`/en/info/stores`}>
+                      <MessageCircleIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark">Chat</span>
                     </Link>
                   </div>
                 </div>

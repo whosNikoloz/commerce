@@ -26,7 +26,7 @@ export function SkeletonProductGrid({
     <div
       className={
         viewMode === "grid"
-          ? "grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
+          ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6"
           : "space-y-3 sm:space-y-4"
       }
       role="list"

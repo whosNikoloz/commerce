@@ -236,41 +236,44 @@ const ProductCard = memo(function ProductCard({
                 )}
               </div>
 
-              <div className="p-4 space-y-3">
+              <div className="p-2 sm:p-3 md:p-4 space-y-1.5 sm:space-y-2 md:space-y-3">
                 <div>
-                  <h3 className="font-semibold text-text-light dark:text-text-lightdark text-lg leading-tight line-clamp-2 group-hover:text-brand-primary transition-colors">
+                  <h3 className="font-semibold text-text-light dark:text-text-lightdark text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] group-hover:text-brand-primary transition-colors">
                     {product.name ?? "Unnamed Product"}
                   </h3>
                   {metaLine && (
-                    <p className="text-sm text-text-subtle dark:text-text-subtledark mt-1">
+                    <p className="text-[10px] sm:text-xs md:text-sm text-text-subtle dark:text-text-subtledark mt-1 truncate">
                       {metaLine}
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
                   <span
                     itemScope
-                    className="font-bold text-2xl text-text-light dark:text-text-lightdark"
+                    className="font-bold text-base sm:text-xl md:text-2xl text-text-light dark:text-text-lightdark"
                     itemProp="offers"
                     itemType="https://schema.org/Offer"
                   >
                     <meta content="USD" itemProp="priceCurrency" />
                     <span itemProp="price">{formatPrice(displayPrice)}</span>
                   </span>
-                  <span className="text-lg text-text-subtle dark:text-text-subtledark line-through">
-                    {formatPrice(originalPrice)}
-                  </span>
+                  {originalPrice && (
+                    <span className="text-xs sm:text-sm md:text-base lg:text-lg text-text-subtle dark:text-text-subtledark line-through">
+                      {formatPrice(originalPrice)}
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-0.5 sm:pt-1 md:pt-2">
                   <Button
-                    className="flex-1 bg-gradient-to-r from-brand-primary to-brand-primarydark hover:opacity-95 text-white border-0 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                    className="flex-1 bg-gradient-to-r from-brand-primary to-brand-primarydark hover:opacity-95 text-white border-0 rounded-lg sm:rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] text-[10px] sm:text-xs md:text-sm h-8 sm:h-9 md:h-10"
                     disabled={!inStock || showComingSoon}
                     onClick={() => onAdd(product.id)}
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {ctaLabel}
+                    <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2" />
+                    <span className="hidden sm:inline">{ctaLabel}</span>
+                    <span className="sm:hidden">Add</span>
                   </Button>
                 </div>
               </div>
@@ -373,8 +376,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       aria-label="Products"
       className={
         viewMode === "grid"
-          ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
-          : "space-y-4"
+          ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6"
+          : "space-y-3 sm:space-y-4"
       }
       role="list"
     >

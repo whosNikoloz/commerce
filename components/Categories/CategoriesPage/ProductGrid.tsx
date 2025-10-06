@@ -233,7 +233,7 @@ const ProductCard = memo(function ProductCard({
                 )}
               </div>
 
-              <div className="p-3 sm:p-4 space-y-2 bg-gradient-to-b from-background/50 to-background">
+              <div className="p-2 sm:p-3 md:p-4 space-y-1.5 sm:space-y-2 bg-gradient-to-b from-background/50 to-background">
                 {/* Meta & Title - Grouped tightly */}
                 <div className="space-y-1">
                   {metaLine && (
@@ -241,16 +241,16 @@ const ProductCard = memo(function ProductCard({
                       {metaLine}
                     </p>
                   )}
-                  <h3 className="font-semibold text-foreground text-sm sm:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-brand-primary transition-colors duration-300">
+                  <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] group-hover:text-brand-primary transition-colors duration-300">
                     {product.name ?? "Unnamed Product"}
                   </h3>
                 </div>
 
                 {/* Price - Close to title, key decision point */}
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-1.5 sm:gap-2">
                   <span
                     itemScope
-                    className="font-bold text-xl sm:text-2xl lg:text-3xl text-foreground bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text"
+                    className="font-bold text-base sm:text-xl md:text-2xl lg:text-3xl text-foreground bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text"
                     itemProp="offers"
                     itemType="https://schema.org/Offer"
                   >
@@ -258,7 +258,7 @@ const ProductCard = memo(function ProductCard({
                     <span itemProp="price">{formatPrice(displayPrice)}</span>
                   </span>
                   {originalPrice && (
-                    <span className="text-sm sm:text-base text-muted-foreground/70 line-through">
+                    <span className="text-xs sm:text-sm md:text-base text-muted-foreground/70 line-through">
                       {formatPrice(originalPrice)}
                     </span>
                   )}
@@ -285,14 +285,15 @@ const ProductCard = memo(function ProductCard({
                 </div>
 
                 {/* CTA Button - Tight spacing for quick action */}
-                <div className="pt-1">
+                <div className="pt-0.5 sm:pt-1">
                   <Button
-                    className="w-full bg-gradient-to-r from-brand-primary via-brand-primary to-brand-primary/90 hover:from-brand-primary/90 hover:via-brand-primary/80 hover:to-brand-primary/70 text-white border-0 rounded-xl font-semibold shadow-lg shadow-brand-primary/25 hover:shadow-2xl hover:shadow-brand-primary/40 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] text-xs sm:text-sm h-9 sm:h-10"
+                    className="w-full bg-gradient-to-r from-brand-primary via-brand-primary to-brand-primary/90 hover:from-brand-primary/90 hover:via-brand-primary/80 hover:to-brand-primary/70 text-white border-0 rounded-lg sm:rounded-xl font-semibold shadow-lg shadow-brand-primary/25 hover:shadow-2xl hover:shadow-brand-primary/40 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] text-[10px] sm:text-xs md:text-sm h-8 sm:h-9 md:h-10"
                     disabled={!inStock || showComingSoon}
                     onClick={() => onAdd(product.id)}
                   >
-                    <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                    {ctaLabel}
+                    <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2" />
+                    <span className="hidden sm:inline">{ctaLabel}</span>
+                    <span className="sm:hidden">Add</span>
                   </Button>
                 </div>
               </div>
@@ -443,8 +444,8 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       aria-label="Products"
       className={
         viewMode === "grid"
-          ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
-          : "space-y-4"
+          ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6"
+          : "space-y-3 sm:space-y-4"
       }
       role="list"
     >

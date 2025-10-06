@@ -57,9 +57,9 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
         return (
           <Card
             key={`${item.id}-${(item as any).variantKey ?? ""}`}
-            className={`p-3 sm:p-4 md:p-5 rounded-2xl bg-gradient-to-br from-card to-card/90 border-2 shadow-lg transition-all duration-300 ${outOfStock
+            className={`p-3 sm:p-4 md:p-5 rounded-xl bg-white dark:bg-gray-900 border shadow-sm transition-all duration-300 ${outOfStock
               ? "border-red-500/50 shadow-red-500/10"
-              : "border-border/50 hover:border-brand-primary/30 hover:shadow-xl"
+              : "border-gray-200 dark:border-gray-800 hover:border-brand-primary/40 hover:shadow-md"
               }`}
           >
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_160px_48px] md:items-center">
@@ -139,7 +139,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
 
               {/* qty */}
               <div className="order-3 md:order-none flex md:justify-center">
-                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border border-brand-muted/70 dark:border-brand-muteddark/50 bg-card">
+                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                   <Button
                     aria-label="Decrease"
                     className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"

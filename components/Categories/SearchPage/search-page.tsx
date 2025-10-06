@@ -130,8 +130,9 @@ export default function SearchPage({ query = "" }: { query?: string }) {
 
   return (
     <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
-      <div className="container mx-auto px-4 py-4 lg:py-6">
-        <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
+      <div className="max-w-[100vw] overflow-x-hidden">
+        <div className="container mx-auto px-2 sm:px-4 py-4 lg:py-6">
+          <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
           <SideBarCategories buildSubHref={buildSubHref} categorys={categories} />
 
           <div className="space-y-4 lg:space-y-6">
@@ -157,6 +158,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
               totalPages={totalPages}
               onPageChange={setCurrentPage}
             />
+          </div>
           </div>
         </div>
       </div>

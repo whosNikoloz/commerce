@@ -533,7 +533,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           order: 2,
           data: {
             imageUrl: "/banners/promo-1.jpg",
-            mobileImageUrl: "/banners/promo-1-mobile.jpg",
+            mobileImageUrl: "/banners/promo-1.jpg",
             href: "/category/deals",
             alt: {
               ka: "სპეციალური შეთავაზება",
@@ -572,7 +572,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           order: 4,
           data: {
             imageUrl: "/banners/promo-2.jpg",
-            mobileImageUrl: "/banners/promo-2-mobile.jpg",
+            mobileImageUrl: "/banners/promo-2.jpg",
             href: "/category/new-arrivals",
             alt: {
               ka: "ახალი ჩამოსვლები",
@@ -758,7 +758,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           order: 2,
           data: {
             imageUrl: "/banners/promo-1.jpg",
-            mobileImageUrl: "/banners/promo-1-mobile.jpg",
+            mobileImageUrl: "/banners/promo-1.jpg",
             href: "/category/deals",
             alt: {
               ka: "სპეციალური შეთავაზება",
@@ -797,7 +797,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           order: 4,
           data: {
             imageUrl: "/banners/promo-2.jpg",
-            mobileImageUrl: "/banners/promo-2-mobile.jpg",
+            mobileImageUrl: "/banners/promo-2.jpg",
             href: "/category/new-arrivals",
             alt: {
               ka: "ახალი ჩამოსვლები",

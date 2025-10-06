@@ -133,8 +133,9 @@ const ProductCard = memo(function ProductCard({
       <meta content={product.name ?? "Product"} itemProp="name" />
       {images?.[0] && <meta content={images[0]} itemProp="image" />}
 
-      <Card className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-card border border-border/40 hover:border-brand-primary/30 backdrop-blur-sm">
-        <CardBody className={viewMode === "grid" ? "p-0" : "gap-4"}>
+      <Link href={`/product/${product.id}`} className="block">
+        <Card className="group relative overflow-hidden rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 transform md:hover:-translate-y-2 bg-card border border-border/40 md:hover:border-brand-primary/30 backdrop-blur-sm">
+          <CardBody className={viewMode === "grid" ? "p-0" : "gap-4"}>
           {viewMode === "grid" ? (
             <div className="relative">
               <div
@@ -164,8 +165,7 @@ const ProductCard = memo(function ProductCard({
                   )}
                 </div>
 
-                <Link prefetch href={`/product/${product.id}`} itemProp="url">
-                  <div ref={emblaRef} className="relative rounded-t-2xl overflow-hidden">
+                <div ref={emblaRef} className="relative rounded-t-2xl overflow-hidden">
                     <div className="flex touch-pan-y">
                       {images.map((src, idx) => (
                         <div key={idx} className="flex-[0_0_100%]">
@@ -173,7 +173,7 @@ const ProductCard = memo(function ProductCard({
                             <Image
                               alt={`${product.name ?? "Product image"} ${idx + 1}`}
                               className={`w-full ${viewMode === "grid" ? "aspect-square" : "h-40"
-                                } object-cover transition-transform duration-500 group-hover/image:scale-105`}
+                                } object-cover transition-transform duration-500 md:group-hover/image:scale-105`}
                               height={250}
                               priority={idx === 0}
                               src={src}
@@ -183,22 +183,29 @@ const ProductCard = memo(function ProductCard({
                         </div>
                       ))}
                     </div>
-                  </div>
-                </Link>
+                </div>
 
                 {images.length > 1 && (
                   <>
                     <button
                       aria-label="Previous image"
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover/image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto"
-                      onClick={goPrev}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover/image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto z-10"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        goPrev(e);
+                      }}
                     >
                       <ChevronRight className="h-5 w-5 rotate-180" />
                     </button>
                     <button
                       aria-label="Next image"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover:image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto"
-                      onClick={goNext}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover:image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto z-10"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        goNext(e);
+                      }}
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
@@ -241,7 +248,7 @@ const ProductCard = memo(function ProductCard({
                       {metaLine}
                     </p>
                   )}
-                  <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] group-hover:text-brand-primary transition-colors duration-300">
+                  <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] md:group-hover:text-brand-primary transition-colors duration-300">
                     {product.name ?? "Unnamed Product"}
                   </h3>
                 </div>
@@ -287,9 +294,13 @@ const ProductCard = memo(function ProductCard({
                 {/* CTA Button - Tight spacing for quick action */}
                 <div className="pt-0.5 sm:pt-1">
                   <Button
-                    className="w-full bg-gradient-to-r from-brand-primary via-brand-primary to-brand-primary/90 hover:from-brand-primary/90 hover:via-brand-primary/80 hover:to-brand-primary/70 text-white border-0 rounded-lg sm:rounded-xl font-semibold shadow-lg shadow-brand-primary/25 hover:shadow-2xl hover:shadow-brand-primary/40 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] text-[10px] sm:text-xs md:text-sm h-8 sm:h-9 md:h-10"
+                    className="w-full bg-gradient-to-r from-brand-primary via-brand-primary to-brand-primary/90 md:hover:from-brand-primary/90 md:hover:via-brand-primary/80 md:hover:to-brand-primary/70 text-white border-0 rounded-lg sm:rounded-xl font-semibold shadow-lg shadow-brand-primary/25 md:hover:shadow-2xl md:hover:shadow-brand-primary/40 transition-all duration-300 md:hover:scale-[1.03] active:scale-[0.98] text-[10px] sm:text-xs md:text-sm h-8 sm:h-9 md:h-10 relative z-10"
                     disabled={!inStock || showComingSoon}
-                    onClick={() => onAdd(product.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onAdd(product.id);
+                    }}
                   >
                     <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1 sm:mr-1.5 md:mr-2" />
                     <span className="hidden sm:inline">{ctaLabel}</span>
@@ -300,7 +311,7 @@ const ProductCard = memo(function ProductCard({
             </div>
           ) : (
             <div
-              className="flex flex-row items-center gap-3 sm:gap-4 w-full p-3 sm:p-4 rounded-2xl bg-card border border-border/40 hover:border-brand-primary/30 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+              className="flex flex-row items-center gap-3 sm:gap-4 w-full p-3 sm:p-4 rounded-2xl bg-card border border-border/40 md:hover:border-brand-primary/30 shadow-md md:hover:shadow-xl transition-all duration-300 md:hover:scale-[1.01]"
               role="listitem"
             >
               {/* Image Container */}
@@ -310,7 +321,7 @@ const ProductCard = memo(function ProductCard({
                     fill
                     priority
                     alt={product.name ?? "Product image"}
-                    className="object-cover transition-transform duration-300 hover:scale-110"
+                    className="object-cover transition-transform duration-300 md:hover:scale-110"
                     sizes="(max-width: 640px) 80px, (max-width: 768px) 112px, 144px"
                     src={imgSrc}
                   />
@@ -347,13 +358,9 @@ const ProductCard = memo(function ProductCard({
                       {metaLine}
                     </p>
                   )}
-                  <Link
-                    prefetch
-                    className="text-sm sm:text-base md:text-lg font-semibold leading-tight hover:text-brand-primary transition-colors line-clamp-2 block"
-                    href={`/product/${product.id}`}
-                  >
+                  <h3 className="text-sm sm:text-base md:text-lg font-semibold leading-tight md:hover:text-brand-primary transition-colors line-clamp-2">
                     {product.name ?? "Unnamed Product"}
-                  </Link>
+                  </h3>
                 </div>
 
                 {/* Price - Minimal spacing from title */}
@@ -394,8 +401,12 @@ const ProductCard = memo(function ProductCard({
                 size="icon"
                 aria-label="Add to cart"
                 disabled={!inStock || showComingSoon}
-                className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-brand-primary to-brand-primary/90 hover:from-brand-primary/90 hover:to-brand-primary/80 text-white shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/40 transition-all duration-300 hover:scale-110 active:scale-95"
-                onClick={() => onAdd(product.id)}
+                className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-brand-primary to-brand-primary/90 md:hover:from-brand-primary/90 md:hover:to-brand-primary/80 text-white shadow-lg shadow-brand-primary/25 md:hover:shadow-xl md:hover:shadow-brand-primary/40 transition-all duration-300 md:hover:scale-110 active:scale-95 relative z-10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAdd(product.id);
+                }}
               >
                 <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
@@ -403,6 +414,7 @@ const ProductCard = memo(function ProductCard({
           )}
         </CardBody>
       </Card>
+      </Link>
     </article>
   );
 });

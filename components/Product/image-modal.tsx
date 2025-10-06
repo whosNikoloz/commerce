@@ -147,7 +147,7 @@ export default function ImageModal({
     <Modal
       hideCloseButton
       classNames={{
-        backdrop: "bg-brand-surfacedark/90 backdrop-blur-md",
+        backdrop: "bg-background/90 backdrop-blur-md",
         base: isMobile
           ? "max-w-full w-full h-full m-0 rounded-none"
           : "max-w-7xl rounded-2xl shadow-2xl",
@@ -160,7 +160,7 @@ export default function ImageModal({
       <ModalContent
         aria-label={`Image gallery for ${productName}`}
         aria-modal="true"
-        className="overflow-hidden outline-none h-full flex flex-col bg-brand-surface dark:bg-brand-surfacedark text-text-light dark:text-text-lightdark"
+        className="overflow-hidden outline-none h-full flex flex-col bg-background text-foreground"
         role="dialog"
         tabIndex={0}
         onKeyDown={handleKeyDown}
@@ -171,13 +171,13 @@ export default function ImageModal({
             "sticky top-0 left-0 right-0 z-50 flex justify-end items-center",
             "px-4 py-3",
             isMobile ? "py-5" : "px-6 py-4",
-            "bg-gradient-to-b from-brand-surface/90 dark:from-brand-surfacedark/90 to-transparent",
+            "bg-gradient-to-b from-background/90 to-transparent",
           )}
         >
           <div className="flex space-x-2">
             <button
               aria-label="Close modal"
-              className="rounded-full bg-brand-surface/60 dark:bg-brand-surfacedark/60 p-2 text-text-light dark:text-text-lightdark backdrop-blur-sm transition hover:bg-brand-surface/80 dark:hover:bg-brand-surfacedark/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/50"
+              className="rounded-full bg-muted/60 p-2 text-foreground backdrop-blur-sm transition hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring"
               onClick={onClose}
             >
               <X className={cn(isMobile ? "h-4 w-4" : "h-5 w-5")} />
@@ -186,19 +186,19 @@ export default function ImageModal({
         </div>
 
         {/* Main content */}
-        <ModalBody className="p-0 relative flex-grow flex items-center justify-center bg-brand-surface dark:bg-brand-surfacedark">
+        <ModalBody className="p-0 relative flex-grow flex items-center justify-center bg-background">
           <div className="w-full h-full flex flex-col md:flex-row">
             {/* Main viewer */}
-            <div className="flex-1 flex items-center justify-center relative bg-brand-surfacedark/5 dark:bg-brand-surfacedark">
+            <div className="flex-1 flex items-center justify-center relative bg-muted/5">
               {/* Nav buttons */}
               <button
-                className="absolute left-4 z-10 rounded-full p-2 text-text-light dark:text-text-lightdark bg-brand-surface/60 dark:bg-brand-surfacedark/60 hover:bg-brand-surface/80 dark:hover:bg-brand-surfacedark/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                className="absolute left-4 z-10 rounded-full p-2 text-foreground bg-muted/60 hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={handlePrevious}
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
               <button
-                className="absolute right-4 z-10 rounded-full p-2 text-text-light dark:text-text-lightdark bg-brand-surface/60 dark:bg-brand-surfacedark/60 hover:bg-brand-surface/80 dark:hover:bg-brand-surfacedark/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                className="absolute right-4 z-10 rounded-full p-2 text-foreground bg-muted/60 hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={handleNext}
               >
                 <ChevronRight className="h-6 w-6" />
@@ -234,11 +234,11 @@ export default function ImageModal({
             </div>
 
             {/* Right rail */}
-            <aside className="w-full md:w-[350px] p-4 flex flex-col gap-4 bg-brand-muted dark:bg-brand-muteddark text-text-light dark:text-text-lightdark overflow-y-auto">
+            <aside className="w-full md:w-[350px] p-4 flex flex-col gap-4 bg-muted text-foreground overflow-y-auto">
               {!isMobile && (
                 <>
                   <div className="text-lg font-semibold">{productName}</div>
-                  <div className="text-sm text-text-subtle dark:text-text-subtledark">
+                  <div className="text-sm text-muted-foreground">
                     {description}
                   </div>
                 </>
@@ -250,9 +250,9 @@ export default function ImageModal({
                     key={idx}
                     className={cn(
                       "border rounded-md transition focus:outline-none",
-                      "border-brand-muted dark:border-brand-muteddark",
-                      "hover:ring-2 hover:ring-brand-primary/80",
-                      currentIndex === idx ? "ring-2 ring-brand-primary" : "opacity-80",
+                      "border-border",
+                      "hover:ring-2 hover:ring-ring",
+                      currentIndex === idx ? "ring-2 ring-ring" : "opacity-80",
                     )}
                     onClick={() => setCurrentIndex(idx)}
                   >
@@ -272,16 +272,16 @@ export default function ImageModal({
         </ModalBody>
 
         {description && isMobile && (
-          <div className="px-6 py-3 border-b bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark">
-            <p className="text-text-subtle dark:text-text-subtledark text-sm leading-relaxed">
+          <div className="px-6 py-3 border-b bg-background border-border">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               {description}
             </p>
           </div>
         )}
 
         {isMobile && (
-          <div className="py-2 px-4 border-t bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark flex justify-between items-center">
-            <div className="text-xs font-medium text-text-light dark:text-text-lightdark">
+          <div className="py-2 px-4 border-t bg-background border-border flex justify-between items-center">
+            <div className="text-xs font-medium text-foreground">
               {currentIndex + 1} / {images.length}
             </div>
           </div>

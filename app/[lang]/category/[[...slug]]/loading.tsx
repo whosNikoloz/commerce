@@ -11,7 +11,7 @@ export default function Loading() {
     <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
       <div className="container mx-auto px-4 py-4 lg:py-6">
         <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
-          <div className="hidden lg:block bg-brand-muted dark:bg-brand-muteddark sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg p-6 shadow-sm">
+          <div className="hidden lg:block bg-card sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto border rounded-lg p-6 shadow-sm">
             <div className="space-y-6 animate-pulse">
               <div>
                 <div className="h-5 w-32 rounded bg-gray-300/40 dark:bg-gray-600/40" />
@@ -66,23 +66,31 @@ export default function Loading() {
               ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
               {cards.map((_, i) => (
                 <div
                   key={i}
-                  className="group bg-brand-muted dark:bg-brand-muteddark border rounded-lg shadow-sm p-3 lg:p-4"
+                  className="overflow-hidden rounded-xl sm:rounded-2xl bg-card border border-border/40 shadow-sm"
                 >
                   <div className="animate-pulse">
-                    <div className="w-full aspect-square rounded-md bg-gray-300/40 dark:bg-gray-600/40" />
-                    <div className="mt-3 space-y-2">
-                      <div className="h-4 w-3/4 rounded bg-gray-300/40 dark:bg-gray-600/40" />
-                      <div className="flex items-center gap-2">
-                        <div className="h-5 w-20 rounded bg-gray-300/40 dark:bg-gray-600/40" />
-                        <div className="h-4 w-12 rounded bg-gray-300/30 dark:bg-gray-600/30" />
+                    <div className="w-full aspect-square bg-gradient-to-br from-muted/50 to-muted/30" />
+
+                    <div className="p-2 sm:p-3 md:p-4 space-y-1.5 sm:space-y-2">
+                      <div className="h-2.5 sm:h-3 w-16 sm:w-20 rounded-md bg-muted/40" />
+
+                      <div className="space-y-1 min-h-[2rem] sm:min-h-[2.5rem]">
+                        <div className="h-3 sm:h-4 w-full rounded-md bg-muted/50" />
+                        <div className="h-3 sm:h-4 w-3/4 rounded-md bg-muted/50" />
                       </div>
-                      <div className="h-3 w-32 rounded bg-gray-300/30 dark:bg-gray-600/30" />
-                      <div className="h-9 w-full rounded bg-gray-300/40 dark:bg-gray-600/40" />
-                      <div className="h-9 w-full rounded bg-gray-300/30 dark:bg-gray-600/30" />
+
+                      <div className="flex items-baseline gap-1.5 sm:gap-2 pt-0.5 sm:pt-1">
+                        <div className="h-6 sm:h-7 w-20 sm:w-24 rounded-md bg-muted/50" />
+                        <div className="h-3 sm:h-4 w-12 sm:w-16 rounded-md bg-muted/30" />
+                      </div>
+
+                      <div className="h-2.5 sm:h-3 w-12 sm:w-16 rounded-full bg-muted/40" />
+
+                      <div className="h-8 sm:h-9 md:h-10 w-full rounded-lg sm:rounded-xl bg-gradient-to-r from-muted/50 to-muted/40 mt-1 sm:mt-2" />
                     </div>
                   </div>
                 </div>

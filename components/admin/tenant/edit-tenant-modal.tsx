@@ -438,12 +438,12 @@ export default function EditTenantModal({
       onClose={onClose}
     >
       <ModalContent className="relative">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-muted/5 via-transparent to-muted/5 pointer-events-none rounded-2xl" />
         {contentEditor.isOpen ? (
           <>
             <ModalHeader className="relative z-10 flex items-center justify-between gap-2 pb-2 pt-8">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
                   <IconEdit className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex flex-col">
@@ -490,7 +490,7 @@ export default function EditTenantModal({
         ) : (
           <>
             <ModalHeader className="relative z-10 flex flex-col items-center gap-2 pb-4 pt-8">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg mb-2">
+              <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg mb-2">
                 <IconEdit className="h-6 w-6 text-white" />
               </div>
               <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100">
@@ -503,22 +503,22 @@ export default function EditTenantModal({
               <Tabs className="w-full" defaultValue="theme">
                 <TabsList className="grid w-full grid-cols-3 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
                   <TabsTrigger
-                    className="rounded-lg font-semibold data-[state=active]:text-white data-[state=active]:shadow
-                               data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600"
+                    className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
+                               data-[state=active]:bg-primary"
                     value="theme"
                   >
                     Theme
                   </TabsTrigger>
                   <TabsTrigger
-                    className="rounded-lg font-semibold data-[state=active]:text-white data-[state=active]:shadow
-                               data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600"
+                    className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
+                               data-[state=active]:bg-primary"
                     value="template"
                   >
                     Template
                   </TabsTrigger>
                   <TabsTrigger
-                    className="rounded-lg font-semibold data-[state=active]:text-white data-[state=active]:shadow
-                               data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600"
+                    className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
+                               data-[state=active]:bg-primary"
                     value="sections"
                   >
                     Sections
@@ -986,7 +986,7 @@ export default function EditTenantModal({
                                   <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
                                     Lifestyle Hero
                                   </span>
-                                  <span className="text-xs px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
+                                  <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
                                     Product Configurator
                                   </span>
                                   <span className="text-xs px-2 py-1 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
@@ -1190,7 +1190,7 @@ export default function EditTenantModal({
                               <div
                                 className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-bold ${
                                   enabled
-                                    ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white"
+                                    ? "bg-primary text-primary-foreground"
                                     : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
                                 }`}
                               >
@@ -1252,7 +1252,7 @@ export default function EditTenantModal({
                               )}
                               <Switch
                                 checked={enabled}
-                                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-orange-600"
+                                className="data-[state=checked]:bg-primary"
                                 onCheckedChange={() =>
                                   originalIndex !== -1 && toggleSection(originalIndex)
                                 }
@@ -1282,7 +1282,7 @@ export default function EditTenantModal({
                 Cancel
               </Button>
               <Button
-                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                 disabled={loading}
                 isLoading={loading}
                 onPress={handleSubmit}

@@ -68,9 +68,9 @@ export function ProductCard({
 
   // Template-specific styling
   const templateClasses: Record<1 | 2 | 3, string> = {
-    1: "rounded-2xl border border-border/50 bg-card hover:border-brand-primary/40 hover:shadow-2xl",
-    2: "rounded-xl border border-border/50 bg-card hover:border-brand-primary/30 hover:shadow-lg",
-    3: "rounded-lg border border-border/40 bg-card hover:border-brand-primary/20 hover:shadow-md",
+    1: "rounded-2xl border border-border/50 bg-card md:hover:border-brand-primary/40 md:hover:shadow-2xl",
+    2: "rounded-xl border border-border/50 bg-card md:hover:border-brand-primary/30 md:hover:shadow-lg",
+    3: "rounded-lg border border-border/40 bg-card md:hover:border-brand-primary/20 md:hover:shadow-md",
   };
 
   const imageContainerClasses: Record<1 | 2 | 3, string> = {
@@ -129,7 +129,7 @@ export function ProductCard({
               alt={product.name || "Product image"}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+              className="object-cover transition-transform duration-500 ease-out md:group-hover:scale-110"
               priority={priority}
               quality={85}
             />
@@ -183,7 +183,7 @@ export function ProductCard({
 
           {/* Quick Actions - Top Right (Desktop only) */}
           {showActions && (
-            <div className="pointer-events-none absolute right-2 sm:right-3 top-2 sm:top-3 hidden sm:flex flex-col gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="pointer-events-none absolute right-2 sm:right-3 top-2 sm:top-3 hidden md:flex flex-col gap-2 z-20 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
               <Button
                 size="icon"
                 variant="secondary"
@@ -223,7 +223,7 @@ export function ProductCard({
         <h3
           className={cn(
             nameClasses[template],
-            "text-foreground transition-colors duration-200 group-hover:text-brand-primary w-full"
+            "text-foreground transition-colors duration-200 md:group-hover:text-brand-primary w-full"
           )}
           itemProp="name"
         >

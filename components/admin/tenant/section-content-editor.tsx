@@ -221,7 +221,7 @@ export default function SectionContentEditor({
         return (
           <div className="space-y-6">
             {renderLocalizedInput("Title", ["title"], data.title)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Category items editing requires advanced interface. Contact
                 developer for category management.
@@ -251,7 +251,7 @@ export default function SectionContentEditor({
             {renderLocalizedInput("Title", ["title"], data.title)}
             {data.subtitle && renderLocalizedInput("Subtitle", ["subtitle"], data.subtitle)}
 
-            <div className="space-y-4 rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
               <h4 className="font-semibold text-sm">Product Filters</h4>
 
               <div className="space-y-2">
@@ -456,7 +456,7 @@ export default function SectionContentEditor({
                 onChange={(e) => updateSimpleField(["endsAtISO"], new Date(e.target.value).toISOString())}
               />
             </div>
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Deal items editing requires advanced interface.
               </p>
@@ -473,7 +473,7 @@ export default function SectionContentEditor({
         return (
           <div className="space-y-6">
             {renderLocalizedInput("Title", ["title"], data.title)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Reviews editing requires advanced interface.
               </p>
@@ -500,7 +500,7 @@ export default function SectionContentEditor({
       case "TrustBadges":
         return (
           <div className="space-y-6">
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Trust badges editing requires advanced interface.
               </p>
@@ -555,7 +555,7 @@ export default function SectionContentEditor({
           <div className="space-y-6">
             {renderLocalizedInput("Title", ["title"], data.title)}
             {data.description && renderLocalizedInput("Description", ["description"], data.description, true)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Product comparison items editing requires advanced interface.
               </p>
@@ -571,7 +571,7 @@ export default function SectionContentEditor({
           <div className="space-y-6">
             {renderLocalizedInput("Title", ["title"], data.title)}
             {data.description && renderLocalizedInput("Description", ["description"], data.description, true)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Configurator steps editing requires advanced interface.
               </p>
@@ -588,7 +588,7 @@ export default function SectionContentEditor({
             {renderLocalizedInput("Title", ["title"], data.title)}
             {data.subtitle && renderLocalizedInput("Subtitle", ["subtitle"], data.subtitle)}
             {data.hashtag && renderLocalizedInput("Hashtag", ["hashtag"], data.hashtag)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Gallery images editing requires advanced interface.
               </p>
@@ -604,7 +604,7 @@ export default function SectionContentEditor({
           <div className="space-y-6">
             {renderLocalizedInput("Title", ["title"], data.title)}
             {renderLocalizedInput("Description", ["description"], data.description, true)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Bundle items editing requires advanced interface.
               </p>
@@ -627,7 +627,7 @@ export default function SectionContentEditor({
                 onChange={(e) => updateSimpleField(["videoUrl"], e.target.value)}
               />
             </div>
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Influencer details and images editing requires advanced
                 interface.
@@ -656,7 +656,7 @@ export default function SectionContentEditor({
               />
             </div>
 
-            <div className="space-y-4 rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
               <h4 className="font-semibold text-sm">Primary CTA</h4>
               {renderLocalizedInput("Button Label", ["primaryCta", "label"], data.primaryCta?.label || { ka: "", en: "" })}
               <div className="space-y-2">
@@ -669,7 +669,7 @@ export default function SectionContentEditor({
               </div>
             </div>
 
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Stats and Features arrays require advanced editing. Categories are automatically fetched from database.
               </p>
@@ -728,7 +728,7 @@ export default function SectionContentEditor({
         return (
           <div className="space-y-6">
             {renderLocalizedInput("Title", ["title"], data.title)}
-            <div className="rounded-lg border border-brand-muted dark:border-brand-muteddark bg-brand-muted/20 dark:bg-brand-muteddark/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm text-text-subtle dark:text-text-subtledark">
                 <strong>Note:</strong> Category carousel items editing requires advanced interface. Contact
                 developer for category management.

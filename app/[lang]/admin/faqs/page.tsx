@@ -34,7 +34,7 @@ export default async function FaqsPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-amber-900 to-orange-900 dark:from-slate-100 dark:via-amber-100 dark:to-orange-100 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-amber-900 to-cyan-900 dark:from-slate-100 dark:via-amber-100 dark:to-cyan-100 bg-clip-text text-transparent">
           FAQs
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">

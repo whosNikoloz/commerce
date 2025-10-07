@@ -32,7 +32,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const links = [
     { label: "Dashboard",  href: `/${currentLang}/admin`,            icon: <IconHome className="h-5 w-5 text-slate-600 dark:text-slate-400" /> },
     { label: "Brands",     href: `/${currentLang}/admin/brands`,     icon: <IconUserBolt className="h-5 w-5 text-purple-600 dark:text-purple-400" /> },
-    { label: "Products",   href: `/${currentLang}/admin/products`,   icon: <IconBox className="h-5 w-5 text-orange-600 dark:text-orange-400" /> },
+    { label: "Products",   href: `/${currentLang}/admin/products`,   icon: <IconBox className="h-5 w-5 text-cyan-600 dark:text-cyan-400" /> },
     { label: "Faqs",       href: `/${currentLang}/admin/faqs`,       icon: <FileQuestionIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> },
     { label: "Categories", href: `/${currentLang}/admin/categories`, icon: <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
     { label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },

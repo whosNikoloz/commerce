@@ -154,7 +154,7 @@ const ProductCard = memo(function ProductCard({
                     </Badge>
                   )}
                   {showClearance && (
-                    <Badge className="bg-gradient-to-r from-orange-500 via-red-600 to-pink-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
+                    <Badge className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
                       <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> CLEARANCE
                     </Badge>
                   )}

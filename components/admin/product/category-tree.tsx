@@ -106,9 +106,9 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                 className={[
                   "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 relative border-2",
                   isSelected
-                    ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 border-orange-300 dark:border-orange-700 shadow-md"
+                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-300 dark:border-blue-700 shadow-md"
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
-                  isHighlighted && !isSelected ? "ring-2 ring-orange-300 dark:ring-orange-700" : "",
+                  isHighlighted && !isSelected ? "ring-2 ring-blue-300 dark:ring-blue-700" : "",
                 ].join(" ")}
                 role="button"
                 onClick={() => handleCategorySelect(cat.id)}
@@ -120,7 +120,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     className={[
                       "p-1 rounded-md transition-all duration-200",
                       isSelected
-                        ? "hover:bg-orange-100 dark:hover:bg-orange-900/40"
+                        ? "hover:bg-blue-100 dark:hover:bg-blue-900/40"
                         : "hover:bg-slate-100 dark:hover:bg-slate-700",
                     ].join(" ")}
                     onClick={(e) => {
@@ -206,18 +206,18 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
   return (
     <Card className="lg:sticky lg:top-4 bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
       <CardHeader className="pb-3 relative">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg shadow-sm">
+            <div className="p-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg shadow-sm">
               <Filter className="h-4 w-4 text-white" />
             </div>
             <CardTitle className="text-lg font-black text-slate-900 dark:text-slate-100">
               Categories
             </CardTitle>
             <Badge
-              className="text-xs font-bold bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800"
+              className="text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
               variant="outline"
             >
               {rootCategories.length}
@@ -263,18 +263,18 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                 className={[
                   "flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-300 border-2",
                   selectedCategory === null
-                    ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 border-orange-300 dark:border-orange-700 shadow-md"
+                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-300 dark:border-blue-700 shadow-md"
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
                 ].join(" ")}
                 role="button"
                 onClick={() => handleCategorySelect(null)}
               >
-                <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`} />
-                <span className={`text-sm font-semibold ${selectedCategory === null ? "text-orange-900 dark:text-orange-300" : "text-slate-900 dark:text-slate-100"}`}>
+                <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
+                <span className={`text-sm font-semibold ${selectedCategory === null ? "text-blue-900 dark:text-blue-300" : "text-slate-900 dark:text-slate-100"}`}>
                   All Categories
                 </span>
                 <Badge
-                  className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategory === null ? "bg-orange-200 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}
+                  className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategory === null ? "bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}
                   variant="secondary"
                 >
                   {rootCategories.length}

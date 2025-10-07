@@ -167,7 +167,7 @@ export function ProductCard({
 
             {/* Liquidation Badge */}
             {product.isLiquidated && (
-              <Badge className="bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-lg text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
+              <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
                 <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
                 CLEARANCE
               </Badge>

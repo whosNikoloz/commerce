@@ -105,7 +105,7 @@ export function ProductInfo({
             </Badge>
           )}
           {isLiquidated && (
-            <Badge className="bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-lg font-bold">
+            <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg font-bold">
               <Tag className="h-3 w-3 mr-1" /> ლიკვიდაცია
             </Badge>
           )}
@@ -115,7 +115,7 @@ export function ProductInfo({
             </Badge>
           )}
           {typeof stock === "number" && stock <= 3 && stock > 0 && (
-            <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg animate-pulse">
+            <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-lg animate-pulse">
               <PackageOpen className="h-3 w-3 mr-1" /> ბოლო {stock} ც
             </Badge>
           )}

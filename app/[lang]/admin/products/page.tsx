@@ -34,7 +34,7 @@ export default async function ProductsPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-orange-900 to-red-900 dark:from-slate-100 dark:via-orange-100 dark:to-red-100 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-slate-100 dark:via-blue-100 dark:to-indigo-100 bg-clip-text text-transparent">
           Products
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">

@@ -87,10 +87,12 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [sortBy, setSortBy] = useState<SortOption>("name");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [mounted, setMounted] = useState(false);
 
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== "undefined") {
       const isSmall = window.matchMedia("(max-width: 1023px)").matches;
 
@@ -262,7 +264,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         : "როგორც ახალი";
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
-    <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-700">
+    <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700">
       <CardContent className="p-4">
         <div className="relative mb-3">
           <div className="relative w-full h-40 sm:h-48">
@@ -359,7 +361,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         {/* Main */}
         <div className="lg:col-span-3">
           <Card className="bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
             <CardHeader className="pb-4 relative">
               <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 flex-1">
@@ -397,10 +399,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
                   {/* Search */}
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500 dark:text-orange-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500 dark:text-cyan-400 h-4 w-4" />
                     <Input
                       aria-label="Search products"
-                      className="pl-10 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 focus:border-orange-500 dark:focus:border-orange-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
+                      className="pl-10 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 focus:border-cyan-500 dark:focus:border-cyan-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
                       placeholder="Search products..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -445,7 +447,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   <div className="flex items-center border-2 rounded-lg overflow-hidden border-slate-200 dark:border-slate-700">
                     <Button
                       aria-pressed={viewMode === "table"}
-                      className={`rounded-none ${viewMode === "table" ? "bg-gradient-to-r from-orange-500 to-red-600 text-white" : "text-slate-700 dark:text-slate-300"}`}
+                      className={`rounded-none ${viewMode === "table" ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white" : "text-slate-700 dark:text-slate-300"}`}
                       size="sm"
                       variant={viewMode === "table" ? "default" : "ghost"}
                       onClick={() => setViewMode("table")}
@@ -454,7 +456,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                     </Button>
                     <Button
                       aria-pressed={viewMode === "grid"}
-                      className={`rounded-none ${viewMode === "grid" ? "bg-gradient-to-r from-orange-500 to-red-600 text-white" : "text-slate-700 dark:text-slate-300"}`}
+                      className={`rounded-none ${viewMode === "grid" ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white" : "text-slate-700 dark:text-slate-300"}`}
                       size="sm"
                       variant={viewMode === "grid" ? "default" : "ghost"}
                       onClick={() => setViewMode("grid")}
@@ -556,7 +558,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                         {filteredAndSortedProducts.map((product) => (
                           <TableRow
                             key={product.id}
-                            className="hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 dark:hover:from-orange-950/20 dark:hover:to-red-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
+                            className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/20 dark:hover:to-indigo-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
                           >
                             <TableCell>
                               <div className="relative w-16 h-16">

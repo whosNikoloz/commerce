@@ -63,12 +63,12 @@ export default function AddFaqModal({
   return (
     <>
       {children ? (
-        <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300" onClick={onOpen}>
+        <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300" onClick={onOpen}>
           {children}
         </Button>
       ) : (
         <Button
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
           size="sm"
           onClick={onOpen}
         >
@@ -111,9 +111,9 @@ export default function AddFaqModal({
       >
         <ModalContent>
           <>
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
             <ModalHeader className="flex flex-col items-center gap-2 pb-4 pt-8 relative">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg mb-2">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-orange-600 rounded-2xl shadow-lg mb-2">
                 <Star className="h-6 w-6 text-white fill-white" />
               </div>
               <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100">
@@ -128,7 +128,7 @@ export default function AddFaqModal({
                 classNames={{
                   label: "text-slate-700 dark:text-slate-300 font-semibold text-sm mb-1.5",
                   inputWrapper:
-                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-600 data-[focus=true]:border-amber-500 dark:data-[focus=true]:border-amber-500 shadow-sm hover:shadow-md transition-all duration-300",
+                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 data-[focus=true]:border-blue-500 dark:data-[focus=true]:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300",
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
@@ -144,7 +144,7 @@ export default function AddFaqModal({
                 classNames={{
                   label: "text-slate-700 dark:text-slate-300 font-semibold text-sm mb-1.5",
                   inputWrapper:
-                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-600 data-[focus=true]:border-amber-500 dark:data-[focus=true]:border-amber-500 shadow-sm hover:shadow-md transition-all duration-300",
+                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 data-[focus=true]:border-blue-500 dark:data-[focus=true]:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300",
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
@@ -172,11 +172,11 @@ export default function AddFaqModal({
                 <div className="flex justify-center items-center gap-2">
                   <Switch
                     checked={featured}
-                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
+                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
                     onCheckedChange={setFeatured}
                   />
                   <Star
-                    className={`h-3.5 w-3.5 ${featured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
+                    className={`h-3.5 w-3.5 ${featured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
                   />
                   <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Featured</span>
                 </div>
@@ -193,7 +193,7 @@ export default function AddFaqModal({
                 გაუქმება
               </Button>
               <Button
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                 disabled={loading}
                 onClick={handleSave}
               >

@@ -154,7 +154,7 @@ export default async function ReturnPolicyPage({ params }: { params: Promise<{ l
     blue: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
     green: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
     purple: "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
-    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800",
+    orange: "bg-cyan-50 dark:bg-cyan-950/20 border-cyan-200 dark:border-cyan-800",
   };
 
   return (
@@ -174,7 +174,7 @@ export default async function ReturnPolicyPage({ params }: { params: Promise<{ l
 
       {/* Header */}
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl p-1 font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
+        <h1 className="mb-4 text-4xl p-1 font-bold bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent">
           დაბრუნება/გაცვლა — წესები
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">

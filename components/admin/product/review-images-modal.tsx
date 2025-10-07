@@ -197,14 +197,14 @@ export default function ReviewImagesModal({
     <>
       {trigger ? (
         <Button
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
           onClick={onOpen}
         >
           {trigger}
         </Button>
       ) : (
         <Button
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
           size="sm"
           title="Manage images"
           onClick={onOpen}
@@ -251,11 +251,11 @@ export default function ReviewImagesModal({
           {() => (
             <>
               {/* დეკორატიული gradient overlay — AddFaqModal-ის სტილში */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
 
               <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-orange-600 rounded-2xl shadow-lg">
                     <Images className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex flex-col">
@@ -268,7 +268,7 @@ export default function ReviewImagesModal({
                   </div>
                 </div>
 
-                <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
                   {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
                 </Badge>
               </ModalHeader>
@@ -282,7 +282,7 @@ export default function ReviewImagesModal({
                     className={cn(
                       "flex items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors cursor-pointer outline-none",
                       isDragging
-                        ? "bg-amber-50/60 dark:bg-amber-900/10 border-amber-400"
+                        ? "bg-blue-50/60 dark:bg-blue-900/10 border-blue-400"
                         : "bg-white/70 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:bg-white/90 dark:hover:bg-slate-800/80",
                     )}
                     role="button"
@@ -342,7 +342,7 @@ export default function ReviewImagesModal({
                                   "border",
                                   img.toDelete
                                     ? "bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30"
-                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30",
+                                    : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
                                 )}
                               >
                                 {img.toDelete ? "Will delete" : "Existing"}
@@ -429,7 +429,7 @@ export default function ReviewImagesModal({
                   Cancel
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                   disabled={saving || (serverImages.every((s) => !s.toDelete) && images.length === 0)}
                   onClick={handleSave}
                 >

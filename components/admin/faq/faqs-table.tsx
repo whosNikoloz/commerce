@@ -59,14 +59,14 @@ function RowDraggable({
     <TableRow
       ref={setNodeRef}
       className={[
-        "hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 dark:hover:from-amber-950/20 dark:hover:to-orange-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50",
+        "hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-orange-50/50 dark:hover:from-blue-950/20 dark:hover:to-orange-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50",
         dragging || isDragging ? "opacity-70 ring-2 ring-amber-400/50 dark:ring-amber-600/50 shadow-lg" : "",
       ].join(" ")}
       style={style}
     >
       <TableCell className="w-10 align-middle">
         <button
-          className="cursor-grab active:cursor-grabbing p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors duration-200 ring-1 ring-slate-200 dark:ring-slate-700"
+          className="cursor-grab active:cursor-grabbing p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors duration-200 ring-1 ring-slate-200 dark:ring-slate-700"
           {...attributes}
           {...listeners}
           aria-label="Drag handle"
@@ -309,7 +309,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   return (
     <>
       <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-lg" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-lg" />
         <CardHeader className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60 relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex flex-1 items-center gap-3">
@@ -319,7 +319,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 classNames={{
                   label: "text-slate-700 dark:text-slate-300 font-semibold",
                   inputWrapper:
-                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-600 data-[focus=true]:border-amber-500 shadow-sm hover:shadow-md transition-all duration-300",
+                    "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 data-[focus=true]:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300",
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
@@ -353,12 +353,12 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
                   <Switch
                     checked={onlyFeatured}
-                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
+                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
                     onCheckedChange={setOnlyFeatured}
                   />
                   <Star
                     className={`h-3.5 w-3.5 ${
-                      onlyFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"
+                      onlyFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"
                     }`}
                   />
                 </div>
@@ -367,7 +367,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
             <div className="flex items-center gap-2">
               <Button
-                className="gap-2 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:border-amber-300 dark:hover:border-amber-600 font-semibold shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-50"
+                className="gap-2 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-600 font-semibold shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-50"
                 disabled={!orderDirty}
                 title={orderDirty ? "შეინახე ახალი რიგი" : "ცვლილება არაა"}
                 variant="secondary"
@@ -398,11 +398,11 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
             )}
             <Switch
               checked={onlyFeatured}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
+              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
               onCheckedChange={setOnlyFeatured}
             />
             <Star
-              className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
+              className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
             />
           </div>
         </CardHeader>
@@ -473,11 +473,11 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                             )}
                             <Switch
                               checked={!!faq.isFeatured}
-                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
+                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
                               onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
                             />
                             <Star
-                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
+                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
                             />
                           </div>
                         </TableCell>
@@ -529,9 +529,9 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
                   >
                     {/* Card Header */}
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
+                    <div className="bg-gradient-to-r from-blue-50 to-orange-50 dark:from-blue-950/30 dark:to-orange-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-orange-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
                           <span className="text-white font-bold text-sm">#{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")}</span>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -568,11 +568,11 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={!!faq.isFeatured}
-                            className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-amber-500 data-[state=checked]:to-amber-600"
+                            className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
                             onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
                           />
                           <Star
-                            className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : "text-slate-400"}`}
+                            className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
                           />
                           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Featured</span>
                         </div>

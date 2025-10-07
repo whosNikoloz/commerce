@@ -136,13 +136,13 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
             ? {
               wrapper: "!transform-none h-[100lvh] p-0 m-0",
               base:
-                "dark:bg-brand-muteddark bg-brand-surface !rounded-none flex flex-col h-full max-h-full " +
+                "dark:bg-slate-900 bg-white !rounded-none flex flex-col h-full max-h-full " +
                 "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
               backdrop: "bg-black/40 backdrop-blur-sm",
             }
             : {
               base:
-                "dark:bg-brand-muteddark bg-brand-surface rounded-xl shadow-lg",
+                "dark:bg-slate-900 bg-white rounded-xl shadow-lg",
               backdrop: "bg-black/40",
             }),
         }}
@@ -183,7 +183,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         size={IsMobile ? "full" : "sm"}
         onClose={handleCloseModal}
       >
-        <ModalContent className="dark:bg-brand-muteddark bg-brand-surface">
+        <ModalContent className="dark:bg-slate-900 bg-white">
           {() => (
             <>
               {IsMobile ? (
@@ -196,7 +196,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                  <h2 className="text-2xl font-bold text-white">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {authMode === "login"
                       ? loginData.title
                       : authMode === "register"
@@ -227,7 +227,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                 {authMode === "forgot" && <ForgotPasswordModal forgotData={forgotData} lng={lng} />}
               </ModalBody>
               <ModalFooter>
-                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-md">
                   <div className="flex justify-around items-center py-2 space-x-3">
                     <Link className="flex flex-col items-center" href="/">
                       <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />

@@ -111,13 +111,13 @@ export function ProductInfoBottom({
                 </Badge>
               )}
               {isLiquidated && (
-                <Badge className="bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-md font-bold">
+                <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-md font-bold">
                   <Tag className="h-3 w-3 mr-1" />
                   ლიკვიდაცია
                 </Badge>
               )}
               {typeof stock === "number" && stock <= 3 && stock > 0 && (
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-md animate-pulse">ბოლო {stock} ც</Badge>
+                <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-md animate-pulse">ბოლო {stock} ც</Badge>
               )}
               {brand && (
                 <Badge className="bg-muted/50 text-foreground border border-border/50 shadow-sm">

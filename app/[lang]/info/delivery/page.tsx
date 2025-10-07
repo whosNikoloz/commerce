@@ -216,7 +216,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ lang:
                 icon: ShieldCheck,
                 title: "24/7 მხარდაჭერა",
                 text: "ჩვენი გუნდი ყოველთვის მზადაა დაგეხმაროს და უპასუხოს შეკითხვებს.",
-                color: "from-orange-500 to-orange-600",
+                color: "from-blue-500 to-blue-600",
               },
             ].map((feature, i) => (
               <article

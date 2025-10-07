@@ -49,7 +49,7 @@ export default function DealCountdown({ data, locale, template = 1, products }: 
       {/* Animated Background */}
       <div className="absolute inset-0">
         <div className="absolute top-10 right-20 w-72 h-72 bg-yellow-400/20 rounded-full filter blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-orange-500/20 rounded-full filter blur-3xl animate-pulse delay-500" />
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-cyan-500/20 rounded-full filter blur-3xl animate-pulse delay-500" />
       </div>
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 

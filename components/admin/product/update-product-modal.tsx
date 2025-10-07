@@ -63,7 +63,7 @@ export default function UpdateProductModal({
   return (
     <>
       <Button
-        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
         size="sm"
         title="პროდუქტის ჩასწორება"
         onClick={onOpen}
@@ -109,7 +109,7 @@ export default function UpdateProductModal({
           {() => (
             <>
               {/* დეკორატიული overlay Add/Update FAQ სტილში */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
 
               {isMobile ? (
                 <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
@@ -118,7 +118,7 @@ export default function UpdateProductModal({
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                    <div className="p-3 bg-gradient-to-br from-blue-500 to-orange-600 rounded-2xl shadow-lg">
                       <Edit className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex flex-col">
@@ -194,7 +194,7 @@ export default function UpdateProductModal({
                   გაუქმება
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                   disabled={loading}
                   onClick={handleSave}
                 >

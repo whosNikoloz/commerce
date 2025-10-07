@@ -40,7 +40,7 @@ export default function Reviews({ data, locale, template = 1 }: ReviewsProps) {
                         key={starIdx}
                         className={`h-4 w-4 transition-colors ${
                           starIdx < review.rating
-                            ? "fill-amber-400 text-amber-400"
+                            ? "fill-blue-400 text-blue-400"
                             : "fill-muted text-muted stroke-muted-foreground/20"
                         }`}
                       />

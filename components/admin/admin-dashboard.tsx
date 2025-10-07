@@ -37,9 +37,9 @@ const stats = [
     value: "789",
     trend: "+25%",
     icon: Package,
-    color: "text-orange-600 dark:text-orange-400",
-    bgColor: "bg-orange-50 dark:bg-orange-900/20",
-    borderColor: "border-orange-200 dark:border-orange-800/50",
+    color: "text-cyan-600 dark:text-cyan-400",
+    bgColor: "bg-cyan-50 dark:bg-cyan-900/20",
+    borderColor: "border-cyan-200 dark:border-cyan-800/50",
   },
 ];
 

@@ -53,7 +53,7 @@ function FAQRow({ item }: { item: FAQItem }) {
         "p-5 relative",
         item.featured
           ? // Featured decoration: gradient bg + left accent bar
-            "bg-gradient-to-br from-amber-50/80 to-transparent dark:from-amber-900/10"
+            "bg-gradient-to-br from-blue-50/80 to-transparent dark:from-blue-900/10"
           : "",
       ].join(" ")}
       variants={containerVariants}
@@ -62,7 +62,7 @@ function FAQRow({ item }: { item: FAQItem }) {
         <motion.span
           aria-hidden
           animate={{ scaleY: 1 }}
-          className="absolute left-0 top-0 h-full w-1.5 rounded-l-md bg-amber-400/80 dark:bg-amber-500/80"
+          className="absolute left-0 top-0 h-full w-1.5 rounded-l-md bg-blue-400/80 dark:bg-blue-500/80"
           initial={{ scaleY: 0 }}
           style={{ transformOrigin: "top" }}
           transition={{ type: "spring", stiffness: 220, damping: 24 }}
@@ -90,7 +90,7 @@ function FAQRow({ item }: { item: FAQItem }) {
       >
         <span className="flex items-center gap-2 text-base font-medium">
           {item.featured && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 bg-amber-100/70 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-500/40">
+            <span className="inline-flex items-center gap-1 rounded-full border border-blue-300/60 bg-blue-100/70 px-2 py-0.5 text-[11px] font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-500/40">
               <Star className="h-3.5 w-3.5 fill-current" /> გამოკვეთილი
             </span>
           )}

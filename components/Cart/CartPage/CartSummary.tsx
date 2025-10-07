@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Truck, Shield, RotateCcw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Truck, Shield, RotateCcw, LogIn } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/app/context/cartContext";
+import { useUser } from "@/app/context/userContext";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(price);
@@ -18,7 +20,13 @@ const PROMO_CODES = {
   FREESHIP: { discount: 0, label: "Free Shipping", freeShipping: true },
 } as const;
 
-export default function CartSummary() {
+interface CartSummaryProps {
+  autoShowLoginPrompt?: boolean;
+}
+
+export default function CartSummary({ autoShowLoginPrompt = false }: CartSummaryProps) {
+  const { user } = useUser();
+  const router = useRouter();
   const itemCount = useCartStore((s) => s.cart.length);
   const subtotal = useCartStore((s) => s.getSubtotal());
 
@@ -27,6 +35,7 @@ export default function CartSummary() {
   const [shippingOption, setShippingOption] = useState<"standard" | "express" | "overnight">(
     "standard",
   );
+  const [showLoginPrompt, setShowLoginPrompt] = useState(autoShowLoginPrompt);
 
   const promoDiscount = appliedPromo ? subtotal * PROMO_CODES[appliedPromo].discount : 0;
 
@@ -57,6 +66,21 @@ export default function CartSummary() {
 
   const removePromoCode = () => setAppliedPromo(null);
 
+  // Update showLoginPrompt when autoShowLoginPrompt changes
+  useEffect(() => {
+    if (autoShowLoginPrompt) {
+      setShowLoginPrompt(true);
+    }
+  }, [autoShowLoginPrompt]);
+
+  const handleCheckoutClick = () => {
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    router.push("/cart/checkout");
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
@@ -67,6 +91,28 @@ export default function CartSummary() {
         </CardHeader>
 
         <CardContent className="space-y-4">
+          {/* Login Prompt */}
+          {showLoginPrompt && !user && (
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+              <div className="flex items-start gap-2 text-sm">
+                <LogIn className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <p className="text-blue-900 dark:text-blue-100 font-medium">
+                    Login Required
+                  </p>
+                  <p className="text-blue-700 dark:text-blue-300 text-xs">
+                    Please log in to continue with checkout. Click the Profile icon in the navigation.
+                  </p>
+                  <button
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    onClick={() => setShowLoginPrompt(false)}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-text-subtle dark:text-text-subtledark">
@@ -123,14 +169,21 @@ export default function CartSummary() {
           {/* Actions */}
           <div className="space-y-3 pt-2">
             <Button
-              asChild
-              className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white"
+              className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white gap-2"
               size="lg"
+              onClick={handleCheckoutClick}
             >
-              <Link className="gap-2" href="/cart/checkout">
-                Proceed to Checkout
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              {user ? (
+                <>
+                  Proceed to Checkout
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  Login to Checkout
+                </>
+              )}
             </Button>
 
             <Button

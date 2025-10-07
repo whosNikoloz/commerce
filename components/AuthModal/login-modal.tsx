@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 import { InputLoadingBtn } from "./input-loading-button";
 
@@ -12,6 +14,7 @@ import {
   type LoginResponse,
 } from "@/app/api/services/authService";
 import { useUser } from "@/app/context/userContext";
+import { MOCK_USERS } from "@/lib/mockAuth";
 
 interface LoginProps {
   loginData: {
@@ -28,14 +31,16 @@ interface LoginProps {
   lng: string;
   onSwitchMode: (mode: string) => void;
   handleOAuth: (provider: string) => void;
+  onLoginSuccess?: () => void;
 }
 
-export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }: LoginProps) {
+export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth, onLoginSuccess }: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
-  const { login } = useUser();
+  const { login, simulateLogin } = useUser();
 
   const [isLoading, setIsLoading] = useState(false);
   const [loginState, setLoginState] = useState({ email: "", password: "" });
+  const [showMockUsers, setShowMockUsers] = useState(false);
 
   const [loginError, setLoginError] = useState("");
   const [loginEmailError, setLoginEmailError] = useState("");
@@ -79,8 +84,10 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
       );
 
       login(res.token);
-      // Optionally close modal or switch view:
-      // onSwitchMode("close");
+      // Close modal after successful login
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
     } catch (e: any) {
       setLoginError(typeof e?.message === "string" ? e.message : "Login failed");
     } finally {
@@ -128,8 +135,77 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth }
     setLoginState((s) => ({ ...s, password: "" }));
   };
 
+  const handleMockLogin = (userEmail: string) => {
+    if (simulateLogin) {
+      simulateLogin(userEmail);
+      // Close modal after successful mock login
+      setLoginError("");
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+    }
+  };
+
   return (
     <div className="space-y-3">
+      {/* Mock Login Section - for testing */}
+      {!showMockUsers ? (
+        <div className="mb-4">
+          <button
+            className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors py-2 px-4 border border-blue-200 rounded-lg hover:bg-blue-50"
+            onClick={() => setShowMockUsers(true)}
+          >
+            🧪 {lng === "ka" ? "ტესტ იუზერები" : "Test Login (Development)"}
+          </button>
+        </div>
+      ) : (
+        <div className="mb-4 space-y-2">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              {lng === "ka" ? "აირჩიე ტესტ იუზერი:" : "Select Test User:"}
+            </span>
+            <button
+              className="text-xs text-gray-500 hover:text-gray-700"
+              onClick={() => setShowMockUsers(false)}
+            >
+              {lng === "ka" ? "დამალვა" : "Hide"}
+            </button>
+          </div>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {MOCK_USERS.map((mockUser) => (
+              <button
+                key={mockUser.userId}
+                className="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"
+                onClick={() => handleMockLogin(mockUser.email)}
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={mockUser.picture} />
+                    <AvatarFallback>{mockUser.firstName[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                      {mockUser.firstName} {mockUser.lastName}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {mockUser.email}
+                    </p>
+                  </div>
+                  <Badge variant={mockUser.role === "Admin" ? "default" : "secondary"} className="shrink-0">
+                    {mockUser.role}
+                  </Badge>
+                </div>
+              </button>
+            ))}
+          </div>
+          <div className="text-xs text-center text-gray-500 mt-2">
+            {lng === "ka"
+              ? "ტესტირებისთვის - არ არის საჭირო პაროლი"
+              : "For testing - No password required"}
+          </div>
+        </div>
+      )}
+
       <Input
         ref={loginRef}
         classNames={{

@@ -53,15 +53,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
         className={slots.wrapper({
           class: clsx(
             [
-              "w-auto h-auto",
-              "bg-transparent",
-              "rounded-lg",
-              "flex items-center justify-center",
-              "group-data-[selected=true]:bg-transparent",
-              "!text-default-500",
-              "pt-px",
-              "px-0",
-              "mx-0",
+             "bg-transparent"
             ],
             classNames?.wrapper,
           ),

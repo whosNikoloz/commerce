@@ -65,6 +65,7 @@ interface UserContextType {
     user: User | null;
     login: (userToken: string) => void;
     logout: () => void;
+    simulateLogin?: (userIdOrEmail: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -152,8 +153,18 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
         localStorage.removeItem("jwt");
     };
 
+    const simulateLogin = (userIdOrEmail: string) => {
+        // Import dynamically to avoid server-side issues
+        if (typeof window !== "undefined") {
+            import("@/lib/mockAuth").then(({ simulateLogin: mockLogin }) => {
+                const mockToken = mockLogin(userIdOrEmail);
+                login(mockToken);
+            });
+        }
+    };
+
     return (
-        <UserContext.Provider value={{ user, login, logout }}>
+        <UserContext.Provider value={{ user, login, logout, simulateLogin }}>
             {loading ? (
                 <div className="h-screen bg-black" />
             ) : (

@@ -8,7 +8,15 @@ const SHOP_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Shop/";
 const ORDER_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Order/";
 const ACCOUNT_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Account/";
 
+// Mock mode - check if we should use mock data
+const USE_MOCK_DATA = typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature");
+
 export async function getMyOrders(page = 1, pageSize = 10) {
+    if (USE_MOCK_DATA || (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature"))) {
+        const { getMockOrders } = await import("@/lib/mockOrderData");
+        return getMockOrders(page, pageSize);
+    }
+
     const url = `${ORDER_BASE}my?page=${page}&pageSize=${pageSize}`;
     const res = await apiFetch<ApiEnvelope<PagedResult<OrderSummary>>>(url, {
         method: "GET",
@@ -19,6 +27,13 @@ export async function getMyOrders(page = 1, pageSize = 10) {
 }
 
 export async function getOrderById(id: string) {
+    if (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature")) {
+        const { getMockOrderById } = await import("@/lib/mockOrderData");
+        const order = getMockOrderById(id);
+        if (order) return order;
+        throw new Error("Order not found");
+    }
+
     const url = `${ORDER_BASE}${encodeURIComponent(id)}`;
     const res = await apiFetch<ApiEnvelope<OrderDetail>>(url, { method: "GET" } as any);
 
@@ -52,6 +67,11 @@ export async function downloadInvoiceFile(id: string) {
 
 
 export async function getWishlist() {
+    if (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature")) {
+        const { getMockWishlist } = await import("@/lib/mockOrderData");
+        return getMockWishlist();
+    }
+
     const url = `${ACCOUNT_BASE}wishlist`;
     const res = await apiFetch<ApiEnvelope<{ items: WishlistItem[] }>>(url, { method: "GET" } as any);
 

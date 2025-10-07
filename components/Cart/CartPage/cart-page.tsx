@@ -7,16 +7,19 @@ import EmptyCart from "./EmptyCart";
 import CartItems from "./CartItems";
 import { useCartStore } from "@/app/context/cartContext";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { getProductRestsByIds } from "@/app/api/services/productService";
 
 export type AvailabilityMap = Record<string, number>;
 
 export default function CartPage() {
+  const searchParams = useSearchParams();
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
 
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const productIds = useMemo(
     () => Array.from(new Set((cart ?? []).map((it: any) => String(it.id)))),
@@ -52,6 +55,14 @@ export default function CartPage() {
     };
   }, [productIds.join("|")]);
 
+  // Check for login requirement from URL parameter
+  useEffect(() => {
+    const loginRequired = searchParams.get("login");
+    if (loginRequired === "required") {
+      setShowLoginPrompt(true);
+    }
+  }, [searchParams]);
+
   if (cartLen === 0) return <EmptyCart />;
 
   return (
@@ -70,7 +81,7 @@ export default function CartPage() {
             <CartItems availability={availability} />
           </div>
           <div className="lg:sticky lg:top-6 h-fit">
-            <CartSummary />
+            <CartSummary autoShowLoginPrompt={showLoginPrompt} />
           </div>
         </div>
       </div>

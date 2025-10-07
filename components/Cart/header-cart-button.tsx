@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCartIconAnimation, AnimatedCount, CartIconBouncer } from "./cart-anim";
 
 import { useCartStore } from "@/app/context/cartContext";
+import { Button } from "@heroui/button";
 
 type HeaderCartButtonProps = {
   onClick?: () => void;
@@ -26,11 +27,17 @@ export default function HeaderCartButton({ onClick, className }: HeaderCartButto
 
   return (
     <Badge color="danger" content={<AnimatedCount animKey={animKey} value={total} />} size="sm">
-      <button aria-label="Open cart" className={className} type="button" onClick={handleClick}>
+       <Button
+        isIconOnly
+        aria-expanded={false}
+        aria-label="Open cart"
+        className={className}
+        onPress={handleClick}
+      >
         <CartIconBouncer controls={controls}>
           <ShoppingCartIcon size={24} />
         </CartIconBouncer>
-      </button>
+      </Button>
     </Badge>
   );
 }

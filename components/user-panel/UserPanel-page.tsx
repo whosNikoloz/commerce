@@ -20,6 +20,7 @@ import {
   ChevronUp,
   Clock,
   MapPin as MapPinIcon,
+  LogIn,
 } from "lucide-react";
 
 import {
@@ -48,6 +49,7 @@ import {
 } from "@/components/ui/collapsible";
 import { getMyOrders, getWishlist, getOrderById, getTracking, downloadInvoiceFile } from "@/app/api/services/orderService";
 import { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/orderTypes";
+import { useUser } from "@/app/context/userContext";
 
 function cx(...cls: Array<string | false | null | undefined>) {
   return cls.filter(Boolean).join(" ");
@@ -58,26 +60,6 @@ const fmtMoney = (n: number) =>
     n ?? 0
   );
 
-function UserHeader() {
-  return (
-    <div className="mb-8">
-      <div className="flex items-center gap-4 mb-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src="/diverse-user-avatars.png" />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back!
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your account, orders and preferences
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function NotificationArea({
   notifications,
@@ -140,6 +122,7 @@ function EmptyState({
 }
 
 export default function UserPanel() {
+  const { user, simulateLogin, logout } = useUser();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // data state
@@ -320,45 +303,45 @@ export default function UserPanel() {
   // Inner sections (kept in-file to avoid extra files)
   // —————————————————————————————————————————————————————————————
   const DashboardStats = () => (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-          <Package className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-xs sm:text-sm font-medium">Total Orders</CardTitle>
+          <Package className="h-4 w-4 text-muted-foreground shrink-0" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{paged.total}</div>
-          <p className="text-xs text-muted-foreground">All time</p>
+          <div className="text-xl sm:text-2xl font-bold">{paged.total}</div>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">All time</p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-xs sm:text-sm font-medium">Total Spent</CardTitle>
+          <CreditCard className="h-4 w-4 text-muted-foreground shrink-0" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{fmtMoney(totalSpent)}</div>
-          <p className="text-xs text-muted-foreground">All time</p>
+          <div className="text-xl sm:text-2xl font-bold">{fmtMoney(totalSpent)}</div>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">All time</p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Wishlist Items</CardTitle>
-          <Heart className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-xs sm:text-sm font-medium">Wishlist Items</CardTitle>
+          <Heart className="h-4 w-4 text-muted-foreground shrink-0" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{wishlist.length}</div>
-          <p className="text-xs text-muted-foreground">Saved for later</p>
+          <div className="text-xl sm:text-2xl font-bold">{wishlist.length}</div>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Saved for later</p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Reward Points</CardTitle>
-          <Star className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-xs sm:text-sm font-medium">Reward Points</CardTitle>
+          <Star className="h-4 w-4 text-muted-foreground shrink-0" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">—</div>
-          <p className="text-xs text-muted-foreground">Coming soon</p>
+          <div className="text-xl sm:text-2xl font-bold">—</div>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Coming soon</p>
         </CardContent>
       </Card>
     </div>
@@ -414,22 +397,22 @@ export default function UserPanel() {
           <CardDescription>Your latest purchases and their status</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {orders.slice(0, 5).map((order) => (
               <div
                 key={order.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 md:p-4 border rounded-lg"
               >
-                <div className="flex items-center gap-4">
-                  <Package className="h-8 w-8 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">{order.id}</p>
-                    <p className="text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                  <Package className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm md:text-base truncate">{order.id}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
                       {new Date(order.date).toLocaleDateString()} • {order.items} items
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between sm:justify-end gap-2 md:gap-4">
                   <Badge
                     variant={
                       order.status === "Delivered"
@@ -438,15 +421,16 @@ export default function UserPanel() {
                           ? "secondary"
                           : "outline"
                     }
+                    className="text-xs"
                   >
                     {order.status}
                   </Badge>
-                  <p className="font-medium">
+                  <p className="font-medium text-sm md:text-base">
                     {fmtMoney((order as OrderDetail).total ?? 0)}
                   </p>
-                  <Button size="sm" variant="outline" onClick={() => onView(order.id)}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    View
+                  <Button size="sm" variant="outline" onClick={() => onView(order.id)} className="shrink-0">
+                    <Eye className="h-3 w-3 md:h-4 md:w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">View</span>
                   </Button>
                 </div>
               </div>
@@ -499,10 +483,10 @@ export default function UserPanel() {
 
     return (
       <Card>
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
           <div>
-            <CardTitle>Order History</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg md:text-xl">Order History</CardTitle>
+            <CardDescription className="text-xs md:text-sm">
               View and manage all your orders with detailed tracking
             </CardDescription>
           </div>
@@ -516,7 +500,7 @@ export default function UserPanel() {
             >
               Prev
             </Button>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">
               Page {paged.page} / {Math.max(1, Math.ceil(paged.total / paged.pageSize))}
             </span>
             <Button
@@ -546,7 +530,7 @@ export default function UserPanel() {
                       <div
                         aria-expanded={expanded}
                         className={cx(
-                          "flex items-center justify-between p-6 cursor-pointer transition-colors",
+                          "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 md:p-6 cursor-pointer transition-colors",
                           expanded ? "bg-muted/50" : "hover:bg-muted/50"
                         )}
                         role="button"
@@ -563,21 +547,21 @@ export default function UserPanel() {
                           }
                         }}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="p-2 bg-muted rounded-lg">
-                            <Package className="h-6 w-6" />
+                        <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">
+                          <div className="p-2 bg-muted rounded-lg shrink-0">
+                            <Package className="h-5 w-5 md:h-6 md:w-6" />
                           </div>
-                          <div>
-                            <p className="font-semibold text-lg">{order.id}</p>
-                            <p className="text-muted-foreground">
-                              Ordered on {new Date(order.date).toLocaleDateString()}
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-base md:text-lg truncate">{order.id}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground">
+                              {new Date(order.date).toLocaleDateString()}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs md:text-sm text-muted-foreground">
                               {order.items} items • {fmtMoney((order as OrderDetail).total ?? 0)}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between sm:justify-end gap-3">
                           <Badge
                             variant={
                               order.status === "Delivered"
@@ -586,13 +570,14 @@ export default function UserPanel() {
                                   ? "secondary"
                                   : "outline"
                             }
+                            className="text-xs"
                           >
                             {order.status}
                           </Badge>
                           {expanded ? (
-                            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                            <ChevronUp className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground shrink-0" />
                           ) : (
-                            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                            <ChevronDown className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground shrink-0" />
                           )}
                         </div>
                       </div>
@@ -715,9 +700,10 @@ export default function UserPanel() {
                           </div>
 
                           {/* Actions */}
-                          <div className="flex gap-3 pt-2">
+                          <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-2">
                             <Button
-                              className="flex-1 bg-transparent"
+                              className="flex-1 bg-transparent text-xs md:text-sm"
+                              size="sm"
                               disabled={
                                 orderActions[`track-${detail.id}`] === true ||
                                 !detail.trackingNumber
@@ -727,30 +713,34 @@ export default function UserPanel() {
                                 handleTrackPackage(detail.id, detail.trackingNumber)
                               }
                             >
-                              <Truck className="h-4 w-4 mr-2" />
+                              <Truck className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                               {orderActions[`track-${detail.id}`]
                                 ? "Tracking..."
                                 : "Track Package"}
                             </Button>
                             <Button
-                              className="flex-1 bg-transparent"
+                              className="flex-1 bg-transparent text-xs md:text-sm"
+                              size="sm"
                               disabled={orderActions[`invoice-${detail.id}`] === true}
                               variant="outline"
                               onClick={() => handleDownloadInvoice(detail.id)}
                             >
-                              <Download className="h-4 w-4 mr-2" />
-                              {orderActions[`invoice-${detail.id}`]
+                              <Download className="h-3 w-3 md:h-4 md:w-4 mr-2" />
+                              <span className="hidden sm:inline">{orderActions[`invoice-${detail.id}`]
                                 ? "Downloading..."
-                                : "Download Invoice"}
+                                : "Download Invoice"}</span>
+                              <span className="sm:hidden">Invoice</span>
                             </Button>
                             {detail.status === "Delivered" && (
                               <Button
-                                className="flex-1 bg-transparent"
+                                className="flex-1 bg-transparent text-xs md:text-sm"
+                                size="sm"
                                 variant="outline"
                                 onClick={() => handleLeaveReview(detail.id)}
                               >
-                                <Star className="h-4 w-4 mr-2" />
-                                Leave Review
+                                <Star className="h-3 w-3 md:h-4 md:w-4 mr-2" />
+                                <span className="hidden sm:inline">Leave Review</span>
+                                <span className="sm:hidden">Review</span>
                               </Button>
                             )}
                           </div>
@@ -964,38 +954,93 @@ export default function UserPanel() {
   );
 
   // —————————————————————————————————————————————————————————————
+  // Login Required Screen
+  // —————————————————————————————————————————————————————————————
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center ">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center">
+              <UserIcon className="h-8 w-8 text-blue-600" />
+            </div>
+            <CardTitle className="text-2xl">Login Required</CardTitle>
+            <CardDescription>
+              Please log in to access your user panel
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-center text-muted-foreground">
+              You need to be logged in to view your orders, wishlist, and account settings.
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
+              Click the profile icon in the navigation to log in.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // —————————————————————————————————————————————————————————————
   // Render
   // —————————————————————————————————————————————————————————————
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto my-20">
-        <UserHeader />
+    <div className="min-h-screen mt-10 md:mt-0">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12 lg:py-20">
+        {/* Header - Mobile Responsive */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center gap-3 md:gap-4">
+            <Avatar className="h-12 w-12 md:h-16 md:w-16">
+              <AvatarImage src={user.picture} />
+              <AvatarFallback>{user.firstName[0]}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">
+                Welcome back, {user.firstName}!
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                {user.email} • {user.role}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto"
+            onClick={logout}
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
         <NotificationArea
           notifications={notifications}
           onDismiss={dismissNotification}
         />
 
-        <Tabs className="space-y-6" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 lg:w-fit">
-            <TabsTrigger className="flex items-center gap-2" value="dashboard">
-              <UserIcon className="h-4 w-4" />
-              Dashboard
+        <Tabs className="space-y-4 md:space-y-6" value={activeTab} onValueChange={setActiveTab}>
+          {/* Tabs Navigation */}
+          <TabsList className="grid w-full grid-cols-5 lg:w-fit bg-inherit">
+            <TabsTrigger className="flex flex-col md:flex-row items-center gap-1 md:gap-2 py-3 md:py-2" value="dashboard">
+              <UserIcon className="h-5 w-5 md:h-4 md:w-4" />
+              <span className="text-[10px] md:text-sm">Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger className="flex items-center gap-2" value="orders">
-              <Package className="h-4 w-4" />
-              Orders
+            <TabsTrigger className="flex flex-col md:flex-row items-center gap-1 md:gap-2 py-3 md:py-2" value="orders">
+              <Package className="h-5 w-5 md:h-4 md:w-4" />
+              <span className="text-[10px] md:text-sm">Orders</span>
             </TabsTrigger>
-            <TabsTrigger className="flex items-center gap-2" value="wishlist">
-              <Heart className="h-4 w-4" />
-              Wishlist
+            <TabsTrigger className="flex flex-col md:flex-row items-center gap-1 md:gap-2 py-3 md:py-2" value="wishlist">
+              <Heart className="h-5 w-5 md:h-4 md:w-4" />
+              <span className="text-[10px] md:text-sm">Wishlist</span>
             </TabsTrigger>
-            <TabsTrigger className="flex items-center gap-2" value="account">
-              <Settings className="h-4 w-4" />
-              Account
+            <TabsTrigger className="flex flex-col md:flex-row items-center gap-1 md:gap-2 py-3 md:py-2" value="account">
+              <Settings className="h-5 w-5 md:h-4 md:w-4" />
+              <span className="text-[10px] md:text-sm">Account</span>
             </TabsTrigger>
-            <TabsTrigger className="flex items-center gap-2" value="support">
-              <Shield className="h-4 w-4" />
-              Support
+            <TabsTrigger className="flex flex-col md:flex-row items-center gap-1 md:gap-2 py-3 md:py-2" value="support">
+              <Shield className="h-5 w-5 md:h-4 md:w-4" />
+              <span className="text-[10px] md:text-sm">Support</span>
             </TabsTrigger>
           </TabsList>
 

@@ -64,7 +64,7 @@ export default function CartDropdown() {
 
   return (
     <div ref={dropdownRef} className="relative">
-      <HeaderCartButton onClick={handleClickCart} />
+      <HeaderCartButton onClick={handleClickCart} className="bg-transparent"/>
 
       <div
         className={`absolute right-0 top-14 w-[440px] md:w-[500px] transform transition-all duration-300 ease-out z-50

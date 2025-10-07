@@ -3,23 +3,24 @@
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
-import { HomeIcon, ProfileIcon } from "../icons";
+import { HomeIcon } from "../icons";
 import { LanguageSwitch } from "../Switch/language";
 import CartDropdown from "../Cart/cart-dropdown";
 import Cartlink from "../Cart/cart-link";
 import Search from "../Search/search-dropdown";
 import SearchForMobile from "../Search/search-for-mobile";
 import { GoBackButton } from "../go-back-button";
+import CategoryDrawer from "../Categories/category-drawer";
+import CategoryDropdown from "../Categories/category-dropdown";
+import AuthModal from "../AuthModal/auth-modal";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
 import { SiteConfig, DEFAULT_SITE, SITES } from "@/config/site";
-import AuthModal from "../AuthModal/auth-modal";
-import { MessageCircleIcon } from "lucide-react";
-import Link from "next/link";
-import { useUser } from "@/app/context/userContext";
+
 
 function getSiteByHostClient(): SiteConfig {
   if (typeof window === "undefined") return DEFAULT_SITE;
@@ -29,7 +30,6 @@ function getSiteByHostClient(): SiteConfig {
 }
 
 export const Navbar = () => {
-  const user = useUser;
   const [site, setSite] = useState<SiteConfig>(DEFAULT_SITE);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -110,7 +110,7 @@ export const Navbar = () => {
           >
             <div className="mx-auto px-4">
               <div className="flex items-center justify-between h-16">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-4">
                   <Link className="flex items-center space-x-2 group" href={`/${lng}`}>
                     {/* Logo */}
                     <Image
@@ -149,7 +149,8 @@ export const Navbar = () => {
                   />
                 )}
 
-                <div className="items-center space-x-4 hidden md:flex">
+                <div className="items-center space-x-1 hidden md:flex">
+                  <CategoryDropdown />
                   <CartDropdown />
                   <LanguageSwitch />
                   <AuthModal IsMobile={isMobile} />
@@ -173,7 +174,7 @@ export const Navbar = () => {
       )}
 
       <div className="md:hidden z-50 fixed bottom-0 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
-        <div className="flex justify-around items-center py-2 space-x-3">
+        <div className="flex justify-around items-center py-2 space-x-1">
           <Link className="flex flex-col items-center" href={`/${lng}`}>
             <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
@@ -181,6 +182,7 @@ export const Navbar = () => {
             </span>
           </Link>
 
+          
 
           {isMobile && (
             <div className="flex flex-col items-center">
@@ -197,15 +199,15 @@ export const Navbar = () => {
             </div>
           )}
 
-
           <Cartlink />
 
-          <Link className="flex flex-col items-center" href={`/${lng}/info/stores`}>
-            <MessageCircleIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
+          <div className="flex flex-col items-center">
+            <CategoryDrawer />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
-              {lng === "en" ? "Chat" : "კონტაქტი"}
+              {lng === "en" ? "Category" : "კატეგორია"}
             </span>
-          </Link>
+          </div>
+
           <div className="flex flex-col items-center">
             <AuthModal IsMobile={isMobile} />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">

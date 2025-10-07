@@ -9,7 +9,8 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
@@ -20,6 +21,7 @@ import RegisterModal from "./register-modal";
 import ForgotPasswordModal from "./forgot-password-modal";
 
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { useUser } from "@/app/context/userContext";
 
 const AuthData = {
   ka: {
@@ -91,12 +93,25 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ IsMobile }: AuthModalProps) {
+  const { user } = useUser();
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [authMode, setAuthMode] = useState("login");
   const lng = "ka"; // This can be made dynamic if needed
   const { regData, loginData, forgotData } = AuthData[lng];
 
   useBodyScrollLock(isOpen);
+
+  // Redirect to user page if already logged in
+  const handleProfileClick = () => {
+    if (user) {
+      // If user is logged in, navigate to user page
+      router.push(`/${lng}/user`);
+    } else {
+      // If not logged in, open the modal
+      onOpen();
+    }
+  };
 
 
   const handleOAuth = async (provider: string) => {
@@ -120,10 +135,10 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         className="flex flex-col items-center bg-transparent"
         role="button"
         tabIndex={0}
-        onClick={() => onOpen()}
+        onClick={handleProfileClick}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
-            onOpen();
+            handleProfileClick();
           }
         }}
       >
@@ -211,6 +226,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                     handleOAuth={handleOAuth}
                     lng={lng}
                     loginData={loginData}
+                    onLoginSuccess={handleCloseModal}
                     onSwitchMode={handleAuthMode}
                   />
                 )}

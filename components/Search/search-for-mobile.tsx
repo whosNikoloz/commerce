@@ -14,7 +14,7 @@ import { Input } from "@headlessui/react";
 import { motion } from "framer-motion";
 import { MessageCircleIcon } from "lucide-react";
 
-import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
+import { HomeIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
 import { GoBackButton } from "../go-back-button";
 
@@ -208,7 +208,7 @@ export default function SearchForMobile({
     <>
       {forBottomNav ? (
         <div
-          className="flex flex-col items-center bg-transparent"
+          className="flex flex-col items-center h-6"
           role="button"
           tabIndex={0}
           onClick={handleOpen}
@@ -216,7 +216,7 @@ export default function SearchForMobile({
             if (e.key === "Enter" || e.key === " ") handleOpen();
           }}
         >
-          <SearchIcon />        </div>
+          <SearchIcon height={19} width={19}/>        </div>
       ) : (
         <button
           className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"

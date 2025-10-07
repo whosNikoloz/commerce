@@ -13,8 +13,10 @@ import OrderSummary from "./OrderSummary";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
 import { apiPost } from "@/app/api/payment";
+import { useUser } from "@/app/context/userContext";
 
 export default function CheckoutPage() {
+  const { user } = useUser();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +37,13 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (cartLen === 0) router.push("/cart");
   }, [cartLen, router]);
+
+  // Redirect to cart with login prompt if not logged in
+  useEffect(() => {
+    if (!user) {
+      router.push("/cart?login=required");
+    }
+  }, [user, router]);
 
   if (cartLen === 0) return null;
 

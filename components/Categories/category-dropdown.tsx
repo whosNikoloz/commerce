@@ -166,7 +166,7 @@ export default function CategoryDropdown() {
                                 ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
                             }`}
-                          href={`/categories/${c.id}`}
+                          href={`/category/${c.id}`}
                           onClick={() => {
                             onClose();
                             setHoveredTop(null);
@@ -194,7 +194,7 @@ export default function CategoryDropdown() {
                                   ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                                   : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                               }`}
-                            href={`/categories/${child.id}`}
+                            href={`/category/${child.id}`}
                             onClick={() => {
                               onClose();
                               setHoveredTop(null);

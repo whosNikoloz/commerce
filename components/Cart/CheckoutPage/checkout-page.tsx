@@ -1,18 +1,18 @@
 "use client";
 
-import type { CreateOrderPayload, PaymentProvider } from "@/lib/payment/types";
+import type { PaymentProvider } from "@/types/payment";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import CheckoutForm, { CheckoutFormValues } from "./CheckoutForm";
+import CheckoutForm from "./CheckoutForm";
 import OrderSummary from "./OrderSummary";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
-import { apiPost } from "@/app/api/payment";
+import { apiPost } from "@/app/api/payment/helpers";
 import { useUser } from "@/app/context/userContext";
 
 export default function CheckoutPage() {
@@ -47,52 +47,53 @@ export default function CheckoutPage() {
 
   if (cartLen === 0) return null;
 
-  const handleSubmit = async (form: CheckoutFormValues) => {
+  const handleSubmit = async () => {
+    if (!user?.userId) {
+      setError("User not logged in");
+      return;
+    }
+
     setError(null);
     setIsProcessing(true);
     try {
-      const payload: CreateOrderPayload & { provider: PaymentProvider } = {
-        orderId: crypto.randomUUID(),
-        currency: "GEL",
-        amount: total,
-        items: cart.map((i) => ({
-          productId: i.id,
-          qty: i.quantity,
-          unitPrice: Number(i.price),
-          name: i.name,
-        })),
-        customer: {
-          firstName: form.firstName,
-          lastName: form.lastName,
-          email: form.email,
-          phone: form.phone || "",
-        },
-        shippingAddress: {
-          line1: form.address,
-          city: form.city,
-          state: form.state || "",
-          zip: form.zip || "",
-          country: "GE",
-        },
-        billingAddress: form.sameAsShipping
-          ? undefined
-          : {
-              line1: form.billingAddress || "",
-              city: form.billingCity || "",
-              state: form.billingState || "",
-              zip: form.billingZip || "",
-              country: "GE",
-            },
-        metadata: { source: "nextjs-checkout", cartItems: cart.length },
-        provider,
-      };
+      const orderId = crypto.randomUUID();
+      const items = cart.map((i) => ({
+        productId: i.id,
+        qty: i.quantity,
+        unitPrice: Number(i.price),
+        name: i.name,
+      }));
 
-      const data = await apiPost<{ orderId: string; paymentUrl: string }>("/api/payment", payload);
+      let data: { orderId?: string; paymentId?: string; redirectUrl: string };
 
-      if (!data?.paymentUrl) throw new Error("paymentUrl missing");
+      if (provider === "bog") {
+        data = await apiPost<{ orderId: string; redirectUrl: string }>("/api/payment/bog/create", {
+          userId: user.userId,
+          amount: total,
+          items,
+          orderId,
+          returnUrl: `${window.location.origin}/payment/callback?provider=bog`,
+          locale: "en-US",
+        });
+      } else if (provider === "tbc") {
+        data = await apiPost<{ paymentId: string; redirectUrl: string }>("/api/payment/tbc/create", {
+          userId: user.userId,
+          amount: total,
+          currency: "GEL",
+          returnUrl: `${window.location.origin}/payment/callback?provider=tbc`,
+          extraInfo: `Order ${orderId}`,
+          language: "KA",
+        });
+      } else {
+        throw new Error("Invalid payment provider");
+      }
 
-      if (typeof window !== "undefined") sessionStorage.setItem("lastOrderId", data.orderId);
-      window.location.href = data.paymentUrl;
+      if (!data?.redirectUrl) throw new Error("redirectUrl missing");
+
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("lastOrderId", orderId);
+      }
+      window.location.href = data.redirectUrl;
     } catch (e: any) {
       setError(e?.message ?? "Failed to start payment.");
       setIsProcessing(false);
@@ -129,9 +130,10 @@ export default function CheckoutPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <CheckoutForm value={provider} onChange={setProvider} onSubmit={handleSubmit} />
+          <CheckoutForm value={provider} onChange={setProvider} />
           <OrderSummary
             isProcessing={isProcessing}
+            onSubmit={handleSubmit}
             submitButtonLabel={
               isProcessing ? "Redirecting..." : `Pay Securely • ₾${total.toFixed(2)}`
             }

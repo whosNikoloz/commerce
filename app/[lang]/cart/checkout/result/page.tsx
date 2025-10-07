@@ -23,7 +23,11 @@ export default function CheckoutResultPage() {
       return;
     }
 
-    fetch(`/api/payment/status?provider=${provider}&id=${encodeURIComponent(id)}`)
+    const endpoint = provider === "tbc"
+      ? `/api/payment/tbc/status/${encodeURIComponent(id)}`
+      : `/api/payment/bog/status/${encodeURIComponent(id)}`;
+
+    fetch(endpoint)
       .then((r) => r.json())
       .then((d) => {
         const ok = String(d?.status || "").toLowerCase();

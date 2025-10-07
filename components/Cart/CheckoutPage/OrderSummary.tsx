@@ -13,6 +13,7 @@ interface OrderSummaryProps {
   isProcessing: boolean;
   submitButtonLabel?: string;
   totalOverride?: number;
+  onSubmit?: () => void;
 }
 
 const toNumber = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0));
@@ -21,6 +22,7 @@ export default function OrderSummary({
   isProcessing,
   submitButtonLabel,
   totalOverride,
+  onSubmit,
 }: OrderSummaryProps) {
   const cart = useCartStore((s) => s.cart);
   const subtotal = useCartStore((s) => s.getSubtotal());
@@ -123,7 +125,12 @@ export default function OrderSummary({
           </div>
         </div>
 
-        <Button disabled className="w-full bg-brand-primary text-white" size="lg">
+        <Button
+          className="w-full bg-brand-primary text-white"
+          disabled={isProcessing}
+          size="lg"
+          onClick={onSubmit}
+        >
           {isProcessing ? "Processing..." : (submitButtonLabel ?? "Review & Pay")}
         </Button>
 

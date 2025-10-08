@@ -84,14 +84,9 @@ export default function LoginModal({
 
     setIsLoading(true);
     try {
-      // ✅ REAL LOGIN: /CustomerAuth/login
-      const { accessToken /*, refreshToken*/ } = await loginCustomer(
-        loginState.email,
-        loginState.password
-      );
-
-      // If your UserContext.login expects a token, pass accessToken
-      login(accessToken);
+      const tokens = await loginCustomer(loginState.email, loginState.password);
+      
+      login(tokens);
 
       if (onLoginSuccess) onLoginSuccess();
     } catch (e: any) {

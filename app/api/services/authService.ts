@@ -1,3 +1,4 @@
+import { Tokens } from "@/app/context/userContext";
 import { apiFetch } from "../client/fetcher";
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "CustomerAuth/";
@@ -42,7 +43,7 @@ function normalizeTokens(json: any): TokensResponse {
   const refreshToken = json?.refreshToken ?? json?.RefreshToken;
 
   if (!accessToken || !refreshToken) throw new Error("Invalid token payload");
-
+  
   return { accessToken, refreshToken };
 }
 
@@ -54,13 +55,13 @@ export async function loginAdmin({ email, password }: LoginRequest): Promise<Log
   });
 }
 
-export async function loginCustomer(email: string, password: string): Promise<TokensResponse> {
+export async function loginCustomer(email: string, password: string): Promise<Tokens> {
   const data = await apiFetch<any>(`${BASE}login`, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 
-  return normalizeTokens(data);
+  return Tokens.fromJSON(data); 
 }
 
 export async function registerCustomer(p: RegisterPayload): Promise<void | TokensResponse> {

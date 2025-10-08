@@ -992,12 +992,12 @@ export default function UserPanel() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
           <div className="flex items-center gap-3 md:gap-4">
             <Avatar className="h-12 w-12 md:h-16 md:w-16">
-              <AvatarImage src={user.picture} />
-              <AvatarFallback>{user.firstName[0]}</AvatarFallback>
+              <AvatarImage src={"/placeholder.png"} />
+              <AvatarFallback>{user.userName}</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">
-                Welcome back, {user.firstName}!
+                Welcome back, {user.userName}!
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 {user.email} • {user.role}

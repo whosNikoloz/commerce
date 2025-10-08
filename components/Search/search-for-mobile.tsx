@@ -450,7 +450,7 @@ export default function SearchForMobile({
                 )}
               </ModalBody>
 
-              <ModalFooter className="shrink-0">
+              {/* <ModalFooter className="shrink-0">
                 <div className="md:hidden z-50 fixed bottom-0 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
                   <div className="flex justify-around items-center py-2 space-x-3">
                     <Link className="flex flex-col items-center" href="/en">
@@ -493,8 +493,8 @@ export default function SearchForMobile({
                               </div>
                   </div>
                 </div>
-              </ModalFooter>
-            </>
+              </ModalFooter> */}
+            </> 
           )}
         </ModalContent>
       </Modal>

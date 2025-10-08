@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 
-import { useUser } from "@/app/context/userContext";
+import { Tokens, useUser } from "@/app/context/userContext";
 
 /**
  * Syncs NextAuth session (OAuth) with UserContext (email/password)
@@ -23,7 +23,7 @@ export function AuthSync() {
 
         // Sync the token to UserContext
         // This will decode the JWT and set the user info
-        login(session.accessToken);
+        login(Tokens.fromJSON(session));
       }
     }
 

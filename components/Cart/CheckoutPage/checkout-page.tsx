@@ -49,7 +49,7 @@ export default function CheckoutPage() {
   if (cartLen === 0) return null;
 
   const handleSubmit = async () => {
-    if (!user?.userId) {
+    if (!user?.id) {
       setError("User not logged in");
       return;
     }
@@ -58,16 +58,21 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      const items = cart.map((i) => ({
+      const orderItems = cart.map((i) => ({
         productId: i.id,
         quantity: i.quantity,
+        variant: i.variantKey,
       }));
 
-      const orderId = await createOrder({
-        items,
-        addressId: "default",
-        paymentMethod: provider.toUpperCase(),
-      });
+      const orderResponse = await createOrder({
+        orderItems,
+        shippingAddress: "Default Address",
+        shippingCity: "Tbilisi",
+        shippingCountry: "Georgia",
+        currency: "GEL",
+      } , user.id);
+
+      const orderId = orderResponse.id;
 
       let data: { orderId?: string; paymentId?: string; redirectUrl: string };
 
@@ -75,9 +80,9 @@ export default function CheckoutPage() {
         data = await apiPost<{ orderId: string; redirectUrl: string }>(
           "/api/payment/bog/create",
           {
-            userId: user.userId,
+            userId: user.id,
             amount: total,
-            items,
+            orderItems,
             orderId,
             returnUrl: `${window.location.origin}/payment/callback?provider=bog`,
             locale: "KA",
@@ -87,7 +92,7 @@ export default function CheckoutPage() {
         data = await apiPost<{ paymentId: string; redirectUrl: string }>(
           "/api/payment/tbc/create",
           {
-            userId: user.userId,
+            userId: user.id,
             amount: total,
             currency: "GEL",
             returnUrl: `${window.location.origin}/payment/callback?provider=tbc`,

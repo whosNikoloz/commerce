@@ -12,23 +12,42 @@ const ACCOUNT_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Account/";
 const USE_MOCK_DATA = typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature");
 
 
-export async function createOrder(payload: {
-    items: { productId: string; quantity: number }[]
-    addressId: string
-    paymentMethod: string
-    notes?: string
-}) {
-    const url = `${ORDER_BASE}create`
-    const res = await apiFetch<ApiEnvelope<{ orderId: string }>>(url, {
-        method: "POST",
-        body: JSON.stringify(payload),
-    } as any)
-
-    if (res.successful && res.response?.orderId)
-        return res.response.orderId
-
-    throw new Error(res.error || "Failed to create order")
+export interface CreateOrderPayload {
+    orderItems: {
+        productId: string
+        quantity: number
+        variant?: string
+    }[]
+    shippingAddress: string
+    shippingCity?: string
+    shippingState?: string
+    shippingZipCode?: string
+    shippingCountry?: string
+    customerNotes?: string
+    currency?: string
 }
+
+export async function createOrder(
+  payload: CreateOrderPayload,
+  userId: string
+) {
+  const url = `${ORDER_BASE}create-order?userId=${encodeURIComponent(userId)}`;
+
+  const requestPayload = {
+    ...payload,
+    currency: payload.currency || "GEL",
+  };
+
+  const res = await apiFetch<ApiEnvelope<OrderDetail>>(url, {
+    method: "POST",
+    body: JSON.stringify(requestPayload),
+  } as any);
+
+  if (res.successful && res.response) return res.response;
+
+  throw new Error(res.error || "Failed to create order");
+}
+
 
 export async function getMyOrders(page = 1, pageSize = 10) {
     if (USE_MOCK_DATA || (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature"))) {

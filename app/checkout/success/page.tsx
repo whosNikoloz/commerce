@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [orderInfo, setOrderInfo] = useState<{ orderId: string; paymentId?: string } | null>(null);
@@ -28,7 +28,7 @@ export default function PaymentSuccessPage() {
         sessionStorage.removeItem('lastOrderId');
       }
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
@@ -89,5 +89,17 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

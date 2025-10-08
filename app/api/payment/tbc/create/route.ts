@@ -4,7 +4,7 @@ import { apiFetch } from "@/app/api/client/fetcher";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, amount, currency = "GEL", returnUrl, extraInfo, language = "KA" } = body;
+    const { userId, amount, currency = "GEL", returnUrl, extraInfo, language = "KA", orderId } = body;
 
     if (!userId) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
@@ -14,18 +14,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
+    if (!orderId) {
+      return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+    }
+
     const backendUrl = process.env.BACKEND_API_URL || "https://localhost:7043";
 
     const paymentRequest = {
       userId,
-      amount: {
-        currency,
-        total: amount,
-      },
+      amount: amount,
       currency,
       returnUrl: returnUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/callback?provider=tbc`,
       extraInfo,
       language,
+      //merchantPaymentId: orderId,
     };
 
     const response = await apiFetch<{ paymentId: string; redirectUrl: string }>(

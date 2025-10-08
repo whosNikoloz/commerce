@@ -10,7 +10,7 @@ import {
 } from "@heroui/modal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
@@ -114,11 +114,22 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   };
 
 
-  const handleOAuth = async (provider: string) => {
-    const callbackUrl = "/user/auth/oauth";
-    // Implement OAuth login logic here
-    // Example: await signIn(provider, { callbackUrl });
+  const handleOAuth = async (provider: "google" | "facebook") => {
+    const backTo =
+      typeof window !== "undefined"
+        ? window.location.pathname + window.location.search + window.location.hash
+        : `/${lng}`;
+
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("redirect_url", backTo);
+    }
+
+    const { signIn } = await import("next-auth/react");
+
+    onClose();
+    await signIn(provider, { callbackUrl: backTo });
   };
+
 
   const handleAuthMode = (mode: string) => {
     setAuthMode(mode);

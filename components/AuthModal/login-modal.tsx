@@ -3,18 +3,18 @@
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 
 import { InputLoadingBtn } from "./input-loading-button";
 
-import {
-  checkEmailLogin,
-  loginWithEmail,
-  type LoginResponse,
-} from "@/app/api/services/authService";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+
+
+// ✅ NEW: use real CustomerAuth API (no old authService)
+
 import { useUser } from "@/app/context/userContext";
 import { MOCK_USERS } from "@/lib/mockAuth";
+import { loginCustomer, validateUser } from "@/app/api/services/authService";
 
 interface LoginProps {
   loginData: {
@@ -30,11 +30,17 @@ interface LoginProps {
   };
   lng: string;
   onSwitchMode: (mode: string) => void;
-  handleOAuth: (provider: string) => void;
+  handleOAuth: (provider: "google" | "facebook") => void;
   onLoginSuccess?: () => void;
 }
 
-export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth, onLoginSuccess }: LoginProps) {
+export default function LoginModal({
+  loginData,
+  lng,
+  onSwitchMode,
+  handleOAuth,
+  onLoginSuccess,
+}: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
   const { login, simulateLogin } = useUser();
 
@@ -78,16 +84,16 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth, 
 
     setIsLoading(true);
     try {
-      const res: LoginResponse = await loginWithEmail(
+      // ✅ REAL LOGIN: /CustomerAuth/login
+      const { accessToken /*, refreshToken*/ } = await loginCustomer(
         loginState.email,
-        loginState.password,
+        loginState.password
       );
 
-      login(res.token);
-      // Close modal after successful login
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
+      // If your UserContext.login expects a token, pass accessToken
+      login(accessToken);
+
+      if (onLoginSuccess) onLoginSuccess();
     } catch (e: any) {
       setLoginError(typeof e?.message === "string" ? e.message : "Login failed");
     } finally {
@@ -114,16 +120,19 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth, 
     setEmailLogHasBlurred(true);
     setLogLoader(true);
     try {
-      // ✅ check email existance via API
-      const r = await checkEmailLogin(loginState.email);
-
-      setEmailExists(!!r?.success);
-      if (!r?.success && r?.result) {
-        setLoginEmailError(r.result);
-        setEmailLogHasBlurred(false);
-      }
-    } catch {
-      setLoginEmailError(lng === "ka" ? "სერვერის შეცდომა" : "Server error");
+      // ✅ REAL PRE-CHECK: /CustomerAuth/validateUser (password is optional in DTO)
+      await validateUser(loginState.email);
+      setEmailExists(true);
+    } catch (err: any) {
+      setEmailExists(false);
+      // Optionally show returned message if backend sends a clear reason
+      setLoginEmailError(
+        typeof err?.message === "string"
+          ? err.message
+          : lng === "ka"
+          ? "მომხმარებელი არ მოიძებნა"
+          : "Email not found"
+      );
       setEmailLogHasBlurred(false);
     } finally {
       setLogLoader(false);
@@ -138,11 +147,8 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth, 
   const handleMockLogin = (userEmail: string) => {
     if (simulateLogin) {
       simulateLogin(userEmail);
-      // Close modal after successful mock login
       setLoginError("");
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
+      if (onLoginSuccess) onLoginSuccess();
     }
   };
 
@@ -191,7 +197,10 @@ export default function LoginModal({ loginData, lng, onSwitchMode, handleOAuth, 
                       {mockUser.email}
                     </p>
                   </div>
-                  <Badge variant={mockUser.role === "Admin" ? "default" : "secondary"} className="shrink-0">
+                  <Badge
+                    className="shrink-0"
+                    variant={mockUser.role === "Admin" ? "default" : "secondary"}
+                  >
                     {mockUser.role}
                   </Badge>
                 </div>

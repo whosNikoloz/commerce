@@ -5,12 +5,7 @@ import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 
 import { InputLoadingBtn } from "./input-loading-button";
-
-import {
-  checkEmailRegister,
-  checkUserNameRegister,
-  registerUser,
-} from "@/app/api/services/authService";
+import { registerCustomer } from "@/app/api/services/authService";
 
 interface RegisterProps {
   regData: {
@@ -27,7 +22,7 @@ interface RegisterProps {
   };
   lng: string;
   onSwitchMode: (mode: string) => void;
-  handleOAuth: (provider: string) => void;
+  handleOAuth: (provider: "google" | "facebook") => void;
 }
 
 export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth }: RegisterProps) {
@@ -47,14 +42,17 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [regRegPasswordError, setRegPasswordError] = useState("");
 
-  const [Regusernameloader, setRegusernameLoader] = useState(false);
-  const [Regemailloader, setRegemailLoader] = useState(false);
+  // ✅ ორსაფეხურიანი რეგისტრაცია — კოდის მოთხოვნა/დადასტურება
+  const [codeRequested, setCodeRequested] = useState(false);
+  const [verifyCode, setVerifyCode] = useState("");
 
-  const [regUserNameHasBlurred, setRegUserNameHasBlurred] = useState(false);
-  const [regEmailHasBlurred, setRegEmailHasBlurred] = useState(false);
-
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
+  // UI ბეჯები/ლოუდერები დატოვე სურვილისამებრ—ახლა API-ჩეკები ამოღებულია
+  const [Regusernameloader] = useState(false);
+  const [Regemailloader] = useState(false);
+  const [regUserNameHasBlurred] = useState(false);
+  const [regEmailHasBlurred] = useState(false);
+  const [usernameAvailable] = useState<boolean | null>(null);
+  const [emailAvailable] = useState<boolean | null>(null);
 
   const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -70,53 +68,61 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     // Basic client-side validation
     if (!username) {
       setRegUserNameError(lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field");
-
       return;
     }
     if (!email) {
       setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
-
       return;
     }
     if (!isValidEmail(email)) {
       setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
-
       return;
     }
     if (!password) {
       setRegError(lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
-
       return;
     }
     if (password.length < 6) {
       setRegPasswordError(
         lng === "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols"
       );
-
       return;
     }
     if (!confirmPassword) {
       setConfirmPasswordError(
-        lng === "ka"
-          ? "შეავსე პაროლის დადასტურების ველი"
-          : "Please fill in the ConfirmPassword field"
+        lng === "ka" ? "შეავსე პაროლის დადასტურების ველი" : "Please fill in the ConfirmPassword field"
       );
-
       return;
     }
     if (password !== confirmPassword) {
       setConfirmPasswordError(lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match");
-
       return;
     }
 
     setIsLoading(true);
     try {
-      // 🔐 Register via API
-      await registerUser(username, email, password, confirmPassword);
+      if (!codeRequested) {
+        // 1) სთხოვს ბექს კოდის გაგზავნას (verifyCode არ ვაგზავნით → 0)
+        await registerCustomer({
+          firstName: username, // map username -> FirstName
+          lastName: "",        // LastName optional -> ცარიელი
+          email,
+          password,
+        });
 
-      // Success → switch to login screen (or auto-login if your API returns a token)
-      onSwitchMode("login");
+        setCodeRequested(true);
+      } else {
+        // 2) მომხმარებელმა შეიყვანა კოდი → ვაგზავნით verifyCode-თან ერთად
+        const tokens = await registerCustomer({
+          firstName: username,
+          lastName: "",
+          email,
+          password,
+          verifyCode: Number(verifyCode) || 0,
+        });
+
+        onSwitchMode("login");
+      }
     } catch (e: any) {
       setRegError(typeof e?.message === "string" ? e.message : "Registration failed");
     } finally {
@@ -124,95 +130,8 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     }
   };
 
-  const handleRegisterEmailExists = async () => {
-    setRegEmailError("");
-    setEmailAvailable(null);
-
-    const email = registrationState.email;
-
-    if (!email) {
-      setRegEmailHasBlurred(false);
-
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
-      setRegEmailHasBlurred(false);
-
-      return;
-    }
-
-    setRegEmailHasBlurred(true);
-    setRegemailLoader(true);
-    try {
-      // ✅ check availability (API returns { success: boolean } semantics)
-      const r = await checkEmailRegister(email);
-      const ok = !!r?.success;
-
-      setEmailAvailable(ok);
-
-      if (!ok && (r as any)?.result) {
-        // e.g. “email already exists”
-        setRegEmailError((r as any).result);
-        setRegEmailHasBlurred(false);
-      }
-    } catch {
-      setRegEmailError(lng === "ka" ? "სერვერის შეცდომა" : "Server error");
-      setRegEmailHasBlurred(false);
-    } finally {
-      setRegemailLoader(false);
-    }
-  };
-
-  const handleRegisterUsernameExists = async () => {
-    setRegUserNameError("");
-    setUsernameAvailable(null);
-
-    const username = registrationState.username;
-
-    if (!username) {
-      setRegUserNameHasBlurred(false);
-
-      return;
-    }
-
-    setRegUserNameHasBlurred(true);
-    setRegusernameLoader(true);
-    try {
-      const r = await checkUserNameRegister(username);
-      const ok = !!r?.success;
-
-      setUsernameAvailable(ok);
-
-      if (!ok && (r as any)?.result) {
-        setRegUserNameError((r as any).result);
-        setRegUserNameHasBlurred(false);
-      }
-    } catch {
-      setRegUserNameError(lng === "ka" ? "სერვერის შეცდომა" : "Server error");
-      setRegUserNameHasBlurred(false);
-    } finally {
-      setRegusernameLoader(false);
-    }
-  };
-
-  const handleRegEmailClear = () => {
-    setRegEmailError("");
-    setRegistrationState((s) => ({ ...s, email: "" }));
-    setRegEmailHasBlurred(false);
-    setEmailAvailable(null);
-  };
-
-  const handleRegUserNameClear = () => {
-    setRegUserNameError("");
-    setRegistrationState((s) => ({ ...s, username: "" }));
-    setRegUserNameHasBlurred(false);
-    setUsernameAvailable(null);
-  };
-
   const handleBlurConfirmPassword = () => {
     const { password, confirmPassword } = registrationState;
-
     if (!confirmPassword) return;
     setConfirmPasswordError(
       password !== confirmPassword
@@ -223,7 +142,6 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
 
   const handleBlurPassword = () => {
     const { password } = registrationState;
-
     if (!password) return;
     setRegPasswordError(
       password.length < 6
@@ -242,6 +160,16 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
   const handleRegPasswordClear = () => {
     setRegPasswordError("");
     setRegistrationState((s) => ({ ...s, password: "" }));
+  };
+
+  const handleRegEmailClear = () => {
+    setRegEmailError("");
+    setRegistrationState((s) => ({ ...s, email: "" }));
+  };
+
+  const handleRegUserNameClear = () => {
+    setRegUserNameError("");
+    setRegistrationState((s) => ({ ...s, username: "" }));
   };
 
   return (
@@ -268,7 +196,6 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         startContent={<i className="fas fa-user text-blue-500" />}
         type="text"
         value={registrationState.username}
-        onBlur={handleRegisterUsernameExists}
         onChange={(e) =>
           setRegistrationState((s) => ({
             ...s,
@@ -299,7 +226,6 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         startContent={<i className="fas fa-envelope text-blue-500" />}
         type="email"
         value={registrationState.email}
-        onBlur={handleRegisterEmailExists}
         onChange={(e) =>
           setRegistrationState((s) => ({
             ...s,
@@ -361,6 +287,27 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         onClear={handleRegConfirmPasswordClear}
       />
 
+      {/* ✅ მეორე ნაბიჯი — ვაჩვენოთ კოდის ველი, როცა ბექმა უკვე გააგზავნა კოდი */}
+      {codeRequested && (
+        <Input
+          isClearable
+          classNames={{
+            input: ["text-[16px]"],
+            inputWrapper: [
+              "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
+              "hover:bg-gray-100 dark:hover:bg-slate-600",
+            ],
+            label: ["font-medium text-gray-700 dark:text-gray-200"],
+          }}
+          label={lng === "ka" ? "დადასტურების კოდი" : "Verification Code"}
+          startContent={<i className="fas fa-key text-blue-500" />}
+          type="tel"
+          value={verifyCode}
+          onChange={(e) => setVerifyCode(e.target.value)}
+          onClear={() => setVerifyCode("")}
+        />
+      )}
+
       {regError && (
         <div className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg">
           <i className="fas fa-exclamation-circle mr-2" />
@@ -374,7 +321,9 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         startContent={<i className="fas fa-user-plus mr-2" />}
         onPress={handleRegistration}
       >
-        {regData.button}
+        {!codeRequested
+          ? regData.button // „რეგისტრაცია“ (კოდის გაგზავნა)
+          : (lng === "ka" ? "დადასტურება" : "Confirm")} {/* მეორე ეტაპი */}
       </Button>
 
       <div className="flex items-center justify-center my-4">

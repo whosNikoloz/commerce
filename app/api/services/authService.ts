@@ -1,37 +1,49 @@
 import { apiFetch } from "../client/fetcher";
 
+const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "CustomerAuth/";
 const AUTH_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Auth/";
-const USER_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "User/";
 
-export type ApiBool = { successful?: boolean; status?: boolean };
+
+export type TokensResponse = { accessToken: string; refreshToken: string };
+export type LoginAdminResponse = string;
+
 export type ApiEnvelope<T = unknown> = {
   successful?: boolean;
   status?: boolean;
   response?: T;
   error?: string | null;
 };
-
 export interface LoginRequest {
   email: string;
   password: string;
 }
-export interface LoginResponse {
-  token: string;
-  user?: {
-    id: number;
-    email: string;
-    userName?: string;
-    picture?: string;
-  };
-}
+export type UserRole = 0;
+export const CUSTOMER_ROLE: UserRole = 0;
 
-export type LoginAdminResponse = string;
+export type RegisterPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  verifyCode?: number;
+};
+export type GoogleLoginRequest = {
+  accessToken: string;
+  idToken: string;
+  role?: UserRole;
+};
+export type FacebookLoginRequest = {
+  accesToken: string; 
+  role?: UserRole;
+};
 
-export async function checkEmailLogin(email: string) {
-  return apiFetch<ApiEnvelope>(`${AUTH_BASE}Login/check-email`, {
-    method: "POST",
-    body: JSON.stringify({ email }),
-  }).then((d) => (d.successful ? { success: true } : { success: false, result: d.error }));
+function normalizeTokens(json: any): TokensResponse {
+  const accessToken = json?.accessToken ?? json?.AccessToken;
+  const refreshToken = json?.refreshToken ?? json?.RefreshToken;
+
+  if (!accessToken || !refreshToken) throw new Error("Invalid token payload");
+
+  return { accessToken, refreshToken };
 }
 
 export async function loginAdmin({ email, password }: LoginRequest): Promise<LoginAdminResponse> {
@@ -42,166 +54,72 @@ export async function loginAdmin({ email, password }: LoginRequest): Promise<Log
   });
 }
 
-export async function loginWithEmail(email: string, password: string) {
-  const data = await apiFetch<ApiEnvelope<LoginResponse>>(`${AUTH_BASE}Email`, {
+export async function loginCustomer(email: string, password: string): Promise<TokensResponse> {
+  const data = await apiFetch<any>(`${BASE}login`, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 
-  if (data.successful && data.response?.token) return data.response;
-  throw new Error(data.error || "Login failed");
+  return normalizeTokens(data);
 }
 
-export async function loginWithOAuthEmail(oAuthprovider: string, oAuthproviderId: string) {
-  const data = await apiFetch<ApiEnvelope<LoginResponse>>(`${AUTH_BASE}OAuthEmail`, {
+export async function registerCustomer(p: RegisterPayload): Promise<void | TokensResponse> {
+  const body = {
+    firstName: p.firstName,
+    lastName: p.lastName,
+    email: p.email,
+    password: p.password,
+    verifyCode: p.verifyCode ?? 0,
+  };
+
+  const data = await apiFetch<any>(`${BASE}register`, {
     method: "POST",
-    body: JSON.stringify({ oAuthprovider, oAuthproviderId }),
+    body: JSON.stringify(body),
   });
 
-  if (data.successful && data.response?.token) return data.response;
-  throw new Error(data.error || "OAuth login failed");
+  // registration may return 204 (no content) or tokens
+  if (data && (data.accessToken || data.AccessToken)) return normalizeTokens(data);
 }
 
-export async function checkEmailRegister(email: string) {
-  const d = await apiFetch<ApiEnvelope>(`${AUTH_BASE}Register/check-email`, {
+/* ———————— Validate User (email/password check) ———————— */
+export async function validateUser(email: string, password?: string): Promise<void> {
+  await apiFetch<void>(`${BASE}validateUser`, {
     method: "POST",
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, password }),
   });
-
-  return d.status || d.successful ? { success: true } : { success: false, result: d.error };
 }
 
-export async function checkUserNameRegister(username: string) {
-  const d = await apiFetch<ApiEnvelope>(
-    `${AUTH_BASE}Register/check-username/${encodeURIComponent(username)}`,
-    {
-      method: "GET",
-    },
-  );
-
-  return d.status || d.successful ? { success: true } : { success: false, result: d.error };
-}
-
-export async function registerUser(
-  userName: string,
-  email: string,
-  password: string,
-  confirmPassword: string,
-) {
-  const d = await apiFetch<ApiEnvelope>(`${AUTH_BASE}Register`, {
-    method: "POST",
-    body: JSON.stringify({ email, userName, password, confirmPassword }),
-  });
-
-  if (d.successful || d.status) return true;
-  throw new Error(d.error || "Registration failed");
-}
-
-export async function oauthExists(oAuthProvider: string, oAuthProviderId: string) {
-  const res = await apiFetch<Response>(`${AUTH_BASE}OAuth2Exist`, {
-    method: "POST",
-    body: JSON.stringify({ oAuthProvider, oAuthProviderId }),
-  });
-
-  return !!res;
-}
-
-export async function registerOAuth2(
-  email: string,
-  username: string,
-  picture: string,
-  oAuthProvider: string,
-  oAuthProviderId: string,
-) {
-  const d = await apiFetch<ApiEnvelope>(`${AUTH_BASE}RegisterOAuth2`, {
-    method: "POST",
-    body: JSON.stringify({ email, username, picture, oAuthProvider, oAuthProviderId }),
-  });
-
-  if (d.successful || d.status) return true;
-  throw new Error(d.error || "OAuth registration failed");
-}
-
-export async function forgotPassword(email: string) {
-  const url = `${USER_BASE}ForgotPassword?email=${encodeURIComponent(email)}`;
-
-  await apiFetch<unknown>(url, { method: "POST" });
-
-  return true;
-}
-
-export async function resetPassword(Token: string, Password: string, ConfirmPassword: string) {
-  await apiFetch<unknown>(`${USER_BASE}ResetPassword`, {
-    method: "PUT",
-    body: JSON.stringify({ Token, Password, ConfirmPassword }),
-  });
-
-  return true;
-}
-
-export async function changePassword(
-  userid: number,
-  OldPassword: string,
-  Password: string,
-  ConfirmPassword: string,
-) {
-  await apiFetch<unknown>(`${USER_BASE}ChangePassword`, {
-    method: "PUT",
-    body: JSON.stringify({ userid, OldPassword, Password, ConfirmPassword }),
-  });
-
-  return true;
-}
-
-export async function changeGeneral(
-  userid: number,
-  UserName: string,
-  FirstName: string,
-  LastName: string,
-  PhoneNumber: string,
-) {
-  await apiFetch<unknown>(`${USER_BASE}ChangeGeneral`, {
-    method: "PUT",
-    body: JSON.stringify({ userid, UserName, FirstName, LastName, PhoneNumber }),
-  });
-
-  return true;
-}
-
-export async function getUpdatedUser(userid: number) {
-  const data = await apiFetch<ApiEnvelope<LoginResponse>>(`${USER_BASE}${userid}`, {
+/* ———————— Refresh Tokens ———————— */
+export async function refreshTokens(refreshToken: string): Promise<TokensResponse> {
+  const data = await apiFetch<any>(`${BASE}refreshToken`, {
     method: "GET",
+    headers: { refreshToken },
   });
 
-  if (data.successful && data.response?.token) return data.response;
-  throw new Error(data.error || "Failed to refresh user");
+  return normalizeTokens(data);
 }
 
-export async function reLogin(password: string) {
-  const encoded = encodeURIComponent(password);
-
-  await apiFetch<unknown>(`${USER_BASE}ReLogin/${encoded}`, {
-    method: "GET",
-  });
-
-  return true;
-}
-
-export async function changeEmailRequest(email: string) {
-  const encoded = encodeURIComponent(email);
-  const verificationCode = await apiFetch<string>(`${USER_BASE}ChangeEmailRequest/${encoded}`, {
+export async function googleLogin(req: GoogleLoginRequest): Promise<TokensResponse> {
+  const data = await apiFetch<any>(`${BASE}googleLogin`, {
     method: "POST",
+    body: JSON.stringify({
+      accessToken: req.accessToken,
+      idToken: req.idToken,
+      role: req.role ?? CUSTOMER_ROLE,
+    }),
   });
 
-  return { ok: true as const, data: verificationCode };
+  return normalizeTokens(data);
 }
 
-export async function changeEmail(email: string) {
-  const encoded = encodeURIComponent(email);
-
-  await apiFetch<unknown>(`${USER_BASE}ChangeEmail/${encoded}`, {
+export async function facebookLogin(req: FacebookLoginRequest): Promise<TokensResponse> {
+  const data = await apiFetch<any>(`${BASE}fbLogin`, {
     method: "POST",
+    body: JSON.stringify({
+      accesToken: req.accesToken,
+      role: req.role ?? CUSTOMER_ROLE,
+    }),
   });
 
-  return true;
+  return normalizeTokens(data);
 }

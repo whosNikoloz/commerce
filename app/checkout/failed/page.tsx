@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { XCircle, RefreshCw } from 'lucide-react';
 
-export default function PaymentFailedPage() {
+function PaymentFailedContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [paymentInfo, setPaymentInfo] = useState<{ reason?: string } | null>(null);
@@ -23,72 +23,88 @@ export default function PaymentFailedPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <div className="text-center">
-          {/* Error Icon */}
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
-            <XCircle className="h-12 w-12 text-red-600" />
+      <div className="w-full max-w-md">
+        <div className="rounded-lg bg-white p-8 shadow-lg">
+          <div className="mb-6 flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <XCircle className="h-10 w-10 text-red-600" />
+            </div>
           </div>
 
-          {/* Error Message */}
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">Payment Failed</h1>
-          <p className="mb-6 text-gray-600">
-            Unfortunately, we couldn't process your payment. Please try again.
-          </p>
+          <h1 className="mb-2 text-center text-2xl font-bold text-gray-900">
+            Payment Failed
+          </h1>
 
-          {/* Failure Reason */}
           {paymentInfo?.reason && (
-            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-              <p className="text-sm font-medium text-red-800">Reason:</p>
-              <p className="text-sm text-red-700">{paymentInfo.reason}</p>
+            <div className="mb-6 rounded-lg bg-red-50 p-4">
+              <p className="text-sm text-red-800">
+                <strong>Reason:</strong> {paymentInfo.reason}
+              </p>
             </div>
           )}
 
-          {/* Common Reasons */}
-          <div className="mb-6 rounded-lg bg-gray-50 p-4 text-left">
-            <h2 className="mb-2 text-sm font-semibold text-gray-700">Common Issues:</h2>
-            <ul className="space-y-1 text-sm text-gray-600">
-              <li>• Insufficient funds</li>
-              <li>• Incorrect card details</li>
-              <li>• Payment cancelled by user</li>
-              <li>• Bank declined the transaction</li>
+          <div className="mb-6">
+            <p className="mb-4 text-center text-gray-600">
+              We couldn&apos;t process your payment. This could be due to:
+            </p>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Insufficient funds</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Card declined by bank</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Incorrect card details</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Payment cancelled</span>
+              </li>
             </ul>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={handleRetry}
-              className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+          <div className="space-y-3">
+            <button onClick={handleRetry}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
             >
               <RefreshCw className="h-5 w-5" />
               Try Again
             </button>
-            <Link
+
+            <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50"
               href="/cart"
-              className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
             >
               Back to Cart
             </Link>
-            <Link
+
+            <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50"
               href="/"
-              className="text-sm text-gray-600 underline hover:text-gray-900"
             >
               Continue Shopping
             </Link>
-          </div>
 
-          {/* Help Section */}
-          <div className="mt-6 border-t border-gray-200 pt-6">
-            <p className="text-sm text-gray-600">
-              Need help?{' '}
-              <Link href="/contact" className="text-blue-600 hover:underline">
-                Contact Support
-              </Link>
-            </p>
+            <Link className="block w-full text-center text-sm text-blue-600 hover:underline" href="mailto:support@example.com">
+              Contact Support
+            </Link>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentFailedPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+      </div>
+    }>
+      <PaymentFailedContent />
+    </Suspense>
   );
 }

@@ -7,6 +7,7 @@ import {
     FC,
 } from "react";
 import { jwtDecode } from "jwt-decode";
+import { signOut } from "next-auth/react";
 
 enum UserRole {
     Admin = "Admin",
@@ -148,9 +149,16 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
         localStorage.setItem("jwt", userToken);
     };
 
-    const logout = () => {
+    const logout = async () => {
         setUser(null);
         localStorage.removeItem("jwt");
+
+        // Also sign out from NextAuth (OAuth sessions)
+        try {
+            await signOut({ redirect: false });
+        } catch (error) {
+            console.error("Error signing out from NextAuth:", error);
+        }
     };
 
     const simulateLogin = (userIdOrEmail: string) => {

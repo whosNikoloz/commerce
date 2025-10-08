@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiFetch } from "@/app/api/client/fetcher";
 
-export async function GET(request: NextRequest, { params }: { params: { orderId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
-    const { orderId } = params;
+    const { orderId } = await params;
 
     if (!orderId) {
       return NextResponse.json({ error: "Order ID is required" }, { status: 400 });

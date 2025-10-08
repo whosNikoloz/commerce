@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiFetch } from "@/app/api/client/fetcher";
 
-export async function GET(request: NextRequest, { params }: { params: { paymentId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ paymentId: string }> }) {
   try {
-    const { paymentId } = params;
+    const { paymentId } = await params;
 
     if (!paymentId) {
       return NextResponse.json({ error: "Payment ID is required" }, { status: 400 });

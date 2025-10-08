@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
 import { apiPost } from "@/app/api/payment/helpers";
 import { useUser } from "@/app/context/userContext";
+import { createOrder } from "@/app/api/services/orderService";
 
 export default function CheckoutPage() {
   const { user } = useUser();
@@ -55,35 +56,45 @@ export default function CheckoutPage() {
 
     setError(null);
     setIsProcessing(true);
+
     try {
-      const orderId = crypto.randomUUID();
       const items = cart.map((i) => ({
         productId: i.id,
-        qty: i.quantity,
-        unitPrice: Number(i.price),
-        name: i.name,
+        quantity: i.quantity,
       }));
+
+      const orderId = await createOrder({
+        items,
+        addressId: "default",
+        paymentMethod: provider.toUpperCase(),
+      });
 
       let data: { orderId?: string; paymentId?: string; redirectUrl: string };
 
       if (provider === "bog") {
-        data = await apiPost<{ orderId: string; redirectUrl: string }>("/api/payment/bog/create", {
-          userId: user.userId,
-          amount: total,
-          items,
-          orderId,
-          returnUrl: `${window.location.origin}/payment/callback?provider=bog`,
-          locale: "en-US",
-        });
+        data = await apiPost<{ orderId: string; redirectUrl: string }>(
+          "/api/payment/bog/create",
+          {
+            userId: user.userId,
+            amount: total,
+            items,
+            orderId,
+            returnUrl: `${window.location.origin}/payment/callback?provider=bog`,
+            locale: "KA",
+          }
+        );
       } else if (provider === "tbc") {
-        data = await apiPost<{ paymentId: string; redirectUrl: string }>("/api/payment/tbc/create", {
-          userId: user.userId,
-          amount: total,
-          currency: "GEL",
-          returnUrl: `${window.location.origin}/payment/callback?provider=tbc`,
-          extraInfo: `Order ${orderId}`,
-          language: "KA",
-        });
+        data = await apiPost<{ paymentId: string; redirectUrl: string }>(
+          "/api/payment/tbc/create",
+          {
+            userId: user.userId,
+            amount: total,
+            currency: "GEL",
+            returnUrl: `${window.location.origin}/payment/callback?provider=tbc`,
+            extraInfo: `Order ${orderId}`,
+            language: "KA",
+          }
+        );
       } else {
         throw new Error("Invalid payment provider");
       }
@@ -93,12 +104,14 @@ export default function CheckoutPage() {
       if (typeof window !== "undefined") {
         sessionStorage.setItem("lastOrderId", orderId);
       }
+
       window.location.href = data.redirectUrl;
     } catch (e: any) {
       setError(e?.message ?? "Failed to start payment.");
       setIsProcessing(false);
     }
   };
+
 
   return (
     <div className="min-h-screen ">

@@ -7,6 +7,7 @@ export function useTBCPayment() {
 
   const createPayment = async (
     amount: number,
+    orderId: string,
     currency: string = "GEL",
     returnUrl?: string,
     extraInfo?: string,
@@ -23,6 +24,7 @@ export function useTBCPayment() {
         },
         body: JSON.stringify({
           amount,
+          orderId,
           currency,
           returnUrl,
           extraInfo,

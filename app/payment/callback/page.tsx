@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTBCPayment } from '@/hooks/payment/useTBCPayment';
 import { useBOGPayment } from '@/hooks/payment/useBOGPayment';
 import { usePaymentHub } from '@/hooks/payment/usePaymentHub';
 
-export default function PaymentCallbackPage() {
+function PaymentCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const provider = searchParams.get('provider');
@@ -160,5 +160,17 @@ export default function PaymentCallbackPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+      </div>
+    }>
+      <PaymentCallbackContent />
+    </Suspense>
   );
 }

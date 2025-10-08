@@ -168,8 +168,8 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
             }
             : {
               base:
-                "dark:bg-slate-900 bg-white rounded-xl shadow-lg",
-              backdrop: "bg-black/40",
+                "dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700",
+              backdrop: "bg-black/50 backdrop-blur-sm",
             }),
         }}
 
@@ -209,19 +209,32 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
         size={IsMobile ? "full" : "sm"}
         onClose={handleCloseModal}
       >
-        <ModalContent className="dark:bg-slate-900 bg-white">
+        <ModalContent className="">
           {() => (
             <>
               {IsMobile ? (
-                <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
-                  <GoBackButton onClick={handleCloseModal} />
+                <ModalHeader className="relative flex items-center justify-between px-4 mb-5 pt-6 pb-2 mx-4 bg-white dark:bg-slate-900">
+                  <div className="absolute left-4 top-6">
+                    <GoBackButton onClick={handleCloseModal} />
+                  </div>
+
+                  <h2 className="absolute left-1/2 top-6 -translate-x-1/2 text-2xl font-bold text-gray-900 dark:text-white">
+                    {authMode === "login"
+                      ? loginData.title
+                      : authMode === "register"
+                        ? regData.title
+                        : forgotData.title}
+                  </h2>
                 </ModalHeader>
               ) : authMode == "forgot" ? (
-                <ModalHeader className="flex items-center gap-2 px-4 pt-6 mx-4 z-50">
+                <ModalHeader className="flex items-center gap-2 px-6 pt-6 pb-4 z-50 border-b border-gray-200 dark:border-gray-700">
                   <GoBackButton onClick={() => handleAuthMode("login")} />
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white ml-2">
+                    {forgotData.title}
+                  </h2>
                 </ModalHeader>
               ) : (
-                <ModalHeader className="flex flex-col items-center gap-1 pb-4">
+                <ModalHeader className="flex flex-col items-center gap-2 pt-8 pb-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {authMode === "login"
                       ? loginData.title
@@ -231,7 +244,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                   </h2>
                 </ModalHeader>
               )}
-              <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
+              <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-12rem)] custom-scrollbar">
                 {authMode === "login" && (
                   <LoginModal
                     handleOAuth={handleOAuth}

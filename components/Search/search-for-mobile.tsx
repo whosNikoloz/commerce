@@ -22,6 +22,8 @@ import { searchProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import CategoryDrawer from "../Categories/category-drawer";
+import AuthModal from "../AuthModal/auth-modal";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
@@ -453,26 +455,42 @@ export default function SearchForMobile({
                   <div className="flex justify-around items-center py-2 space-x-3">
                     <Link className="flex flex-col items-center" href="/en">
                       <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark">Home</span>
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                        Home 
+                      </span>
                     </Link>
 
+                   
+                  <div className="flex flex-col items-center">
                     <div
-                      className="flex flex-col items-center bg-transparent"
-                      role="button"
-                      tabIndex={0}
-                      onClick={handleClose}
-                      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClose()}
-                    >
-                      <SearchIcon className="w-6 h-6" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark">Search</span>
-                    </div>
+                            className="flex flex-col items-center h-6"
+                            role="button"
+                            tabIndex={0}
+                            onClick={handleClose}
+                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClose()}
+                          >
+                            <SearchIcon height={19} width={19}/>       
+                          </div>
+                    <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                      Search
+                    </span>
+                  </div>
 
                     <Cartlink />
 
-                    <Link className="flex flex-col items-center" href={`/en/info/stores`}>
-                      <MessageCircleIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark">Chat</span>
-                    </Link>
+                  <div className="flex flex-col items-center">
+                                <CategoryDrawer />
+                                <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                                  Category
+                                </span>
+                              </div>
+
+                  <div className="flex flex-col items-center">
+                                <AuthModal IsMobile={true} />
+                                <span className="text-xs text-text-subtle dark:text-text-subtledark">
+                                  Profile
+                                </span>
+                              </div>
                   </div>
                 </div>
               </ModalFooter>

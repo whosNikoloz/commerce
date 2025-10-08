@@ -153,52 +153,53 @@ export default function LoginModal({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Mock Login Section - for testing */}
       {!showMockUsers ? (
         <div className="mb-4">
           <button
-            className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors py-2 px-4 border border-blue-200 rounded-lg hover:bg-blue-50"
+            className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-all duration-200 py-2.5 px-4 border-2 border-blue-200 dark:border-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => setShowMockUsers(true)}
           >
             🧪 {lng === "ka" ? "ტესტ იუზერები" : "Test Login (Development)"}
           </button>
         </div>
       ) : (
-        <div className="mb-4 space-y-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <div className="mb-6 space-y-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl border border-blue-100 dark:border-blue-900">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <span className="text-lg">👤</span>
               {lng === "ka" ? "აირჩიე ტესტ იუზერი:" : "Select Test User:"}
             </span>
             <button
-              className="text-xs text-gray-500 hover:text-gray-700"
+              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium px-3 py-1 rounded-lg hover:bg-white/50 dark:hover:bg-slate-700/50 transition-all"
               onClick={() => setShowMockUsers(false)}
             >
               {lng === "ka" ? "დამალვა" : "Hide"}
             </button>
           </div>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
             {MOCK_USERS.map((mockUser) => (
               <button
                 key={mockUser.userId}
-                className="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"
+                className="w-full text-left p-3 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg dark:hover:shadow-blue-900/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
                 onClick={() => handleMockLogin(mockUser.email)}
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-11 w-11 ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-400 dark:group-hover:ring-blue-600 transition-all">
                     <AvatarImage src={mockUser.picture} />
-                    <AvatarFallback>{mockUser.firstName[0]}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold">{mockUser.firstName[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {mockUser.firstName} {mockUser.lastName}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                       {mockUser.email}
                     </p>
                   </div>
                   <Badge
-                    className="shrink-0"
+                    className="shrink-0 font-semibold"
                     variant={mockUser.role === "Admin" ? "default" : "secondary"}
                   >
                     {mockUser.role}
@@ -207,7 +208,7 @@ export default function LoginModal({
               </button>
             ))}
           </div>
-          <div className="text-xs text-center text-gray-500 mt-2">
+          <div className="text-xs text-center text-gray-600 dark:text-gray-400 mt-3 py-2 px-3 bg-white/60 dark:bg-slate-700/40 rounded-lg">
             {lng === "ka"
               ? "ტესტირებისთვის - არ არის საჭირო პაროლი"
               : "For testing - No password required"}
@@ -220,10 +221,11 @@ export default function LoginModal({
         classNames={{
           input: ["text-[16px]"],
           inputWrapper: [
-            "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
-            "hover:bg-gray-100 dark:hover:bg-slate-600",
+            "dark:bg-slate-800/50 bg-white shadow-sm border-2 border-gray-200 dark:border-gray-700 focus-within:!border-blue-500 dark:focus-within:!border-blue-400 transition-all duration-200",
+            "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md",
+            "rounded-xl",
           ],
-          label: ["font-medium text-gray-700 dark:text-gray-200"],
+          label: ["font-semibold text-gray-700 dark:text-gray-200"],
         }}
         endContent={
           logEmailHasBlurred ? (
@@ -233,7 +235,7 @@ export default function LoginModal({
         errorMessage={loginEmailError}
         isInvalid={loginEmailError !== ""}
         label={loginData.email}
-        startContent={<i className="fas fa-envelope text-blue-500" />}
+        startContent={<i className="fas fa-envelope text-blue-500 dark:text-blue-400" />}
         type="email"
         value={loginState.email}
         onBlur={handleLoginEmailExists}
@@ -250,15 +252,16 @@ export default function LoginModal({
         classNames={{
           input: ["text-[16px]"],
           inputWrapper: [
-            "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
-            "hover:bg-gray-100 dark:hover:bg-slate-600",
+            "dark:bg-slate-800/50 bg-white shadow-sm border-2 border-gray-200 dark:border-gray-700 focus-within:!border-blue-500 dark:focus-within:!border-blue-400 transition-all duration-200",
+            "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md",
+            "rounded-xl",
           ],
-          label: ["font-medium text-gray-700 dark:text-gray-200"],
+          label: ["font-semibold text-gray-700 dark:text-gray-200"],
         }}
         errorMessage={loginPasswordError}
         isInvalid={loginPasswordError !== ""}
         label={loginData.password}
-        startContent={<i className="fas fa-lock text-blue-500" />}
+        startContent={<i className="fas fa-lock text-blue-500 dark:text-blue-400" />}
         type="password"
         value={loginState.password}
         onChange={(e) =>
@@ -270,9 +273,9 @@ export default function LoginModal({
         onClear={handleLoginPasswordClear}
       />
 
-      <div className="flex px-1 justify-end">
+      <div className="flex px-1 justify-end -mt-1">
         <button
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("forgot")}
         >
           {loginData.forgotPassword}
@@ -280,46 +283,46 @@ export default function LoginModal({
       </div>
 
       {loginError && (
-        <div className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg">
+        <div className="text-red-600 dark:text-red-400 text-sm text-center font-semibold bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 p-3 rounded-xl animate-in slide-in-from-top-2 duration-300">
           <i className="fas fa-exclamation-circle mr-2" />
           {loginError}
         </div>
       )}
 
       <Button
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors"
+        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white font-bold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
         isLoading={isLoading}
-        startContent={<i className="fas fa-sign-in-alt mr-2" />}
+        startContent={!isLoading && <i className="fas fa-sign-in-alt" />}
         onPress={handleLogin}
       >
         {loginData.button}
       </Button>
 
-      <div className="flex items-center justify-center my-4">
-        <div className="flex-grow border-t border-gray-300" />
-        <span className="mx-4 text-gray-500 text-sm font-medium">{loginData.or}</span>
-        <div className="flex-grow border-t border-gray-300" />
+      <div className="flex items-center justify-center my-6">
+        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
+        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{loginData.or}</span>
+        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
       <Button
-        className="w-full bg-[#4267B2] hover:bg-[#365899] text-white font-bold py-3 rounded-lg shadow-md transition-colors mb-3"
-        startContent={<i className="fab fa-facebook-f mr-2" />}
+        className="w-full bg-[#4267B2] hover:bg-[#365899] dark:bg-[#4267B2] dark:hover:bg-[#365899] text-white font-bold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mb-3"
+        startContent={<i className="fab fa-facebook-f" />}
         onPress={() => handleOAuth("facebook")}
       >
         {loginData.facebookAuth}
       </Button>
 
       <Button
-        className="w-full bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 font-bold py-3 rounded-lg shadow-md transition-colors"
-        startContent={<i className="fab fa-google mr-2 text-[#4285F4]" />}
+        className="w-full bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-100 font-bold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        startContent={<i className="fab fa-google text-[#4285F4]" />}
         onPress={() => handleOAuth("google")}
       >
         {loginData.googleAuth}
       </Button>
 
-      <div className="text-center mt-4">
+      <div className="text-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("register")}
         >
           {loginData.switchMode}

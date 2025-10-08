@@ -81,18 +81,22 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
   };
 
   return (
-    <div className="space-y-3">
-      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{forgotData.subText}</p>
+    <div className="space-y-5">
+      <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+        <i className="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mt-0.5" />
+        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{forgotData.subText}</p>
+      </div>
 
       <Input
         ref={forgotRef}
         classNames={{
           input: ["text-[16px]"],
           inputWrapper: [
-            "dark:bg-slate-700 bg-gray-50 shadow-sm border-2 border-gray-200 focus-within:border-blue-500 transition-colors",
-            "hover:bg-gray-100 dark:hover:bg-slate-600",
+            "dark:bg-slate-800/50 bg-white shadow-sm border-2 border-gray-200 dark:border-gray-700 focus-within:!border-blue-500 dark:focus-within:!border-blue-400 transition-all duration-200",
+            "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md",
+            "rounded-xl",
           ],
-          label: ["font-medium text-gray-700 dark:text-gray-200"],
+          label: ["font-semibold text-gray-700 dark:text-gray-200"],
         }}
         endContent={
           forgotEmailHasBlurred ? (
@@ -104,7 +108,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
         errorMessage={forgotEmailError}
         isInvalid={forgotEmailError !== ""}
         label={forgotData.email}
-        startContent={<i className="fas fa-envelope text-blue-500" />}
+        startContent={<i className="fas fa-envelope text-blue-500 dark:text-blue-400" />}
         type="email"
         value={forgotState.email}
         onBlur={handleForgotEmailExists}
@@ -117,16 +121,16 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
       />
 
       {forgotError && (
-        <div className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg">
+        <div className="text-red-600 dark:text-red-400 text-sm text-center font-semibold bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 p-3 rounded-xl animate-in slide-in-from-top-2 duration-300">
           <i className="fas fa-exclamation-circle mr-2" />
           {forgotError}
         </div>
       )}
 
       <Button
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors"
+        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white font-bold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
         isLoading={isLoading}
-        startContent={<i className="fas fa-envelope mr-2" />}
+        startContent={!isLoading && <i className="fas fa-paper-plane" />}
         onPress={handleForgotPassword}
       >
         {forgotData.button}

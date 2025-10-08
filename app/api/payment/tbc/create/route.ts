@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { apiFetch } from "@/app/api/client/fetcher";
 
 export async function POST(request: NextRequest) {
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error: any) {
     console.error("TBC Payment creation error:", error);
+
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

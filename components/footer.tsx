@@ -111,9 +111,11 @@ export function Footer() {
               aria-label={t("footer.switchTheme", "თემის შეცვლა")}
               className="inline-flex items-center justify-center rounded-full border border-brand-muted bg-brand-surface/80 p-2 text-text-light shadow-sm outline-none transition hover:bg-brand-surface focus-visible:ring-2 focus-visible:ring-brand-primary dark:border-brand-mutedDark dark:bg-brand-surfaceDark/80 dark:text-text-lightDark dark:hover:bg-brand-surfaceDark"
               title={
-                resolvedTheme === "dark"
-                  ? t("footer.lightMode", "ღია რეჟიმი")
-                  : t("footer.darkMode", "მუქი რეჟიმი")
+                mounted
+                  ? resolvedTheme === "dark"
+                    ? t("footer.lightMode", "ღია რეჟიმი")
+                    : t("footer.darkMode", "მუქი რეჟიმი")
+                  : t("footer.switchTheme", "თემის შეცვლა")
               }
               type="button"
               whileHover={{ scale: 1.06 }}

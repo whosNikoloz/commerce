@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-import { TokensResponse } from "../api/services/authService";
+import {TokensResponse } from "../api/services/authService";
 
 
 interface DecodedToken {
@@ -122,6 +122,8 @@ export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem(REFRESH_KEY);
+
+    //Serverlogout();
   };
 
   const simulateLogin = (userIdOrEmail: string) => {

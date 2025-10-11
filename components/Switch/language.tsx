@@ -39,7 +39,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
     <Component
       {...getBaseProps({
         className: clsx(
-          "px-px transition-opacity hover:opacity-80 cursor-pointer",
+          "px-px transition-opacity  hover:opacity-80 cursor-pointer",
           className,
           classNames?.base,
         ),
@@ -50,14 +50,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
       </VisuallyHidden>
       <div
         {...getWrapperProps()}
-        className={slots.wrapper({
-          class: clsx(
-            [
-             "bg-transparent"
-            ],
-            classNames?.wrapper,
-          ),
-        })}
+        className={clsx("flex items-center justify-center p-2", slots?.wrapper, classNames?.wrapper)}
       >
         {isSelected || isSSR ? <GeorgiaIcon size={30} /> : <EnglishIcon size={30} />}
       </div>

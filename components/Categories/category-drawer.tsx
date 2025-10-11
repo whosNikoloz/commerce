@@ -2,15 +2,36 @@
 
 import type { CategoryModel } from "@/types/category";
 
-import { useState, Fragment, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon, Squares2X2Icon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, ChevronRightIcon, ChevronDownIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "@heroui/button";
-
 import { getAllCategories } from "@/app/api/services/categoryService";
 
 type ChildrenMap = Record<string, CategoryModel[]>;
+
+const ROOT_KEY = "__root__";
+
+function normalizeId(id?: string | null) {
+  return (id ?? "").trim();
+}
+
+/** Build children map strictly by parentId; guard against cycles/missing parents. */
+function buildTree(categories: CategoryModel[]) {
+  const map: ChildrenMap = {};
+  for (const c of categories) {
+    const parent = normalizeId(c.parentId) || ROOT_KEY;
+    if (!map[parent]) map[parent] = [];
+    map[parent].push(c);
+  }
+  // stable sort by name (fallback to id)
+  Object.keys(map).forEach((k) =>
+    map[k].sort((a, b) => (a.name ?? a.id ?? "").localeCompare(b.name ?? b.id ?? ""))
+  );
+  const roots = map[ROOT_KEY] ?? [];
+  return { childrenMap: map, roots };
+}
 
 export default function CategoryDrawer() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,80 +39,92 @@ export default function CategoryDrawer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const closeDrawer = () => setIsOpen(false);
+  // expanded state per id
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const hasLoadedRef = useRef(false);
+
+  const { childrenMap, roots } = useMemo(() => buildTree(categories), [categories]);
+
   const openDrawer = () => {
     setIsOpen(true);
-    if (categories.length === 0) {
+    if (!hasLoadedRef.current) {
       void loadCategories();
     }
   };
+  const closeDrawer = () => setIsOpen(false);
 
-  const loadCategories = async () => {
+  const toggle = (id: string) =>
+    setExpanded((s) => ({ ...s, [id]: !s[id] }));
+
+  const getChildren = (id?: string | null) =>
+    (id ? childrenMap[normalizeId(id)] : childrenMap[ROOT_KEY]) ?? [];
+
+  async function loadCategories() {
     setLoading(true);
     setError(null);
     try {
       const data = await getAllCategories();
-
       setCategories(Array.isArray(data) ? data : []);
-    } catch (err) {
+      hasLoadedRef.current = true;
+    } catch (e) {
+      console.error(e);
       setError("Failed to load categories");
-      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  // ----- Build tree via parentId (no Map to avoid TS target issues) -----
-  const { roots, childrenMap } = useMemo(() => {
-    const ROOT = "__root__";
-    const m: ChildrenMap = {};
-
-    for (const c of categories) {
-      const key = c.parentId && c.parentId.trim().length > 0 ? c.parentId.trim() : ROOT;
-
-      if (!m[key]) m[key] = [];
-      m[key].push(c);
-    }
-    // sort buckets by name for stable ordering
-    Object.keys(m).forEach((k) => m[k].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
-
-    return { roots: m[ROOT] ?? [], childrenMap: m };
-  }, [categories]);
-
-  const getChildren = (parentId?: string | null) =>
-    (parentId ? childrenMap[parentId] : undefined) ?? [];
-
-  const hasChildren = (id: string) => (childrenMap[id]?.length ?? 0) > 0;
-
-  // ----- Recursive renderer for unlimited nesting -----
-  const renderNode = (node: CategoryModel, level = 0) => {
-    const kids = getChildren(node.id);
-    const padLeft = Math.min(24 + level * 14, 48); // gentle indent, capped
+  /** Recursive row */
+  function NodeRow({ node, level = 0 }: { node: CategoryModel; level?: number }) {
+    const id = normalizeId(node.id);
+    const kids = getChildren(id);
+    const isExpandable = kids.length > 0;
+    const isOpen = !!expanded[id];
+    const leftPad = Math.min(16 + level * 14, 48);
 
     return (
-      <li key={node.id}>
-        <Link
-          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-all group"
-          href={`/category/${node.id}`}
-          style={{ paddingLeft: padLeft }}
-          onClick={closeDrawer}
+      <li key={id} className="select-none">
+        <div
+          className={`group flex items-center justify-between rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-all`}
+          style={{ paddingLeft: leftPad }}
         >
-          <span className="text-sm md:text-base font-medium text-gray-800 dark:text-white truncate">
+          <Link
+            href={`/category/${id}`}
+            className="flex-1 py-3 pr-2 text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate"
+            onClick={closeDrawer}
+          >
             {node.name ?? "Category"}
-          </span>
-          {hasChildren(node.id) && (
-            <ChevronRightIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 group-hover:translate-x-1 transition-all" />
-          )}
-        </Link>
+          </Link>
 
-        {kids.length > 0 && (
-          <ul className="mt-2 space-y-1">
-            {kids.map((k) => renderNode(k, level + 1))}
+          {isExpandable ? (
+            <button
+              aria-label={isOpen ? "Collapse" : "Expand"}
+              className="p-2 mr-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              onClick={() => toggle(id)}
+              type="button"
+            >
+              {isOpen ? (
+                <ChevronDownIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+              ) : (
+                <ChevronRightIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+              )}
+            </button>
+          ) : (
+            <span className="px-2 text-xs text-gray-400 dark:text-gray-500">—</span>
+          )}
+        </div>
+
+        {isExpandable && isOpen && (
+          <ul className="mt-1 space-y-1">
+            {kids.map((k) => (
+              <NodeRow key={k.id} node={k} level={level + 1} />
+            ))}
           </ul>
         )}
       </li>
     );
-  };
+  }
 
   return (
     <>
@@ -106,61 +139,88 @@ export default function CategoryDrawer() {
 
       <Transition show={isOpen}>
         <Dialog className="relative z-50" onClose={closeDrawer}>
+          {/* Backdrop */}
           <Transition.Child
             as={Fragment}
-            enter="transition-opacity ease-in-out duration-300"
-            enterFrom="opacity-0 backdrop-blur-none"
-            enterTo="opacity-100 backdrop-blur-sm"
-            leave="transition-opacity ease-in-out duration-200"
-            leaveFrom="opacity-100 backdrop-blur-sm"
-            leaveTo="opacity-0 backdrop-blur-none"
+            enter="transition-opacity duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <div aria-hidden="true" className="fixed inset-0 bg-black/40 dark:bg-black/60" />
+            <div aria-hidden="true" className="fixed inset-0 bg-black/45 backdrop-blur-[2px]" />
           </Transition.Child>
 
+          {/* Panel */}
           <Transition.Child
             as={Fragment}
-            enter="transition-transform ease-in-out duration-300"
+            enter="transition-transform duration-300"
             enterFrom="-translate-x-full"
             enterTo="translate-x-0"
-            leave="transition-transform ease-in-out duration-200"
+            leave="transition-transform duration-200"
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
-            <Dialog.Panel className="fixed left-0 top-0 h-full w-96 max-w-full bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 shadow-2xl rounded-r-xl overflow-hidden flex flex-col">
+            <Dialog.Panel className="fixed left-0 top-0 h-full w-[420px] max-w-[92vw] bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl rounded-r-2xl overflow-hidden flex flex-col">
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">📂 Categories</h2>
-                <button className="hover:rotate-90 transition-transform" onClick={closeDrawer}>
+              <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <Squares2X2Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <h2 className="text-xl font-extrabold text-gray-900 dark:text-white">Categories</h2>
+                </div>
+                <button
+                  aria-label="Close"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  onClick={closeDrawer}
+                >
                   <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
                 </button>
               </div>
 
               {/* Body */}
-              {loading ? (
-                <div className="flex flex-col items-center justify-center flex-1 p-6 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 dark:border-white" />
-                  <p className="mt-4 text-gray-600 dark:text-gray-300">Loading categories...</p>
-                </div>
-              ) : error ? (
-                <div className="flex flex-col items-center justify-center flex-1 p-6 text-center">
-                  <p className="text-red-600 dark:text-red-400">{error}</p>
-                  <Button className="mt-4" color="primary" variant="flat" onPress={loadCategories}>
-                    Try Again
-                  </Button>
-                </div>
-              ) : roots.length === 0 ? (
-                <div className="flex flex-col items-center justify-center flex-1 p-6 text-center">
-                  <Squares2X2Icon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
-                  <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">No categories available.</p>
-                </div>
-              ) : (
-                <div className="flex-1 overflow-y-auto p-6">
-                  <ul className="space-y-2">
-                    {roots.map((root) => renderNode(root, 0))}
+              <div className="flex-1 overflow-y-auto p-5">
+                {loading && (
+                  <div className="space-y-2">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-11 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse"
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {error && !loading && (
+                  <div className="text-center py-10">
+                    <p className="text-red-600 dark:text-red-400">{error}</p>
+                    <Button className="mt-4" color="primary" variant="flat" onPress={loadCategories}>
+                      Try again
+                    </Button>
+                  </div>
+                )}
+
+                {!loading && !error && roots.length === 0 && (
+                  <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+                    No categories available.
+                  </div>
+                )}
+
+                {!loading && !error && roots.length > 0 && (
+                  <ul className="space-y-1">
+                    {roots.map((root) => (
+                      <NodeRow key={root.id} node={root} />
+                    ))}
                   </ul>
-                </div>
-              )}
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-5 border-t border-gray-200 dark:border-gray-700">
+                <Button as={Link} href="/category" fullWidth color="primary" onPress={closeDrawer}>
+                  View all categories
+                </Button>
+              </div>
             </Dialog.Panel>
           </Transition.Child>
         </Dialog>

@@ -149,7 +149,7 @@ export const Navbar = () => {
                   />
                 )}
 
-                <div className="items-center space-x-1 hidden md:flex">
+                <div className="items-center hidden md:flex">
                   <CategoryDropdown />
                   <CartDropdown />
                   <LanguageSwitch />

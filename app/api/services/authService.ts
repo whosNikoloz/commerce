@@ -1,5 +1,6 @@
-import { Tokens } from "@/app/context/userContext";
 import { apiFetch } from "../client/fetcher";
+
+import { Tokens } from "@/app/context/userContext";
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "CustomerAuth/";
 const AUTH_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Auth/";
@@ -124,3 +125,10 @@ export async function facebookLogin(req: FacebookLoginRequest): Promise<TokensRe
 
   return normalizeTokens(data);
 }
+
+// export async function Serverlogout(refreshToken: string): Promise<void> {
+//   await apiFetch<void>(`${BASE}logout`, {
+//     method: "POST",
+//     headers: { refreshToken },
+//   });
+// }

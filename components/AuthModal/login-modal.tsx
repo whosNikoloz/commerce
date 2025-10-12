@@ -6,6 +6,7 @@ import { Button } from "@heroui/button";
 
 import { InputLoadingBtn } from "./input-loading-button";
 
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
@@ -30,7 +31,6 @@ interface LoginProps {
   };
   lng: string;
   onSwitchMode: (mode: string) => void;
-  handleOAuth: (provider: "google" | "facebook") => void;
   onLoginSuccess?: () => void;
 }
 
@@ -38,7 +38,6 @@ export default function LoginModal({
   loginData,
   lng,
   onSwitchMode,
-  handleOAuth,
   onLoginSuccess,
 }: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
@@ -299,21 +298,7 @@ export default function LoginModal({
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
-      <Button
-        className="w-full bg-[#4267B2] hover:bg-[#365899] dark:bg-[#4267B2] dark:hover:bg-[#365899] text-white font-bold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mb-3"
-        startContent={<i className="fab fa-facebook-f" />}
-        onPress={() => handleOAuth("facebook")}
-      >
-        {loginData.facebookAuth}
-      </Button>
-
-      <Button
-        className="w-full bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-100 font-bold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-        startContent={<i className="fab fa-google text-[#4285F4]" />}
-        onPress={() => handleOAuth("google")}
-      >
-        {loginData.googleAuth}
-      </Button>
+      <OAuthButtons variant="flat" onSuccess={onLoginSuccess} />
 
       <div className="text-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button

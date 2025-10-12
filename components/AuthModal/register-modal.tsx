@@ -5,6 +5,8 @@ import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 
 import { InputLoadingBtn } from "./input-loading-button";
+
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { registerCustomer } from "@/app/api/services/authService";
 
 interface RegisterProps {
@@ -22,10 +24,9 @@ interface RegisterProps {
   };
   lng: string;
   onSwitchMode: (mode: string) => void;
-  handleOAuth: (provider: "google" | "facebook") => void;
 }
 
-export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth }: RegisterProps) {
+export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterProps) {
   const regRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,10 +66,12 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
 
     if (!email) {
       setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
+
       return;
     }
     if (!isValidEmail(email)) {
       setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+
       return;
     }
 
@@ -102,45 +105,54 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
     // Basic client-side validation
     if (!username) {
       setRegUserNameError(lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field");
+
       return;
     }
     if (!email) {
       setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
+
       return;
     }
     if (!isValidEmail(email)) {
       setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+
       return;
     }
     if (!password) {
       setRegError(lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
+
       return;
     }
     if (password.length < 6) {
       setRegPasswordError(
         lng === "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols"
       );
+
       return;
     }
     if (!confirmPassword) {
       setConfirmPasswordError(
         lng === "ka" ? "შეავსე პაროლის დადასტურების ველი" : "Please fill in the ConfirmPassword field"
       );
+
       return;
     }
     if (password !== confirmPassword) {
       setConfirmPasswordError(lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match");
+
       return;
     }
 
     // Ensure code has been requested before allowing registration
     if (!codeRequested) {
       setRegError(lng === "ka" ? "გთხოვთ ჯერ გამოითხოვოთ კოდი" : "Please request verification code first");
+
       return;
     }
 
     if (!verifyCode) {
       setRegError(lng === "ka" ? "შეიყვანეთ დადასტურების კოდი" : "Please enter verification code");
+
       return;
     }
 
@@ -165,6 +177,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
 
   const handleBlurConfirmPassword = () => {
     const { password, confirmPassword } = registrationState;
+
     if (!confirmPassword) return;
     setConfirmPasswordError(
       password !== confirmPassword
@@ -175,6 +188,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
 
   const handleBlurPassword = () => {
     const { password } = registrationState;
+
     if (!password) return;
     setRegPasswordError(
       password.length < 6
@@ -391,21 +405,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode, handleOAuth 
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
-      <Button
-        className="w-full bg-[#4267B2] hover:bg-[#365899] dark:bg-[#4267B2] dark:hover:bg-[#365899] text-white font-bold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mb-3"
-        startContent={<i className="fab fa-facebook-f" />}
-        onPress={() => handleOAuth("facebook")}
-      >
-        {regData.facebookAuth}
-      </Button>
-
-      <Button
-        className="w-full bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-100 font-bold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-        startContent={<i className="fab fa-google text-[#4285F4]" />}
-        onPress={() => handleOAuth("google")}
-      >
-        {regData.googleAuth}
-      </Button>
+      <OAuthButtons onSuccess={() => onSwitchMode("login")} />
 
       <div className="text-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button

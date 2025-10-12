@@ -6,7 +6,7 @@ import { OrderDetail, OrderSummary, PagedResult, TrackingStep, WishlistItem } fr
 
 const SHOP_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Shop/";
 const ORDER_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Order/";
-const ACCOUNT_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Account/";
+const WISHLIST_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "WishList/";
 
 // Mock mode - check if we should use mock data
 const USE_MOCK_DATA = typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature");
@@ -110,7 +110,7 @@ export async function getWishlist() {
         return getMockWishlist();
     }
 
-    const url = `${ACCOUNT_BASE}wishlist`;
+    const url = `${WISHLIST_BASE}wishlist`;
     const res = await apiFetch<ApiEnvelope<{ items: WishlistItem[] }>>(url, { method: "GET" } as any);
 
     if (res.successful && res.response) return res.response.items;

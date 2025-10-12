@@ -12,7 +12,9 @@
       "Bash(rm:*)",
       "Bash(git checkout:*)",
       "Bash(timeout 60 tail -f .next/trace)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(echo \"Category URL: $NEXT_PUBLIC_API_URLCategory/get-all-categories\")",
+      "Bash(echo \"Product URL: $NEXT_PUBLIC_API_URLProduct/get-all-products\")"
     ],
     "deny": [],
     "ask": []

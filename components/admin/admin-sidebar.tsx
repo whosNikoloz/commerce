@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
 import Link from "next/link";
-import { FileQuestionIcon } from "lucide-react";
+import { CreditCard, FileQuestionIcon } from "lucide-react";
 
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     { label: "Faqs",       href: `/${currentLang}/admin/faqs`,       icon: <FileQuestionIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> },
     { label: "Categories", href: `/${currentLang}/admin/categories`, icon: <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
     { label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    { label: "Payments",    href: `/${currentLang}/admin/payments`,  icon: <CreditCard className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
     { label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
   ];
 

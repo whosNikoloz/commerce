@@ -114,21 +114,8 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   };
 
 
-  const handleOAuth = async (provider: "google" | "facebook") => {
-    const backTo =
-      typeof window !== "undefined"
-        ? window.location.pathname + window.location.search + window.location.hash
-        : `/${lng}`;
-
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("redirect_url", backTo);
-    }
-
-    const { signIn } = await import("next-auth/react");
-
-    onClose();
-    await signIn(provider, { callbackUrl: backTo });
-  };
+  // OAuth is now handled by the OAuthButtons component
+  // No need for handleOAuth function anymore
 
 
   const handleAuthMode = (mode: string) => {
@@ -247,7 +234,6 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-12rem)] custom-scrollbar">
                 {authMode === "login" && (
                   <LoginModal
-                    handleOAuth={handleOAuth}
                     lng={lng}
                     loginData={loginData}
                     onLoginSuccess={handleCloseModal}
@@ -257,7 +243,6 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
                 {authMode === "register" && (
                   <RegisterModal
-                    handleOAuth={handleOAuth}
                     lng={lng}
                     regData={regData}
                     onSwitchMode={handleAuthMode}

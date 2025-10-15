@@ -49,10 +49,10 @@ export class Tokens {
 interface UserContextType {
   user: User | null;
   accessToken: string | null;
+  isInitializing: boolean;
   login: (tokens: Tokens) => void;
   refresh: () => Promise<void>;
   logout: () => void;
-  simulateLogin?: (userIdOrEmail: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -68,9 +68,24 @@ export const useUser = () => {
 export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  // store refresh token (only for demo; in production use httpOnly cookie)
+  // store tokens in localStorage
   const REFRESH_KEY = "refreshToken";
+  const ACCESS_KEY = "accessToken";
+
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+
+      if (!decoded.exp) return true;
+
+      // Check if token expires in less than 30 seconds
+      return decoded.exp * 1000 < Date.now() + 30000;
+    } catch {
+      return true;
+    }
+  };
 
   const decodeAccessToken = (token: string): User | null => {
     try {
@@ -94,27 +109,57 @@ export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     setUser(u);
     setAccessToken(accessToken);
     if (refreshToken) localStorage.setItem(REFRESH_KEY, refreshToken);
+    if (accessToken) localStorage.setItem(ACCESS_KEY, accessToken);
   };
 
   const refresh = async () => {
-    const refreshToken = localStorage.getItem(REFRESH_KEY);
+    try {
+      // First, try to restore from stored access token (instant!)
+      const storedAccessToken = localStorage.getItem(ACCESS_KEY);
+      const refreshToken = localStorage.getItem(REFRESH_KEY);
 
-    if (!refreshToken) return logout();
+      if (!refreshToken) {
+        setIsInitializing(false);
 
-    const res = await fetch("/api/auth/refresh", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    });
+        return logout();
+      }
 
-    if (!res.ok) return logout();
+      // If we have a valid access token, use it immediately
+      if (storedAccessToken && !isTokenExpired(storedAccessToken)) {
+        const u = decodeAccessToken(storedAccessToken);
 
-    const data = await res.json();
+        setUser(u);
+        setAccessToken(storedAccessToken);
+        setIsInitializing(false);
 
-    if (data.accessToken) {
-      login(Tokens.fromJSON(data));
-    } else {
+        return;
+      }
+
+      // Access token expired or missing, refresh it
+      const res = await fetch("/api/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!res.ok) {
+        setIsInitializing(false);
+
+        return logout();
+      }
+
+      const data = await res.json();
+
+      if (data.accessToken) {
+        login(Tokens.fromJSON(data));
+      } else {
+        logout();
+      }
+    } catch (error) {
+      console.error("Refresh error:", error);
       logout();
+    } finally {
+      setIsInitializing(false);
     }
   };
 
@@ -122,28 +167,17 @@ export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(ACCESS_KEY);
 
     //Serverlogout();
   };
-
-  const simulateLogin = (userIdOrEmail: string) => {
-        // Import dynamically to avoid server-side issues
-        if (typeof window !== "undefined") {
-            import("@/lib/mockAuth").then(({ simulateLogin: mockLogin }) => {
-                const mockToken = mockLogin(userIdOrEmail);
-
-                login(Tokens.fromJSON(mockToken));
-            });
-        }
-    };
-
-  // On first load: try to refresh access token automatically
+  
   useEffect(() => {
     refresh();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, accessToken, login, refresh, logout , simulateLogin }}>
+    <UserContext.Provider value={{ user, accessToken, isInitializing, login, refresh, logout }}>
       {children}
     </UserContext.Provider>
   );

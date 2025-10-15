@@ -31,11 +31,13 @@ export const demoWishlist: WishlistItem[] = [
 const sampleItems: OrderItem[] = [
   {
     name: "Running Shoes", quantity: 1, price: 89.99, image: "/placeholder.png", variant: null,
-    productId: ""
+    productId: "",
+    id: ""
   },
   {
     name: "Water Bottle", quantity: 2, price: 15, image: "/placeholder.png",
-    productId: ""
+    productId: "",
+    id: ""
   },
 ];
 

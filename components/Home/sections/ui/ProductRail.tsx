@@ -1,13 +1,16 @@
 import type { ProductRailData, Locale } from "@/types/tenant"
 import type { FilterModel } from "@/types/filter"
 import type { Condition, StockStatus } from "@/types/enums"
-import { t, tOpt } from "@/lib/i18n"
+
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { searchProductsByFilter } from "@/app/api/services/productService"
+
 import { ProductCard, ProductCardSkeleton } from "./ProductCard"
 import { SectionContainer } from "./SectionContainer"
+
+import { Button } from "@/components/ui/button"
+import { searchProductsByFilter } from "@/app/api/services/productService"
+import { t, tOpt } from "@/lib/i18n"
 
 interface ProductRailProps {
   data: ProductRailData
@@ -109,16 +112,17 @@ export default async function ProductRail({
     if (data.filterBy?.hasDiscount) return "No discounted items available"
     if (data.filterBy?.categoryIds && data.filterBy.categoryIds.length > 0) return "No products found in selected categories"
     if (data.filterBy?.brandIds && data.filterBy.brandIds.length > 0) return "No products found from selected brands"
+
     return "No products available"
   }
 
   return (
     <SectionContainer
+      className={className || "py-20 "}
+      emptyMessage={getEmptyMessage()}
       error={error}
       isEmpty={!products || products.length === 0}
-      emptyMessage={getEmptyMessage()}
       loadingSkeleton={loadingSkeleton}
-      className={className || "py-20 "}
     >
       <div className="container mx-auto px-4">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10 gap-4">
@@ -133,8 +137,8 @@ export default async function ProductRail({
             )}
           </div>
 
-          <Button variant="ghost" asChild className="group self-start sm:self-auto">
-            <Link href={data.viewAllHref} className="flex items-center gap-2 font-semibold">
+          <Button asChild className="group self-start sm:self-auto" variant="ghost">
+            <Link className="flex items-center gap-2 font-semibold" href={data.viewAllHref}>
               View All
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -143,7 +147,7 @@ export default async function ProductRail({
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {products?.map((product) => (
-            <ProductCard key={product.id} product={product} template={template} />
+            <ProductCard key={product.id} product={product} showActions={true} template={template}/>
           ))}
         </div>
       </div>

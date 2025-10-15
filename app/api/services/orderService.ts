@@ -1,15 +1,49 @@
 import type { ApiEnvelope } from "./authService";
 
+import { jwtDecode } from "jwt-decode";
+
 import { apiFetch } from "../client/fetcher";
 
 import { OrderDetail, OrderSummary, PagedResult, TrackingStep, WishlistItem } from "@/types/orderTypes";
 
 const SHOP_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Shop/";
 const ORDER_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Order/";
-const WISHLIST_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "WishList/";
+const WISHLIST_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Wishlist/";
 
-// Mock mode - check if we should use mock data
-const USE_MOCK_DATA = typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature");
+function getUserIdFromToken(): string {
+  if (typeof window === "undefined") throw new Error("Not authenticated");
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) throw new Error("Not authenticated");
+
+  try {
+    const decoded = jwtDecode<{ id: string }>(accessToken);
+
+    return decoded.id;
+  } catch {
+    throw new Error("Invalid token");
+  }
+}
+
+// Helper to convert C# model property names (PascalCase) to TypeScript (camelCase)
+function toCamelCase(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) return obj.map(toCamelCase);
+  if (typeof obj !== 'object') return obj;
+
+  const result: any = {};
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+
+      result[camelKey] = toCamelCase(obj[key]);
+    }
+  }
+
+  return result;
+}
 
 
 export interface CreateOrderPayload {
@@ -49,42 +83,45 @@ export async function createOrder(
 }
 
 
-export async function getMyOrders(page = 1, pageSize = 10) {
-    if (USE_MOCK_DATA || (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature"))) {
-        const { getMockOrders } = await import("@/lib/mockOrderData");
-        return getMockOrders(page, pageSize);
-    }
+export async function getMyOrders(page = 1, pageSize = 10): Promise<PagedResult<OrderSummary>> {
 
-    const url = `${ORDER_BASE}my?page=${page}&pageSize=${pageSize}`;
-    const res = await apiFetch<ApiEnvelope<PagedResult<OrderSummary>>>(url, {
+    const userId = getUserIdFromToken();
+    const url = `${ORDER_BASE}get-user-orders?userId=${encodeURIComponent(userId)}&page=${page}&pageSize=${pageSize}`;
+
+    const res = await apiFetch<any>(url, {
         method: "GET",
     } as any);
 
-    if (res.successful && res.response) return res.response;
-    throw new Error(res.error || "Failed to load orders");
+    // Convert PascalCase from C# to camelCase for TypeScript
+    return toCamelCase(res) as PagedResult<OrderSummary>;
 }
 
-export async function getOrderById(id: string) {
-    if (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature")) {
-        const { getMockOrderById } = await import("@/lib/mockOrderData");
-        const order = getMockOrderById(id);
-        if (order) return order;
-        throw new Error("Order not found");
-    }
+export async function getOrderById(id: string): Promise<OrderDetail> {
 
-    const url = `${ORDER_BASE}${encodeURIComponent(id)}`;
-    const res = await apiFetch<ApiEnvelope<OrderDetail>>(url, { method: "GET" } as any);
+    const userId = getUserIdFromToken();
+    const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`;
 
-    if (res.successful && res.response) return res.response;
-    throw new Error(res.error || "Failed to load order");
+    const res = await apiFetch<any>(url, { method: "GET" } as any);
+
+    // Convert PascalCase from C# to camelCase for TypeScript
+    return toCamelCase(res) as OrderDetail;
 }
 
-export async function getTracking(trackingNumber: string) {
+export async function getTracking(trackingNumber: string): Promise<TrackingStep[]> {
+    // Note: This endpoint might not exist in your backend yet
+    // You may need to implement it or adjust the tracking retrieval logic
     const url = `${ORDER_BASE}track/${encodeURIComponent(trackingNumber)}`;
     const res = await apiFetch<ApiEnvelope<{ steps: TrackingStep[] }>>(url, { method: "GET" } as any);
 
     if (res.successful && res.response) return res.response.steps ?? [];
     throw new Error(res.error || "Failed to load tracking");
+}
+
+export async function cancelOrder(orderId: string): Promise<void> {
+    const userId = getUserIdFromToken();
+    const url = `${ORDER_BASE}cancel-order-${encodeURIComponent(orderId)}?userId=${encodeURIComponent(userId)}`;
+
+    await apiFetch<{ message: string }>(url, { method: "POST" } as any);
 }
 
 export async function downloadInvoiceFile(id: string) {
@@ -104,15 +141,43 @@ export async function downloadInvoiceFile(id: string) {
 }
 
 
-export async function getWishlist() {
-    if (typeof window !== "undefined" && localStorage.getItem("jwt")?.includes("mock_signature")) {
-        const { getMockWishlist } = await import("@/lib/mockOrderData");
-        return getMockWishlist();
-    }
+export async function getWishlist(): Promise<WishlistItem[]> {
 
-    const url = `${WISHLIST_BASE}wishlist`;
-    const res = await apiFetch<ApiEnvelope<{ items: WishlistItem[] }>>(url, { method: "GET" } as any);
+    const userId = getUserIdFromToken();
+    const url = `${WISHLIST_BASE}get-wishlist?userId=${encodeURIComponent(userId)}`;
 
-    if (res.successful && res.response) return res.response.items;
-    throw new Error(res.error || "Failed to load wishlist");
+    const res = await apiFetch<any>(url, { method: "GET" } as any);
+
+    // Convert PascalCase from C# to camelCase for TypeScript
+    return toCamelCase(res) as WishlistItem[];
+}
+
+export async function addToWishlist(productId: string): Promise<void> {
+    const userId = getUserIdFromToken();
+    const url = `${WISHLIST_BASE}add-to-wishlist-${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}`;
+
+    await apiFetch<{ message: string }>(url, { method: "POST" } as any);
+}
+
+export async function removeFromWishlist(productId: string): Promise<void> {
+    const userId = getUserIdFromToken();
+    const url = `${WISHLIST_BASE}remove-from-wishlist-${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}`;
+
+    await apiFetch<{ message: string }>(url, { method: "DELETE" } as any);
+}
+
+export async function isInWishlist(productId: string): Promise<boolean> {
+    const userId = getUserIdFromToken();
+    const url = `${WISHLIST_BASE}is-in-wishlist-${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}`;
+
+    const res = await apiFetch<{ inWishlist: boolean }>(url, { method: "GET" } as any);
+
+    return res.inWishlist;
+}
+
+export async function clearWishlist(): Promise<void> {
+    const userId = getUserIdFromToken();
+    const url = `${WISHLIST_BASE}clear-wishlist?userId=${encodeURIComponent(userId)}`;
+
+    await apiFetch<{ message: string }>(url, { method: "DELETE" } as any);
 }

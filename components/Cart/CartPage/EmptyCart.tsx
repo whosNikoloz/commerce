@@ -21,7 +21,7 @@ export default function EmptyCart() {
 
   return (
     <div className="min-h-screen mt-10">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20">
         <div className="flex items-center gap-3 mb-8 mt-10">
           <div className="p-2 rounded-lg bg-brand-primary/10">
             <ShoppingBag className="h-6 w-6 text-brand-primary" />

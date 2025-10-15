@@ -1,13 +1,14 @@
-// app/(routes)/cart/CartPage.tsx
 "use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import CartHeader from "./CartHeader";
 import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
 import CartItems from "./CartItems";
+
 import { useCartStore } from "@/app/context/cartContext";
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { getProductRestsByIds } from "@/app/api/services/productService";
 
 export type AvailabilityMap = Record<string, number>;
@@ -32,12 +33,14 @@ export default function CartPage() {
     async function load() {
       if (productIds.length === 0) {
         setAvailability({});
+
         return;
       }
       setLoading(true);
       try {
         const res = await getProductRestsByIds({ prods: productIds });
         const map: AvailabilityMap = {};
+
         if (!res.ex && Array.isArray(res.summedRests)) {
           for (const r of res.summedRests) map[String(r.id)] = Number(r.totalRest ?? 0);
         }
@@ -50,6 +53,7 @@ export default function CartPage() {
     }
 
     load();
+
     return () => {
       cancelled = true;
     };
@@ -58,6 +62,7 @@ export default function CartPage() {
   // Check for login requirement from URL parameter
   useEffect(() => {
     const loginRequired = searchParams.get("login");
+
     if (loginRequired === "required") {
       setShowLoginPrompt(true);
     }

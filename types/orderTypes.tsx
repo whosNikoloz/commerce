@@ -8,7 +8,8 @@ export type OrderStatus =
     | "Refunded";
 
 export interface OrderItem {
-    productId?: string;
+    id: string;             // OrderItem ID (Guid from backend)
+    productId?: string | null;  // Product ID (Guid from backend)
     name: string;
     image?: string | null;
     price: number;          // numeric; format in UI
@@ -49,7 +50,8 @@ export interface PagedResult<T> {
 }
 
 export interface WishlistItem {
-    id: string;
+    id: string;              // ProductId from backend
+    productId?: string;      // Alias for id (for compatibility)
     name: string;
     image?: string | null;
     price: number;

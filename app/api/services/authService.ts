@@ -4,7 +4,7 @@ import { Tokens } from "@/app/context/userContext";
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "CustomerAuth/";
 const AUTH_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Auth/";
-const TENANT_BASSE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Tenant/";
+const TENANT_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Tenant/";
 
 
 export type TokensResponse = { accessToken: string; refreshToken: string };
@@ -127,20 +127,19 @@ export async function facebookLogin(req: FacebookLoginRequest): Promise<TokensRe
   return normalizeTokens(data);
 }
 
-/* ———————— OAuth Credentials ———————— */
 export type OAuthCredentials = {
   googleClientId: string;
   facebookClientId: string;
 };
 
 export async function getOAuthCredentials(): Promise<OAuthCredentials> {
-  const data = await apiFetch<any>(`${TENANT_BASSE}oauthCredentials`, {
+  const data = await apiFetch<any>(`${TENANT_BASE}oauth-credentials`, {
     method: "GET",
   });
 
   return {
-    googleClientId: data.googleClientId ?? data.GoogleClientId ?? "",
-    facebookClientId: data.facebookClientId ?? data.FacebookClientId ?? "",
+    googleClientId: data.googleClientId ??  "",
+    facebookClientId: data.fbClientId ??  "",
   };
 }
 

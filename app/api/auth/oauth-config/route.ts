@@ -17,5 +17,5 @@ export async function GET() {
       googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
       facebookClientId: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID || "",
     });
-  }
+  } 
 }

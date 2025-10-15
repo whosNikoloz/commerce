@@ -128,6 +128,23 @@ export default function EditTenantModal({
   const [loading, setLoading] = useState(false);
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
+  // Configuration settings state
+  const [configSettings, setConfigSettings] = useState({
+    REFRESH_TOKEN_EXPIRE_TIME: "",
+    FB_CLIENT_ID: "",
+    FB_CLIENT_SECRET: "",
+    GOOGLE_CLIENT_ID: "",
+    GOOGLE_CLIENT_SECRET: "",
+    FINA_IP: "",
+    FINA_LOGIN: "",
+    FINA_PASSWORD: "",
+    AUTHORIZATION_GOOGLE_USER_INFO_URL: "",
+    AWS_ACCESS_KEY_ID: "",
+    AWS_SECRET_ACCESS_KEY: "",
+    AWS_REGION: "",
+    AWS_BUCKET_NAME: "",
+  });
+
   // Inline editor state
   const contentEditor = useDisclosure();
   const [selectedSection, setSelectedSection] = useState<{
@@ -168,7 +185,37 @@ export default function EditTenantModal({
       },
     );
     setSections(config.homepage.sections as AnySectionInstance[]);
-  }, [isOpen, config]);
+
+    // Fetch existing settings
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`/api/admin/tenants/get-settings?domain=${domain}`);
+        const result = await response.json();
+
+        if (response.ok && result.success && result.settings) {
+          setConfigSettings({
+            REFRESH_TOKEN_EXPIRE_TIME: result.settings.REFRESH_TOKEN_EXPIRE_TIME || "",
+            FB_CLIENT_ID: result.settings.FB_CLIENT_ID || "",
+            FB_CLIENT_SECRET: result.settings.FB_CLIENT_SECRET || "",
+            GOOGLE_CLIENT_ID: result.settings.GOOGLE_CLIENT_ID || "",
+            GOOGLE_CLIENT_SECRET: result.settings.GOOGLE_CLIENT_SECRET || "",
+            FINA_IP: result.settings.FINA_IP || "",
+            FINA_LOGIN: result.settings.FINA_LOGIN || "",
+            FINA_PASSWORD: result.settings.FINA_PASSWORD || "",
+            AUTHORIZATION_GOOGLE_USER_INFO_URL: result.settings.AUTHORIZATION_GOOGLE_USER_INFO_URL || "",
+            AWS_ACCESS_KEY_ID: result.settings.AWS_ACCESS_KEY_ID || "",
+            AWS_SECRET_ACCESS_KEY: result.settings.AWS_SECRET_ACCESS_KEY || "",
+            AWS_REGION: result.settings.AWS_REGION || "",
+            AWS_BUCKET_NAME: result.settings.AWS_BUCKET_NAME || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching tenant settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, [isOpen, config, domain]);
 
   const handleThemeModeChange = (value: string) => {
     setThemeMode(value as "light" | "dark");
@@ -294,6 +341,23 @@ export default function EditTenantModal({
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // First, save configuration settings if any are provided
+      const hasSettings = Object.values(configSettings).some(val => val && val.trim() !== "");
+
+      if (hasSettings) {
+        const settingsResponse = await fetch(`/api/admin/tenants/update-settings/${encodeURIComponent(domain)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(configSettings),
+        });
+
+        const settingsResult = await settingsResponse.json();
+
+        if (!settingsResponse.ok || !settingsResult.success) {
+          throw new Error(settingsResult.message || "Failed to update tenant settings");
+        }
+      }
+
       const hexToRGB = (hex: string): string => {
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
@@ -393,7 +457,11 @@ export default function EditTenantModal({
       if (!response.ok || !result.success)
         throw new Error(result.message || "Failed to update tenant");
 
-      toast.success("Tenant updated successfully! Refresh the page to see changes.");
+      const successMessage = hasSettings
+        ? "Tenant and settings updated successfully! Refresh the page to see changes."
+        : "Tenant updated successfully! Refresh the page to see changes.";
+
+      toast.success(successMessage);
       onClose();
     } catch (error: any) {
       toast.error(error.message || "Failed to update tenant");
@@ -501,7 +569,7 @@ export default function EditTenantModal({
 
             <ModalBody className="relative z-10 px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
               <Tabs className="w-full" defaultValue="theme">
-                <TabsList className="grid w-full grid-cols-3 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
+                <TabsList className="grid w-full grid-cols-4 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
                   <TabsTrigger
                     className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
                                data-[state=active]:bg-primary"
@@ -522,6 +590,13 @@ export default function EditTenantModal({
                     value="sections"
                   >
                     Sections
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
+                               data-[state=active]:bg-primary"
+                    value="config"
+                  >
+                    Settings
                   </TabsTrigger>
                 </TabsList>
 
@@ -1269,6 +1344,311 @@ export default function EditTenantModal({
                       <strong>Tip:</strong> Click &quot;Add Section&quot; to add any section type available for this template. You can add multiple ProductRail sections with different filters (liquidated, new arrivals, categories, brands, etc).
                     </p>
                   </div>
+                </TabsContent>
+
+                {/* SETTINGS/CONFIG TAB */}
+                <TabsContent className="pt-4" value="config">
+                  <ScrollArea className="h-[500px] pr-4">
+                    <div className="space-y-6">
+                      {/* OAuth Configuration */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">OAuth Authentication</h4>
+                          </div>
+                          <Button
+                            className="h-7 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 border-0"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setConfigSettings({
+                                ...configSettings,
+                                GOOGLE_CLIENT_ID: "",
+                                GOOGLE_CLIENT_SECRET: "",
+                                FB_CLIENT_ID: "",
+                                FB_CLIENT_SECRET: "",
+                                AUTHORIZATION_GOOGLE_USER_INFO_URL: "",
+                                REFRESH_TOKEN_EXPIRE_TIME: "",
+                              });
+                              toast.success("OAuth settings cleared");
+                            }}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-blue-500">●</span> Google Client ID
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                              placeholder="Enter Google Client ID"
+                              type="text"
+                              value={configSettings.GOOGLE_CLIENT_ID}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, GOOGLE_CLIENT_ID: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-blue-500">●</span> Google Client Secret
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                              placeholder="Enter Google Client Secret"
+                              type="password"
+                              value={configSettings.GOOGLE_CLIENT_SECRET}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, GOOGLE_CLIENT_SECRET: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-indigo-500">●</span> Facebook Client ID
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                              placeholder="Enter Facebook Client ID"
+                              type="text"
+                              value={configSettings.FB_CLIENT_ID}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, FB_CLIENT_ID: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-indigo-500">●</span> Facebook Client Secret
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                              placeholder="Enter Facebook Client Secret"
+                              type="password"
+                              value={configSettings.FB_CLIENT_SECRET}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, FB_CLIENT_SECRET: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1 pt-2">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-violet-500">●</span> Google User Info URL
+                          </label>
+                          <input
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-violet-500 dark:focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all font-mono"
+                            placeholder="https://www.googleapis.com/oauth2/v1/userinfo"
+                            type="text"
+                            value={configSettings.AUTHORIZATION_GOOGLE_USER_INFO_URL}
+                            onChange={(e) =>
+                              setConfigSettings({ ...configSettings, AUTHORIZATION_GOOGLE_USER_INFO_URL: e.target.value })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-amber-500">●</span> Refresh Token Expire Time <span className="text-slate-400 font-normal">(seconds)</span>
+                          </label>
+                          <input
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            placeholder="604800 (7 days)"
+                            type="text"
+                            value={configSettings.REFRESH_TOKEN_EXPIRE_TIME}
+                            onChange={(e) =>
+                              setConfigSettings({ ...configSettings, REFRESH_TOKEN_EXPIRE_TIME: e.target.value })
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* FINA Configuration */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-emerald-500/10 rounded-lg">
+                              <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">FINA Integration</h4>
+                          </div>
+                          <Button
+                            className="h-7 text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 border-0"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setConfigSettings({
+                                ...configSettings,
+                                FINA_IP: "",
+                                FINA_LOGIN: "",
+                                FINA_PASSWORD: "",
+                              });
+                              toast.success("FINA settings cleared");
+                            }}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-emerald-500">●</span> FINA IP Address
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
+                              placeholder="192.168.1.100"
+                              type="text"
+                              value={configSettings.FINA_IP}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, FINA_IP: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-teal-500">●</span> FINA Login
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                              placeholder="Enter FINA username"
+                              type="text"
+                              value={configSettings.FINA_LOGIN}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, FINA_LOGIN: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-cyan-500">●</span> FINA Password
+                          </label>
+                          <input
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-cyan-500 dark:focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                            placeholder="Enter FINA password"
+                            type="password"
+                            value={configSettings.FINA_PASSWORD}
+                            onChange={(e) =>
+                              setConfigSettings({ ...configSettings, FINA_PASSWORD: e.target.value })
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* AWS S3 Configuration */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-orange-500/10 rounded-lg">
+                              <svg className="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">AWS S3 Storage</h4>
+                          </div>
+                          <Button
+                            className="h-7 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50 border-0"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setConfigSettings({
+                                ...configSettings,
+                                AWS_ACCESS_KEY_ID: "",
+                                AWS_SECRET_ACCESS_KEY: "",
+                                AWS_REGION: "",
+                                AWS_BUCKET_NAME: "",
+                              });
+                              toast.success("AWS settings cleared");
+                            }}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-orange-500">●</span> Access Key ID
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-orange-500 dark:focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono"
+                              placeholder="AKIAIOSFODNN7EXAMPLE"
+                              type="text"
+                              value={configSettings.AWS_ACCESS_KEY_ID}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, AWS_ACCESS_KEY_ID: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-red-500">●</span> Secret Access Key
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-red-500 dark:focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all font-mono"
+                              placeholder="wJalrXUtnFEMI/K7MDENG/..."
+                              type="password"
+                              value={configSettings.AWS_SECRET_ACCESS_KEY}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, AWS_SECRET_ACCESS_KEY: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-amber-500">●</span> Region
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                              placeholder="us-east-1"
+                              type="text"
+                              value={configSettings.AWS_REGION}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, AWS_REGION: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-yellow-500">●</span> Bucket Name
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-yellow-500 dark:focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                              placeholder="my-s3-bucket"
+                              type="text"
+                              value={configSettings.AWS_BUCKET_NAME}
+                              onChange={(e) =>
+                                setConfigSettings({ ...configSettings, AWS_BUCKET_NAME: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg mt-0.5">
+                            <svg className="w-4 h-4 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">Security Notice</h5>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                              These credentials are stored securely and encrypted in your tenant configuration. Only use production credentials in production environments. Never share these values publicly.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
                 </TabsContent>
               </Tabs>
             </ModalBody>

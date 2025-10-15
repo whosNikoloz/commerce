@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 // ✅ NEW: use real CustomerAuth API (no old authService)
 
 import { useUser } from "@/app/context/userContext";
-import { MOCK_USERS } from "@/lib/mockAuth";
 import { loginCustomer, validateUser } from "@/app/api/services/authService";
 
 interface LoginProps {
@@ -41,7 +40,7 @@ export default function LoginModal({
   onLoginSuccess,
 }: LoginProps) {
   const loginRef = useRef<HTMLInputElement>(null);
-  const { login, simulateLogin } = useUser();
+  const { login } = useUser();
 
   const [isLoading, setIsLoading] = useState(false);
   const [loginState, setLoginState] = useState({ email: "", password: "" });
@@ -138,78 +137,8 @@ export default function LoginModal({
     setLoginState((s) => ({ ...s, password: "" }));
   };
 
-  const handleMockLogin = (userEmail: string) => {
-    if (simulateLogin) {
-      simulateLogin(userEmail);
-      setLoginError("");
-      if (onLoginSuccess) onLoginSuccess();
-    }
-  };
-
   return (
     <div className="space-y-4">
-      {/* Mock Login Section - for testing */}
-      {!showMockUsers ? (
-        <div className="mb-4">
-          <button
-            className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-all duration-200 py-2.5 px-4 border-2 border-blue-200 dark:border-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-            onClick={() => setShowMockUsers(true)}
-          >
-            🧪 {lng === "ka" ? "ტესტ იუზერები" : "Test Login (Development)"}
-          </button>
-        </div>
-      ) : (
-        <div className="mb-6 space-y-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl border border-blue-100 dark:border-blue-900">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-              <span className="text-lg">👤</span>
-              {lng === "ka" ? "აირჩიე ტესტ იუზერი:" : "Select Test User:"}
-            </span>
-            <button
-              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium px-3 py-1 rounded-lg hover:bg-white/50 dark:hover:bg-slate-700/50 transition-all"
-              onClick={() => setShowMockUsers(false)}
-            >
-              {lng === "ka" ? "დამალვა" : "Hide"}
-            </button>
-          </div>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
-            {MOCK_USERS.map((mockUser) => (
-              <button
-                key={mockUser.userId}
-                className="w-full text-left p-3 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg dark:hover:shadow-blue-900/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
-                onClick={() => handleMockLogin(mockUser.email)}
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-11 w-11 ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-400 dark:group-hover:ring-blue-600 transition-all">
-                    <AvatarImage src={mockUser.picture} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold">{mockUser.firstName[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                      {mockUser.firstName} {mockUser.lastName}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                      {mockUser.email}
-                    </p>
-                  </div>
-                  <Badge
-                    className="shrink-0 font-semibold"
-                    variant={mockUser.role === "Admin" ? "default" : "secondary"}
-                  >
-                    {mockUser.role}
-                  </Badge>
-                </div>
-              </button>
-            ))}
-          </div>
-          <div className="text-xs text-center text-gray-600 dark:text-gray-400 mt-3 py-2 px-3 bg-white/60 dark:bg-slate-700/40 rounded-lg">
-            {lng === "ka"
-              ? "ტესტირებისთვის - არ არის საჭირო პაროლი"
-              : "For testing - No password required"}
-          </div>
-        </div>
-      )}
-
       <Input
         ref={loginRef}
         classNames={{

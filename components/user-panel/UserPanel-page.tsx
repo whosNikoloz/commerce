@@ -47,7 +47,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { getMyOrders, getWishlist, getOrderById, getTracking, downloadInvoiceFile } from "@/app/api/services/orderService";
+import { getMyOrders, getWishlist, getOrderById, getTracking, downloadInvoiceFile, removeFromWishlist } from "@/app/api/services/orderService";
 import { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/orderTypes";
 import { useUser } from "@/app/context/userContext";
 
@@ -122,7 +122,7 @@ function EmptyState({
 }
 
 export default function UserPanel() {
-  const { user, simulateLogin, logout } = useUser();
+  const { user, isInitializing, logout } = useUser();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // data state
@@ -298,6 +298,22 @@ export default function UserPanel() {
 
       return n;
     });
+
+  const handleRemoveFromWishlist = async (productId: string) => {
+    try {
+      await removeFromWishlist(productId);
+      setWishlist((prev) => prev.filter((item) => item.id !== productId));
+      setNotifications((p) => ({
+        ...p,
+        [productId]: "Item removed from wishlist",
+      }));
+    } catch (e: any) {
+      setNotifications((p) => ({
+        ...p,
+        [productId]: `Failed to remove: ${String(e?.message || e)}`,
+      }));
+    }
+  };
 
   // —————————————————————————————————————————————————————————————
   // Inner sections (kept in-file to avoid extra files)
@@ -824,7 +840,7 @@ export default function UserPanel() {
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Add to Cart
                   </Button>
-                  <Button size="icon" variant="outline">
+                  <Button size="icon" variant="outline" onClick={() => handleRemoveFromWishlist(item.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -952,6 +968,20 @@ export default function UserPanel() {
       </Card>
     </div>
   );
+
+  // —————————————————————————————————————————————————————————————
+  // Loading State
+  // —————————————————————————————————————————————————————————————
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // —————————————————————————————————————————————————————————————
   // Login Required Screen

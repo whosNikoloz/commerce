@@ -19,8 +19,8 @@ export async function generateMetadata({
   const lang = raw === "ka" || raw === "en" ? raw : "en";
 
   return i18nPageMetadataAsync({
-    title: "Admin",
-    description: "Administrative dashboard.",
+    title: "User Panel",
+    description: "User dashboard.",
     lang,
     path: "/admin",
     index: false, // noindex admin

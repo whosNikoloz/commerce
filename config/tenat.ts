@@ -777,7 +777,7 @@ export const TENANTS: Record<string, TenantConfig> = {
           data: {
             title: {
               ka: "ახალი ჩამოსვლები",
-              en: "New Arrivals",
+              en: "New Arrivals test",
             },
             subtitle: {
               ka: "უახლესი კოლექცია",
@@ -785,9 +785,7 @@ export const TENANTS: Record<string, TenantConfig> = {
             },
             limit: 4,
             viewAllHref: "/products",
-            filterBy: {
-              isNewArrival: true,
-            },
+            filterBy: {},
             sortBy: "newest",
           },
         },

@@ -71,6 +71,8 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     next: { revalidate: 60, ...(options as any).next },
   });
 
+  console.log("Fetch", method, url, res.status, options.body ? options.body : "");
+
   const ct = res.headers.get("content-type") || "";
 
   if (!res.ok) {

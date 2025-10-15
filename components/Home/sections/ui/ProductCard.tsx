@@ -1,7 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
+import { Heart, ShoppingCart, Sparkles, Tag, TrendingUp } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
@@ -14,10 +18,14 @@ import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Icons
-import { Heart, ShoppingCart, Star, Sparkles, Tag, TrendingUp } from "lucide-react";
 
 // utils
 import { formatPrice } from "@/lib/utils";
+
+// services
+import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
+import { useUser } from "@/app/context/userContext";
+import { CartItem, useCartStore } from "@/app/context/cartContext";
 
 interface ProductCardProps {
   product: ProductResponseModel;
@@ -48,6 +56,21 @@ export function ProductCard({
   showActions = false,
   priority = false,
 }: ProductCardProps) {
+  const { user } = useUser();
+  const [inWishlist, setInWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const addToCart = useCartStore((s) => s.addToCart);
+  
+
+  // Check if product is in wishlist on mount
+  useEffect(() => {
+    if (user && product.id) {
+      isInWishlist(product.id)
+        .then(setInWishlist)
+        .catch(() => setInWishlist(false));
+    }
+  }, [user, product.id]);
+
   // Calculate discount percentage
   const discountPercent = product.discountPrice
     ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
@@ -91,55 +114,106 @@ export function ProductCard({
     3: "p-2.5 sm:p-3",
   };
 
+  // Handle wishlist toggle
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      toast.error("Please log in to add items to your wishlist");
+
+      return;
+    }
+
+    if (!product.id) {
+      toast.error("Product ID is missing");
+
+      return;
+    }
+
+    setWishlistLoading(true);
+    try {
+      if (inWishlist) {
+        await removeFromWishlist(product.id);
+        setInWishlist(false);
+        toast.success("Removed from wishlist");
+      } else {
+        await addToWishlist(product.id);
+        setInWishlist(true);
+        toast.success("Added to wishlist");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update wishlist");
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
+  const handleAddToCart = (product: ProductResponseModel) => {
+      const item: CartItem = {
+        id: product.id,
+        name: product.name ?? "Unnamed Product",
+        price: product.discountPrice ?? product.price,
+        image: product.images?.[0] ?? "/placeholder.png",
+        quantity: 1,
+        discount: product.discountPrice
+          ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
+          : 0,
+        originalPrice: product.price,
+      };
+  
+      addToCart(item);
+    };
+
   return (
     <article
       itemScope
-      itemType="https://schema.org/Product"
       className={cn(
         "group relative overflow-hidden transition-all duration-300",
         "focus-within:ring-2 focus-within:ring-brand-primary/50 focus-within:ring-offset-2",
         templateClasses[template],
         className
       )}
+      itemType="https://schema.org/Product"
     >
       {/* SEO: Product metadata */}
-      <meta itemProp="name" content={product.name || "Product"} />
-      {imageUrl && <meta itemProp="image" content={imageUrl} />}
-      {brandName && <meta itemProp="brand" content={brandName} />}
+      <meta content={product.name || "Product"} itemProp="name" />
+      {imageUrl && <meta content={imageUrl} itemProp="image" />}
+      {brandName && <meta content={brandName} itemProp="brand" />}
 
       {/* Main clickable area */}
       <Link
-        href={`/product/${product.id}`}
-        className="absolute inset-0 z-10"
         aria-label={`View ${product.name || "product"} details`}
+        className="absolute inset-0 z-10"
+        href={`/product/${product.id}`}
       />
 
       {/* Image Section */}
       <CardContent className={cn("relative", paddingClasses[template])}>
         <div className="relative">
           <AspectRatio
-            ratio={1}
             className={cn(
               "overflow-hidden bg-muted/30",
               imageContainerClasses[template]
             )}
+            ratio={1}
           >
             <Image
-              src={imageUrl}
-              alt={product.name || "Product image"}
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              alt={product.name || "Product image"}
               className="object-cover transition-transform duration-500 ease-out md:group-hover:scale-110"
               priority={priority}
               quality={85}
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              src={imageUrl}
             />
 
             {/* Out of stock overlay */}
             {!isInStock && !product.isComingSoon && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                 <Badge
-                  variant="secondary"
                   className="bg-slate-800/90 text-white border-0 text-xs sm:text-sm px-3 py-1 shadow-lg"
+                  variant="secondary"
                 >
                   Out of Stock
                 </Badge>
@@ -181,17 +255,30 @@ export function ProductCard({
             )}
           </div>
 
-          {/* Quick Actions - Top Right (Desktop only) */}
+          {/* Quick Actions - Top Right (Desktop and Mobile) */}
           {showActions && (
-            <div className="pointer-events-none absolute right-2 sm:right-3 top-2 sm:top-3 hidden md:flex flex-col gap-2 z-20 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+            <div className="pointer-events-none absolute right-2 sm:right-3 top-2 sm:top-3 flex flex-col gap-2 z-20 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
               <Button
+                className={cn(
+                  "pointer-events-auto h-8 w-8 sm:h-9 sm:w-9 rounded-full backdrop-blur-md shadow-lg hover:scale-110 transition-all",
+                  inWishlist
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "bg-background/80 hover:bg-background"
+                )}
+                disabled={wishlistLoading}
                 size="icon"
                 variant="secondary"
-                className="pointer-events-auto h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/80 backdrop-blur-md shadow-lg hover:bg-background hover:scale-110 transition-transform"
-                onClick={(e) => e.preventDefault()}
+                onClick={handleWishlistToggle}
               >
-                <Heart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="sr-only">Add to wishlist</span>
+                <Heart
+                  className={cn(
+                    "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all",
+                    inWishlist && "fill-current"
+                  )}
+                />
+                <span className="sr-only">
+                  {inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                </span>
               </Button>
             </div>
           )}
@@ -232,21 +319,21 @@ export function ProductCard({
 
         {/* Condition Badge (if applicable) */}
         {conditionLabel && product.condition !== Condition.New && (
-          <Badge variant="outline" className="text-[10px] px-2 py-0 border-muted-foreground/30">
+          <Badge className="text-[10px] px-2 py-0 border-muted-foreground/30" variant="outline">
             {conditionLabel}
           </Badge>
         )}
 
         {/* Price Section */}
         <div
-          className="flex items-baseline gap-2 w-full mt-auto"
           itemScope
-          itemType="https://schema.org/Offer"
+          className="flex items-baseline gap-2 w-full mt-auto"
           itemProp="offers"
+          itemType="https://schema.org/Offer"
         >
-          <meta itemProp="priceCurrency" content="USD" />
-          <meta itemProp="price" content={displayPrice.toString()} />
-          <meta itemProp="availability" content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
+          <meta content="USD" itemProp="priceCurrency" />
+          <meta content={displayPrice.toString()} itemProp="price" />
+          <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
 
           <span className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
             {formatPrice(displayPrice)}
@@ -259,7 +346,7 @@ export function ProductCard({
           )}
         </div>
 
-        {/* Stock Status & Action Button */}
+        {/* Stock Status & Action Buttons */}
         <div className="flex items-center justify-between gap-2 w-full mt-1">
           {/* Stock indicator */}
           <div className="flex items-center gap-1.5">
@@ -281,20 +368,43 @@ export function ProductCard({
             )}
           </div>
 
-          {/* Add to Cart Button (if enabled) */}
+          {/* Action Buttons (if enabled) */}
           {showActions && (
-            <Button
-              size="sm"
-              className="relative z-20 gap-1.5 h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4 rounded-lg shadow-md hover:shadow-lg transition-all"
-              disabled={!isInStock || product.isComingSoon}
-              onClick={(e) => {
-                e.preventDefault();
-                // Add to cart logic here
-              }}
-            >
-              <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              <span className="hidden sm:inline">Add</span>
-            </Button>
+            <div className="flex items-center gap-2 relative z-20">
+              {/* Wishlist Button - Visible on mobile */}
+              <Button
+                className={cn(
+                  "md:hidden h-8 w-8 rounded-lg shadow-sm transition-all",
+                  inWishlist
+                    ? "bg-red-500 hover:bg-red-600 text-white border-red-500"
+                    : "hover:bg-muted"
+                )}
+                disabled={wishlistLoading}
+                size="icon"
+                variant="outline"
+                onClick={handleWishlistToggle}
+              >
+                <Heart
+                  className={cn(
+                    "h-3.5 w-3.5 transition-all",
+                    inWishlist && "fill-current"
+                  )}
+                />
+              </Button>
+
+              {/* Add to Cart Button */}
+              <Button
+                className="gap-1.5 h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4 rounded-lg shadow-md hover:shadow-lg transition-all"
+                disabled={!isInStock || product.isComingSoon}
+                size="sm"
+                onClick={(e) => {
+                  handleAddToCart(product);
+                }}
+              >
+                <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Add</span>
+              </Button>
+            </div>
           )}
         </div>
       </CardFooter>
@@ -324,7 +434,7 @@ export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2 | 3 }) 
   return (
     <Card className={cn("overflow-hidden animate-pulse", templateClasses[template])}>
       <CardContent className={paddingClasses[template]}>
-        <AspectRatio ratio={1} className={cn("overflow-hidden", imageContainerClasses[template])}>
+        <AspectRatio className={cn("overflow-hidden", imageContainerClasses[template])} ratio={1}>
           <Skeleton className="h-full w-full bg-muted/50" />
         </AspectRatio>
       </CardContent>

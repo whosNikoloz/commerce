@@ -9,6 +9,7 @@ export const TENANTS: Record<string, TenantConfig> = {
   "commerce-sxvadomain.vercel.app": {
     templateId: 1,
     themeColor: "#2563eb",
+    merchantType: "FINA", // FINA users can sync data from FINA system
     theme: {
       mode: "dark",
       brand: {
@@ -434,6 +435,7 @@ export const TENANTS: Record<string, TenantConfig> = {
   "commerce-topaz-sigma-62.vercel.app": {
     templateId: 4,
     themeColor: "#22c55e",
+    merchantType: "CUSTOM", // CUSTOM users add products manually (no sync)
     theme: {
       mode: "dark",
       brand: {
@@ -659,6 +661,7 @@ export const TENANTS: Record<string, TenantConfig> = {
   "localhost:3000": {
     templateId: 4,
     themeColor: "#22c55e",
+    merchantType: "CUSTOM", // FINA users can sync data from FINA system
     theme: {
       mode: "dark",
       brand: {

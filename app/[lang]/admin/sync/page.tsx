@@ -1,26 +1,29 @@
-import type { Metadata } from "next";
-import type { Locale } from "@/i18n.config";
+"use client";
 
-import { i18nPageMetadataAsync } from "@/lib/seo"; // ← async SEO helper
+import { useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+
 import FinaSyncPanel from "@/components/admin/fina-sync-panel";
+import { useTenant } from "@/app/context/tenantContext";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: Locale }>;
-}): Promise<Metadata> {
-  const { lang } = await params;
+export default function AdminSyncPage() {
+  const { config } = useTenant();
+  const router = useRouter();
+  const { lang } = useParams<{ lang?: string }>();
+  const currentLang = lang || "en";
 
-  return i18nPageMetadataAsync({
-    title: "Admin • Synchronization",
-    description: "Run synchronizations and view live logs.",
-    lang,
-    path: "/admin/sync",
-    index: false, // admin pages should not be indexed
-  });
-}
+  // Redirect if not FINA merchant
+  useEffect(() => {
+    if (config && config.merchantType !== "FINA") {
+      router.push(`/${currentLang}/admin`);
+    }
+  }, [config, router, currentLang]);
 
-export default async function AdminSyncPage() {
+  // Don't render if not FINA merchant
+  if (!config || config.merchantType !== "FINA") {
+    return null;
+  }
+
   return (
     <div className="space-y-8">
       <div className="space-y-2">

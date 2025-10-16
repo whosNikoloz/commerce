@@ -2,6 +2,7 @@
 
 import type { ProductRequestModel } from "@/types/product";
 import type { CategoryModel } from "@/types/category";
+import type { BrandModel } from "@/types/brand";
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -19,6 +20,9 @@ import {
   Filter,
   Layers,
 } from "lucide-react";
+
+import { useTenant } from "@/app/context/tenantContext";
+import { getAllBrands } from "@/app/api/services/brandService";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +59,7 @@ const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: 
 const CategoryTree = dynamic(() => import("./category-tree").then((m) => m.CategoryTree), {
   ssr: false,
 });
+const AddProductModal = dynamic(() => import("./add-product-modal"), { ssr: false });
 
 type ViewMode = "table" | "grid";
 type SortOption = "name" | "price" | "created" | "status";
@@ -76,7 +81,11 @@ function useDebounced<T>(value: T, delay = 250): T {
 }
 
 export function ProductsTable({ initialCategories }: ProductsTableProps) {
+  const { config } = useTenant();
+  const isCustomMerchant = config?.merchantType === "CUSTOM";
+
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
+  const [brands, setBrands] = useState<BrandModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearch = useDebounced(searchTerm, 250);
 
@@ -98,6 +107,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
       if (isSmall) setViewMode("grid");
     }
+
+    // Load brands for product modals
+    getAllBrands().then(setBrands).catch(console.error);
   }, []);
 
   const handleImagesChanged = (productId: string, urls: string[]) => {
@@ -148,6 +160,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const handleUpdateProduct = async (
     productId: string,
     description: string,
+    brandId: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
   ) => {
     const current = products.find((p) => p.id === productId);
@@ -158,13 +171,13 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     const patched: ProductRequestModel = {
       ...current,
       description,
+      brandId,
       isLiquidated: flags.isLiquidated,
       isComingSoon: flags.isComingSoon,
       isNewArrival: flags.isNewArrival,
       discountPrice: current.discountPrice ?? undefined,
       images: current.images ?? [],
       productFacetValues: current.productFacetValues ?? [],
-      brandId: current.brandId,
       categoryId: current.categoryId,
     };
 
@@ -326,6 +339,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 onCheckedChange={() => toggleProductVisibility(product.id)}
               />
               <UpdateProductModal
+                brands={brands}
+                initialBrandId={product.brandId}
                 initialDescription={product.description}
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
@@ -365,6 +380,21 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             <CardHeader className="pb-4 relative">
               <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 flex-1">
+                  {/* Add Product Button - Only for CUSTOM merchants */}
+                  {isCustomMerchant && (
+                    <AddProductModal
+                      brands={brands}
+                      categories={initialCategories}
+                      onProductAdded={() => {
+                        if (selectedCategoryId) {
+                          getProductsByCategory(selectedCategoryId)
+                            .then(setProducts)
+                            .catch(console.error);
+                        }
+                      }}
+                    />
+                  )}
+
                   {/* Mobile: open categories */}
                   <Sheet>
                     <SheetTrigger asChild>
@@ -644,6 +674,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   />
                                 </div>
                                 <UpdateProductModal
+                                  brands={brands}
+                                  initialBrandId={product.brandId}
                                   initialDescription={product.description}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}

@@ -10,18 +10,21 @@ import { CreditCard, FileQuestionIcon } from "lucide-react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTenant } from "@/app/context/tenantContext";
 
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { config } = useTenant();
 
   const router = useRouter();
   const pathname = usePathname();                 // ⬅️ current route
   const { lang } = useParams<{ lang?: string }>();
   const currentLang = lang || "en";
 
-  
+  // Check if merchant is FINA type (can sync)
+  const isFinaMerchant = config?.merchantType === "FINA";
 
   // ✅ Auto-close on route change (only on mobile)
   useEffect(() => {
@@ -29,16 +32,19 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]); // whenever the route changes
 
-  const links = [
+  const allLinks = [
     { label: "Dashboard",  href: `/${currentLang}/admin`,            icon: <IconHome className="h-5 w-5 text-slate-600 dark:text-slate-400" /> },
     { label: "Brands",     href: `/${currentLang}/admin/brands`,     icon: <IconUserBolt className="h-5 w-5 text-purple-600 dark:text-purple-400" /> },
     { label: "Products",   href: `/${currentLang}/admin/products`,   icon: <IconBox className="h-5 w-5 text-cyan-600 dark:text-cyan-400" /> },
     { label: "Faqs",       href: `/${currentLang}/admin/faqs`,       icon: <FileQuestionIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> },
     { label: "Categories", href: `/${currentLang}/admin/categories`, icon: <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
-    { label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    // Only show Sync for FINA merchants
+    ...(isFinaMerchant ? [{ label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> }] : []),
     { label: "Payments",    href: `/${currentLang}/admin/payments`,  icon: <CreditCard className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
     { label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
   ];
+
+  const links = allLinks;
 
   const handleLogout = async () => {
     // close first on mobile

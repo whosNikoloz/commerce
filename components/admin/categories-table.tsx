@@ -3,10 +3,13 @@
 import type { CategoryModel } from "@/types/category";
 
 import { useEffect, useMemo, useState } from "react";
-import { Tag, Eye, EyeOff } from "lucide-react";
+import { Tag, Eye, EyeOff, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import dynamic from "next/dynamic";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useTenant } from "@/app/context/tenantContext";
 import {
   Table,
   TableBody,
@@ -17,19 +20,47 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { updateCategory } from "@/app/api/services/categoryService";
+import { updateCategory, deleteCategory, getAllCategories } from "@/app/api/services/categoryService";
+
+const AddCategoryModal = dynamic(() => import("./add-category-modal"), { ssr: false });
 
 interface Props {
   initialCategories: CategoryModel[];
 }
 
 export function CategoriesTable({ initialCategories }: Props) {
+  const { config } = useTenant();
+  const isCustomMerchant = config?.merchantType === "CUSTOM";
+
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     setCategories(initialCategories ?? []);
   }, [initialCategories]);
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+
+    try {
+      await deleteCategory(categoryId);
+      setCategories((prev) => prev.filter((c) => c.id !== categoryId));
+      toast.success("Category deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete category", err);
+      toast.error("Failed to delete category");
+    }
+  };
+
+  const refreshCategories = async () => {
+    try {
+      const fresh = await getAllCategories();
+
+      setCategories(fresh);
+    } catch (error) {
+      console.error("Failed to refresh categories", error);
+    }
+  };
 
   const toggleCategoryVisibility = async (categoryId: string, nextVal: boolean) => {
     const current = categories.find((p) => p.id === categoryId);
@@ -70,6 +101,11 @@ export function CategoriesTable({ initialCategories }: Props) {
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none rounded-lg" />
       <CardHeader className="relative">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Add Category Button - Only for CUSTOM merchants */}
+          {isCustomMerchant && (
+            <AddCategoryModal categories={categories} onCategoryAdded={refreshCategories} />
+          )}
+
           <div className="relative flex-1 max-w-md">
             <input
               className="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2.5 text-sm
@@ -96,6 +132,9 @@ export function CategoriesTable({ initialCategories }: Props) {
                 <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Parent</TableHead>
                 <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Facets</TableHead>
                 <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Status</TableHead>
+                {isCustomMerchant && (
+                  <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Actions</TableHead>
+                )}
               </TableRow>
             </TableHeader>
 
@@ -176,6 +215,19 @@ export function CategoriesTable({ initialCategories }: Props) {
                       )}
                     </div>
                   </TableCell>
+
+                  {isCustomMerchant && (
+                    <TableCell>
+                      <Button
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteCategory(category.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               );
             })}
@@ -282,6 +334,20 @@ export function CategoriesTable({ initialCategories }: Props) {
                       )}
                     </div>
                   </div>
+
+                  {isCustomMerchant && (
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <Button
+                        className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteCategory(category.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Category
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             );

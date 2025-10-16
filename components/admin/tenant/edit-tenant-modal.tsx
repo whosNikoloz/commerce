@@ -106,6 +106,9 @@ export default function EditTenantModal({
   const [templateId, setTemplateId] = useState<1 | 2 | 3 | 4>(config.templateId as 1 | 2 | 3 | 4);
   const [themeColor, setThemeColor] = useState(config.themeColor);
   const [themeMode, setThemeMode] = useState<"light" | "dark">(config.theme.mode);
+  const [merchantType, setMerchantType] = useState<"FINA" | "CUSTOM">(
+    config.merchantType || "CUSTOM"
+  );
 
   // Brand & text colors
   const [brandColors, setBrandColors] = useState(config.theme.brand);
@@ -175,6 +178,7 @@ export default function EditTenantModal({
     setTemplateId(config.templateId as 1 | 2 | 3 | 4);
     setThemeColor(config.themeColor);
     setThemeMode(config.theme.mode);
+    setMerchantType(config.merchantType || "CUSTOM");
     setBrandColors(config.theme.brand);
     setTextColors(config.theme.text);
     setFonts(
@@ -388,6 +392,7 @@ export default function EditTenantModal({
         updatedConfig = {
           templateId: 1,
           themeColor,
+          merchantType,
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -403,6 +408,7 @@ export default function EditTenantModal({
         updatedConfig = {
           templateId: 2,
           themeColor,
+          merchantType,
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -418,6 +424,7 @@ export default function EditTenantModal({
         updatedConfig = {
           templateId: 3,
           themeColor,
+          merchantType,
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -433,6 +440,7 @@ export default function EditTenantModal({
         updatedConfig = {
           templateId: 4,
           themeColor,
+          merchantType,
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -1350,6 +1358,88 @@ export default function EditTenantModal({
                 <TabsContent className="pt-4" value="config">
                   <ScrollArea className="h-[500px] pr-4">
                     <div className="space-y-6">
+                      {/* Merchant Type Configuration */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-purple-500/10 rounded-lg">
+                              <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">Merchant Type</h4>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            Choose your merchant type to control product management workflow:
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <button
+                              className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all text-left ${
+                                merchantType === "FINA"
+                                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950/20"
+                                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-blue-300 dark:hover:border-blue-700"
+                              }`}
+                              type="button"
+                              onClick={() => setMerchantType("FINA")}
+                            >
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="p-1.5 bg-blue-500/10 rounded">
+                                    <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                  </div>
+                                  <h5 className="font-bold text-base">FINA Sync</h5>
+                                </div>
+                                {merchantType === "FINA" && (
+                                  <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+                                    </svg>
+                                  </div>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-600 dark:text-slate-400">
+                                Sync products and categories from FINA system automatically
+                              </p>
+                            </button>
+
+                            <button
+                              className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all text-left ${
+                                merchantType === "CUSTOM"
+                                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20"
+                                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 hover:border-emerald-300 dark:hover:border-emerald-700"
+                              }`}
+                              type="button"
+                              onClick={() => setMerchantType("CUSTOM")}
+                            >
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="p-1.5 bg-emerald-500/10 rounded">
+                                    <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                  </div>
+                                  <h5 className="font-bold text-base">Custom</h5>
+                                </div>
+                                {merchantType === "CUSTOM" && (
+                                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+                                    </svg>
+                                  </div>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-600 dark:text-slate-400">
+                                Add and manage products and categories manually
+                              </p>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* OAuth Configuration */}
                       <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
                         <div className="flex items-center justify-between mb-1">

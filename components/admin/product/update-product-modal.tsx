@@ -1,5 +1,7 @@
 "use client";
 
+import type { BrandModel } from "@/types/brand";
+
 import { useState } from "react";
 import { Box, Clock3, Edit, Sparkles } from "lucide-react";
 import {
@@ -16,17 +18,28 @@ import { GoBackButton } from "../../go-back-button";
 
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UpdateProductModalProps {
   productId: string;
   initialDescription?: string;
+  initialBrandId?: string;
   initialIsLiquidated?: boolean;
   initialIsComingSoon?: boolean;
   initialIsNewArrival?: boolean;
+  brands?: BrandModel[];
   onSave: (
     id: string,
     newDescription: string,
+    brandId: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
   ) => void | Promise<void>;
 }
@@ -34,13 +47,16 @@ interface UpdateProductModalProps {
 export default function UpdateProductModal({
   productId,
   initialDescription = "",
+  initialBrandId = "",
   initialIsLiquidated = false,
   initialIsComingSoon = false,
   initialIsNewArrival = false,
+  brands = [],
   onSave,
 }: UpdateProductModalProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState(initialDescription);
+  const [brandId, setBrandId] = useState(initialBrandId);
   const [isLiquidated, setIsLiquidated] = useState(initialIsLiquidated);
   const [isComingSoon, setIsComingSoon] = useState(initialIsComingSoon);
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
@@ -49,10 +65,15 @@ export default function UpdateProductModal({
   const isMobile = useIsMobile();
 
   const handleSave = async () => {
+    if (!brandId) {
+      alert("Please select a brand");
+      return;
+    }
+
     try {
       setLoading(true);
       await Promise.resolve(
-        onSave(productId, description, { isLiquidated, isComingSoon, isNewArrival }),
+        onSave(productId, description, brandId, { isLiquidated, isComingSoon, isNewArrival }),
       );
       onClose();
     } finally {
@@ -135,6 +156,27 @@ export default function UpdateProductModal({
 
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 <div className="space-y-5">
+                  {/* Brand Selection */}
+                  {brands.length > 0 && (
+                    <div className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                        ბრენდი
+                      </Label>
+                      <Select value={brandId} onValueChange={setBrandId}>
+                        <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+                          <SelectValue placeholder="აირჩიე ბრენდი" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
+                          {brands.map((brand) => (
+                            <SelectItem key={brand.id} value={brand.id}>
+                              {brand.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   {/* Flag switches */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">

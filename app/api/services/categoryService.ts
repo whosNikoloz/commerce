@@ -23,6 +23,19 @@ export async function updateCategory(data: CategoryModel): Promise<string> {
   });
 }
 
+export async function createCategory(data: CategoryModel): Promise<string> {
+  return apiFetch<string>(`${API_BASE}/add-category`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteCategory(id: string): Promise<string> {
+  return apiFetch<string>(`${API_BASE}/delete-category-by-${id}`, {
+    method: "DELETE",
+  });
+}
+
 // export async function getProductsByCategory(id: string): Promise<ProductResponseModel[]> {
 //     return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
 // }

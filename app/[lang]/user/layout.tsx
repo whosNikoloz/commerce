@@ -35,7 +35,7 @@ export default function UserLayout({
 }) {
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl dark:bg-brand-surfacedark bg-brand-surface p-2 md:p-10 text-text-light dark:text-text-lightdark">
+      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl dark:bg-brand-surfacedark bg-brand-surface p-2 md:p-10 text-text-light dark:text-text-lightdark mt-16 md:mt-10">
         {children}
       </div>
     </div>

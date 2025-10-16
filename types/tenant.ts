@@ -403,6 +403,9 @@ export type Template4Homepage = {
 
 export type Homepage = Template1Homepage | Template2Homepage | Template3Homepage | Template4Homepage;
 
+// ===== Merchant Type =====
+export type MerchantType = "FINA" | "CUSTOM";
+
 // ===== Updated TenantConfig =====
 export type TenantConfig =
   | {
@@ -410,22 +413,26 @@ export type TenantConfig =
     themeColor: string;
     theme: ThemeVars;
     homepage: Template1Homepage;
+    merchantType?: MerchantType; // FINA users can sync, CUSTOM users add products manually
   }
   | {
     templateId: 2;
     themeColor: string;
     theme: ThemeVars;
     homepage: Template2Homepage;
+    merchantType?: MerchantType;
   }
   | {
     templateId: 3;
     themeColor: string;
     theme: ThemeVars;
     homepage: Template3Homepage;
+    merchantType?: MerchantType;
   }
   | {
     templateId: 4;
     themeColor: string;
     theme: ThemeVars;
     homepage: Template4Homepage;
+    merchantType?: MerchantType;
   };

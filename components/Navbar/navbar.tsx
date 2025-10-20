@@ -19,18 +19,20 @@ import AuthModal from "../AuthModal/auth-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
-import { SiteConfig, DEFAULT_SITE, SITES } from "@/config/site";
+import { DEFAULT_TENANT, TENANTS } from "@/config/tenat";
+import type { SiteConfig } from "@/types/tenant";
 
 
 function getSiteByHostClient(): SiteConfig {
-  if (typeof window === "undefined") return DEFAULT_SITE;
+  if (typeof window === "undefined") return DEFAULT_TENANT.siteConfig;
   const host = window.location.hostname.toLowerCase();
+  const tenant = TENANTS[host] ?? DEFAULT_TENANT;
 
-  return SITES[host] ?? DEFAULT_SITE;
+  return tenant.siteConfig;
 }
 
 export const Navbar = () => {
-  const [site, setSite] = useState<SiteConfig>(DEFAULT_SITE);
+  const [site, setSite] = useState<SiteConfig>(DEFAULT_TENANT.siteConfig);
   const [isScrolled, setIsScrolled] = useState(false);
 
   // ძაფები/სტატუსები

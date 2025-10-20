@@ -128,6 +128,9 @@ export default function EditTenantModal({
     config.homepage.sections as AnySectionInstance[],
   );
 
+  // Site Config state
+  const [siteConfig, setSiteConfig] = useState(config.siteConfig);
+
   const [loading, setLoading] = useState(false);
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
@@ -189,6 +192,7 @@ export default function EditTenantModal({
       },
     );
     setSections(config.homepage.sections as AnySectionInstance[]);
+    setSiteConfig(config.siteConfig);
 
     // Fetch existing settings
     const fetchSettings = async () => {
@@ -393,6 +397,7 @@ export default function EditTenantModal({
           templateId: 1,
           themeColor,
           merchantType,
+          siteConfig, // Use the updated site config from state
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -409,6 +414,7 @@ export default function EditTenantModal({
           templateId: 2,
           themeColor,
           merchantType,
+          siteConfig, // Use the updated site config from state
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -425,6 +431,7 @@ export default function EditTenantModal({
           templateId: 3,
           themeColor,
           merchantType,
+          siteConfig, // Use the updated site config from state
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -441,6 +448,7 @@ export default function EditTenantModal({
           templateId: 4,
           themeColor,
           merchantType,
+          siteConfig, // Use the updated site config from state
           theme: {
             mode: themeMode,
             brand: { ...brandColors, primary: primaryRGB, primaryDark: primaryRGB },
@@ -577,7 +585,7 @@ export default function EditTenantModal({
 
             <ModalBody className="relative z-10 px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
               <Tabs className="w-full" defaultValue="theme">
-                <TabsList className="grid w-full grid-cols-4 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
+                <TabsList className="grid w-full grid-cols-5 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
                   <TabsTrigger
                     className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
                                data-[state=active]:bg-primary"
@@ -598,6 +606,13 @@ export default function EditTenantModal({
                     value="sections"
                   >
                     Sections
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
+                               data-[state=active]:bg-primary"
+                    value="siteInfo"
+                  >
+                    Site Info
                   </TabsTrigger>
                   <TabsTrigger
                     className="rounded-lg font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow
@@ -1352,6 +1367,266 @@ export default function EditTenantModal({
                       <strong>Tip:</strong> Click &quot;Add Section&quot; to add any section type available for this template. You can add multiple ProductRail sections with different filters (liquidated, new arrivals, categories, brands, etc).
                     </p>
                   </div>
+                </TabsContent>
+
+                {/* SITE INFO TAB */}
+                <TabsContent className="pt-4" value="siteInfo">
+                  <ScrollArea className="h-[500px] pr-4">
+                    <div className="space-y-6">
+                      {/* Basic Info */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">Basic Information</h4>
+                          </div>
+                          <Button
+                            className="h-7 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 border-0"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setSiteConfig(config.siteConfig);
+                              toast.success("Site info reset");
+                            }}
+                          >
+                            Reset
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-blue-500">●</span> Site Name
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                              placeholder="Commerce SXVA"
+                              type="text"
+                              value={siteConfig.name}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, name: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-indigo-500">●</span> Short Name
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                              placeholder="SXVA"
+                              type="text"
+                              value={siteConfig.shortName}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, shortName: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-violet-500">●</span> Description
+                          </label>
+                          <textarea
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-violet-500 dark:focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all resize-none"
+                            placeholder="Site description for SEO"
+                            rows={3}
+                            value={siteConfig.description}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, description: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-purple-500">●</span> Site URL
+                          </label>
+                          <input
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono"
+                            placeholder="https://example.com"
+                            type="text"
+                            value={siteConfig.url}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, url: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Assets & Media */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="p-2 bg-green-500/10 rounded-lg">
+                            <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">Assets & Media</h4>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-green-500">●</span> Logo Path
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-green-500 dark:focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all font-mono"
+                              placeholder="/svg/logo.svg"
+                              type="text"
+                              value={siteConfig.logo}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, logo: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-teal-500">●</span> Favicon Path
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all font-mono"
+                              placeholder="/favicons/favicon.ico"
+                              type="text"
+                              value={siteConfig.favicon}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, favicon: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-cyan-500">●</span> OG Image Path
+                          </label>
+                          <input
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-cyan-500 dark:focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-mono"
+                            placeholder="/ogtest.jpg"
+                            type="text"
+                            value={siteConfig.ogImage}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, ogImage: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Localization */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="p-2 bg-orange-500/10 rounded-lg">
+                            <svg className="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                            </svg>
+                          </div>
+                          <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">Localization & Currency</h4>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-orange-500">●</span> Default Locale
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-orange-500 dark:focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono"
+                              placeholder="en"
+                              type="text"
+                              value={siteConfig.localeDefault}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, localeDefault: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-amber-500">●</span> Currency
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-mono"
+                              placeholder="USD"
+                              type="text"
+                              value={siteConfig.currency}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, currency: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                            <span className="text-yellow-500">●</span> Available Locales <span className="text-slate-400 font-normal">(comma-separated)</span>
+                          </label>
+                          <input
+                            className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-yellow-500 dark:focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all font-mono"
+                            placeholder="en,ka"
+                            type="text"
+                            value={siteConfig.locales.join(",")}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, locales: e.target.value.split(",").map(l => l.trim()).filter(Boolean) })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Social Links */}
+                      <div className="space-y-4 p-5 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="p-2 bg-pink-500/10 rounded-lg">
+                            <svg className="w-4 h-4 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                          </div>
+                          <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">Social Media Links</h4>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-blue-500">●</span> Twitter URL
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
+                              placeholder="https://twitter.com/..."
+                              type="text"
+                              value={siteConfig.links.twitter || ""}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, links: { ...siteConfig.links, twitter: e.target.value } })}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-pink-500">●</span> Instagram URL
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-pink-500 dark:focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all font-mono"
+                              placeholder="https://instagram.com/..."
+                              type="text"
+                              value={siteConfig.links.instagram || ""}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, links: { ...siteConfig.links, instagram: e.target.value } })}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-indigo-500">●</span> Facebook URL
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono"
+                              placeholder="https://facebook.com/..."
+                              type="text"
+                              value={siteConfig.links.facebook || ""}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, links: { ...siteConfig.links, facebook: e.target.value } })}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 block flex items-center gap-1">
+                              <span className="text-red-500">●</span> YouTube URL
+                            </label>
+                            <input
+                              className="w-full px-3 py-2.5 text-sm rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-red-500 dark:focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all font-mono"
+                              placeholder="https://youtube.com/..."
+                              type="text"
+                              value={siteConfig.links.youtube || ""}
+                              onChange={(e) => setSiteConfig({ ...siteConfig, links: { ...siteConfig.links, youtube: e.target.value } })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/20 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg mt-0.5">
+                            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-bold text-sm text-blue-900 dark:text-blue-100 mb-1">Site Information</h5>
+                            <p className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed">
+                              These settings control your site metadata, SEO information, branding assets, and social media links. Changes will affect how your site appears in search results and social media shares.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
                 </TabsContent>
 
                 {/* SETTINGS/CONFIG TAB */}

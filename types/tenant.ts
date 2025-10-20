@@ -406,6 +406,26 @@ export type Homepage = Template1Homepage | Template2Homepage | Template3Homepage
 // ===== Merchant Type =====
 export type MerchantType = "FINA" | "CUSTOM";
 
+// ===== Site Configuration (merged into tenant) =====
+export type SiteConfig = {
+  name: string;
+  shortName: string;
+  description: string;
+  favicon: string;
+  url: string;
+  ogImage: string;
+  logo: string;
+  currency: string;
+  localeDefault: string;
+  locales: string[];
+  links: {
+    twitter?: string;
+    instagram?: string;
+    facebook?: string;
+    youtube?: string;
+  };
+};
+
 // ===== Updated TenantConfig =====
 export type TenantConfig =
   | {
@@ -414,6 +434,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template1Homepage;
     merchantType?: MerchantType; // FINA users can sync, CUSTOM users add products manually
+    siteConfig: SiteConfig; // Site metadata and configuration
   }
   | {
     templateId: 2;
@@ -421,6 +442,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template2Homepage;
     merchantType?: MerchantType;
+    siteConfig: SiteConfig;
   }
   | {
     templateId: 3;
@@ -428,6 +450,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template3Homepage;
     merchantType?: MerchantType;
+    siteConfig: SiteConfig;
   }
   | {
     templateId: 4;
@@ -435,4 +458,5 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template4Homepage;
     merchantType?: MerchantType;
+    siteConfig: SiteConfig;
   };

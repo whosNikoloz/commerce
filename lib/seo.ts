@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 
 import { headers } from "next/headers";
 
-import { SITES, DEFAULT_SITE, type SiteConfig } from "@/config/site";
+import { TENANTS, DEFAULT_TENANT } from "@/config/tenat";
+import type { SiteConfig } from "@/types/tenant";
 import { locales, type Locale, defaultLocale } from "@/i18n.config";
 
 /* ---------- site resolvers ---------- */
@@ -11,8 +12,9 @@ import { locales, type Locale, defaultLocale } from "@/i18n.config";
 export function getSiteByHost(host?: string): SiteConfig {
   const key = (host || "").toLowerCase();
   const clean = key.replace(/:.*$/, "").replace(",", ".");
+  const tenant = TENANTS[clean] ?? DEFAULT_TENANT;
 
-  return SITES[clean] ?? DEFAULT_SITE;
+  return tenant.siteConfig;
 }
 
 // Async resolver for server-only usage (reads Host header)
@@ -41,16 +43,16 @@ function getBASE(siteConfig: SiteConfig) {
   return siteConfig.url.replace(/\/$/, "");
 }
 
-/** Prefer passing `siteCfg`; otherwise this falls back to DEFAULT_SITE. */
+/** Prefer passing `siteCfg`; otherwise this falls back to DEFAULT_TENANT siteConfig. */
 export function ensureMetaDescription(input?: string, siteCfg?: SiteConfig): string {
-  const site = siteCfg ?? DEFAULT_SITE;
+  const site = siteCfg ?? DEFAULT_TENANT.siteConfig;
   const base = toPlain(input || "") || toPlain(site.description || "") || " ";
 
   return clamp(base || " ", 160);
 }
 
 export function toAbsoluteImages(images?: string[], siteCfg?: SiteConfig): string[] {
-  const site = siteCfg ?? DEFAULT_SITE;
+  const site = siteCfg ?? DEFAULT_TENANT.siteConfig;
   const BASE = getBASE(site);
   const list = (images ?? []).map((src) => (src.startsWith("http") ? src : `${BASE}${src}`));
 
@@ -58,7 +60,7 @@ export function toAbsoluteImages(images?: string[], siteCfg?: SiteConfig): strin
 }
 
 export function buildI18nUrls(path: string, lang: string | Locale, siteCfg?: SiteConfig) {
-  const site = siteCfg ?? DEFAULT_SITE;
+  const site = siteCfg ?? DEFAULT_TENANT.siteConfig;
   const BASE = getBASE(site);
 
   const l = (lang as string) || defaultLocale;
@@ -92,7 +94,7 @@ export type I18nMetaArgs = {
   siteOverride?: SiteConfig;
 };
 
-/** SYNC: Only safe if you pass siteOverride or accept DEFAULT_SITE fallback. */
+/** SYNC: Only safe if you pass siteOverride or accept DEFAULT_TENANT siteConfig fallback. */
 export function i18nPageMetadata({
   title,
   description,
@@ -104,7 +106,7 @@ export function i18nPageMetadata({
   alternatesOverride,
   siteOverride,
 }: I18nMetaArgs): Metadata {
-  const siteCfg = siteOverride ?? DEFAULT_SITE;
+  const siteCfg = siteOverride ?? DEFAULT_TENANT.siteConfig;
   const desc = ensureMetaDescription(description, siteCfg);
   const absImages = toAbsoluteImages(images, siteCfg);
   const { canonical, languages, BASE } = buildI18nUrls(path, lang, siteCfg);
@@ -188,7 +190,7 @@ export function buildProductJsonLd(args: {
   inLanguage?: string;
   siteOverride?: SiteConfig;
 }) {
-  const siteCfg = args.siteOverride ?? DEFAULT_SITE;
+  const siteCfg = args.siteOverride ?? DEFAULT_TENANT.siteConfig;
 
   return {
     "@context": "https://schema.org",
@@ -243,7 +245,7 @@ export function buildItemListJsonLd(items: Array<{ name: string; url: string; im
 }
 
 export function buildOrganizationJsonLd(siteOverride?: SiteConfig) {
-  const siteCfg = siteOverride ?? DEFAULT_SITE;
+  const siteCfg = siteOverride ?? DEFAULT_TENANT.siteConfig;
   const BASE = getBASE(siteCfg);
 
   return {
@@ -259,7 +261,7 @@ export function buildOrganizationJsonLd(siteOverride?: SiteConfig) {
 }
 
 export function buildWebsiteJsonLd(siteOverride?: SiteConfig) {
-  const siteCfg = siteOverride ?? DEFAULT_SITE;
+  const siteCfg = siteOverride ?? DEFAULT_TENANT.siteConfig;
   const BASE = getBASE(siteCfg);
   const searchUrl = `${BASE}/${siteCfg.localeDefault}/category?q={search_term_string}`;
 

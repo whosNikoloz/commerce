@@ -10,6 +10,24 @@ export const TENANTS: Record<string, TenantConfig> = {
     templateId: 1,
     themeColor: "#2563eb",
     merchantType: "FINA",
+    siteConfig: {
+      name: "Commerce SXVA",
+      shortName: "SXVA",
+      description: "Commerce SXVA — sustainable fashion and accessories.",
+      url: "https://commerce-sxvadomain.vercel.app",
+      ogImage: "/ogtest.jpg",
+      logo: "/svg/sxva.svg",
+      favicon: "/favicons/sxva.ico",
+      currency: "USD",
+      localeDefault: "en",
+      locales: [
+        "en",
+      ],
+      links: {
+        twitter: "https://twitter.com/sxvabrand",
+        instagram: "https://instagram.com/sxvabrand",
+      },
+    },
     theme: {
       mode: "dark",
       brand: {
@@ -436,6 +454,25 @@ export const TENANTS: Record<string, TenantConfig> = {
     templateId: 4,
     themeColor: "#22c55e",
     merchantType: "CUSTOM",
+    siteConfig: {
+      name: "Topaz Sigma",
+      shortName: "Topaz",
+      description: "Topaz Sigma 62 — electronics and smart gadgets.",
+      url: "https://commerce-topaz-sigma-62.vercel.app",
+      ogImage: "/ogtest.jpg",
+      logo: "/svg/sigma.svg",
+      favicon: "/favicons/sigma.ico",
+      currency: "EUR",
+      localeDefault: "en",
+      locales: [
+        "en",
+        "ka",
+      ],
+      links: {
+        twitter: "https://twitter.com/topazsigma",
+        instagram: "https://instagram.com/topazsigma",
+      },
+    },
     theme: {
       mode: "dark",
       brand: {
@@ -662,6 +699,25 @@ export const TENANTS: Record<string, TenantConfig> = {
     templateId: 4,
     themeColor: "#22c55e",
     merchantType: "FINA",
+    siteConfig: {
+      name: "ShopX Local",
+      shortName: "ShorTNameSite",
+      description: "Local testing environment for ShopX.",
+      url: "http://localhost:3000",
+      ogImage: "/ogtest.jpg",
+      logo: "/svg/local.svg",
+      favicon: "/favicons/local.ico",
+      currency: "GEL",
+      localeDefault: "en",
+      locales: [
+        "en",
+        "ka",
+      ],
+      links: {
+        twitter: "https://twitter.com/yourbrand",
+        instagram: "https://instagram.com/yourbrand",
+      },
+    },
     theme: {
       mode: "dark",
       brand: {

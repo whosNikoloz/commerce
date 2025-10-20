@@ -1,10 +1,11 @@
 "use client";
 
 import type { FinaSyncStatus } from "@/types/fina";
+import type { DetailedSyncResult } from "@/types/sync";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Play, RefreshCw, ListChecks, Terminal } from "lucide-react";
+import { Play, RefreshCw, ListChecks, Terminal, FileDown, FileText, FileSpreadsheet, FileJson } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { syncAll, fullSync, finaAuthenticate } from "@/app/api/services/syncService";
+import { downloadSyncLog, ChangeType } from "@/types/sync";
 
 type LogLevel = "info" | "success" | "error";
 type LogItem = {
@@ -36,6 +38,7 @@ export default function FinaSyncPanel() {
   const [status, setStatus] = useState<FinaSyncStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [logs, setLogs] = useState<LogItem[]>([]);
+  const [lastSyncResult, setLastSyncResult] = useState<DetailedSyncResult | null>(null);
   const logEndRef = useRef<HTMLDivElement | null>(null);
 
   const addLog = useCallback((msg: string, level: LogLevel = "info") => {
@@ -75,12 +78,69 @@ export default function FinaSyncPanel() {
     try {
       setBusy(true);
       addLog("Sync-All started…", "info");
-      await syncAll();
-      addLog("Sync-All finished.", "success");
-      toast.success("Sync-All finished");
+
+      const result = await syncAll();
+      setLastSyncResult(result);
+
+      // Check if backend provides detailed tracking
+      const hasDetailedTracking = result.addedCount > 0 || result.updatedCount > 0 || result.unchangedCount > 0 || result.productChanges.length > 0;
+
+      addLog("SYNC SUMMARY", "info");
+      if (hasDetailedTracking) {
+        addLog(`✅ Added: ${result.addedCount} products`, "success");
+        addLog(`🔄 Updated: ${result.updatedCount} products`, "success");
+        addLog(`⚪ Unchanged: ${result.unchangedCount} products`, "info");
+        addLog(`❌ Failed: ${result.failureCount} products`, result.failureCount > 0 ? "error" : "info");
+        addLog(`📦 Total Processed: ${result.processedItems} products`, "info");
+
+        const addedProducts = result.productChanges.filter(p => p.changeType === ChangeType.Added);
+        const updatedProducts = result.productChanges.filter(p => p.changeType === ChangeType.Updated);
+
+        if (addedProducts.length > 0) {
+          addLog("", "info");
+          addLog("➕ NEW PRODUCTS:", "success");
+          addedProducts.forEach((p) => {
+            addLog(`   • ${p.productName}`, "success");
+          });
+        }
+
+        if (updatedProducts.length > 0) {
+          addLog("", "info");
+          addLog("🔄 UPDATED PRODUCTS:", "success");
+          updatedProducts.forEach((p) => {
+            const changes = p.changedFields?.join(", ") || "various fields";
+
+            addLog(`   • ${p.productName} (${changes})`, "success");
+          });
+        }
+      } else {
+        // Basic tracking mode
+        addLog(`✅ Successful: ${result.successCount} products`, "success");
+        addLog(`❌ Failed: ${result.failureCount} products`, result.failureCount > 0 ? "error" : "info");
+        addLog(`📦 Total Processed: ${result.processedItems} products`, "info");
+        addLog("", "info");
+        addLog("ℹ️ Basic tracking mode active. Update backend for detailed change tracking.", "info");
+      }
+
+      // Log errors (always available)
+      if (result.errors && result.errors.length > 0) {
+        addLog("⚠️ ERRORS:", "error");
+        result.errors.forEach((error) => {
+          addLog(`   • ${error}`, "error");
+        });
+      }
+
+      addLog("Sync-All finished successfully!", "success");
+
+      // Toast message based on available data
+      if (hasDetailedTracking) {
+        toast.success(`Sync completed! ${result.addedCount} added, ${result.updatedCount} updated`);
+      } else {
+        toast.success(`Sync completed! ${result.successCount} successful, ${result.failureCount} failed`);
+      }
     } catch (e: any) {
       console.error(e);
-      addLog(`Sync-All failed: ${e?.message ?? "Unknown error"}`, "error");
+      addLog(`❌ Sync-All failed: ${e?.message ?? "Unknown error"}`, "error");
       toast.error("Sync-All failed");
     } finally {
       setBusy(false);
@@ -211,6 +271,7 @@ export default function FinaSyncPanel() {
             </div>
           </CardContent>
         </Card>
+
       </div>
 
       {/* Right: Logger (spans 3) */}
@@ -235,25 +296,75 @@ export default function FinaSyncPanel() {
                 >
                   Clear
                 </Button>
-                <Button
-                  className="bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
-                  size="sm"
-                  onClick={() => {
-                    const blob = new Blob(
-                      [logs.map((l) => `[${l.t}] ${l.level.toUpperCase()} - ${l.msg}`).join("\n")],
-                      { type: "text/plain;charset=utf-8" },
-                    );
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
+                {lastSyncResult && (() => {
+                  const hasDetailedTracking = lastSyncResult.productChanges.length > 0;
 
-                    a.href = url;
-                    a.download = `fina-sync-log-${new Date().toISOString()}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                >
-                  Download
-                </Button>
+                  return hasDetailedTracking ? (
+                    // Show all 3 download formats when detailed data is available
+                    <>
+                      <Button
+                        className="gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                        size="sm"
+                        title="Download detailed sync log as text file"
+                        onClick={() => downloadSyncLog(lastSyncResult, "txt")}
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        TXT
+                      </Button>
+                      <Button
+                        className="gap-1.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                        size="sm"
+                        onClick={() => downloadSyncLog(lastSyncResult, "csv")}
+                        title="Download sync log as CSV (Excel-compatible)"
+                      >
+                        <FileSpreadsheet className="h-3.5 w-3.5" />
+                        CSV
+                      </Button>
+                      <Button
+                        className="gap-1.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                        size="sm"
+                        onClick={() => downloadSyncLog(lastSyncResult, "json")}
+                        title="Download sync log as JSON"
+                      >
+                        <FileJson className="h-3.5 w-3.5" />
+                        JSON
+                      </Button>
+                    </>
+                  ) : (
+                    // Show JSON download for basic data
+                    <Button
+                      className="gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                      size="sm"
+                      onClick={() => downloadSyncLog(lastSyncResult, "json")}
+                      title="Download sync summary as JSON"
+                    >
+                      <FileJson className="h-3.5 w-3.5" />
+                      Download JSON
+                    </Button>
+                  );
+                })()}
+                {!lastSyncResult && (
+                  <Button
+                    className="gap-1.5 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                    size="sm"
+                    onClick={() => {
+                      const blob = new Blob(
+                        [logs.map((l) => `[${l.t}] ${l.level.toUpperCase()} - ${l.msg}`).join("\n")],
+                        { type: "text/plain;charset=utf-8" },
+                      );
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+
+                      a.href = url;
+                      a.download = `fina-sync-log-${new Date().toISOString()}.txt`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    <FileDown className="h-3.5 w-3.5" />
+                    Download Activity Log
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>

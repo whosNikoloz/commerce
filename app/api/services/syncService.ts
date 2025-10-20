@@ -1,6 +1,7 @@
 import { apiFetch } from "../client/fetcher";
 
 import { FinaSyncStatus } from "@/types/fina";
+import { DetailedSyncResult } from "@/types/sync";
 
 const API_FINA_BASE = process.env.NEXT_PUBLIC_API_URL + "api/FinaSync";
 const API_FINA_BASE_AUTH = process.env.NEXT_PUBLIC_API_URL + "api";
@@ -18,11 +19,24 @@ export async function finaAuthenticate(): Promise<FinaAuthResponse> {
     body: "",
   });
 }
-export async function syncAll(): Promise<SyncOk> {
-  return apiFetch<SyncOk>(`${API_FINA_BASE}/sync-all`, {
+
+export async function syncAll(): Promise<DetailedSyncResult> {
+  const response = await apiFetch<any>(`${API_FINA_BASE}/sync-all`, {
     method: "POST",
     body: "",
   });
+
+  return {
+    success: response.message?.includes("success") || response.successCount > 0,
+    successCount: response.successCount || 0,
+    failureCount: response.failureCount || 0,
+    processedItems: response.processedItems || 0,
+    errors: response.errors || [],
+    addedCount: response.addedCount || 0,
+    updatedCount: response.updatedCount || 0,
+    unchangedCount: response.unchangedCount || 0,
+    productChanges: response.productChanges || [],
+  };
 }
 
 export async function syncProduct(finaProductId: number): Promise<SyncOk> {

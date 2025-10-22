@@ -24,14 +24,9 @@ import { useTenant } from "@/app/context/tenantContext";
 export const Navbar = () => {
   const { config, isLoading } = useTenant();
   const site = config?.siteConfig;
+
+  // All hooks must be called unconditionally before any early returns
   const [isScrolled, setIsScrolled] = useState(false);
-
-  // Don't render until config is loaded
-  if (isLoading || !site) {
-    return null;
-  }
-
-  // ძაფები/სტატუსები
   const [searchModalIsOpen, setSearchModalIsOpen] = useState(false);
   const [categoryName, setCategoryName] = useState<string | null>(null);
   const [subcategoryName, setSubcategoryName] = useState<string | null>(null);
@@ -75,7 +70,10 @@ export const Navbar = () => {
           if (alive) setSubcategoryName(sub?.name ?? null);
         }
       } catch (err) {
-        console.error("Failed to fetch category/subcategory", err);
+        // Log error only in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Failed to fetch category/subcategory", err);
+        }
       }
     })();
 
@@ -83,6 +81,11 @@ export const Navbar = () => {
       alive = false;
     };
   }, [isCategory, category, subcategory]);
+
+  // Don't render until config is loaded (early return after all hooks)
+  if (isLoading || !site) {
+    return null;
+  }
 
 
   return (

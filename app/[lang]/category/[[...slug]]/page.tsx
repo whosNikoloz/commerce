@@ -151,8 +151,8 @@ export default async function CategoryIndex({
 
   // --- Search-only landing (no category) ---
   if (!categoryId) {
-    const home = buildI18nUrls("/", lang, site).canonical;
-    const catalog = buildI18nUrls("/category", lang, site).canonical;
+    const { canonical: home } = await buildI18nUrls("/", lang, site);
+    const { canonical: catalog } = await buildI18nUrls("/category", lang, site);
 
     const crumbsJsonLd = buildBreadcrumbJsonLd([
       { name: "Home", url: home },
@@ -210,9 +210,9 @@ export default async function CategoryIndex({
   }).catch(() => ({ items: [], totalCount: 0 }));
 
   // JSON-LD (localized URLs)
-  const home = buildI18nUrls("/", lang, site).canonical;
-  const catalog = buildI18nUrls("/category", lang, site).canonical;
-  const current = buildI18nUrls(`/category/${slug.join("/")}`, lang, site).canonical;
+  const { canonical: home } = await buildI18nUrls("/", lang, site);
+  const { canonical: catalog } = await buildI18nUrls("/category", lang, site);
+  const { canonical: current } = await buildI18nUrls(`/category/${slug.join("/")}`, lang, site);
 
   const crumbsJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", url: home },
@@ -223,20 +223,25 @@ export default async function CategoryIndex({
   const listJsonLd =
     (initial.items?.length ?? 0) > 0
       ? buildItemListJsonLd(
-          (initial.items ?? []).map((p: any) => {
-            const img =
-              typeof p.image === "string"
-                ? p.image
-                : Array.isArray(p.images) && p.images.length > 0
-                  ? p.images[0]
-                  : site.ogImage; // ← per-host fallback
+          await Promise.all(
+            (initial.items ?? []).map(async (p: any) => {
+              const img =
+                typeof p.image === "string"
+                  ? p.image
+                  : Array.isArray(p.images) && p.images.length > 0
+                    ? p.images[0]
+                    : site.ogImage; // ← per-host fallback
 
-            return {
-              name: p.name,
-              url: buildI18nUrls(`/product/${p.id}`, lang, site).canonical,
-              image: toAbsoluteImages(site, [img])[0], // absolutize with active site
-            };
-          }),
+              const { canonical: url } = await buildI18nUrls(`/product/${p.id}`, lang, site);
+              const absoluteImages = await toAbsoluteImages(site, [img]);
+
+              return {
+                name: p.name,
+                url,
+                image: absoluteImages[0], // absolutize with active site
+              };
+            }),
+          ),
         )
       : undefined;
 

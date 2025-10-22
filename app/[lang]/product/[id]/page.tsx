@@ -52,7 +52,7 @@ export async function generateMetadata({
 
   const title = product?.name ?? "Product";
   const description = product?.description ?? site.description;
-  const images = toAbsoluteImages(site, normalizeImages(product?.images, site.ogImage));
+  const images = await toAbsoluteImages(site, normalizeImages(product?.images, site.ogImage));
 
   return i18nPageMetadataAsync({
     title,
@@ -73,9 +73,9 @@ export default async function ProductPage({ params }: DetailPageProps) {
   if (!product) return notFound();
 
   const path = `/product/${id}`;
-  const { canonical } = buildI18nUrls(path, lang, site); // canonical for current locale
+  const { canonical } = await buildI18nUrls(path, lang, site); // canonical for current locale
 
-  const images = toAbsoluteImages(site, normalizeImages(product.images, site.ogImage));
+  const images = await toAbsoluteImages(site, normalizeImages(product.images, site.ogImage));
   const price = product.discountPrice ?? product.price ?? 0;
 
   const availability =

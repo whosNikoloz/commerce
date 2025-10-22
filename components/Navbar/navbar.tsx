@@ -19,21 +19,17 @@ import AuthModal from "../AuthModal/auth-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
-import { DEFAULT_TENANT, TENANTS } from "@/config/tenat";
-import type { SiteConfig } from "@/types/tenant";
-
-
-function getSiteByHostClient(): SiteConfig {
-  if (typeof window === "undefined") return DEFAULT_TENANT.siteConfig;
-  const host = window.location.hostname.toLowerCase();
-  const tenant = TENANTS[host] ?? DEFAULT_TENANT;
-
-  return tenant.siteConfig;
-}
+import { useTenant } from "@/app/context/tenantContext";
 
 export const Navbar = () => {
-  const [site, setSite] = useState<SiteConfig>(DEFAULT_TENANT.siteConfig);
+  const { config, isLoading } = useTenant();
+  const site = config?.siteConfig;
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Don't render until config is loaded
+  if (isLoading || !site) {
+    return null;
+  }
 
   // ძაფები/სტატუსები
   const [searchModalIsOpen, setSearchModalIsOpen] = useState(false);
@@ -50,13 +46,6 @@ export const Navbar = () => {
   const subcategory = (slugParts[3] as string | null) || null;
 
   const lng = "en";
-
-  // იტვირთება site და აწერს CSS ცვლადებს
-  useEffect(() => {
-    const s = getSiteByHostClient();
-
-    setSite(s);
-  }, []);
 
   // scroll state
   useEffect(() => {

@@ -36,10 +36,21 @@ export async function PUT(req: Request) {
       );
     }
 
+    // Tenant management has moved to the backend API
+    // This endpoint is deprecated and should no longer be used
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          "Tenant management has been moved to the backend API. Please use the backend admin panel to manage tenants.",
+      },
+      { status: 410 }, // 410 Gone - indicates resource permanently removed
+    );
+
+    /* DEPRECATED CODE - Tenant config is now managed via backend API
     const configPath = path.join(process.cwd(), "config", "tenat.ts");
     const fileContent = await fs.readFile(configPath, "utf-8");
 
-    // Grab header/footer around TENANTS so we can rewrite safely
     const headerMatch = fileContent.match(
       /^([\s\S]*?export\s+const\s+TENANTS\s*:\s*Record<string,\s*TenantConfig>\s*=\s*\{)/,
     );
@@ -54,11 +65,8 @@ export async function PUT(req: Request) {
     const header = headerMatch[1];
     const footer = footerMatch[1];
 
-    // Load existing tenants (TS transpiles to CJS in Next; dynamic import works on the server)
-    const { TENANTS } = await import("@/config/tenat");
-    const tenantsObj: Record<string, TenantConfig> = { ...TENANTS };
+    const tenantsObj: Record<string, TenantConfig> = {};
 
-    // Update/add
     tenantsObj[domain] = config;
 
     // Pretty TS serializer (keeps arrays/objects formatted and supports ISO dates)
@@ -134,6 +142,7 @@ export async function PUT(req: Request) {
       success: true,
       message: "Tenant updated successfully! Please hard refresh (Ctrl+Shift+R) or restart dev server to see changes.",
     });
+    */
   } catch (error: any) {
     console.error("Error updating tenant:", error);
 

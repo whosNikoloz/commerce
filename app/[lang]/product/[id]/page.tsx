@@ -52,7 +52,7 @@ export async function generateMetadata({
 
   const title = product?.name ?? "Product";
   const description = product?.description ?? site.description;
-  const images = toAbsoluteImages(normalizeImages(product?.images, site.ogImage), site);
+  const images = toAbsoluteImages(site, normalizeImages(product?.images, site.ogImage));
 
   return i18nPageMetadataAsync({
     title,
@@ -75,7 +75,7 @@ export default async function ProductPage({ params }: DetailPageProps) {
   const path = `/product/${id}`;
   const { canonical } = buildI18nUrls(path, lang, site); // canonical for current locale
 
-  const images = toAbsoluteImages(normalizeImages(product.images, site.ogImage), site);
+  const images = toAbsoluteImages(site, normalizeImages(product.images, site.ogImage));
   const price = product.discountPrice ?? product.price ?? 0;
 
   const availability =
@@ -97,7 +97,7 @@ export default async function ProductPage({ params }: DetailPageProps) {
     availability,
     condition: itemCondition,
     inLanguage: lang,
-    siteOverride: site, // optional (builders already default to DEFAULT_SITE if omitted)
+    siteConfig: site, // required for dynamic tenant config
   });
 
   return (

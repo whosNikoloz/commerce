@@ -4,7 +4,8 @@ import type { FAQModel } from "@/types/faq";
 import NextLink from "next/link";
 import { HelpCircle } from "lucide-react";
 
-import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import { i18nPageMetadataAsync, getActiveSite, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import type { SiteConfig } from "@/types/tenant";
 import { getAllFaqs } from "@/app/api/services/faqService";
 import { FAQList } from "@/components/Info/faq/FAQList";
 
@@ -14,14 +15,16 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
+  const site = await getActiveSite();
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "ხშირად დასმული კითხვები (FAQ)",
     description: "პასუხები გავრცელებულ შეკითხვებზე: მიწოდება, გადახდა, დაბრუნება, გარანტია.",
     lang,
     path: "/info/faq",
     images: ["/og/faq-og.jpg"],
     index: true,
+    siteOverride: site,
   });
 }
 
@@ -40,9 +43,9 @@ function slugify(input: string) {
     .replace(TRIM_DASH, "");
 }
 
-function JsonLd({ items, lang }: { items: FAQItem[]; lang: string }) {
-  const home = buildI18nUrls("/", lang).canonical;
-  const faq = buildI18nUrls("/info/faq", lang).canonical;
+async function JsonLd({ items, lang, site }: { items: FAQItem[]; lang: string; site: SiteConfig }) {
+  const home = (await buildI18nUrls("/", lang, site)).canonical;
+  const faq = (await buildI18nUrls("/info/faq", lang, site)).canonical;
 
   const breadcrumb = buildBreadcrumbJsonLd([
     { name: "მთავარი", url: home },
@@ -75,6 +78,7 @@ function JsonLd({ items, lang }: { items: FAQItem[]; lang: string }) {
 
 export default async function FAQPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
+  const site = await getActiveSite();
 
   let faqs: FAQModel[] = [];
 
@@ -120,7 +124,7 @@ export default async function FAQPage({ params }: { params: Promise<{ lang: stri
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-      <JsonLd items={items} lang={lang} />
+      {await JsonLd({ items, lang, site })}
 
       <nav aria-label="breadcrumb" className="mb-6 text-sm text-muted-foreground">
         <NextLink className="hover:text-primary" href={`/${lang}`}>

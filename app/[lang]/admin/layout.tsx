@@ -1,7 +1,7 @@
 import type { Viewport, Metadata } from "next";
 
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { i18nPageMetadata } from "@/lib/seo";
+import { i18nPageMetadataAsync } from "@/lib/seo";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { lang: raw } = await params;
   const lang = raw === "ka" || raw === "en" ? raw : "en";
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "Admin",
     description: "Administrative dashboard.",
     lang,

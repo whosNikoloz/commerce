@@ -5,15 +5,16 @@ import { headers } from "next/headers";
 import { getAllProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { locales } from "@/i18n.config";
-import { getSiteByHost } from "@/lib/getSiteByHost"; // ← use this
+import { getTenantByHost } from "@/lib/getTenantByHost";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const h = await headers(); // ← your types require await
+  const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
-  const site = getSiteByHost(host);
-  const base = site.url.replace(/\/$/, "");
+  const tenant = await getTenantByHost(host);
+  const site = tenant.siteConfig;
+  const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
   const now = new Date();
 
   const statics = ["", "/category"].flatMap((p) =>

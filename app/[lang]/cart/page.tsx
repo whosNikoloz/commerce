@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import CartPage from "@/components/Cart/CartPage/cart-page";
-import { i18nPageMetadata } from "@/lib/seo";
+import { i18nPageMetadataAsync } from "@/lib/seo";
 import { Locale } from "@/i18n.config";
 
 export async function generateMetadata({
@@ -12,7 +12,7 @@ export async function generateMetadata({
   const { lang } = await params;
   const isKa = lang === "ka";
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: isKa ? "კალათა" : "Cart",
     description: isKa
       ? "ნახე კალათის შიგთავსი და გააგრძელე შეკვეთა."

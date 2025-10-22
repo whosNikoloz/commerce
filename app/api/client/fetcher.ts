@@ -64,14 +64,20 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   }
 
 
-  const res = await fetch(url, {
+  const fetchOptions: RequestInit = {
     ...options,
     headers,
     credentials: isServer ? "include" : "same-origin",
-    next: { revalidate: 60, ...(options as any).next },
-  });
+  };
 
-  console.log("Fetch", method, url, res.status, options.body ? options.body : "");
+  // Only add revalidate if cache is not explicitly set to no-store
+  if (options.cache !== "no-store") {
+    (fetchOptions as any).next = { revalidate: 60, ...(options as any).next };
+  }
+
+  const res = await fetch(url, fetchOptions);
+
+  //console.log("Fetch", method, url, res.status, options.body ? options.body : "");
 
   const ct = res.headers.get("content-type") || "";
 
@@ -80,8 +86,16 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
       ? JSON.stringify(await res.json())
       : await res.text();
 
+    console.error(`❌ API Error [${method} ${url}]:`, res.status, msg);
     throw new Error(`Error ${res.status}: ${msg}`);
   }
 
-  return (ct.includes("application/json") ? await res.json() : await res.text()) as T;
+  const result = (ct.includes("application/json") ? await res.json() : await res.text()) as T;
+
+  // Log tenant configuration responses for debugging
+  if (url.includes("/Tenant/tenant-configuration")) {
+    //console.log("📦 Tenant config response:", JSON.stringify(result, null, 2));
+  }
+
+  return result;
 }

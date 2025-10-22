@@ -13,7 +13,8 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import { i18nPageMetadataAsync, getActiveSite, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import type { SiteConfig } from "@/types/tenant";
 
 /* ---------------- SEO (i18n-aware) ---------------- */
 export async function generateMetadata({
@@ -22,8 +23,9 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
+  const site = await getActiveSite();
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "მიწოდება — ვადები, ტარიფები და თვალთვალი",
     description:
       "გაიგე მიწოდების წესები: ვადები, ტარიფები, კურიერული ზონები და შეკვეთის თვალთვალი.",
@@ -31,14 +33,15 @@ export async function generateMetadata({
     path: "/info/delivery",
     images: ["/og/delivery-og.jpg"],
     index: true,
+    siteOverride: site,
   });
 }
 
 /* ---------------- JSON-LD ---------------- */
-function JsonLd({ lang }: { lang: string }) {
-  const home = buildI18nUrls("/", lang).canonical;
-  const info = buildI18nUrls("/info", lang).canonical;
-  const delivery = buildI18nUrls("/info/delivery", lang).canonical;
+async function JsonLd({ lang, site }: { lang: string; site: SiteConfig }) {
+  const home = (await buildI18nUrls("/", lang, site)).canonical;
+  const info = (await buildI18nUrls("/info", lang, site)).canonical;
+  const delivery = (await buildI18nUrls("/info/delivery", lang, site)).canonical;
 
   const breadcrumb = buildBreadcrumbJsonLd([
     { name: "მთავარი", url: home },
@@ -85,10 +88,11 @@ function JsonLd({ lang }: { lang: string }) {
 
 export default async function DeliveryPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
+  const site = await getActiveSite();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-surface via-white to-brand-surface/30">
-      <JsonLd lang={lang} />
+      {await JsonLd({ lang, site })}
 
       {/* Hero Section with Gradient Background */}
       <section className="relative overflow-hidden bg-gradient-to-r from-brand-primary via-brand-primarydark to-brand-primary">

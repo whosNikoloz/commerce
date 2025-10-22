@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 
 import { locales } from "@/i18n.config";
-import { getSiteByHost } from "@/lib/getSiteByHost";
+import { getTenantByHost } from "@/lib/getTenantByHost";
 
 export const dynamic = "force-dynamic"; // read Host header per request
 
@@ -22,8 +22,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const rawHost = h.get("x-forwarded-host") ?? h.get("host") ?? "";
   const host = normalizeHost(rawHost);
 
-  const site = getSiteByHost(host);
-  const BASE = site.url.replace(/\/$/, "");
+  const tenant = await getTenantByHost(host);
+  const site = tenant.siteConfig;
+  const BASE = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
 
   // Global or per-host exact allow list (avoid if you don't truly need it)
   const allowedExact = PER_HOST_ALLOWED_EXACT[host] ?? [

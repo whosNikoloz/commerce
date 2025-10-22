@@ -1,15 +1,15 @@
+import type { SiteConfig } from "@/types/tenant";
 import { headers } from "next/headers";
 
-import { DEFAULT_TENANT, TENANTS } from "@/config/tenat";
-import type { SiteConfig } from "@/types/tenant";
+import { getTenantByHost } from "./getTenantByHost";
 
 function normalizeHost(host?: string) {
   return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
 }
 
-export function getSiteByHost(host?: string): SiteConfig {
+export async function getSiteByHost(host?: string): Promise<SiteConfig> {
   const key = normalizeHost(host);
-  const tenant = TENANTS[key] ?? DEFAULT_TENANT;
+  const tenant = await getTenantByHost(key);
 
   return tenant.siteConfig;
 }

@@ -234,7 +234,7 @@ export default async function CategoryIndex({
             return {
               name: p.name,
               url: buildI18nUrls(`/product/${p.id}`, lang, site).canonical,
-              image: toAbsoluteImages([img], site)[0], // absolutize with active site
+              image: toAbsoluteImages(site, [img])[0], // absolutize with active site
             };
           }),
         )

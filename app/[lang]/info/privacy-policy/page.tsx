@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Shield, Database, Users, Clock, Eye, Settings, Lock, Globe } from "lucide-react";
 
-import { i18nPageMetadata, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import { i18nPageMetadataAsync, getActiveSite, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
+import type { SiteConfig } from "@/types/tenant";
 
 export async function generateMetadata({
   params,
@@ -11,8 +12,9 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
+  const site = await getActiveSite();
 
-  return i18nPageMetadata({
+  return i18nPageMetadataAsync({
     title: "კონფიდენციალურობის პოლიტიკა",
     description:
       "როგორ ვაგროვებთ და ვაცნობიერებთ პერსონალურ მონაცემებს: მიზნები, ვადები, მესამე პირები.",
@@ -20,13 +22,14 @@ export async function generateMetadata({
     path: "/info/privacy-policy",
     images: ["/og/privacy-og.jpg"],
     index: true,
+    siteOverride: site,
   });
 }
 
-function JsonLd({ lang }: { lang: string }) {
-  const home = buildI18nUrls("/", lang).canonical;
-  const info = buildI18nUrls("/info", lang).canonical;
-  const page = buildI18nUrls("/info/privacy-policy", lang).canonical;
+async function JsonLd({ lang, site }: { lang: string; site: SiteConfig }) {
+  const home = (await buildI18nUrls("/", lang, site)).canonical;
+  const info = (await buildI18nUrls("/info", lang, site)).canonical;
+  const page = (await buildI18nUrls("/info/privacy-policy", lang, site)).canonical;
 
   const breadcrumb = buildBreadcrumbJsonLd([
     { name: "მთავარი", url: home },
@@ -44,6 +47,7 @@ function JsonLd({ lang }: { lang: string }) {
 
 export default async function PrivacyPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
+  const site = await getActiveSite();
 
   const dataTypes = [
     {
@@ -141,7 +145,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-      <JsonLd lang={lang} />
+      {await JsonLd({ lang, site })}
 
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-muted-foreground">

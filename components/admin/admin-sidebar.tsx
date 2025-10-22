@@ -41,7 +41,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     // Only show Sync for FINA merchants
     ...(isFinaMerchant ? [{ label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> }] : []),
     { label: "Payments",    href: `/${currentLang}/admin/payments`,  icon: <CreditCard className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
-    { label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    //{ label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
   ];
 
   const links = allLinks;

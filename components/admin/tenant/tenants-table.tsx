@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@heroui/button";
 import { useDisclosure } from "@heroui/modal";
-import { IconPlus, IconEdit, IconTrash, IconEye, IconTemplate } from "@tabler/icons-react";
+import { IconPlus, IconEdit, IconTrash, IconEye, IconTemplate, IconAlertCircle } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 import AddTenantModal from "./add-tenant-modal";
@@ -13,21 +13,50 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { TENANTS } from "@/config/tenat";
+import type { TenantConfig } from "@/types/tenant";
 
 export default function TenantsTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTenant, setSelectedTenant] = useState<{
     domain: string;
-    config: (typeof TENANTS)[string];
+    config: TenantConfig;
   } | null>(null);
+  const [tenantsData, setTenantsData] = useState<Record<string, TenantConfig>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const addModal = useDisclosure();
   const editModal = useDisclosure();
 
-  const tenants = useMemo(() => {
-    return Object.entries(TENANTS).map(([domain, config]) => ({ domain, config }));
+  // Fetch tenants from API
+  useEffect(() => {
+    const fetchTenants = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        // TODO: Replace with actual API endpoint to fetch all tenants
+        // const response = await fetch('/api/admin/tenants/list');
+        // const data = await response.json();
+        // setTenantsData(data);
+
+        // For now, show a message that tenant management has moved to the backend
+        setError("Tenant management has been moved to the backend API. Please use the backend admin panel to manage tenants.");
+        setTenantsData({});
+      } catch (err) {
+        console.error("Failed to fetch tenants:", err);
+        setError("Failed to load tenants. Tenant configuration is now managed via the backend API.");
+        setTenantsData({});
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTenants();
   }, []);
+
+  const tenants = useMemo(() => {
+    return Object.entries(tenantsData).map(([domain, config]) => ({ domain, config }));
+  }, [tenantsData]);
 
   const filteredTenants = useMemo(() => {
     if (!searchQuery.trim()) return tenants;
@@ -35,7 +64,7 @@ export default function TenantsTable() {
     return tenants.filter((tenant) => tenant.domain.toLowerCase().includes(query));
   }, [tenants, searchQuery]);
 
-  const handleEdit = (domain: string, config: (typeof TENANTS)[string]) => {
+  const handleEdit = (domain: string, config: TenantConfig) => {
     setSelectedTenant({ domain, config });
     editModal.onOpen();
   };
@@ -109,18 +138,43 @@ export default function TenantsTable() {
           </div>
         </CardHeader>
         <CardContent className="relative">
-          <div className="mb-6">
-            <Input
-              className="max-w-md rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2.5 text-sm
-                         text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 dark:focus:border-indigo-600
-                         shadow-sm hover:shadow-md transition-all duration-300 font-medium"
-              placeholder="🔍 Search by domain..."
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          {error && (
+            <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl">
+              <div className="flex items-start gap-3">
+                <IconAlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                    Tenant Management Moved
+                  </h3>
+                  <p className="text-sm text-amber-800 dark:text-amber-300">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="mb-6 p-8 text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">Loading tenants...</p>
+            </div>
+          )}
+
+          {!isLoading && !error && (
+            <div className="mb-6">
+              <Input
+                className="max-w-md rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2.5 text-sm
+                           text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 dark:focus:border-indigo-600
+                           shadow-sm hover:shadow-md transition-all duration-300 font-medium"
+                placeholder="🔍 Search by domain..."
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          )}
 
           {/* Desktop Table View */}
           <div className="hidden md:block rounded-xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden">

@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 import { i18nPageMetadataAsync, getActiveSite } from "@/lib/seo";
 import { Locale } from "@/i18n.config";
-import { TENANTS, DEFAULT_TENANT } from "@/config/tenat";
+import { getTenantByHost } from "@/lib/getTenantByHost";
 import HomeRenderer from "@/components/Home/HomeRenderer";
 
 export const revalidate = 300;
@@ -36,10 +36,12 @@ export default async function HomePage({
 }) {
   const { lang } = await params;
   const headersList = await headers();
-  const host = headersList.get("host") || "localhost:3000";
+  const host = (headersList.get("x-forwarded-host") || headersList.get("host") || "localhost:3000")
+    .replace(/^www\./, "")
+    .toLowerCase();
 
-  // Get tenant configuration based on host
-  const tenant = TENANTS[host] || DEFAULT_TENANT;
+  // Get tenant configuration dynamically from API
+  const tenant = await getTenantByHost(host);
 
   return <HomeRenderer locale={lang} tenant={tenant} />;
 }

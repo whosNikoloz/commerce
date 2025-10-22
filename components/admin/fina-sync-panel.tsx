@@ -108,7 +108,7 @@ export default function FinaSyncPanel() {
           addLog("", "info");
           addLog("🔄 UPDATED PRODUCTS:", "success");
           updatedProducts.forEach((p) => {
-            const changes = p.changedFields?.join(", ") || "various fields";
+            const changes = p.fieldChanges?.map(fc => fc.fieldName).join(", ") || "various fields";
 
             addLog(`   • ${p.productName} (${changes})`, "success");
           });

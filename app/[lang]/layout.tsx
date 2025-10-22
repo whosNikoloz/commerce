@@ -11,8 +11,7 @@ import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import { locales, defaultLocale } from "@/i18n.config";
 import BackToTopShadcn from "@/components/back_to_top";
 import { themeToStyle } from "@/lib/applyTheme";
-import { getTenantByHostStatic } from "@/lib/getTenantByHost";
-import { getSiteByHost } from "@/lib/getSiteByHost";
+import { getTenantByHost } from "@/lib/getTenantByHost";
 import ClientUADataFix from "@/components/ClientUADataFix";
 import { generateFontClassNames } from "@/lib/loadTenantFonts";
 
@@ -23,18 +22,19 @@ function normalizeHost(host?: string) {
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
-  const site = getSiteByHost(host);
+  const tenant = await getTenantByHost(host);
+  const site = tenant.siteConfig;
 
-  const base = site.url.replace(/\/$/, "");
-  const ogImageAbs = `${base}${site.ogImage}`;
+  const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
+  const ogImageAbs = site.ogImage ? `${base}${site.ogImage}` : `${base}/og-image.jpg`;
 
   return {
-    metadataBase: new URL(site.url),
+    metadataBase: new URL(base),
     title: { default: site.name, template: `%s • ${site.shortName}` },
     description: site.description,
     openGraph: {
       type: "website",
-      url: site.url,
+      url: base,
       title: site.name,
       description: site.description,
       siteName: site.name,
@@ -72,10 +72,15 @@ export default async function RootLayout({
 
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
-  const tenant = getTenantByHostStatic(host);
-  const site = getSiteByHost(host);
+  const tenant = await getTenantByHost(host);
+  //console.log("🏗️ [LAYOUT SSR] Tenant loaded for host:", host, "→", tenant.siteConfig.name);
+  const site = tenant.siteConfig;
   const style = themeToStyle(tenant.theme);
   const fontClassNames = generateFontClassNames(tenant.theme);
+
+  // Build JSON-LD asynchronously
+  const organizationJsonLd = await buildOrganizationJsonLd(site);
+  const websiteJsonLd = await buildWebsiteJsonLd(site);
 
   return (
     <html suppressHydrationWarning lang={safeLang} style={style}>
@@ -88,11 +93,11 @@ export default async function RootLayout({
         />
         {/* JSON-LD with per-host site info */}
         <script
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd(site)) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
           type="application/ld+json"
         />
         <script
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebsiteJsonLd(site)) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
           type="application/ld+json"
         />
       </head>

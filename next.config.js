@@ -14,6 +14,11 @@ const nextConfig = {
         hostname: "finasyncecomm.s3.eu-central-1.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+        pathname: "/**",
+      },
 
       // If any of these ever serve over HTTP in dev, add HTTP entries too:
       // { protocol: "http", hostname: "media.veli.store", pathname: "/**" },

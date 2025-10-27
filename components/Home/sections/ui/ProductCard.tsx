@@ -35,20 +35,7 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-/**
- * Modern E-commerce Product Card - Best Practices
- *
- * Features:
- * - Mobile-first responsive design with optimized touch targets
- * - Progressive image loading with proper aspect ratios
- * - Clear visual hierarchy with appropriate typography scale
- * - Accessible with ARIA labels and semantic HTML
- * - Multiple status badges (New, Discount, Liquidation, Coming Soon)
- * - Optimized hover states for desktop, touch-friendly for mobile
- * - Skeleton loading states for better perceived performance
- * - SEO-friendly with proper schema.org markup
- * - Template variations for different page contexts
- */
+
 export function ProductCard({
   product,
   template = 1,
@@ -62,7 +49,6 @@ export function ProductCard({
   const addToCart = useCartStore((s) => s.addToCart);
   
 
-  // Check if product is in wishlist on mount
   useEffect(() => {
     if (user && product.id) {
       isInWishlist(product.id)
@@ -77,7 +63,7 @@ export function ProductCard({
     : 0;
 
   // Get display values
-  const imageUrl = product.images?.[0] || "/placeholder.svg";
+  const imageUrl = product.images?.[0] || "/placeholder.png";
   const isInStock = product.status === StockStatus.InStock;
   const displayPrice = product.discountPrice || product.price;
   const hasDiscount = !!product.discountPrice && product.discountPrice < product.price;

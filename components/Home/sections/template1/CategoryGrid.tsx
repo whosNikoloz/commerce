@@ -1,12 +1,13 @@
 import type { CategoryGridData, Locale } from "@/types/tenant"
 
+import { Sparkles } from "lucide-react"
+
 import { CategoryCard, CategoryCardSkeleton } from "../ui/CategoryCard"
 import { SectionContainer } from "../ui/SectionContainer"
 
 import { t } from "@/lib/i18n"
 import { getAllCategories } from "@/app/api/services/categoryService"
 import { searchProductsByFilter } from "@/app/api/services/productService"
-import { Sparkles } from "lucide-react"
 
 interface CategoryGridProps {
   data: CategoryGridData

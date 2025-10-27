@@ -50,8 +50,43 @@ const CategoryGridDataSchema = z.object({
   ),
 });
 
-const BrandStripDataSchema = z.object({
+const BrandCarouselDataSchema = z.object({
   title: LocalizedTextSchema.optional(),
+});
+
+const AboutUsDataSchema = z.object({
+  title: LocalizedTextSchema,
+  description: LocalizedRichSchema,
+  imageUrl: z.string().optional(),
+  videoUrl: z.string().optional(),
+  stats: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: LocalizedTextSchema,
+      })
+    )
+    .optional(),
+  cta: z
+    .object({
+      label: LocalizedTextSchema,
+      href: z.string(),
+    })
+    .optional(),
+});
+
+const CommercialBannerDataSchema = z.object({
+  layout: z.enum(["carousel", "grid"]),
+  columns: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  banners: z.array(
+    z.object({
+      imageUrl: z.string(),
+      mobileImageUrl: z.string().optional(),
+      href: z.string(),
+      alt: LocalizedTextSchema,
+      badge: LocalizedTextSchema.optional(),
+    })
+  ),
 });
 
 const DealCountdownDataSchema = z.object({
@@ -73,6 +108,8 @@ const ProductRailDataSchema = z.object({
   customName: z.string().optional(),
   title: LocalizedTextSchema,
   subtitle: LocalizedTextSchema.optional(),
+  layout: z.enum(["carousel", "grid"]),
+  columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
   limit: z.number(),
   viewAllHref: z.string(),
   filterBy: z.object({
@@ -148,10 +185,22 @@ const NewsletterAppDataSchema = z.object({
 
 const Template1SectionSchema = z.discriminatedUnion("type", [
   z.object({
-    type: z.literal("HeroWithSearch"),
+    type: z.literal("ProductRail"),
     enabled: z.boolean(),
     order: z.number(),
-    data: HeroWithSearchDataSchema,
+    data: ProductRailDataSchema,
+  }),
+  z.object({
+    type: z.literal("CommercialBanner"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CommercialBannerDataSchema,
+  }),
+  z.object({
+    type: z.literal("AboutUs"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: AboutUsDataSchema,
   }),
   z.object({
     type: z.literal("CategoryGrid"),
@@ -160,46 +209,10 @@ const Template1SectionSchema = z.discriminatedUnion("type", [
     data: CategoryGridDataSchema,
   }),
   z.object({
-    type: z.literal("BrandStrip"),
+    type: z.literal("BrandCarousel"),
     enabled: z.boolean(),
     order: z.number(),
-    data: BrandStripDataSchema,
-  }),
-  z.object({
-    type: z.literal("DealCountdown"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: DealCountdownDataSchema,
-  }),
-  z.object({
-    type: z.literal("ProductRail"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: ProductRailDataSchema,
-  }),
-  z.object({
-    type: z.literal("ComparisonBlock"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: ComparisonBlockDataSchema,
-  }),
-  z.object({
-    type: z.literal("Reviews"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: ReviewsDataSchema,
-  }),
-  z.object({
-    type: z.literal("TrustBadges"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: TrustBadgesDataSchema,
-  }),
-  z.object({
-    type: z.literal("NewsletterApp"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: NewsletterAppDataSchema,
+    data: BrandCarouselDataSchema,
   }),
 ]);
 
@@ -498,12 +511,8 @@ const HeroCategoryGridDataSchema = z.object({
   features: z.array(LocalizedTextSchema).optional(),
 });
 
-const CommercialBannerDataSchema = z.object({
-  imageUrl: z.string(),
-  mobileImageUrl: z.string().optional(),
-  href: z.string(),
-  alt: LocalizedTextSchema,
-  badge: LocalizedTextSchema.optional(),
+const BrandStripDataSchema = z.object({
+  title: LocalizedTextSchema.optional(),
 });
 
 const CategoryCarouselDataSchema = z.object({
@@ -597,32 +606,17 @@ export type TemplateDefinition<
 // Template 1
 import { lazy } from "react";
 
-const HeroWithSearch = lazy(
-  () => import("@/components/Home/sections/template1/HeroWithSearch")
+const ProductRail = lazy(
+  () => import("@/components/Home/sections/ui/ProductRail")
 );
 const CategoryGridT1 = lazy(
   () => import("@/components/Home/sections/template1/CategoryGrid")
 );
-const BrandStrip = lazy(
-  () => import("@/components/Home/sections/template1/BrandStrip")
+const BrandCarousel = lazy(
+  () => import("@/components/Home/sections/template1/BrandCarousel")
 );
-const DealCountdown = lazy(
-  () => import("@/components/Home/sections/template1/DealCountdownWrapper")
-);
-const ProductRail = lazy(
-  () => import("@/components/Home/sections/ui/ProductRail")
-);
-const ComparisonBlock = lazy(
-  () => import("@/components/Home/sections/template1/ComparisonBlock")
-);
-const Reviews = lazy(
-  () => import("@/components/Home/sections/template1/Reviews")
-);
-const TrustBadges = lazy(
-  () => import("@/components/Home/sections/template1/TrustBadges")
-);
-const NewsletterApp = lazy(
-  () => import("@/components/Home/sections/template1/NewsletterApp")
+const AboutUs = lazy(
+  () => import("@/components/Home/sections/template1/AboutUs")
 );
 
 // Template 2
@@ -672,7 +666,7 @@ const NewsletterBeauty = lazy(
 const HeroCategoryGrid = lazy(
   () => import("@/components/Home/sections/template4/HeroCategoryGrid")
 );
-const CommercialBanner = lazy(
+const CommercialBannerT4 = lazy(
   () => import("@/components/Home/sections/template4/CommercialBanner")
 );
 const BrandStripT4 = lazy(
@@ -684,15 +678,11 @@ const CategoryCarousel = lazy(
 
 // ===== Template 1 Definition =====
 export const TEMPLATE_1_ALLOWED_SECTIONS = [
-  "HeroWithSearch",
-  "CategoryGrid",
-  "BrandStrip",
-  "DealCountdown",
   "ProductRail",
-  "ComparisonBlock",
-  "Reviews",
-  "TrustBadges",
-  "NewsletterApp",
+  "CommercialBanner",
+  "AboutUs",
+  "CategoryGrid",
+  "BrandCarousel",
 ] as const;
 
 export const template1Definition: TemplateDefinition<
@@ -702,15 +692,11 @@ export const template1Definition: TemplateDefinition<
   allowedSections: TEMPLATE_1_ALLOWED_SECTIONS,
   schema: Template1HomepageSchema,
   registry: {
-    HeroWithSearch,
-    CategoryGrid: CategoryGridT1,
-    BrandStrip,
-    DealCountdown,
     ProductRail,
-    ComparisonBlock,
-    Reviews,
-    TrustBadges,
-    NewsletterApp,
+    CommercialBanner: CommercialBannerT4,
+    AboutUs,
+    CategoryGrid: CategoryGridT1,
+    BrandCarousel,
   },
 };
 
@@ -789,7 +775,7 @@ export const template4Definition: TemplateDefinition<
   schema: Template4HomepageSchema,
   registry: {
     HeroCategoryGrid,
-    CommercialBanner,
+    CommercialBanner: CommercialBannerT4,
     BrandStrip: BrandStripT4,
     CategoryCarousel,
     ProductRail,

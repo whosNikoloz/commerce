@@ -30,17 +30,13 @@ export type ThemeVars = {
   };
 };
 
-// ===== Template 1: Tech / Electronics =====
+// ===== Template 1: Clean Sections =====
 export type Template1SectionType =
-  | "HeroWithSearch"
-  | "CategoryGrid"
-  | "BrandStrip"
-  | "DealCountdown"
   | "ProductRail"
-  | "ComparisonBlock"
-  | "Reviews"
-  | "TrustBadges"
-  | "NewsletterApp";
+  | "CommercialBanner"
+  | "AboutUs"
+  | "CategoryGrid"
+  | "BrandCarousel";
 
 export type HeroWithSearchData = {
   headline: LocalizedText;
@@ -61,8 +57,20 @@ export type CategoryGridData = {
   }>;
 };
 
-export type BrandStripData = {
+export type BrandCarouselData = {
   title?: LocalizedText;
+};
+
+export type AboutUsData = {
+  title: LocalizedText;
+  description: LocalizedRich;
+  imageUrl?: string;
+  videoUrl?: string;
+  stats?: Array<{
+    value: string;
+    label: LocalizedText;
+  }>;
+  cta?: { label: LocalizedText; href: string };
 };
 
 export type DealCountdownData = {
@@ -82,6 +90,8 @@ export type ProductRailData = {
   customName?: string; // Optional custom name to identify this rail in admin (e.g., "Liquidated Laptops", "Premium Phones")
   title: LocalizedText;
   subtitle?: LocalizedText;
+  layout: "carousel" | "grid"; // Display as carousel or grid
+  columns?: 2 | 3 | 4; // Grid column count (only for grid layout)
   limit: number;
   viewAllHref: string;
   // Filter options - use any combination
@@ -302,12 +312,20 @@ export type HeroCategoryGridData = {
   features?: Array<LocalizedText>;
 };
 
+export type BrandStripData = {
+  title?: LocalizedText;
+};
+
 export type CommercialBannerData = {
-  imageUrl: string;
-  mobileImageUrl?: string;
-  href: string;
-  alt: LocalizedText;
-  badge?: LocalizedText;
+  layout: "carousel" | "grid";
+  columns?: 1 | 2 | 3; // Grid column count (only for grid layout)
+  banners: Array<{
+    imageUrl: string;
+    mobileImageUrl?: string;
+    href: string;
+    alt: LocalizedText;
+    badge?: LocalizedText;
+  }>;
 };
 
 export type CategoryCarouselData = {
@@ -344,15 +362,11 @@ export type ProductGridData = {
 
 // ===== Section instances with discriminated unions =====
 export type Template1SectionInstance =
-  | { type: "HeroWithSearch"; enabled: boolean; order: number; data: HeroWithSearchData }
-  | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
-  | { type: "BrandStrip"; enabled: boolean; order: number; data: BrandStripData }
-  | { type: "DealCountdown"; enabled: boolean; order: number; data: DealCountdownData }
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "ComparisonBlock"; enabled: boolean; order: number; data: ComparisonBlockData }
-  | { type: "Reviews"; enabled: boolean; order: number; data: ReviewsData }
-  | { type: "TrustBadges"; enabled: boolean; order: number; data: TrustBadgesData }
-  | { type: "NewsletterApp"; enabled: boolean; order: number; data: NewsletterAppData };
+  | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
+  | { type: "AboutUs"; enabled: boolean; order: number; data: AboutUsData }
+  | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
+  | { type: "BrandCarousel"; enabled: boolean; order: number; data: BrandCarouselData };
 
 export type Template2SectionInstance =
   | { type: "HeroLifestyle"; enabled: boolean; order: number; data: HeroLifestyleData }

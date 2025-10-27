@@ -1,120 +1,95 @@
-import type { ProductRailData, Locale } from "@/types/tenant"
-import type { FilterModel } from "@/types/filter"
-import type { Condition, StockStatus } from "@/types/enums"
+import type { ProductRailData, Locale } from "@/types/tenant";
+import type { FilterModel } from "@/types/filter";
+import type { Condition, StockStatus } from "@/types/enums";
 
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
-import { ProductCard, ProductCardSkeleton } from "./ProductCard"
-import { SectionContainer } from "./SectionContainer"
+import { ProductCard, ProductCardSkeleton } from "./ProductCard";
+import { SectionContainer } from "./SectionContainer";
 
-import { Button } from "@/components/ui/button"
-import { searchProductsByFilter } from "@/app/api/services/productService"
-import { t, tOpt } from "@/lib/i18n"
+import { Button } from "@/components/ui/button";
+import { searchProductsByFilter } from "@/app/api/services/productService";
+import { t, tOpt } from "@/lib/i18n";
+import CarouselRail from "@/components/rails/CarouselRail";
+
 
 interface ProductRailProps {
-  data: ProductRailData
-  locale: Locale
-  template?: 1 | 2 | 3
-  className?: string
+  data: ProductRailData;
+  locale: Locale;
+  template?: 1 | 2 | 3;
+  className?: string;
 }
 
 export default async function ProductRail({
   data,
   locale,
   template = 1,
-  className
+  className,
 }: ProductRailProps) {
-  let products = null
-  let error = null
+  let products: any[] | null = null;
+  let error: Error | null = null;
 
   try {
-    // Build filter based on data.filterBy options using actual FilterModel
-    const filter: FilterModel = {}
+    const filter: FilterModel = {};
 
-    // Handle category IDs filtering
-    if (data.filterBy?.categoryIds && data.filterBy.categoryIds.length > 0) {
-      filter.categoryIds = data.filterBy.categoryIds
-    }
+    if (data.filterBy?.categoryIds?.length) filter.categoryIds = data.filterBy.categoryIds;
+    if (data.filterBy?.brandIds?.length) filter.brandIds = data.filterBy.brandIds;
+    if (data.filterBy?.condition?.length) filter.condition = data.filterBy.condition as Condition[];
+    if (data.filterBy?.stockStatus) filter.stockStatus = data.filterBy.stockStatus as StockStatus;
+    if (data.filterBy?.minPrice !== undefined) filter.minPrice = data.filterBy.minPrice;
+    if (data.filterBy?.maxPrice !== undefined) filter.maxPrice = data.filterBy.maxPrice;
 
-    // Handle brand IDs filtering
-    if (data.filterBy?.brandIds && data.filterBy.brandIds.length > 0) {
-      filter.brandIds = data.filterBy.brandIds
-    }
-
-    // Handle condition filtering
-    if (data.filterBy?.condition && data.filterBy.condition.length > 0) {
-      filter.condition = data.filterBy.condition  as Condition[]
-    }
-
-    // Handle stock status filtering
-    if (data.filterBy?.stockStatus) {
-      filter.stockStatus = data.filterBy.stockStatus as StockStatus
-    }
-
-    // Handle price range
-    if (data.filterBy?.minPrice !== undefined) {
-      filter.minPrice = data.filterBy.minPrice
-    }
-    if (data.filterBy?.maxPrice !== undefined) {
-      filter.maxPrice = data.filterBy.maxPrice
-    }
-
-    // Fetch products
     const result = await searchProductsByFilter({
       filter,
-      pageSize: data.limit * 2, // Fetch more to allow for client-side filtering
+      pageSize: data.limit * 2,
       page: 1,
-      sortBy: data.sortBy || "featured"
-    })
+      sortBy: data.sortBy || "featured",
+    });
 
-    let filteredProducts = result.items || []
+    let list = result.items || [];
 
-    // Apply additional client-side filters for product flags
-    if (data.filterBy?.isNewArrival) {
-      filteredProducts = filteredProducts.filter(p => p.isNewArrival === true)
-    }
-    if (data.filterBy?.isLiquidated) {
-      filteredProducts = filteredProducts.filter(p => p.isLiquidated === true)
-    }
-    if (data.filterBy?.isComingSoon) {
-      filteredProducts = filteredProducts.filter(p => p.isComingSoon === true)
-    }
-    if (data.filterBy?.hasDiscount) {
-      filteredProducts = filteredProducts.filter(p => p.discountPrice && p.discountPrice > 0)
-    }
+    if (data.filterBy?.isNewArrival) list = list.filter((p: any) => p.isNewArrival);
+    if (data.filterBy?.isLiquidated) list = list.filter((p: any) => p.isLiquidated);
+    if (data.filterBy?.isComingSoon) list = list.filter((p: any) => p.isComingSoon);
+    if (data.filterBy?.hasDiscount) list = list.filter((p: any) => p.discountPrice > 0);
 
-    // Limit to requested count
-    products = filteredProducts.slice(0, data.limit)
+    products = list.slice(0, data.limit);
   } catch (e) {
-    error = e as Error
-    console.error("Failed to load products:", e)
+    error = e as Error;
+    console.error("Failed to load products:", e);
   }
+
+  const isCarousel = data.layout === "carousel";
+  const columns = data.columns || 4;
+
+  const gridClass = isCarousel
+    ? "flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+    : `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-${columns === 2 ? "2" : columns === 3 ? "3" : "4"} gap-4 md:gap-6`;
 
   const loadingSkeleton = (
     <div className={className || "py-20 "}>
       <div className="container mx-auto px-4">
         <div className="h-12 bg-muted rounded-lg w-64 mb-10 animate-pulse" />
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className={gridClass}>
           {Array.from({ length: data.limit }).map((_, idx) => (
             <ProductCardSkeleton key={idx} template={template} />
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 
-  // Generate empty message based on filters
   const getEmptyMessage = () => {
-    if (data.filterBy?.isNewArrival) return "No new arrivals at the moment"
-    if (data.filterBy?.isLiquidated) return "No liquidated items available"
-    if (data.filterBy?.isComingSoon) return "No coming soon items"
-    if (data.filterBy?.hasDiscount) return "No discounted items available"
-    if (data.filterBy?.categoryIds && data.filterBy.categoryIds.length > 0) return "No products found in selected categories"
-    if (data.filterBy?.brandIds && data.filterBy.brandIds.length > 0) return "No products found from selected brands"
+    if (data.filterBy?.isNewArrival) return "No new arrivals at the moment";
+    if (data.filterBy?.isLiquidated) return "No liquidated items available";
+    if (data.filterBy?.isComingSoon) return "No coming soon items";
+    if (data.filterBy?.hasDiscount) return "No discounted items available";
+    if (data.filterBy?.categoryIds?.length) return "No products found in selected categories";
+    if (data.filterBy?.brandIds?.length) return "No products found from selected brands";
 
-    return "No products available"
-  }
+    return "No products available";
+  };
 
   return (
     <SectionContainer
@@ -130,13 +105,10 @@ export default async function ProductRail({
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance font-heading">
               {t(data.title, locale)}
             </h2>
-            {data.subtitle && (
-              <p className="text-muted-foreground mt-3 text-lg">
-                {tOpt(data.subtitle, locale)}
-              </p>
-            )}
+            {data.subtitle && <p className="text-muted-foreground mt-3 text-lg">{tOpt(data.subtitle, locale)}</p>}
           </div>
 
+        {/* VIEW ALL */}
           <Button asChild className="group self-start sm:self-auto" variant="ghost">
             <Link className="flex items-center gap-2 font-semibold" href={data.viewAllHref}>
               View All
@@ -145,12 +117,19 @@ export default async function ProductRail({
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {products?.map((product) => (
-            <ProductCard key={product.id} product={product} showActions={true} template={template}/>
-          ))}
-        </div>
+        {/* CONTENT */}
+        {isCarousel ? (
+          <CarouselRail columns={columns} products={products || []} template={template} />
+        ) : (
+          <div className={gridClass}>
+            {products?.map((product) => (
+              <div key={product.id}>
+                <ProductCard product={product} showActions={true} template={template} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </SectionContainer>
-  )
+  );
 }

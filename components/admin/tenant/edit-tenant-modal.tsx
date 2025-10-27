@@ -45,15 +45,11 @@ type AnySectionInstance =
   | Template4SectionInstance;
 
 const T1_TYPES = new Set<Template1SectionInstance["type"]>([
-  "HeroWithSearch",
-  "CategoryGrid",
-  "BrandStrip",
-  "DealCountdown",
   "ProductRail",
-  "ComparisonBlock",
-  "Reviews",
-  "TrustBadges",
-  "NewsletterApp",
+  "CommercialBanner",
+  "AboutUs",
+  "CategoryGrid",
+  "BrandCarousel",
 ]);
 const T2_TYPES = new Set<Template2SectionInstance["type"]>([
   "HeroLifestyle",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/modal";
 
 import AdminDashboard from "@/components/admin/admin-dashboard";
@@ -9,43 +9,36 @@ import LoginModal from "@/components/admin/login-modal";
 import { GoBackButton } from "@/components/go-back-button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const AuthData = {
-  ka: {
-    loginData: {
-      title: "შესვლა",
-      email: "ელ-ფოსტა",
-      password: "პაროლი",
-      button: "შესვლა",
-    },
-  },
-  en: {
-    loginData: {
-      title: "Sign In",
-      email: "Email",
-      password: "Password",
-      button: "Sign In",
-    },
-  },
-} as const;
-
 export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { lang } = useParams<{ lang?: string }>();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const isMobile = useIsMobile();
+
+  const currentLang = lang === "ka" ? "ka" : "en";
+  const next = searchParams.get("next"); // <- read ?next=/en/admin/products
 
   useEffect(() => {
     let cancelled = false;
 
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/auth/check", { method: "GET" });
+        const res = await fetch("/api/auth/check", { method: "GET", cache: "no-store" });
         const data = await res.json();
 
-        if (!cancelled) {
-          if (data.authorized) setIsAuthorized(true);
-          else onOpen();
+        if (cancelled) return;
+
+        if (data.authorized) {
+          setIsAuthorized(true);
+
+          // If we came here due to middleware redirect, go to the target immediately
+          if (next) {
+            router.replace(next);
+          }
+        } else {
+          onOpen(); // show login modal
         }
       } catch {
         if (!cancelled) onOpen();
@@ -53,34 +46,25 @@ export default function AdminPage() {
     };
 
     checkAuth();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [onOpen]);
+    return () => void (cancelled = true);
+  }, [onOpen, router, next]);
 
   const handleCloseModal = () => {
     onClose();
-    router.push(`/${lang ?? "en"}`);
+    router.push(`/${currentLang}`);
   };
 
   if (!isAuthorized) {
-    const currentLang = lang === "ka" ? "ka" : "en";
-    const loginData = AuthData[currentLang].loginData;
+    const loginData =
+      currentLang === "ka"
+        ? { title: "შესვლა", email: "ელ-ფოსტა", password: "პაროლი", button: "შესვლა" }
+        : { title: "Sign In", email: "Email", password: "Password", button: "Sign In" };
 
     return (
       <Modal
         classNames={{
-          // Dimmed brand-aware backdrop
           backdrop: "backdrop-blur-md",
-
-          // Modal surface styled with your tokens
-          base: [
-            "rounded-t-xl", // mobile top sheet look
-            "text-text-light dark:text-text-lightdark",
-            "shadow-xl",
-          ].join(" "),
-
+          base: "rounded-t-xl text-text-light dark:text-text-lightdark shadow-xl",
           wrapper: isMobile ? "p-0" : "",
         }}
         hideCloseButton={isMobile}
@@ -88,18 +72,8 @@ export default function AdminPage() {
         motionProps={{
           variants: {
             enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
-            center: {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 },
-            },
-            exit: {
-              y: 40,
-              opacity: 0,
-              scale: 0.96,
-              transition: { duration: 0.18, ease: "easeIn" },
-            },
+            center: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 } },
+            exit: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0.18, ease: "easeIn" } },
           },
           initial: "enter",
           animate: "center",
@@ -131,6 +105,8 @@ export default function AdminPage() {
                   onSuccess={() => {
                     setIsAuthorized(true);
                     onClose();
+                    const fallback = `/${currentLang}/admin`;
+                    router.replace(next && next.startsWith(`/${currentLang}/admin`) ? next : fallback);
                   }}
                 />
               </ModalBody>
@@ -141,6 +117,7 @@ export default function AdminPage() {
     );
   }
 
+  // If authorized and no "next", stay on the dashboard
   return (
     <div className="space-y-8">
       <div className="space-y-2">

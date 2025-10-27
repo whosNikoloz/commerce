@@ -47,11 +47,13 @@ export function middleware(request: NextRequest) {
   const isAdminSubRoute = pathname.startsWith(`/${locInPath}/admin/`) && !isAdminRoot;
 
   if (!adminToken && isAdminSubRoute) {
-    const nextParam = encodeURIComponent(`${pathname}${search || ""}`);
-    const url = new URL(`/${locInPath}/admin?next=${nextParam}`, request.url);
+    const url = new URL(`/${locInPath}/admin`, request.url);
+
+    url.searchParams.set("next", `${pathname}${search || ""}`);
 
     return NextResponse.redirect(url);
   }
+
 
   return NextResponse.next();
 }

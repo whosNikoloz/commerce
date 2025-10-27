@@ -24,7 +24,7 @@ export class PaymentHubService {
 
     try {
       await this.connection.start();
-      console.log('SignalR Connected');
+      //console.log('SignalR Connected');
 
       await this.connection.invoke('JoinPaymentGroup', this.paymentId);
     } catch (err) {

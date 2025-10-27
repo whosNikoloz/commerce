@@ -36,7 +36,7 @@ declare module "@react-types/shared" {
 export function Providers({ children, themeProps, initialTenant }: ProvidersProps) {
   const router = useRouter();
 
-  console.log("⚙️ [PROVIDERS] Initializing with tenant:", initialTenant.siteConfig.name);
+  //console.log("⚙️ [PROVIDERS] Initializing with tenant:", initialTenant.siteConfig.name);
 
   return (
     <HeroUIProvider navigate={router.push}>

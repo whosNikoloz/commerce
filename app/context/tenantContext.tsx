@@ -28,7 +28,7 @@ export const TenantProvider: React.FC<{
   children: React.ReactNode;
   initialConfig?: TenantConfig | null;
 }> = ({ children, initialConfig = null }) => {
-  console.log("🔧 TenantProvider initialized with:", initialConfig ? `${initialConfig.siteConfig.name}` : "null");
+  //console.log("🔧 TenantProvider initialized with:", initialConfig ? `${initialConfig.siteConfig.name}` : "null");
   const [config, setConfig] = useState<TenantConfig | null>(initialConfig);
   const [isLoading, setIsLoading] = useState(!initialConfig);
   const mounted = useRef(true);
@@ -36,7 +36,7 @@ export const TenantProvider: React.FC<{
   // Apply theme immediately on mount/updates
   useEffect(() => {
     if (config?.theme) {
-      console.log("🎨 Applying theme for:", config.siteConfig.name);
+      //console.log("🎨 Applying theme for:", config.siteConfig.name);
       applyThemeOnDocument(config.theme);
       try {
         const payload: Cached = { v: CACHE_VERSION, data: config };
@@ -53,13 +53,13 @@ export const TenantProvider: React.FC<{
     const boot = async () => {
       // If SSR provided config, we're done.
       if (initialConfig) {
-        console.log("✅ Using SSR config, skipping client fetch:", initialConfig.siteConfig.name);
+        //console.log("✅ Using SSR config, skipping client fetch:", initialConfig.siteConfig.name);
         setIsLoading(false);
 
         return;
       }
 
-      console.log("⚠️ No SSR config, attempting client-side fetch...");
+      //console.log("⚠️ No SSR config, attempting client-side fetch...");
 
       // Try cache
       try {
@@ -69,10 +69,10 @@ export const TenantProvider: React.FC<{
           const parsed = JSON.parse(raw) as Cached;
 
           if (parsed?.v === CACHE_VERSION && parsed?.data) {
-            console.log("📦 Loaded cached config:", parsed.data.siteConfig.name);
+            //console.log("📦 Loaded cached config:", parsed.data.siteConfig.name);
             setConfig(parsed.data);
           } else {
-            console.log("🗑️ Clearing invalid/old cache");
+            //console.log("🗑️ Clearing invalid/old cache");
             localStorage.removeItem(CACHE_KEY);
           }
         }
@@ -84,13 +84,13 @@ export const TenantProvider: React.FC<{
       //When your endpoint is ready, uncomment this block:
       try {
         const host = window.location.host;
-        console.log("🌐 Fetching tenant config from /api/tenant-config for:", host);
+        //console.log("🌐 Fetching tenant config from /api/tenant-config for:", host);
         const res = await fetch(`/api/tenant-config?host=${encodeURIComponent(host)}`, { cache: "no-store" });
 
         if (res.ok) {
           const fresh = (await res.json()) as TenantConfig;
 
-          console.log("🔄 Updating config from client fetch:", fresh.siteConfig.name);
+          //console.log("🔄 Updating config from client fetch:", fresh.siteConfig.name);
           if (mounted.current) setConfig(fresh);
         } else {
           console.error("❌ Failed to fetch tenant config:", res.status);

@@ -86,6 +86,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
   const [brands, setBrands] = useState<BrandModel[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearch = useDebounced(searchTerm, 250);
 
@@ -109,7 +110,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     }
 
     // Load brands for product modals
-    getAllBrands().then(setBrands).catch(console.error);
+    setBrandsLoading(true);
+    getAllBrands()
+      .then((data) => {
+        //console.log("✅ Brands loaded:", data);
+        setBrands(data);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to load brands:", err);
+        toast.error("Failed to load brands");
+      })
+      .finally(() => {
+        setBrandsLoading(false);
+      });
   }, []);
 
   const handleImagesChanged = (productId: string, urls: string[]) => {

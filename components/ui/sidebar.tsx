@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext, ComponentPropsWithoutRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import Link from "next/link";
@@ -154,14 +154,19 @@ export const MobileSidebar = ({ className, children, ...props }: React.Component
   );
 };
 
-export const SidebarLink = ({ link, className, ...props }: { link: Links; className?: string }) => {
+type SidebarLinkProps = Omit<ComponentPropsWithoutRef<typeof Link>, "href"> & {
+  link: Links;
+  className?: string;
+};
+
+export const SidebarLink = ({ link, className, ...props }: SidebarLinkProps) => {
   const { open, animate } = useSidebar();
 
   return (
     <Link
-      className={cn("flex items-center justify-start gap-2  group/sidebar py-2", className)}
+      className={cn("flex items-center justify-start gap-2 group/sidebar py-2", className)}
       href={link.href}
-      {...props}
+      {...props} // now you can pass onClick, onKeyDown, etc.
     >
       {link.icon}
 

@@ -30,7 +30,7 @@ export async function generateMetadata({
 }
 
 export default async function BrandsPage() {
-  const brands = await getBrandsCached();
+  const brands = await getAllBrands();
 
   return (
     <div className="space-y-8">

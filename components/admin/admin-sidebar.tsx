@@ -79,22 +79,12 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             {open ? <Logo /> : <LogoIcon />}
 
             <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <button
-                  key={idx}
-                  aria-label={link.label}
-                  className="w-full text-left bg-transparent border-0 p-0 m-0 focus:outline-none"
-                  tabIndex={0}
-                  type="button"
+              {links.map((link) => (
+                <SidebarLink
+                  key={link.href}
+                  link={link}
                   onClick={() => isMobile && setOpen(false)}
-                  onKeyDown={e => {
-                    if ((e.key === "Enter" || e.key === " ") && isMobile) {
-                      setOpen(false);
-                    }
-                  }}
-                >
-                  <SidebarLink link={link} />
-                </button>
+                />
               ))}
             </div>
           </div>

@@ -104,13 +104,18 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
     }
   };
 
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault(); 
+    handleLogin();
+  };
+
   const handleLoginPasswordClear = async () => {
     setLoginPasswordError("");
     setLoginState((s) => ({ ...s, password: "" }));
   };
 
   return (
-    <div className="space-y-3">
+    <form className="space-y-3" onSubmit={onSubmit}>
       <Input
         ref={loginRef}
         classNames={{
@@ -183,10 +188,11 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
         className="w-full bg-brand-primary hover:bg-brand-primarydark text-white font-bold py-3 rounded-lg shadow-md transition-colors"
         isLoading={isLoading}
         startContent={<i className="fas fa-sign-in-alt mr-2" />}
-        onPress={handleLogin}
+        type="submit"
+        onPress={handleLogin}   
       >
         {loginData.button}
       </Button>
-    </div>
+    </form>
   );
 }

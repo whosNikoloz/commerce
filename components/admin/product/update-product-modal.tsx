@@ -2,7 +2,7 @@
 
 import type { BrandModel } from "@/types/brand";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Clock3, Edit, Sparkles } from "lucide-react";
 import {
   Modal,
@@ -12,6 +12,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/modal";
+import { Select as HSelect, SelectItem as HSelectItem } from "@heroui/select";
 
 import { CustomEditor } from "../../wysiwyg-text-custom";
 import { GoBackButton } from "../../go-back-button";
@@ -19,13 +20,6 @@ import { GoBackButton } from "../../go-back-button";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UpdateProductModalProps {
@@ -67,6 +61,7 @@ export default function UpdateProductModal({
   const handleSave = async () => {
     if (!brandId) {
       alert("Please select a brand");
+
       return;
     }
 
@@ -80,6 +75,17 @@ export default function UpdateProductModal({
       setLoading(false);
     }
   };
+
+ 
+
+  const validBrandId = brands.some(b => b.id === brandId) ? brandId : undefined;
+  const selectedKeys = validBrandId ? new Set([validBrandId]) : new Set<string>();
+
+   useEffect(() => {
+      if (!validBrandId && brands.length > 0) {
+        setBrandId(brands[0].id); 
+      }
+    }, [brands, validBrandId]);
 
   return (
     <>
@@ -139,9 +145,7 @@ export default function UpdateProductModal({
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-orange-600 rounded-2xl shadow-lg">
-                      <Edit className="h-6 w-6 text-white" />
-                    </div>
+                    
                     <div className="flex flex-col">
                       <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
                         პროდუქტის აღწერის განახლება
@@ -157,25 +161,35 @@ export default function UpdateProductModal({
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 <div className="space-y-5">
                   {/* Brand Selection */}
-                  {brands.length > 0 && (
-                    <div className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                      <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">
-                        ბრენდი
-                      </Label>
-                      <Select value={brandId} onValueChange={setBrandId}>
-                        <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                          <SelectValue placeholder="აირჩიე ბრენდი" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-                          {brands.map((brand) => (
-                            <SelectItem key={brand.id} value={brand.id}>
-                              {brand.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
+                  <div className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                    <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                      ბრენდი
+                    </Label>
+                    {brands.length > 0 ? (
+                      <HSelect
+                        label="ბრენდი"
+                        // remove disallowEmptySelection OR ensure you always have a valid key
+                        // disallowEmptySelection
+                        selectedKeys={selectedKeys}
+                        selectionMode="single"
+                        variant="bordered"
+                        onSelectionChange={(keys) => {
+                          const k = Array.from(keys)[0] as string | undefined;
+                          setBrandId(k ?? "");
+                        }}
+                      >
+                        {brands.map((b) => (
+                          <HSelectItem key={String(b.id)} textValue={b.name}>
+                            {b.name}
+                          </HSelectItem>
+                        ))}
+                      </HSelect>
+                    ) : (
+                      <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                        No brands available. Check console for errors.
+                      </div>
+                    )}
+                  </div>
 
                   {/* Flag switches */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

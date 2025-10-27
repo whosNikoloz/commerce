@@ -107,18 +107,26 @@ export const Navbar = () => {
                 <div className="flex items-center space-x-4">
                   <Link className="flex items-center space-x-2 group" href={`/${lng}`}>
                     {/* Logo */}
-                    <Image
-                      alt={`${site.name} logo`}
+                    {/* <Image
+                      alt="Site Logo"
                       className="select-none transition-transform duration-300 group-hover:scale-105"
-                      height={28}
+                      height={50}
+                      src={"https://placehold.co/200x80/6366f1/white?text=Logo"}
+                      width={50}
+                    /> */}
+                    <Image
+                      unoptimized
+                      alt="Site Logo"
+                      height={50}
                       src={site.logo}
-                      width={28}
+                      width={50}
                     />
                     <span
                       className={`
-                            font-bold text-xl md:block hidden
+                            font-bold text-xl md:block
                             text-text-light dark:text-text-lightdark
                             transition-all duration-300
+                            flex pr-9
                             ${isScrolled ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"}
                           `}
                     >

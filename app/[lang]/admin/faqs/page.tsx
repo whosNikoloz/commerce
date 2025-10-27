@@ -29,7 +29,7 @@ export async function generateMetadata({
 }
 
 export default async function FaqsPage() {
-  const faqs = await getFaqsCached();
+  const faqs = await getAllFaqs();
 
   return (
     <div className="space-y-8">

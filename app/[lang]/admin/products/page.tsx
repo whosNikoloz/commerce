@@ -29,7 +29,7 @@ export async function generateMetadata({
 }
 
 export default async function ProductsPage() {
-  const categories = await getCategoriesCached();
+  const categories = await getAllCategories();
 
   return (
     <div className="space-y-8">

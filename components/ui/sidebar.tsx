@@ -166,6 +166,7 @@ export const SidebarLink = ({ link, className, ...props }: SidebarLinkProps) => 
     <Link
       className={cn("flex items-center justify-start gap-2 group/sidebar py-2", className)}
       href={link.href}
+      prefetch={false}
       {...props} // now you can pass onClick, onKeyDown, etc.
     >
       {link.icon}

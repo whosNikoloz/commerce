@@ -34,9 +34,12 @@ export default function AdminPage() {
           setIsAuthorized(true);
 
           // If we came here due to middleware redirect, go to the target immediately
-          if (next) {
-            router.replace(next);
-          }
+          const target = next && next.startsWith(`/${currentLang}/admin`)
+            ? next
+            : `/${currentLang}/admin`;
+
+          router.replace(target);
+          router.refresh();  
         } else {
           onOpen(); // show login modal
         }

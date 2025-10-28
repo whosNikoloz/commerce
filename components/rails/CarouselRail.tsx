@@ -61,7 +61,7 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
   return (
     <div className="relative group">
       {/* Navigation Buttons - Show on hover */}
-      {canGoPrev && (
+      {/* {canGoPrev && (
         <button
           aria-label="Previous"
           className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-border shadow-lg hover:bg-white transition-all opacity-0 group-hover:opacity-100 group-hover:-translate-x-2 disabled:opacity-0"
@@ -79,9 +79,9 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
           type="button"
           onClick={() => splideRef.current?.go(">")}
         >
-          <ArrowRight className="h-5 w-5 text-foreground" />
+          <ArrowRight className="h-5 w-5 text-black" />
         </button>
-      )}
+      )} */}
 
       <Splide
         ref={splideRef as any}
@@ -90,12 +90,15 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
           type: "slide",
           gap: "0.75rem",
           pagination: false,
-          arrows: false,
-          drag: true,
-          snap: true,
+          arrows: true,
+          drag: "free",
+          trimSpace: true,    
+           snap: false,
+          omitEnd: true,      
+          focus: 0,
+          perMove: 0,          
+          flickPower: 500,
           perPage: perPageDesktop,
-          perMove: 1,
-          omitEnd: true,
           breakpoints: {
             1536: { perPage: 6, gap: "1rem" },
             1280: { perPage: 5, gap: "0.75rem" },

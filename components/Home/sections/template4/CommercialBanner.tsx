@@ -138,7 +138,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative group">
           {/* Navigation Buttons */}
-          {canGoPrev && (
+          {/* {canGoPrev && (
             <button
               aria-label="Previous"
               className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-border shadow-lg hover:bg-white transition-all opacity-0 group-hover:opacity-100 group-hover:-translate-x-2"
@@ -158,7 +158,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
             >
               <ArrowRight className="h-6 w-6 text-foreground" />
             </button>
-          )}
+          )} */}
 
           {/* Carousel */}
           <Splide
@@ -170,7 +170,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
               perMove: 1,
               gap: "1.5rem",
               pagination: true,
-              arrows: false,
+              arrows: true,
               drag: true,
               autoplay: true,
               interval: 5000,

@@ -160,6 +160,13 @@ const ProductCard = memo(function ProductCard({
     }
   };
 
+  const stopAll = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // @ts-ignore — native event may exist
+    e.nativeEvent?.stopImmediatePropagation?.();
+  };
+
   const ActionButtons = ({ compact = false }: { compact?: boolean }) => (
     <div className={compact ? "flex flex-col gap-2" : "absolute top-2 right-2 flex flex-col gap-2 z-30"}>
       <Button
@@ -270,14 +277,14 @@ const ProductCard = memo(function ProductCard({
                         <button
                           aria-label="Previous image"
                           className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover/image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto z-10"
-                          onClick={goPrev}
+                          onClick={(e) => { stopAll(e); goPrev(e); }}
                         >
                           <ChevronRight className="h-5 w-5 rotate-180" />
                         </button>
                         <button
                           aria-label="Next image"
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover/image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto z-10"
-                          onClick={goNext}
+                          onClick={(e) => { stopAll(e); goNext(e); }}
                         >
                           <ChevronRight className="h-5 w-5" />
                         </button>
@@ -314,14 +321,14 @@ const ProductCard = memo(function ProductCard({
                     )}
                   </div>
 
-                  <div className="p-2 sm:p-3 md:p-4 space-y-1.5 sm:space-y-2 bg-gradient-to-b from-background/50 to-background">
+                  <div className="p-1 sm:p-2 md:p-3  bg-gradient-to-b from-background/50 to-background">
                     <div className="space-y-1">
                       {metaLine && (
                         <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-medium truncate">
                           {metaLine}
                         </p>
                       )}
-                      <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] md:group-hover:text-brand-primary transition-colors duration-300">
+                      <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[1rem] sm:min-h-[2rem] md:group-hover:text-brand-primary transition-colors duration-300">
                         {product.name ?? "Unnamed Product"}
                       </h3>
                     </div>
@@ -329,7 +336,7 @@ const ProductCard = memo(function ProductCard({
                     <div className="flex items-baseline gap-1.5 sm:gap-2">
                       <span
                         itemScope
-                        className="font-bold text-base sm:text-xl md:text-2xl lg:text-3xl text-foreground bg-clip-text"
+                        className="font-bold text-base sm:text-xl md:text-xl lg:text-2xl text-foreground bg-clip-text"
                         itemProp="offers"
                         itemType="https://schema.org/Offer"
                       >
@@ -497,7 +504,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       aria-label="Products"
       className={
         viewMode === "grid"
-          ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6"
+          ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 md:gap-3"
           : "space-y-3 sm:space-y-4"
       }
       role="list"

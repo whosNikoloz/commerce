@@ -192,6 +192,7 @@ export function ProductCard({
               quality={85}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               src={imageUrl}
+              unoptimized
             />
 
             {/* Out of stock overlay */}

@@ -24,6 +24,23 @@ const LocalizedRichSchema = z.object({
 });
 
 // ===== Template 1 Zod Schemas =====
+const HeroDataSchema = z.object({
+  categoriesTitle: LocalizedTextSchema.optional(),
+  maxCategories: z.number().optional(),
+  banners: z.array(
+    z.object({
+      imageUrl: z.string(),
+      mobileImageUrl: z.string().optional(),
+      href: z.string(),
+      alt: LocalizedTextSchema,
+      badge: LocalizedTextSchema.optional(),
+      title: LocalizedTextSchema.optional(),
+      description: LocalizedTextSchema.optional(),
+    })
+  ),
+  bannerHeight: z.string().optional(),
+});
+
 const HeroWithSearchDataSchema = z.object({
   headline: LocalizedTextSchema,
   subheadline: LocalizedTextSchema,
@@ -185,6 +202,12 @@ const NewsletterAppDataSchema = z.object({
 
 const Template1SectionSchema = z.discriminatedUnion("type", [
   z.object({
+    type: z.literal("Hero"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: HeroDataSchema,
+  }),
+  z.object({
     type: z.literal("ProductRail"),
     enabled: z.boolean(),
     order: z.number(),
@@ -201,12 +224,6 @@ const Template1SectionSchema = z.discriminatedUnion("type", [
     enabled: z.boolean(),
     order: z.number(),
     data: AboutUsDataSchema,
-  }),
-  z.object({
-    type: z.literal("CategoryGrid"),
-    enabled: z.boolean(),
-    order: z.number(),
-    data: CategoryGridDataSchema,
   }),
   z.object({
     type: z.literal("BrandCarousel"),
@@ -606,6 +623,9 @@ export type TemplateDefinition<
 // Template 1
 import { lazy } from "react";
 
+const Hero = lazy(
+  () => import("@/components/Home/sections/template1/Hero")
+);
 const ProductRail = lazy(
   () => import("@/components/Home/sections/ui/ProductRail")
 );
@@ -678,10 +698,10 @@ const CategoryCarousel = lazy(
 
 // ===== Template 1 Definition =====
 export const TEMPLATE_1_ALLOWED_SECTIONS = [
+  "Hero",
   "ProductRail",
   "CommercialBanner",
   "AboutUs",
-  "CategoryGrid",
   "BrandCarousel",
 ] as const;
 
@@ -692,10 +712,10 @@ export const template1Definition: TemplateDefinition<
   allowedSections: TEMPLATE_1_ALLOWED_SECTIONS,
   schema: Template1HomepageSchema,
   registry: {
+    Hero,
     ProductRail,
     CommercialBanner: CommercialBannerT4,
     AboutUs,
-    CategoryGrid: CategoryGridT1,
     BrandCarousel,
   },
 };

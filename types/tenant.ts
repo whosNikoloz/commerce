@@ -32,11 +32,26 @@ export type ThemeVars = {
 
 // ===== Template 1: Clean Sections =====
 export type Template1SectionType =
+  | "Hero"
   | "ProductRail"
   | "CommercialBanner"
   | "AboutUs"
-  | "CategoryGrid"
   | "BrandCarousel";
+
+export type HeroData = {
+  categoriesTitle?: LocalizedText;
+  maxCategories?: number;
+  banners: Array<{
+    imageUrl: string;
+    mobileImageUrl?: string;
+    href: string;
+    alt: LocalizedText;
+    badge?: LocalizedText;
+    title?: LocalizedText;
+    description?: LocalizedText;
+  }>;
+  bannerHeight?: string;
+};
 
 export type HeroWithSearchData = {
   headline: LocalizedText;
@@ -362,10 +377,10 @@ export type ProductGridData = {
 
 // ===== Section instances with discriminated unions =====
 export type Template1SectionInstance =
+  | { type: "Hero"; enabled: boolean; order: number; data: HeroData }
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
   | { type: "AboutUs"; enabled: boolean; order: number; data: AboutUsData }
-  | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
   | { type: "BrandCarousel"; enabled: boolean; order: number; data: BrandCarouselData };
 
 export type Template2SectionInstance =

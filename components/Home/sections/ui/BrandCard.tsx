@@ -38,7 +38,7 @@ export function BrandCard({
   return (
     <Link className={cn("block group", className)} href={href}>
       <div className={wrapperStyles[template]}>
-        <Image fill alt={brand.name || "Brand"} className="object-contain" sizes="200px" src={logoUrl} />
+        <Image fill alt={brand.name || "Brand"} className="object-contain" sizes="200px" src={logoUrl} unoptimized />
       </div>
     </Link>
   )

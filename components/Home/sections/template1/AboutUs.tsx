@@ -73,6 +73,7 @@ export default function AboutUs({ data, locale, template = 1 }: AboutUsProps) {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
+                  unoptimized
                 />
               </div>
             ) : null}

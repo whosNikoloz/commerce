@@ -17,7 +17,9 @@
       "Bash(echo \"Product URL: $NEXT_PUBLIC_API_URLProduct/get-all-products\")",
       "Bash(dir:*)",
       "Read(//d/MyProjects/nextjs/**)",
-      "Bash(npm init:*)"
+      "Bash(npm init:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

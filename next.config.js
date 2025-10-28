@@ -23,6 +23,9 @@ const nextConfig = {
       // If any of these ever serve over HTTP in dev, add HTTP entries too:
       // { protocol: "http", hostname: "media.veli.store", pathname: "/**" },
     ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 

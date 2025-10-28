@@ -34,6 +34,7 @@ export function CategoryCard({
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            unoptimized
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent group-hover:from-black/90 group-hover:via-black/50 transition-all duration-500" />

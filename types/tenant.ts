@@ -106,7 +106,7 @@ export type ProductRailData = {
   title: LocalizedText;
   subtitle?: LocalizedText;
   layout: "carousel" | "grid"; // Display as carousel or grid
-  columns?: 2 | 3 | 4; // Grid column count (only for grid layout)
+  columns?: 2 | 3 | 4 | 5 | 6; // Grid column count (only for grid layout)
   limit: number;
   viewAllHref: string;
   // Filter options - use any combination
@@ -333,7 +333,7 @@ export type BrandStripData = {
 
 export type CommercialBannerData = {
   layout: "carousel" | "grid";
-  columns?: 1 | 2 | 3; // Grid column count (only for grid layout)
+  columns?: 1 | 2 | 3 | 4 | 5; // Grid column count (only for grid layout)
   banners: Array<{
     imageUrl: string;
     mobileImageUrl?: string;

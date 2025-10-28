@@ -65,7 +65,7 @@ export default async function ProductRail({
 
   const gridClass = isCarousel
     ? "flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
-    : `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-${columns === 2 ? "2" : columns === 3 ? "3" : "4"} gap-4 md:gap-6`;
+    : `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-${columns} gap-4 md:gap-6`;
 
   const loadingSkeleton = (
     <div className={className || "py-20 "}>

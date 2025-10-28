@@ -174,7 +174,7 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
         return (
           <nav
             aria-label={`${data?.category.name} subcategories`}
-            className="fixed z-[9999] w-80 max-h-[400px] bg-card rounded-xl shadow-2xl border border-border overflow-hidden"
+            className="fixed z-50 w-80 max-h-[400px] bg-card rounded-xl shadow-2xl border border-border overflow-hidden"
             role="navigation"
             style={{ top: panelPos.top, left: panelPos.left }}
             onMouseEnter={() => { setOverPanel(true); cancelClose(); }}

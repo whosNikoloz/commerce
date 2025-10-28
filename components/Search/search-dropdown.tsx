@@ -154,7 +154,7 @@ const Search = ({
 
   return (
     <div className="relative w-full">
-      <div className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
+      <div className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-full mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
         <SearchIcon className="text-gray-500" />
         <Input
           aria-controls="search-results"

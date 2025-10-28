@@ -184,14 +184,15 @@ export function BrandsCarousel({
                 <div
                   key={brand.id}
                   className={cn(
-                    "shrink-0 px-2",
-                    "[flex-basis:calc(100%/2.2)] sm:[flex-basis:calc(100%/3.2)] md:[flex-basis:calc(100%/5.2)] lg:[flex-basis:calc(100%/6.2)] xl:[flex-basis:calc(100%/7.2)]",
+                    "shrink-0 min-w-0 px-2", // <- min-w-0 თავიდანაც კი კარგი იდეაა overflow-ებისთვის
+                    "basis-[calc(100%/2.2)] sm:basis-[calc(100%/3.2)] md:basis-[calc(100%/5.2)] lg:basis-[calc(100%/6.2)] xl:basis-[calc(100%/7.2)]"
                   )}
                 >
                   <BrandCard brand={brand} logoUrl={logo} template={template} />
                 </div>
               )
             })}
+
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
 import { useTenant } from "@/app/context/tenantContext";
+import { cn } from "@/lib/utils";
 
 export const Navbar = () => {
   const { config, isLoading } = useTenant();
@@ -104,36 +105,35 @@ export const Navbar = () => {
           >
             <div className="mx-auto px-4">
               <div className="flex items-center justify-between h-16">
-                <div className="flex items-center space-x-4">
-                  <Link className="flex items-center space-x-2 group" href={`/${lng}`}>
-                    {/* Logo */}
-                    {/* <Image
-                      alt="Site Logo"
-                      className="select-none transition-transform duration-300 group-hover:scale-105"
-                      height={50}
-                      src={"https://placehold.co/200x80/6366f1/white?text=Logo"}
-                      width={50}
-                    /> */}
+                <div className="flex items-center">
+                  <Link className="flex items-center  group" href={`/${lng}`}>
                     <Image
                       unoptimized
                       alt="Site Logo"
-                      height={50}
+                      className=" select-none transition-transform duration-300 group-hover:scale-105 object-contain"
+                      height={100}
                       src={site.logo}
-                      width={50}
+                      width={100}
                     />
-                    <span
-                      className={`
-                            font-bold text-xl md:block
-                            text-text-light dark:text-text-lightdark
-                            transition-all duration-300
-                            flex pr-9
-                            ${isScrolled ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"}
-                          `}
+
+                    {/* <span
+                      className={cn(
+                        "font-bold text-xl whitespace-nowrap",
+                        "text-text-light dark:text-text-lightdark",
+                        "transition-all duration-300",
+                        isScrolled
+                          ? "opacity-0 translate-x-2 w-0 overflow-hidden"
+                          : "opacity-100 translate-x-0 w-auto"
+                      )}
                     >
                       {site.shortName}
-                    </span>
+                    </span> */}
                   </Link>
                 </div>
+                <div className="items-center hidden md:flex">
+                   <CategoryDropdown />
+                </div>
+
 
                 {isMobile ? (
                   <SearchForMobile
@@ -152,7 +152,6 @@ export const Navbar = () => {
                 )}
 
                 <div className="items-center hidden md:flex">
-                  <CategoryDropdown />
                   <CartDropdown />
                   <LanguageSwitch />
                   <AuthModal IsMobile={isMobile} />

@@ -94,7 +94,7 @@ const AboutUsDataSchema = z.object({
 
 const CommercialBannerDataSchema = z.object({
   layout: z.enum(["carousel", "grid"]),
-  columns: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  columns: z.union([z.literal(1), z.literal(2), z.literal(3),z.literal(4),z.literal(5)]).optional(),
   banners: z.array(
     z.object({
       imageUrl: z.string(),
@@ -126,7 +126,7 @@ const ProductRailDataSchema = z.object({
   title: LocalizedTextSchema,
   subtitle: LocalizedTextSchema.optional(),
   layout: z.enum(["carousel", "grid"]),
-  columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  columns: z.union([z.literal(2), z.literal(3), z.literal(4),z.literal(5),z.literal(6)]).optional(),
   limit: z.number(),
   viewAllHref: z.string(),
   filterBy: z.object({
@@ -548,7 +548,7 @@ const ProductGridDataSchema = z.object({
   customName: z.string().optional(),
   title: LocalizedTextSchema,
   subtitle: LocalizedTextSchema.optional(),
-  columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  columns: z.union([z.literal(2), z.literal(3), z.literal(4),z.literal(5),z.literal(6)]).optional(),
   limit: z.number(),
   viewAllHref: z.string(),
   filterBy: z.object({

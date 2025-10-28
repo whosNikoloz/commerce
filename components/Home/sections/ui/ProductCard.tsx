@@ -4,28 +4,22 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Heart, ShoppingCart, Sparkles, Tag, TrendingUp } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 
 // shadcn/ui
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-
-// Icons
-
-// utils
-import { formatPrice } from "@/lib/utils";
 
 // services
 import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
 import { useUser } from "@/app/context/userContext";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
+import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
   product: ProductResponseModel;
@@ -35,418 +29,289 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
+const templateStyles = {
+  1: {
+    card:
+      "rounded-2xl border bg-white shadow-[0_6px_24px_-8px_rgba(0,0,0,.20)] " +
+      "border-black/5 dark:bg-zinc-950 dark:border-white/10 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]",
+    imageRadius: "rounded-t-2xl",
+    title: "text-[15px] font-semibold leading-snug line-clamp-2",
+    cta: "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90",
+    oldPrice: "text-muted-foreground dark:text-zinc-400",
+  },
+  2: {
+    card:
+      "rounded-xl border bg-white shadow " +
+      "border-black/10 dark:bg-zinc-950 dark:border-white/10 dark:shadow-none",
+    imageRadius: "rounded-t-xl",
+    title: "text-sm font-semibold leading-snug line-clamp-2",
+    cta: "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-white/90",
+    oldPrice: "text-neutral-400 dark:text-zinc-500",
+  },
+  3: {
+    card:
+      "rounded-lg border bg-white border-zinc-200 " +
+      "dark:bg-zinc-950 dark:border-zinc-800/80",
+    imageRadius: "rounded-t-lg",
+    title: "text-sm font-medium leading-snug line-clamp-2",
+    cta: "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-white/90",
+    oldPrice: "text-zinc-400 dark:text-zinc-500",
+  },
+} as const;
 
 export function ProductCard({
   product,
   template = 1,
   className,
-  showActions = false,
+  showActions = true,
   priority = false,
 }: ProductCardProps) {
   const { user } = useUser();
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const addToCart = useCartStore((s) => s.addToCart);
-  
 
   useEffect(() => {
     if (user && product.id) {
-      isInWishlist(product.id)
-        .then(setInWishlist)
-        .catch(() => setInWishlist(false));
+      isInWishlist(product.id).then(setInWishlist).catch(() => setInWishlist(false));
     }
   }, [user, product.id]);
 
-  // Calculate discount percentage
-  const discountPercent = product.discountPrice
-    ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
-    : 0;
-
-  // Get display values
   const imageUrl = product.images?.[0] || "/placeholder.png";
   const isInStock = product.status === StockStatus.InStock;
-  const displayPrice = product.discountPrice || product.price;
   const hasDiscount = !!product.discountPrice && product.discountPrice < product.price;
+  const displayPrice = hasDiscount ? product.discountPrice! : product.price;
+  const discountPercent = hasDiscount
+    ? Math.max(0, Math.round(((product.price - (product.discountPrice as number)) / product.price) * 100))
+    : 0;
 
-  // Product metadata
-  const brandName = product.brand?.name;
-  const categoryName = product.category?.name;
-  const conditionLabel = product.condition === Condition.New ? "New" :
-                        product.condition === Condition.LikeNew ? "Like New" :
-                        product.condition === Condition.Used ? "Used" : "";
+  const conditionLabel =
+    product.condition === Condition.New
+      ? "New"
+      : product.condition === Condition.LikeNew
+      ? "Like New"
+      : product.condition === Condition.Used
+      ? "Used"
+      : "";
 
-  // Template-specific styling
-  const templateClasses: Record<1 | 2 | 3, string> = {
-    1: "rounded-2xl border border-border/50 bg-card md:hover:border-brand-primary/40 md:hover:shadow-2xl",
-    2: "rounded-xl border border-border/50 bg-card md:hover:border-brand-primary/30 md:hover:shadow-lg",
-    3: "rounded-lg border border-border/40 bg-card md:hover:border-brand-primary/20 md:hover:shadow-md",
-  };
+  const S = templateStyles[template];
 
-  const imageContainerClasses: Record<1 | 2 | 3, string> = {
-    1: "rounded-t-2xl",
-    2: "rounded-t-xl",
-    3: "rounded-t-lg",
-  };
-
-  const nameClasses: Record<1 | 2 | 3, string> = {
-    1: "text-sm md:text-base font-semibold tracking-tight line-clamp-2 min-h-[2.5rem]",
-    2: "text-sm font-semibold line-clamp-2 min-h-[2.5rem]",
-    3: "text-sm font-medium line-clamp-2 min-h-[2.5rem]",
-  };
-
-  const paddingClasses: Record<1 | 2 | 3, string> = {
-    1: "p-3 sm:p-4",
-    2: "p-3",
-    3: "p-2.5 sm:p-3",
-  };
-
-  // Handle wishlist toggle
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!user) {
-      toast.error("Please log in to add items to your wishlist");
-
-      return;
-    }
-
-    if (!product.id) {
-      toast.error("Product ID is missing");
-
-      return;
-    }
-
+    if (!user) return toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
+    if (!product.id) return toast.error("Product ID is missing");
     setWishlistLoading(true);
     try {
       if (inWishlist) {
         await removeFromWishlist(product.id);
         setInWishlist(false);
-        toast.success("Removed from wishlist");
+        toast.success("სურვილების სიიდან წაიშალა");
       } else {
         await addToWishlist(product.id);
         setInWishlist(true);
-        toast.success("Added to wishlist");
+        toast.success("დაემატა სურვილების სიაში");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update wishlist");
     } finally {
       setWishlistLoading(false);
     }
   };
 
-  const handleAddToCart = (product: ProductResponseModel) => {
-      const item: CartItem = {
-        id: product.id,
-        name: product.name ?? "Unnamed Product",
-        price: product.discountPrice ?? product.price,
-        image: product.images?.[0] ?? "/placeholder.png",
-        quantity: 1,
-        discount: product.discountPrice
-          ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
-          : 0,
-        originalPrice: product.price,
-      };
-  
-      addToCart(item);
+  const handleAddToCart = (p: ProductResponseModel) => {
+    const item: CartItem = {
+      id: p.id,
+      name: p.name ?? "Unnamed Product",
+      price: p.discountPrice ?? p.price,
+      image: p.images?.[0] ?? "/placeholder.png",
+      quantity: 1,
+      discount: discountPercent,
+      originalPrice: p.price,
     };
+
+    addToCart(item);
+    toast.success("დაემატა კალათაში");
+  };
 
   return (
     <article
       itemScope
-      className={cn(
-        "group relative overflow-hidden transition-all duration-300",
-        "focus-within:ring-2 focus-within:ring-brand-primary/50 focus-within:ring-offset-2",
-        templateClasses[template],
-        className
-      )}
+      className={cn("group relative overflow-hidden transition-all duration-300", S.card, className)}
       itemType="https://schema.org/Product"
     >
-      {/* SEO: Product metadata */}
       <meta content={product.name || "Product"} itemProp="name" />
       {imageUrl && <meta content={imageUrl} itemProp="image" />}
-      {brandName && <meta content={brandName} itemProp="brand" />}
 
-      {/* Main clickable area */}
       <Link
         aria-label={`View ${product.name || "product"} details`}
-        className="absolute inset-0 z-10"
+        className="absolute inset-0 z-[5]"
         href={`/product/${product.id}`}
+        tabIndex={-1}
       />
 
-      {/* Image Section */}
-      <CardContent className={cn("relative", paddingClasses[template])}>
+      {/* IMAGE */}
+      <CardContent className="p-0 relative z-10"> {/* ensure image area stays interactive (e.g., heart) */}
         <div className="relative">
-          <AspectRatio
-            className={cn(
-              "overflow-hidden bg-muted/30",
-              imageContainerClasses[template]
-            )}
-            ratio={1}
-          >
+          <AspectRatio className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)} ratio={1}>
             <Image
               fill
-              alt={product.name || "Product image"}
-              className="object-cover transition-transform duration-500 ease-out md:group-hover:scale-110"
-              priority={priority}
-              quality={85}
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-              src={imageUrl}
               unoptimized
+              alt={product.name || "Product image"}
+              className="object-cover"
+              priority={priority}
+              sizes="(max-width:640px) 90vw, (max-width:1024px) 40vw, 20vw"
+              src={imageUrl}
             />
-
-            {/* Out of stock overlay */}
-            {!isInStock && !product.isComingSoon && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <Badge
-                  className="bg-slate-800/90 text-white border-0 text-xs sm:text-sm px-3 py-1 shadow-lg"
-                  variant="secondary"
-                >
-                  Out of Stock
-                </Badge>
-              </div>
-            )}
           </AspectRatio>
 
-          {/* Status Badges - Top Left */}
-          <div className="pointer-events-none absolute left-2 sm:left-3 top-2 sm:top-3 flex flex-col gap-1.5 sm:gap-2 z-20">
-            {/* Coming Soon Badge */}
-            {product.isComingSoon && (
-              <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0 shadow-lg text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1">
-                <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
-                Coming Soon
-              </Badge>
-            )}
-
-            {/* New Arrival Badge */}
-            {product.isNewArrival && !product.isComingSoon && (
-              <Badge className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1">
-                <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
-                NEW
-              </Badge>
-            )}
-
-            {/* Liquidation Badge */}
-            {product.isLiquidated && (
-              <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
-                <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
-                CLEARANCE
-              </Badge>
-            )}
-
-            {/* Discount Badge */}
-            {discountPercent > 0 && (
-              <Badge className="bg-gradient-to-r from-red-600 to-pink-600 text-white border-0 shadow-lg text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
+          {discountPercent > 0 && (
+            <div className="absolute left-3 top-3 z-20">
+              <div className="rounded-full bg-red-500 text-white text-xs font-bold px-2.5 py-1 shadow-sm">
                 -{discountPercent}%
-              </Badge>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
 
-          {/* Quick Actions - Top Right (Desktop and Mobile) */}
-          {showActions && (
-            <div className="pointer-events-none absolute right-2 sm:right-3 top-2 sm:top-3 flex flex-col gap-2 z-20 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+          {template !== 2 && showActions && (
+            <div className="absolute right-3 top-3 z-20">
               <Button
                 className={cn(
-                  "pointer-events-auto h-8 w-8 sm:h-9 sm:w-9 rounded-full backdrop-blur-md shadow-lg hover:scale-110 transition-all",
-                  inWishlist
-                    ? "bg-red-500 hover:bg-red-600 text-white"
-                    : "bg-background/80 hover:bg-background"
+                  "rounded-full h-9 w-9 shadow-md",
+                  "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
+                  inWishlist && "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                 )}
                 disabled={wishlistLoading}
                 size="icon"
+                type="button"
                 variant="secondary"
-                onClick={handleWishlistToggle}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleWishlistToggle(e);
+                }}
               >
-                <Heart
-                  className={cn(
-                    "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all",
-                    inWishlist && "fill-current"
-                  )}
-                />
-                <span className="sr-only">
-                  {inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                </span>
+                <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+                <span className="sr-only">{inWishlist ? "Remove from wishlist" : "Add to wishlist"}</span>
               </Button>
             </div>
           )}
         </div>
       </CardContent>
 
-      {/* Content Section */}
-      <CardFooter className={cn("flex flex-col items-start gap-2 sm:gap-2.5 pt-0", paddingClasses[template])}>
-        {/* Brand & Category */}
-        {(brandName || categoryName) && (
-          <div className="flex items-center gap-2 w-full">
-            {brandName && (
-              <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground font-medium truncate">
-                {brandName}
-              </p>
-            )}
-            {brandName && categoryName && (
-              <span className="text-muted-foreground/50">•</span>
-            )}
-            {categoryName && (
-              <p className="text-[10px] sm:text-[11px] text-muted-foreground/80 truncate">
-                {categoryName}
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Product Name */}
-        <h3
-          className={cn(
-            nameClasses[template],
-            "text-foreground transition-colors duration-200 md:group-hover:text-brand-primary w-full"
-          )}
-          itemProp="name"
-        >
+      {/* CONTENT */}
+      <CardFooter className="relative z-10 flex flex-col items-start gap-2.5 p-4">
+        <h3 className={cn(S.title, "text-zinc-900 dark:text-zinc-100 w-full")} itemProp="name">
           {product.name || "Unnamed Product"}
         </h3>
 
-        {/* Condition Badge (if applicable) */}
         {conditionLabel && product.condition !== Condition.New && (
-          <Badge className="text-[10px] px-2 py-0 border-muted-foreground/30" variant="outline">
+          <span className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300">
             {conditionLabel}
-          </Badge>
+          </span>
         )}
 
-        {/* Price Section */}
-        <div
-          itemScope
-          className="flex items-baseline gap-2 w-full mt-auto"
-          itemProp="offers"
-          itemType="https://schema.org/Offer"
-        >
+        <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
           <meta content="USD" itemProp="priceCurrency" />
           <meta content={displayPrice.toString()} itemProp="price" />
-          <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
-
-          <span className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
-            {formatPrice(displayPrice)}
-          </span>
-
-          {hasDiscount && (
-            <span className="text-xs sm:text-sm text-muted-foreground line-through">
-              {formatPrice(product.price)}
-            </span>
-          )}
+          <meta
+            content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
+            itemProp="availability"
+          />
+          <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(displayPrice)}</span>
+          {hasDiscount && <span className={cn("text-sm line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
         </div>
 
-        {/* Stock Status & Action Buttons */}
-        <div className="flex items-center justify-between gap-2 w-full mt-1">
-          {/* Stock indicator */}
-          <div className="flex items-center gap-1.5">
-            {isInStock ? (
-              <>
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-                  In Stock
-                </span>
-              </>
-            ) : product.isComingSoon ? (
-              <span className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
-                Coming Soon
-              </span>
-            ) : (
-              <span className="text-[10px] sm:text-xs text-muted-foreground">
-                Out of Stock
-              </span>
-            )}
+        {template === 2 && showActions ? (
+          <div className="mt-1 w-full flex items-stretch gap-2">
+            <Button
+              className={cn("h-11 flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
+              disabled={!isInStock || product.isComingSoon}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleAddToCart(product);
+              }}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              Add to cart
+            </Button>
+
+            <Button
+              aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+              className={cn(
+                "h-11 w-11 shrink-0 rounded-full border shadow-sm",
+                "bg-white hover:bg-white border-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:border-zinc-700",
+                inWishlist &&
+                  "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
+              )}
+              disabled={wishlistLoading}
+              size="icon"
+              type="button"
+              variant={inWishlist ? "default" : "outline"}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleWishlistToggle(e as any);
+              }}
+            >
+              <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+            </Button>
           </div>
-
-          {/* Action Buttons (if enabled) */}
-          {showActions && (
-            <div className="flex items-center gap-2 relative z-20">
-              {/* Wishlist Button - Visible on mobile */}
-              <Button
-                className={cn(
-                  "md:hidden h-8 w-8 rounded-lg shadow-sm transition-all",
-                  inWishlist
-                    ? "bg-red-500 hover:bg-red-600 text-white border-red-500"
-                    : "hover:bg-muted"
-                )}
-                disabled={wishlistLoading}
-                size="icon"
-                variant="outline"
-                onClick={handleWishlistToggle}
-              >
-                <Heart
-                  className={cn(
-                    "h-3.5 w-3.5 transition-all",
-                    inWishlist && "fill-current"
-                  )}
-                />
-              </Button>
-
-              {/* Add to Cart Button */}
-              <Button
-                className="gap-1.5 h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4 rounded-lg shadow-md hover:shadow-lg transition-all"
-                disabled={!isInStock || product.isComingSoon}
-                size="sm"
-                onClick={(e) => {
-                  handleAddToCart(product);
-                }}
-              >
-                <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                <span className="hidden sm:inline">Add</span>
-              </Button>
-            </div>
-          )}
-        </div>
+        ) : (
+          <Button
+            className={cn("mt-1 w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
+            disabled={!isInStock || product.isComingSoon}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleAddToCart(product);
+            }}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Add to cart
+          </Button>
+        )}
       </CardFooter>
     </article>
   );
 }
 
+
 export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2 | 3 }) {
-  const templateClasses: Record<1 | 2 | 3, string> = {
-    1: "rounded-2xl border border-border/50 bg-card",
-    2: "rounded-xl border border-border/50 bg-card",
-    3: "rounded-lg border border-border/40 bg-card",
-  };
-
-  const imageContainerClasses: Record<1 | 2 | 3, string> = {
-    1: "rounded-t-2xl",
-    2: "rounded-t-xl",
-    3: "rounded-t-lg",
-  };
-
-  const paddingClasses: Record<1 | 2 | 3, string> = {
-    1: "p-3 sm:p-4",
-    2: "p-3",
-    3: "p-2.5 sm:p-3",
-  };
+  const S = templateStyles[template];
 
   return (
-    <Card className={cn("overflow-hidden animate-pulse", templateClasses[template])}>
-      <CardContent className={paddingClasses[template]}>
-        <AspectRatio className={cn("overflow-hidden", imageContainerClasses[template])} ratio={1}>
-          <Skeleton className="h-full w-full bg-muted/50" />
-        </AspectRatio>
+    <article className={cn("overflow-hidden", S.card)}>
+      <CardContent className="p-4">
+        <div className={cn("relative p-2 rounded-xl shadow-inner bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)}>
+          <AspectRatio ratio={1}>
+            <div className="h-full w-full rounded-lg animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+          </AspectRatio>
+
+          <div className="absolute left-4 top-4 h-6 w-16 rounded-full animate-pulse bg-zinc-200/80 dark:bg-zinc-700/70" />
+          <div className="absolute right-4 top-4 h-9 w-9 rounded-full shadow-sm animate-pulse bg-white/80 dark:bg-zinc-800/80" />
+        </div>
       </CardContent>
-      <CardFooter className={cn("flex flex-col gap-2 sm:gap-2.5 pt-0", paddingClasses[template])}>
-        {/* Brand/Category skeleton */}
-        <Skeleton className="h-3 w-24 sm:w-28 bg-muted/50" />
 
-        {/* Product name skeleton */}
-        <div className="space-y-2 w-full">
-          <Skeleton className="h-4 w-full bg-muted/50" />
-          <Skeleton className="h-4 w-3/4 bg-muted/50" />
+      <CardFooter className="flex flex-col gap-3 p-4">
+        <div className="h-4 w-3/4 rounded animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+        <div className="h-4 w-1/2 rounded animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+
+        <div className="mt-1 flex items-center gap-2 w-full">
+          <div className="h-6 w-24 rounded animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-4 w-16 rounded animate-pulse bg-zinc-200 dark:bg-zinc-800" />
         </div>
 
-        {/* Price skeleton */}
-        <div className="flex items-baseline gap-2 w-full mt-1">
-          <Skeleton className="h-6 sm:h-7 w-20 sm:w-24 bg-muted/50" />
-          <Skeleton className="h-3 sm:h-4 w-14 sm:w-16 bg-muted/50" />
-        </div>
-
-        {/* Stock/Action skeleton */}
-        <div className="flex items-center justify-between gap-2 w-full mt-1">
-          <Skeleton className="h-4 w-16 sm:w-20 bg-muted/50" />
-          <Skeleton className="h-8 sm:h-9 w-16 sm:w-20 bg-muted/50 rounded-lg" />
-        </div>
+        {template === 2 ? (
+          <div className="mt-1 w-full flex items-stretch gap-2">
+            <div className="h-11 flex-1 rounded-xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+            <div className="h-11 w-11 rounded-full animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+        ) : (
+          <div className="mt-1 h-11 w-full rounded-xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+        )}
       </CardFooter>
-    </Card>
+    </article>
   );
 }

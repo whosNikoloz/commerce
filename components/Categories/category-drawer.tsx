@@ -4,7 +4,7 @@ import type { CategoryModel } from "@/types/category";
 
 import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon, ChevronRightIcon, ChevronDownIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import { XMarkIcon, ChevronRightIcon, ArrowLeftIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { getAllCategories } from "@/app/api/services/categoryService";
@@ -39,8 +39,8 @@ export default function CategoryDrawer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // expanded state per id
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  // Track current parent category (null = showing root categories)
+  const [currentParentId, setCurrentParentId] = useState<string | null>(null);
 
   const hasLoadedRef = useRef(false);
 
@@ -52,13 +52,33 @@ export default function CategoryDrawer() {
       void loadCategories();
     }
   };
-  const closeDrawer = () => setIsOpen(false);
 
-  const toggle = (id: string) =>
-    setExpanded((s) => ({ ...s, [id]: !s[id] }));
+  const closeDrawer = () => {
+    setIsOpen(false);
+    // Reset navigation when closing
+    setCurrentParentId(null);
+  };
+
+  const navigateToCategory = (id: string) => {
+    setCurrentParentId(id);
+  };
+
+  const goBack = () => {
+    setCurrentParentId(null);
+  };
 
   const getChildren = (id?: string | null) =>
     (id ? childrenMap[normalizeId(id)] : childrenMap[ROOT_KEY]) ?? [];
+
+  // Get categories to display based on current navigation level
+  const currentCategories = currentParentId
+    ? getChildren(currentParentId)
+    : roots;
+
+  // Get current parent category for header display
+  const currentParent = currentParentId
+    ? categories.find(c => normalizeId(c.id) === currentParentId)
+    : null;
 
   async function loadCategories() {
     setLoading(true);
@@ -75,19 +95,16 @@ export default function CategoryDrawer() {
     }
   }
 
-  /** Recursive row */
-  function NodeRow({ node, level = 0 }: { node: CategoryModel; level?: number }) {
+  /** Category row */
+  function NodeRow({ node }: { node: CategoryModel }) {
     const id = normalizeId(node.id);
     const kids = getChildren(id);
-    const isExpandable = kids.length > 0;
-    const isOpen = !!expanded[id];
-    const leftPad = Math.min(16 + level * 14, 48);
+    const hasChildren = kids.length > 0;
 
     return (
       <li key={id} className="select-none">
         <div
-          className={`group flex items-center justify-between rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-all`}
-          style={{ paddingLeft: leftPad }}
+          className={`group flex items-center justify-between rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-all px-4`}
         >
           <Link
             href={`/category/${id}`}
@@ -97,31 +114,19 @@ export default function CategoryDrawer() {
             {node.name ?? "Category"}
           </Link>
 
-          {isExpandable ? (
+          {hasChildren ? (
             <button
-              aria-label={isOpen ? "Collapse" : "Expand"}
+              aria-label="View subcategories"
               className="p-2 mr-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-              onClick={() => toggle(id)}
+              onClick={() => navigateToCategory(id)}
               type="button"
             >
-              {isOpen ? (
-                <ChevronDownIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-              ) : (
-                <ChevronRightIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-              )}
+              <ChevronRightIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
             </button>
           ) : (
             <span className="px-2 text-xs text-gray-400 dark:text-gray-500">—</span>
           )}
         </div>
-
-        {isExpandable && isOpen && (
-          <ul className="mt-1 space-y-1">
-            {kids.map((k) => (
-              <NodeRow key={k.id} node={k} level={level + 1} />
-            ))}
-          </ul>
-        )}
       </li>
     );
   }
@@ -166,8 +171,21 @@ export default function CategoryDrawer() {
               {/* Header */}
               <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
-                  <Squares2X2Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                  <h2 className="text-xl font-extrabold text-gray-900 dark:text-white">Categories</h2>
+                  {currentParent ? (
+                    <button
+                      aria-label="Go back"
+                      className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                      onClick={goBack}
+                      type="button"
+                    >
+                      <ArrowLeftIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                    </button>
+                  ) : (
+                    <Squares2X2Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  )}
+                  <h2 className="text-xl font-extrabold text-gray-900 dark:text-white truncate">
+                    {currentParent ? currentParent.name : "Categories"}
+                  </h2>
                 </div>
                 <button
                   aria-label="Close"
@@ -200,16 +218,16 @@ export default function CategoryDrawer() {
                   </div>
                 )}
 
-                {!loading && !error && roots.length === 0 && (
+                {!loading && !error && currentCategories.length === 0 && (
                   <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-                    No categories available.
+                    {currentParent ? "No subcategories available." : "No categories available."}
                   </div>
                 )}
 
-                {!loading && !error && roots.length > 0 && (
+                {!loading && !error && currentCategories.length > 0 && (
                   <ul className="space-y-1">
-                    {roots.map((root) => (
-                      <NodeRow key={root.id} node={root} />
+                    {currentCategories.map((category) => (
+                      <NodeRow key={category.id} node={category} />
                     ))}
                   </ul>
                 )}

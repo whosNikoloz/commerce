@@ -1,6 +1,7 @@
 // lib/urlState.ts
 import { Condition, StockStatus } from "@/types/enums";
 import { FilterModel } from "@/types/filter";
+import { FacetModel } from "@/types/facet";
 
 export type UrlState = {
   brand?: string[]; // CSV in URL
@@ -80,13 +81,35 @@ export function toUrlState(
   };
 }
 
-export function toFilterFromUrl(u: UrlState): Partial<FilterModel> {
+/**
+ * Build a lookup map from facetValueId to facetId
+ */
+export function buildFacetValueToFacetIdMap(facets: FacetModel[]): Record<string, string> {
+  const map: Record<string, string> = {};
+  facets.forEach((facet) => {
+    (facet.facetValues ?? []).forEach((value) => {
+      if (value.id) {
+        map[value.id] = facet.id;
+      }
+    });
+  });
+  return map;
+}
+
+export function toFilterFromUrl(u: UrlState, facets: FacetModel[] = []): Partial<FilterModel> {
+  const facetValueToFacetId = buildFacetValueToFacetIdMap(facets);
+
   return {
     brandIds: u.brand ?? [],
     condition: (u.cond ?? []) as unknown as Condition[],
     stockStatus: (u.stock ?? undefined) as unknown as StockStatus | undefined,
     minPrice: u.min,
     maxPrice: u.max,
-    facetFilters: (u.facet ?? []).map((id) => ({ facetValueId: id })),
+    facetFilters: (u.facet ?? [])
+      .map((facetValueId) => {
+        const facetId = facetValueToFacetId[facetValueId];
+        return facetId ? { facetId, facetValueId } : null;
+      })
+      .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
   };
 }

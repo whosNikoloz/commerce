@@ -35,7 +35,7 @@ type ProductFiltersProps = {
   onConditionToggle: (cond: Condition) => void;
   onStockChange: (status?: StockStatus) => void;
   onPriceChange: (min?: number, max?: number) => void;
-  onFacetToggle: (facetValueId: string) => void;
+  onFacetToggle: (facetId: string, facetValueId: string) => void;
   onFacetRadioChange: (facetId: string, facetValueId: string) => void;
   clearFilters: () => void;
   activeFiltersCount: number;
@@ -63,7 +63,7 @@ function FacetBlock({
 }: {
   facet: FacetModel;
   filter: FilterModel;
-  onFacetToggle: (facetValueId: string) => void;
+  onFacetToggle: (facetId: string, facetValueId: string) => void;
   onFacetRadioChange: (facetId: string, facetValueId: string) => void;
 }) {
   const values = facet.facetValues ?? [];
@@ -77,7 +77,7 @@ function FacetBlock({
               <Checkbox
                 checked={isFacetValueSelected(filter, v.id)}
                 id={v.id}
-                onCheckedChange={() => v.id && onFacetToggle(v.id)}
+                onCheckedChange={() => v.id && onFacetToggle(facet.id, v.id)}
               />
               <label
                 className="text-sm cursor-pointer text-text-light dark:text-text-lightdark"
@@ -123,7 +123,7 @@ function FacetBlock({
           <span className="text-sm text-text-light dark:text-text-lightdark">
             {v?.value ?? "Enabled"}
           </span>
-          <Switch checked={checked} onCheckedChange={() => v?.id && onFacetToggle(v.id)} />
+          <Switch checked={checked} onCheckedChange={() => v?.id && onFacetToggle(facet.id, v.id)} />
         </div>
       );
     }
@@ -137,7 +137,7 @@ function FacetBlock({
                 <Checkbox
                   checked={isFacetValueSelected(filter, v.id)}
                   id={v.id}
-                  onCheckedChange={() => v.id && onFacetToggle(v.id)}
+                  onCheckedChange={() => v.id && onFacetToggle(facet.id, v.id)}
                 />
                 <label className="cursor-pointer" htmlFor={v.id}>
                   {v.value}

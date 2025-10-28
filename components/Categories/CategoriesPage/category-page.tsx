@@ -19,6 +19,7 @@ import { searchProductsByFilter } from "@/app/api/services/productService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import Loading from "@/app/[lang]/category/[[...slug]]/loading";
+import { buildFacetValueToFacetIdMap } from "@/lib/urlState";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
@@ -28,12 +29,16 @@ const toggleInArray = <T,>(arr: T[] | undefined, val: T) => {
   return a.includes(val) ? a.filter((x) => x !== val) : [...a, val];
 };
 
-const toggleFacetValue = (arr: { facetValueId: string }[] | undefined, facetValueId: string) => {
+const toggleFacetValue = (
+  arr: { facetId: string; facetValueId: string }[] | undefined,
+  facetId: string,
+  facetValueId: string,
+) => {
   const a = arr ?? [];
 
   return a.some((f) => f.facetValueId === facetValueId)
     ? a.filter((f) => f.facetValueId !== facetValueId)
-    : [...a, { facetValueId }];
+    : [...a, { facetId, facetValueId }];
 };
 
 export default function CategoryPage({
@@ -94,6 +99,11 @@ export default function CategoryPage({
     }
   }, [categoryId, __initialCategory]);
 
+  const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
+
+  // Lookup map from facetValueId to facetId
+  const facetValueToFacetId = useMemo(() => buildFacetValueToFacetIdMap(facets), [facets]);
+
   useEffect(() => {
     if (!category) return;
 
@@ -117,11 +127,14 @@ export default function CategoryPage({
       stockStatus: stockParam !== null ? (Number(stockParam) as StockStatus) : undefined,
       minPrice: min ? Number(min) : undefined,
       maxPrice: max ? Number(max) : undefined,
-      facetFilters: facetIds.map((id) => ({ facetValueId: id })),
+      facetFilters: facetIds
+        .map((facetValueId) => {
+          const facetId = facetValueToFacetId[facetValueId];
+          return facetId ? { facetId, facetValueId } : null;
+        })
+        .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
     });
-  }, [category?.id, params, __initialPage, __initialSort]);
-
-  const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
+  }, [category?.id, params, __initialPage, __initialSort, facetValueToFacetId]);
 
   const facetValueLookup = useMemo(() => {
     const map: Record<string, string> = {};
@@ -214,10 +227,10 @@ export default function CategoryPage({
     setFilter((prev) => ({ ...prev, minPrice: min, maxPrice: max }));
     setCurrentPage(1);
   };
-  const onFacetToggle = (facetValueId: string) => {
+  const onFacetToggle = (facetId: string, facetValueId: string) => {
     setFilter((prev) => ({
       ...prev,
-      facetFilters: toggleFacetValue(prev.facetFilters, facetValueId),
+      facetFilters: toggleFacetValue(prev.facetFilters, facetId, facetValueId),
     }));
     setCurrentPage(1);
   };
@@ -230,7 +243,7 @@ export default function CategoryPage({
       );
       const cleaned = current.filter((ff) => !removeIds.has(ff.facetValueId));
 
-      return { ...prev, facetFilters: [...cleaned, { facetValueId }] };
+      return { ...prev, facetFilters: [...cleaned, { facetId, facetValueId }] };
     });
     setCurrentPage(1);
   };

@@ -22,6 +22,8 @@ import {
 } from "@/app/api/services/categoryService";
 import { getAllBrands } from "@/app/api/services/brandService";
 import { searchProductsByFilter } from "@/app/api/services/productService";
+import { buildFacetValueToFacetIdMap } from "@/lib/urlState";
+import type { FacetModel } from "@/types/facet";
 
 export const revalidate = 300; // 5 minutes
 
@@ -41,6 +43,7 @@ type Search = {
 function buildFilter(
   categoryId: string,
   sp: Search,
+  facets: FacetModel[] = [],
 ): {
   filter: FilterModel;
   page: number;
@@ -65,6 +68,9 @@ function buildFilter(
 
   const facetValueIds = Array.isArray(sp.facet) ? sp.facet : sp.facet ? [sp.facet] : [];
 
+  // Build lookup map to find facetId for each facetValueId
+  const facetValueToFacetId = buildFacetValueToFacetIdMap(facets);
+
   return {
     filter: {
       brandIds,
@@ -73,7 +79,12 @@ function buildFilter(
       stockStatus,
       minPrice: Number.isFinite(minPrice!) ? minPrice : undefined,
       maxPrice: Number.isFinite(maxPrice!) ? maxPrice : undefined,
-      facetFilters: facetValueIds.map((id) => ({ facetValueId: id })),
+      facetFilters: facetValueIds
+        .map((facetValueId) => {
+          const facetId = facetValueToFacetId[facetValueId];
+          return facetId ? { facetId, facetValueId } : null;
+        })
+        .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
     },
     page,
     sortBy,
@@ -199,7 +210,8 @@ export default async function CategoryIndex({
   }
 
   // Server-render first page of products (SEO + speed)
-  const { filter, page, sortBy } = buildFilter(parent.id, sp);
+  const facets = (parent.facets as FacetModel[]) ?? [];
+  const { filter, page, sortBy } = buildFilter(parent.id, sp, facets);
   const pageSize = 12;
 
   const initial = await searchProductsByFilter({

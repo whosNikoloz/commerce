@@ -6,6 +6,7 @@ export interface ProductFacetValueResponseModel {
 }
 
 export interface FacetFilterModel {
+  facetId: string;
   facetValueId: string;
 }
 

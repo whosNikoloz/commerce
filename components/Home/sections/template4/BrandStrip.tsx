@@ -64,16 +64,17 @@ export default async function BrandStrip({ data, locale }: BrandStripProps) {
           </h2>
         )}
 
-        {/* Auto-scrolling carousel */}
+        {/* Professional text-based brand carousel */}
         <div className="relative overflow-hidden">
-          <div className="flex gap-12 md:gap-16 lg:gap-20 animate-scroll hover:pause-animation">
-            {duplicatedBrands.map(({ brand, logoUrl }, index) => (
-              <div key={`${brand.id}-${index}`} className="flex-shrink-0">
-                <BrandCard
-                  brand={brand}
-                  logoUrl={logoUrl}
-                  template={template}
-                />
+          <div className="flex gap-16 md:gap-24 lg:gap-32 animate-scroll hover:pause-animation items-center py-8">
+            {duplicatedBrands.map(({ brand }, index) => (
+              <div
+                key={`${brand.id}-${index}`}
+                className="flex-shrink-0 group"
+              >
+                <span className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-300 dark:text-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors duration-500 uppercase tracking-widest whitespace-nowrap">
+                  {brand.name}
+                </span>
               </div>
             ))}
           </div>

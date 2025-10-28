@@ -19,7 +19,9 @@
       "Read(//d/MyProjects/nextjs/**)",
       "Bash(npm init:*)",
       "Bash(tasklist:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(echo:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

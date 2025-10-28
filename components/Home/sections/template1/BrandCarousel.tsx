@@ -50,7 +50,7 @@ export default async function BrandCarousel({ data, locale, template = 1 }: Bran
 
   return (
     <SectionContainer
-      className="py-16 border-y border-border"
+      className="py-16 border-y border-border bg-muted/30"
       emptyMessage="No brands available"
       error={error}
       isEmpty={!brandsData || brandsData.length === 0}
@@ -63,16 +63,17 @@ export default async function BrandCarousel({ data, locale, template = 1 }: Bran
           </h2>
         )}
 
-        {/* Auto-scrolling carousel */}
+        {/* Professional text-based brand carousel */}
         <div className="relative overflow-hidden">
-          <div className="flex gap-12 md:gap-16 animate-scroll hover:pause-animation">
-            {duplicatedBrands.map(({ brand, logoUrl }, index) => (
-              <div key={`${brand.id}-${index}`} className="flex-shrink-0">
-                <BrandCard
-                  brand={brand}
-                  logoUrl={logoUrl}
-                  template={template}
-                />
+          <div className="flex gap-16 md:gap-24 animate-scroll hover:pause-animation items-center py-8">
+            {duplicatedBrands.map(({ brand }, index) => (
+              <div
+                key={`${brand.id}-${index}`}
+                className="flex-shrink-0 group"
+              >
+                <span className="text-xl md:text-2xl font-bold text-muted-foreground/40 hover:text-foreground transition-colors duration-500 uppercase tracking-wider whitespace-nowrap">
+                  {brand.name}
+                </span>
               </div>
             ))}
           </div>

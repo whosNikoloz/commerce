@@ -328,6 +328,11 @@ html {
   .pause-animation:hover {
     animation-play-state: paused;
   }
+
+  /* Tailwind-compatible hover pause animation utility */
+  .hover\:pause-animation:hover {
+    animation-play-state: paused !important;
+  }
 }
 
 /* Fade in animation for category subcategory overlay */

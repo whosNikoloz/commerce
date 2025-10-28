@@ -104,7 +104,7 @@ export const Navbar = () => {
             ].join(" ")}
           >
             <div className="mx-auto px-4">
-              <div className="flex items-center justify-between h-16">
+              <div className="flex items-center justify-between space-x-2 h-16">
                 <div className="flex items-center">
                   <Link className="flex items-center  group" href={`/${lng}`}>
                     <Image

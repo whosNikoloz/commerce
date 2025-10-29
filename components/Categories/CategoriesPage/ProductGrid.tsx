@@ -204,20 +204,20 @@ const ProductCard = memo(function ProductCard({
   );
 
   return (
-    <article itemScope itemType="https://schema.org/Product">
+    <article itemScope itemType="https://schema.org/Product" className={viewMode === "grid" ? "flex flex-col h-full" : ""}>
       <meta content={product.name ?? "Product"} itemProp="name" />
       {imgSrc && <meta content={imgSrc} itemProp="image" />}
 
-      <Card className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card shadow-lg transition-all duration-500 md:hover:-translate-y-2 md:hover:border-brand-primary/30 md:hover:shadow-2xl">
+      <Card className={cn("group relative overflow-hidden rounded-2xl border border-border/40 bg-card shadow-lg transition-all duration-500 md:hover:-translate-y-2 md:hover:border-brand-primary/30 md:hover:shadow-2xl", viewMode === "grid" && "flex flex-col h-full")}>
         {viewMode === "grid" ? (
           <>
             {/* Clickable area only (inside Card, wrapped by Link) */}
             <Link
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-2xl"
+              className="flex flex-col h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-2xl"
               href={`/product/${product.id}`}
             >
-              <CardBody className="p-0">
-                <div className="relative">
+              <CardBody className="p-0 flex flex-col h-full">
+                <div className="relative flex-1 flex flex-col">
                   <div
                     aria-live="polite"
                     className="relative overflow-hidden rounded-t-2xl group/image bg-gradient-to-br from-muted/30 to-muted/10"
@@ -321,19 +321,19 @@ const ProductCard = memo(function ProductCard({
                     )}
                   </div>
 
-                  <div className="p-1 sm:p-2 md:p-3  bg-gradient-to-b from-background/50 to-background">
+                  <div className="p-1 sm:p-2 md:p-3 bg-gradient-to-b from-background/50 to-background mt-auto">
                     <div className="space-y-1">
                       {metaLine && (
                         <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-medium truncate">
                           {metaLine}
                         </p>
                       )}
-                      <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[1rem] sm:min-h-[2rem] md:group-hover:text-brand-primary transition-colors duration-300">
+                      <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2.5rem] md:group-hover:text-brand-primary transition-colors duration-300">
                         {product.name ?? "Unnamed Product"}
                       </h3>
                     </div>
 
-                    <div className="flex items-baseline gap-1.5 sm:gap-2">
+                    <div className="flex items-baseline gap-1.5 sm:gap-2 mt-1">
                       <span
                         itemScope
                         className="font-bold text-base sm:text-xl md:text-xl lg:text-2xl text-foreground bg-clip-text"
@@ -510,14 +510,26 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       role="list"
     >
       {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          selectedImageIndex={selectedImages[product.id] ?? 0}
-          viewMode={viewMode}
-          onAdd={handleAddToCart}
-          onSelectImage={handleImageSelect}
-        />
+        viewMode === "grid" ? (
+          <div key={product.id} className="h-full">
+            <ProductCard
+              product={product}
+              selectedImageIndex={selectedImages[product.id] ?? 0}
+              viewMode={viewMode}
+              onAdd={handleAddToCart}
+              onSelectImage={handleImageSelect}
+            />
+          </div>
+        ) : (
+          <ProductCard
+            key={product.id}
+            product={product}
+            selectedImageIndex={selectedImages[product.id] ?? 0}
+            viewMode={viewMode}
+            onAdd={handleAddToCart}
+            onSelectImage={handleImageSelect}
+          />
+        )
       ))}
     </div>
   );

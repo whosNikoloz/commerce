@@ -52,7 +52,9 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} showActions={true} template={template} />
+          <div key={p.id} className="h-full">
+            <ProductCard product={p} showActions={true} template={template} />
+          </div>
         ))}
       </div>
     );

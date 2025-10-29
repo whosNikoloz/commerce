@@ -123,7 +123,7 @@ export default async function ProductRail({
         ) : (
           <div className={gridClass}>
             {products?.map((product) => (
-              <div key={product.id}>
+              <div key={product.id} className="h-full">
                 <ProductCard product={product} showActions={true} template={template} />
               </div>
             ))}

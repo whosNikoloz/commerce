@@ -135,7 +135,7 @@ export function ProductCard({
   return (
     <article
       itemScope
-      className={cn("group relative overflow-hidden transition-all duration-300", S.card, className)}
+      className={cn("group relative overflow-hidden transition-all duration-300 flex flex-col h-full", S.card, className)}
       itemType="https://schema.org/Product"
     >
       <meta content={product.name || "Product"} itemProp="name" />
@@ -198,32 +198,71 @@ export function ProductCard({
       </CardContent>
 
       {/* CONTENT */}
-      <CardFooter className="relative z-10 flex flex-col items-start gap-2.5 p-4">
-        <h3 className={cn(S.title, "text-zinc-900 dark:text-zinc-100 w-full")} itemProp="name">
+      <CardFooter className="relative z-10 flex flex-col items-start gap-2.5 p-4 flex-1">
+        <h3 className={cn(S.title, "text-zinc-900 dark:text-zinc-100 w-full min-h-[2.5rem]")} itemProp="name">
           {product.name || "Unnamed Product"}
         </h3>
 
-        {conditionLabel && product.condition !== Condition.New && (
-          <span className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300">
-            {conditionLabel}
-          </span>
-        )}
-
-        <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
-          <meta content="USD" itemProp="priceCurrency" />
-          <meta content={displayPrice.toString()} itemProp="price" />
-          <meta
-            content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
-            itemProp="availability"
-          />
-          <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(displayPrice)}</span>
-          {hasDiscount && <span className={cn("text-sm line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
+        <div className="min-h-[20px]">
+          {conditionLabel && product.condition !== Condition.New && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300">
+              {conditionLabel}
+            </span>
+          )}
         </div>
 
-        {template === 2 && showActions ? (
-          <div className="mt-1 w-full flex items-stretch gap-2">
+        <div className="mt-auto w-full space-y-2.5">
+          <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
+            <meta content="USD" itemProp="priceCurrency" />
+            <meta content={displayPrice.toString()} itemProp="price" />
+            <meta
+              content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
+              itemProp="availability"
+            />
+            <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(displayPrice)}</span>
+            {hasDiscount && <span className={cn("text-sm line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
+          </div>
+
+          {template === 2 && showActions ? (
+            <div className="w-full flex items-stretch gap-2">
+              <Button
+                className={cn("h-11 flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
+                disabled={!isInStock || product.isComingSoon}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAddToCart(product);
+                }}
+              >
+                <ShoppingCart className="h-4 w-4" />
+                Add to cart
+              </Button>
+
+              <Button
+                aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                className={cn(
+                  "h-11 w-11 shrink-0 rounded-full border shadow-sm",
+                  "bg-white hover:bg-white border-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:border-zinc-700",
+                  inWishlist &&
+                    "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
+                )}
+                disabled={wishlistLoading}
+                size="icon"
+                type="button"
+                variant={inWishlist ? "default" : "outline"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleWishlistToggle(e as any);
+                }}
+              >
+                <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+              </Button>
+            </div>
+          ) : (
             <Button
-              className={cn("h-11 flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
+              className={cn("w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
               disabled={!isInStock || product.isComingSoon}
               type="button"
               onClick={(e) => {
@@ -235,43 +274,8 @@ export function ProductCard({
               <ShoppingCart className="h-4 w-4" />
               Add to cart
             </Button>
-
-            <Button
-              aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-              className={cn(
-                "h-11 w-11 shrink-0 rounded-full border shadow-sm",
-                "bg-white hover:bg-white border-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:border-zinc-700",
-                inWishlist &&
-                  "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
-              )}
-              disabled={wishlistLoading}
-              size="icon"
-              type="button"
-              variant={inWishlist ? "default" : "outline"}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleWishlistToggle(e as any);
-              }}
-            >
-              <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
-            </Button>
-          </div>
-        ) : (
-          <Button
-            className={cn("mt-1 w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
-            disabled={!isInStock || product.isComingSoon}
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleAddToCart(product);
-            }}
-          >
-            <ShoppingCart className="h-4 w-4" />
-            Add to cart
-          </Button>
-        )}
+          )}
+        </div>
       </CardFooter>
     </article>
   );

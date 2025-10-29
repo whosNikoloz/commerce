@@ -173,7 +173,10 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
       {specs.map((g, i) => (
         <div key={i} className="my-12">
-          <h1 className="font-bold mb-6 text-2xl">{g.headline}</h1>
+          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+            <span className="w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
+            Specifications
+          </h2>
           <Specifications
             specs={g.specifications}
             value={selectedFacets}

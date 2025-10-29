@@ -90,53 +90,65 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
 
   return (
     <div className="mb-12">
-      <div className="p-6 rounded-2xl border-2 border-border/50 bg-gradient-to-br from-card to-card/90 shadow-xl shadow-black/5 dark:shadow-black/20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            {specs.map((spec) => {
+      <div className="max-w-5xl">
+       
+
+        <div className="rounded-2xl border border-border/40 bg-gradient-to-br from-card/80 to-card backdrop-blur-sm shadow-lg overflow-hidden">
+          <div className="divide-y divide-border/30">
+            {specs.map((spec, index) => {
               const isMulti = spec.facetValues.length > 1;
               const selected = selectedValues[spec.facetName];
 
               return (
                 <div
                   key={spec.facetName}
-                  className="grid grid-cols-2 gap-4 border-b border-border/30 pb-4 last:border-0 items-center"
+                  className={`p-5 transition-colors duration-200 hover:bg-muted/30 ${
+                    index % 2 === 0 ? 'bg-muted/10' : ''
+                  }`}
                 >
-                  <span className="font-semibold text-foreground">{spec.facetName}</span>
-                  <div className="flex-1 sm:max-w-md">
-                    {isMulti ? (
-                      <div className="flex gap-2 flex-wrap justify-end">
-                        {spec.facetValues.map((v) => {
-                          const isSelected = selected === v;
+                  <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] lg:grid-cols-[250px_1fr] gap-4 items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-brand-primary/60" />
+                      <span className="font-semibold text-foreground text-sm sm:text-base">
+                        {spec.facetName}
+                      </span>
+                    </div>
 
-                          return (
-                            <button
-                              key={v}
-                              aria-pressed={isSelected}
-                              className={[
-                                "px-4 py-2 text-sm font-semibold rounded-xl border-2 transition-all duration-300 shadow-md",
-                                isSelected
-                                  ? "bg-gradient-to-r from-brand-primary to-brand-primary/90 text-white border-brand-primary shadow-lg shadow-brand-primary/30 scale-105"
-                                  : "bg-card text-foreground border-border/50 hover:border-brand-primary/50 hover:bg-brand-primary/5 hover:scale-105",
-                              ].join(" ")}
-                              type="button"
-                              onClick={() => handleSelect(spec.facetName, v)}
-                            >
-                              {v}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-right">
-                        <span
-                          className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold
-                                     bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 text-brand-primary border-2 border-brand-primary/30 shadow-md"
-                        >
-                          {spec.facetValues[0]}
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex-1">
+                      {isMulti ? (
+                        <div className="flex gap-2 flex-wrap">
+                          {spec.facetValues.map((v) => {
+                            const isSelected = selected === v;
+
+                            return (
+                              <button
+                                key={v}
+                                aria-pressed={isSelected}
+                                className={[
+                                  "px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200",
+                                  isSelected
+                                    ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg transform hover:scale-105"
+                                    : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
+                                ].join(" ")}
+                                type="button"
+                                onClick={() => handleSelect(spec.facetName, v)}
+                              >
+                                {v}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div>
+                          <span
+                            className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                                       bg-brand-primary/10 text-brand-primary border border-brand-primary/30"
+                          >
+                            {spec.facetValues[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

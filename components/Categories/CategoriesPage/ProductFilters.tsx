@@ -388,7 +388,7 @@ export default function ProductFilters(props: ProductFiltersProps) {
       {/* Desktop sidebar */}
       <aside
         aria-label="Filters"
-        className="hidden lg:block sticky top-6 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto
+        className="hidden lg:block lg:sticky lg:top-4 self-start h-fit max-h-[calc(100vh-2rem)] overflow-y-auto
                    border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6
                    shadow-xl shadow-black/5 dark:shadow-black/20
                    hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30

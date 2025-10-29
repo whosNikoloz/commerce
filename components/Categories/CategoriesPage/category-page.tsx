@@ -72,6 +72,7 @@ export default function CategoryPage({
   const [products, setProducts] = useState<ProductResponseModel[]>(__initialProducts ?? []);
   const [totalCount, setTotalCount] = useState<number>(__initialTotal ?? 0);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [hasUsedInitialData, setHasUsedInitialData] = useState(!!__initialProducts);
 
   const [sortBy, setSortBy] = useState(__initialSort ?? "featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -152,6 +153,12 @@ export default function CategoryPage({
   useEffect(() => {
     if (!category) return;
 
+    // Skip fetch on initial mount if we have server data
+    if (hasUsedInitialData) {
+      setHasUsedInitialData(false);
+      return;
+    }
+
     const effectiveFilter = { ...filter, categoryIds: [category.id] };
     let cancelled = false;
 
@@ -202,7 +209,7 @@ export default function CategoryPage({
     return () => {
       cancelled = true;
     };
-  }, [category?.id, filter, sortBy, currentPage, router, startTransition]);
+  }, [category?.id, filter, sortBy, currentPage, router, startTransition, hasUsedInitialData]);
 
   if (notFound) return <CategoryNotFound />;
   if (loading || !category) return <Loading />;
@@ -270,9 +277,9 @@ export default function CategoryPage({
 
   return (
     <div className={cn(isMobile ? "min-h-screen" : "min-h-screen mt-16")}>
-      <div className="max-w-[100vw] overflow-x-hidden">
+      <div className="max-w-[100vw]">
         <div className="container mx-auto px-2 sm:px-4 py-4 lg:py-6">
-          <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8">
+          <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8 lg:items-start">
           <ProductFilters
             activeFiltersCount={activeFiltersCount}
             brands={brands}

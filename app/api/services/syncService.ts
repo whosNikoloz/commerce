@@ -14,10 +14,23 @@ export interface FinaAuthResponse {
 }
 
 export async function finaAuthenticate(): Promise<FinaAuthResponse> {
-  return apiFetch<FinaAuthResponse>(`${API_FINA_BASE_AUTH}/FinaAuthentication/authenticate`, {
+  const response = await apiFetch<FinaAuthResponse>(`${API_FINA_BASE_AUTH}/FinaAuthentication/authenticate`, {
     method: "POST",
     body: "",
   });
+
+  // Immediately fail if token is null or undefined
+  if (!response || !response.token) {
+    console.error("❌ Fina Authentication failed: Token is null or undefined", response);
+    throw new Error("Authentication failed: No valid token received from Fina");
+  }
+
+  console.log("✅ Fina Authentication successful:", {
+    tokenReceived: true,
+    expires: response.expires
+  });
+
+  return response;
 }
 
 export async function syncAll(): Promise<DetailedSyncResult> {

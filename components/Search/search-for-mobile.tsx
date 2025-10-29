@@ -12,7 +12,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@herou
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@headlessui/react";
 import { motion } from "framer-motion";
-import { MessageCircleIcon } from "lucide-react";
+import { MessageCircleIcon, ShoppingBag, Shirt, Watch, Smartphone, Laptop, Home, Package, Grid3x3 } from "lucide-react";
 
 import { HomeIcon, SearchIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
@@ -85,10 +85,10 @@ export default function SearchForMobile({
         if (!alive) return;
 
         if (Array.isArray(raw)) {
-          const rootNode = raw.find((c) => c.parentId == null) ?? raw[0];
-          const subs = raw.filter((c) => c.parentId === rootNode.id);
+          // Get only top-level categories (no parent)
+          const topLevelCategories = raw.filter((c) => c.parentId == null);
 
-          setRoot({ ...rootNode, subcategories: subs });
+          setRoot({ ...topLevelCategories[0], subcategories: topLevelCategories });
         } else {
           setRoot(raw);
         }
@@ -102,7 +102,7 @@ export default function SearchForMobile({
     };
   }, []);
 
-  const categories = useMemo(() => root?.subcategories ?? [], [root]);
+  const categories = useMemo<CategoryModel[]>(() => root?.subcategories ?? [], [root]);
 
   // read q from URL
   useEffect(() => {
@@ -187,23 +187,31 @@ export default function SearchForMobile({
     handleClose();
   };
 
-  const renderCatThumb = (c: CategoryModel) => {
-    const img =
-      // @ts-ignore optional field if present
-      (c.image as string | undefined) ||
-      // @ts-ignore optional field if present
-      (c.imageUrl as string | undefined) ||
-      "https://picsum.photos/seed/category/128/128";
+  const getCategoryIcon = (categoryName: string) => {
+    const name = categoryName.toLowerCase();
 
-    return (
-      <Image
-        alt={c.name ?? "Category Image"}
-        className="h-16 w-16 object-contain mb-3"
-        height={128}
-        src={img}
-        width={128}
-      />
-    );
+    // Map category names to icons
+    if (name.includes('cloth') || name.includes('fashion') || name.includes('apparel')) {
+      return <Shirt className="h-12 w-12 text-blue-500" />;
+    }
+    if (name.includes('watch') || name.includes('time')) {
+      return <Watch className="h-12 w-12 text-purple-500" />;
+    }
+    if (name.includes('phone') || name.includes('mobile')) {
+      return <Smartphone className="h-12 w-12 text-green-500" />;
+    }
+    if (name.includes('laptop') || name.includes('computer')) {
+      return <Laptop className="h-12 w-12 text-orange-500" />;
+    }
+    if (name.includes('home') || name.includes('furniture')) {
+      return <Home className="h-12 w-12 text-red-500" />;
+    }
+    if (name.includes('bag') || name.includes('accessory')) {
+      return <ShoppingBag className="h-12 w-12 text-pink-500" />;
+    }
+
+    // Default icon
+    return <Package className="h-12 w-12 text-gray-500" />;
   };
 
   return (
@@ -362,9 +370,11 @@ export default function SearchForMobile({
                               className="cursor-pointer hover:shadow-md transition-shadow"
                               onClick={() => goToResultsPage(category.name ?? "")}
                             >
-                              <CardBody className="flex flex-col items-center justify-center">
-                                {renderCatThumb(category)}
-                                <span className="text-sm font-medium text-center line-clamp-2">
+                              <CardBody className="flex flex-col items-center justify-center p-3">
+                                <div className="mb-2">
+                                  {getCategoryIcon(category.name ?? "")}
+                                </div>
+                                <span className="text-xs font-medium text-center line-clamp-2 break-words w-full">
                                   {category.name}
                                 </span>
                               </CardBody>

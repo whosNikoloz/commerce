@@ -84,6 +84,15 @@ export async function registerCustomer(p: RegisterPayload): Promise<void | Token
   if (data && (data.accessToken || data.AccessToken)) return normalizeTokens(data);
 }
 
+/* ———————— Send Verification Code ———————— */
+export async function sendVerificationCode(email: string): Promise<void> {
+  const params = new URLSearchParams({ email });
+
+  await apiFetch<void>(`${BASE}send-code?${params.toString()}`, {
+    method: "POST",
+  });
+}
+
 /* ———————— Validate User (email/password check) ———————— */
 export async function validateUser(email: string, password?: string): Promise<void> {
   await apiFetch<void>(`${BASE}validateUser`, {

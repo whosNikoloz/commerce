@@ -7,7 +7,7 @@ import { Button } from "@heroui/button";
 import { InputLoadingBtn } from "./input-loading-button";
 
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
-import { registerCustomer } from "@/app/api/services/authService";
+import { registerCustomer, sendVerificationCode } from "@/app/api/services/authService";
 
 interface RegisterProps {
   regData: {
@@ -58,6 +58,38 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
 
   const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+  // Password validation function
+  const validatePassword = (password: string): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+    const kaErrors: string[] = [];
+
+    if (password.length < 6) {
+      errors.push("At least 6 characters");
+      kaErrors.push("მინიმუმ 6 სიმბოლო");
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push("At least one digit (0-9)");
+      kaErrors.push("მინიმუმ ერთი ციფრი (0-9)");
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push("At least one lowercase letter (a-z)");
+      kaErrors.push("მინიმუმ ერთი პატარა ასო (a-z)");
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push("At least one uppercase letter (A-Z)");
+      kaErrors.push("მინიმუმ ერთი დიდი ასო (A-Z)");
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors.push("At least one special character (!@#$%...)");
+      kaErrors.push("მინიმუმ ერთი სპეციალური სიმბოლო (!@#$%...)");
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors: lng === "ka" ? kaErrors : errors
+    };
+  };
+
   const handleSendCode = async () => {
     setRegError("");
     setRegEmailError("");
@@ -78,13 +110,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
     setIsSendingCode(true);
     try {
       // Call endpoint to send verification code
-      await registerCustomer({
-        firstName: registrationState.username || "User",
-        lastName: "",
-        email,
-        password: registrationState.password || "temporary",
-        verifyCode: 0, // 0 means request code
-      });
+      await sendVerificationCode(email);
       setCodeRequested(true);
     } catch (e: any) {
       setRegError(typeof e?.message === "string" ? e.message : "Failed to send code");
@@ -123,10 +149,11 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
 
       return;
     }
-    if (password.length < 6) {
-      setRegPasswordError(
-        lng === "ka" ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი" : "Password must be more than 6 symbols"
-      );
+
+    // Validate password with all rules
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setRegPasswordError(passwordValidation.errors.join(", "));
 
       return;
     }
@@ -166,7 +193,6 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
         password,
         verifyCode: Number(verifyCode) || 0,
       });
-
       onSwitchMode("login");
     } catch (e: any) {
       setRegError(typeof e?.message === "string" ? e.message : "Registration failed");
@@ -190,12 +216,10 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
     const { password } = registrationState;
 
     if (!password) return;
+
+    const passwordValidation = validatePassword(password);
     setRegPasswordError(
-      password.length < 6
-        ? (lng === "ka"
-          ? "პაროლი უნდა იყოს 6 სიმბოლოზე მეტი"
-          : "Password must be more than 6 symbols")
-        : ""
+      passwordValidation.isValid ? "" : passwordValidation.errors.join(", ")
     );
   };
 
@@ -253,32 +277,71 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
         onClear={handleRegUserNameClear}
       />
 
-      <Input
-        isClearable
-        classNames={{
-          input: ["text-[16px]"],
-          inputWrapper: [
-            "dark:bg-slate-800/50 bg-white shadow-sm border-2 border-gray-200 dark:border-gray-700 focus-within:!border-blue-500 dark:focus-within:!border-blue-400 transition-all duration-200",
-            "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md",
-            "rounded-xl",
-          ],
-          label: ["font-semibold text-gray-700 dark:text-gray-200"],
-        }}
-        errorMessage={regRegPasswordError}
-        isInvalid={regRegPasswordError !== ""}
-        label={regData.password}
-        startContent={<i className="fas fa-lock text-blue-500 dark:text-blue-400" />}
-        type="password"
-        value={registrationState.password}
-        onBlur={handleBlurPassword}
-        onChange={(e) =>
-          setRegistrationState((s) => ({
-            ...s,
-            password: e.target.value,
-          }))
-        }
-        onClear={handleRegPasswordClear}
-      />
+      <div className="space-y-2">
+        <Input
+          isClearable
+          classNames={{
+            input: ["text-[16px]"],
+            inputWrapper: [
+              "dark:bg-slate-800/50 bg-white shadow-sm border-2 border-gray-200 dark:border-gray-700 focus-within:!border-blue-500 dark:focus-within:!border-blue-400 transition-all duration-200",
+              "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md",
+              "rounded-xl",
+            ],
+            label: ["font-semibold text-gray-700 dark:text-gray-200"],
+          }}
+          errorMessage={regRegPasswordError}
+          isInvalid={regRegPasswordError !== ""}
+          label={regData.password}
+          startContent={<i className="fas fa-lock text-blue-500 dark:text-blue-400" />}
+          type="password"
+          value={registrationState.password}
+          onBlur={handleBlurPassword}
+          onChange={(e) =>
+            setRegistrationState((s) => ({
+              ...s,
+              password: e.target.value,
+            }))
+          }
+          onClear={handleRegPasswordClear}
+        />
+        {/* Compact password requirements */}
+        {registrationState.password && (
+          <div className="px-2 py-1.5 bg-gray-50/50 dark:bg-slate-800/20 rounded-lg">
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px]">
+              <div className="flex items-center gap-1">
+                <i className={`fas fa-xs ${registrationState.password.length >= 6 ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
+                <span className={registrationState.password.length >= 6 ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
+                  {lng === "ka" ? "6+ სიმბოლო" : "6+ chars"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <i className={`fas fa-xs ${/[0-9]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
+                <span className={/[0-9]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
+                  {lng === "ka" ? "ციფრი" : "Digit"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <i className={`fas fa-xs ${/[a-z]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
+                <span className={/[a-z]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
+                  {lng === "ka" ? "პატარა" : "Lower"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <i className={`fas fa-xs ${/[A-Z]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
+                <span className={/[A-Z]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
+                  {lng === "ka" ? "დიდი" : "Upper"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <i className={`fas fa-xs ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
+                <span className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
+                  {lng === "ka" ? "სპეც." : "Special"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <Input
         isClearable

@@ -103,7 +103,7 @@ export default async function RootLayout({
       </head>
       <body
         className={clsx(
-          "min-h-screen bg-brand-surface dark:bg-brand-surfacedark font-sans antialiased",
+          "min-h-screen bg-brand-surface dark:bg-brand-surfacedark font-sans antialiased ",
           fontClassNames,
         )}
       >

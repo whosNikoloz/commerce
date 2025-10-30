@@ -50,7 +50,7 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
   }
 
   return (
-    <div className="homepage-container">
+    <div className="homepage-container  max-w-7xl mx-auto">
       {sections.map((section, index) => {
         const Component = templateDefinition.registry[section.type];
 

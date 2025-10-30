@@ -82,6 +82,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
 
   const isCarousel = data.layout === "carousel";
   const columns = data.columns || 1;
+  const carouselStyle = data.carouselStyle || "full-width"; // "full-width" or "grid"
 
   useEffect(() => {
     if (!isCarousel) return;
@@ -164,23 +165,48 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
           <Splide
             ref={splideRef as any}
             aria-label="Commercial Banners"
-            options={{
-              type: "slide",
-              perPage: 1,
-              perMove: 1,
-              gap: "1.5rem",
-              pagination: true,
-              arrows: true,
-              drag: true,
-              autoplay: true,
-              interval: 5000,
-              pauseOnHover: true,
-              resetProgress: false,
-            }}
+            options={
+              carouselStyle === "grid"
+                ? {
+                    // Grid-style carousel (multiple cards)
+                    type: "slide",
+                    gap: "1rem",
+                    pagination: false,
+                    arrows: true,
+                    drag: "free",
+                    trimSpace: true,
+                    snap: false,
+                    omitEnd: true,
+                    focus: 0,
+                    perMove: 1,
+                    autoplay: false,
+                    perPage: columns >= 3 ? 3 : columns >= 2 ? 2 : 1,
+                    breakpoints: {
+                      1280: { perPage: columns >= 3 ? 3 : columns >= 2 ? 2 : 1, gap: "1rem" },
+                      1024: { perPage: columns >= 2 ? 2 : 1, gap: "0.75rem" },
+                      768: { perPage: columns >= 2 ? 2 : 1, gap: "0.75rem" },
+                      640: { perPage: 1, gap: "0.5rem" },
+                    },
+                  }
+                : {
+                    // Full-width carousel (original behavior)
+                    type: "slide",
+                    perPage: 1,
+                    perMove: 1,
+                    gap: "1.5rem",
+                    pagination: true,
+                    arrows: true,
+                    drag: true,
+                    autoplay: true,
+                    interval: 5000,
+                    pauseOnHover: true,
+                    resetProgress: false,
+                  }
+            }
           >
             {data.banners.map((banner, index) => (
-              <SplideSlide key={index}>
-                <BannerItem banner={banner} index={0} locale={locale} />
+              <SplideSlide key={index} className={carouselStyle === "grid" ? "!h-auto" : ""}>
+                <BannerItem banner={banner} index={carouselStyle === "grid" ? 0 : index} locale={locale} />
               </SplideSlide>
             ))}
           </Splide>

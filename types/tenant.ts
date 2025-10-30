@@ -334,6 +334,7 @@ export type BrandStripData = {
 export type CommercialBannerData = {
   layout: "carousel" | "grid";
   columns?: 1 | 2 | 3 | 4 | 5; // Grid column count (only for grid layout)
+  carouselStyle?: "full-width" | "grid"; // Carousel display style (only for carousel layout)
   banners: Array<{
     imageUrl: string;
     mobileImageUrl?: string;

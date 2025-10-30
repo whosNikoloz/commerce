@@ -95,6 +95,7 @@ const AboutUsDataSchema = z.object({
 const CommercialBannerDataSchema = z.object({
   layout: z.enum(["carousel", "grid"]),
   columns: z.union([z.literal(1), z.literal(2), z.literal(3),z.literal(4),z.literal(5)]).optional(),
+  carouselStyle: z.enum(["full-width", "grid"]).optional(),
   banners: z.array(
     z.object({
       imageUrl: z.string(),

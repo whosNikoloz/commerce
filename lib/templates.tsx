@@ -122,6 +122,14 @@ const DealCountdownDataSchema = z.object({
   ),
 });
 
+const CustomHTMLDataSchema = z.object({
+  html: z.string(),
+  css: z.string().optional(),
+  padding: z.enum(["none", "small", "medium", "large"]).optional(),
+  fullWidth: z.boolean().optional(),
+  containerClass: z.string().optional(),
+});
+
 const ProductRailDataSchema = z.object({
   customName: z.string().optional(),
   title: LocalizedTextSchema,
@@ -231,6 +239,12 @@ const Template1SectionSchema = z.discriminatedUnion("type", [
     enabled: z.boolean(),
     order: z.number(),
     data: BrandCarouselDataSchema,
+  }),
+  z.object({
+    type: z.literal("CustomHTML"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CustomHTMLDataSchema,
   }),
 ]);
 
@@ -378,6 +392,12 @@ const Template2SectionSchema = z.discriminatedUnion("type", [
     order: z.number(),
     data: NewsletterDataSchema,
   }),
+  z.object({
+    type: z.literal("CustomHTML"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CustomHTMLDataSchema,
+  }),
 ]);
 
 const Template2HomepageSchema = z.object({
@@ -498,6 +518,12 @@ const Template3SectionSchema = z.discriminatedUnion("type", [
     order: z.number(),
     data: NewsletterDataSchema,
   }),
+  z.object({
+    type: z.literal("CustomHTML"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CustomHTMLDataSchema,
+  }),
 ]);
 
 const Template3HomepageSchema = z.object({
@@ -598,6 +624,12 @@ const Template4SectionSchema = z.discriminatedUnion("type", [
     order: z.number(),
     data: ProductRailDataSchema,
   }),
+  z.object({
+    type: z.literal("CustomHTML"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CustomHTMLDataSchema,
+  }),
 ]);
 
 const Template4HomepageSchema = z.object({
@@ -697,6 +729,11 @@ const CategoryCarousel = lazy(
   () => import("@/components/Home/sections/template4/CategoryCarousel")
 );
 
+// Shared sections
+const CustomHTML = lazy(
+  () => import("@/components/Home/sections/template4/CustomHTML")
+);
+
 // ===== Template 1 Definition =====
 export const TEMPLATE_1_ALLOWED_SECTIONS = [
   "Hero",
@@ -704,6 +741,7 @@ export const TEMPLATE_1_ALLOWED_SECTIONS = [
   "CommercialBanner",
   "AboutUs",
   "BrandCarousel",
+  "CustomHTML",
 ] as const;
 
 export const template1Definition: TemplateDefinition<
@@ -718,6 +756,7 @@ export const template1Definition: TemplateDefinition<
     CommercialBanner: CommercialBannerT4,
     AboutUs,
     BrandCarousel,
+    CustomHTML,
   },
 };
 
@@ -731,6 +770,7 @@ export const TEMPLATE_2_ALLOWED_SECTIONS = [
   "BrandStory",
   "ReviewsWarranty",
   "Newsletter",
+  "CustomHTML",
 ] as const;
 
 export const template2Definition: TemplateDefinition<
@@ -748,6 +788,7 @@ export const template2Definition: TemplateDefinition<
     BrandStory,
     ReviewsWarranty,
     Newsletter,
+    CustomHTML,
   },
 };
 
@@ -760,6 +801,7 @@ export const TEMPLATE_3_ALLOWED_SECTIONS = [
   "BundlePromo",
   "InfluencerHighlight",
   "NewsletterBeauty",
+  "CustomHTML",
 ] as const;
 
 export const template3Definition: TemplateDefinition<
@@ -776,6 +818,7 @@ export const template3Definition: TemplateDefinition<
     BundlePromo,
     InfluencerHighlight,
     NewsletterBeauty,
+    CustomHTML,
   },
 };
 
@@ -786,6 +829,7 @@ export const TEMPLATE_4_ALLOWED_SECTIONS = [
   "BrandStrip",
   "CategoryCarousel",
   "ProductRail",
+  "CustomHTML",
 ] as const;
 
 export const template4Definition: TemplateDefinition<
@@ -800,6 +844,7 @@ export const template4Definition: TemplateDefinition<
     BrandStrip: BrandStripT4,
     CategoryCarousel,
     ProductRail,
+    CustomHTML,
   },
 };
 

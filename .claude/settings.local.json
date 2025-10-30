@@ -21,7 +21,9 @@
       "Bash(tasklist:*)",
       "Bash(findstr:*)",
       "Bash(echo:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(cat:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

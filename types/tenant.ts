@@ -36,7 +36,8 @@ export type Template1SectionType =
   | "ProductRail"
   | "CommercialBanner"
   | "AboutUs"
-  | "BrandCarousel";
+  | "BrandCarousel"
+  | "CustomHTML";
 
 export type HeroData = {
   categoriesTitle?: LocalizedText;
@@ -177,7 +178,8 @@ export type Template2SectionType =
   | "CustomerGallery"
   | "BrandStory"
   | "ReviewsWarranty"
-  | "Newsletter";
+  | "Newsletter"
+  | "CustomHTML";
 
 export type HeroLifestyleData = {
   headline: LocalizedText;
@@ -251,7 +253,8 @@ export type Template3SectionType =
   | "ProductRail"
   | "BundlePromo"
   | "InfluencerHighlight"
-  | "NewsletterBeauty";
+  | "NewsletterBeauty"
+  | "CustomHTML";
 
 // ===== Template 4: Casual Ecommerce =====
 export type Template4SectionType =
@@ -259,7 +262,8 @@ export type Template4SectionType =
   | "CommercialBanner"
   | "BrandStrip"
   | "CategoryCarousel"
-  | "ProductRail";
+  | "ProductRail"
+  | "CustomHTML";
 
 export type HeroBannerData = {
   headline: LocalizedText;
@@ -376,13 +380,22 @@ export type ProductGridData = {
   sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
 };
 
+export type CustomHTMLData = {
+  html: string; // The custom HTML content
+  css?: string; // Optional scoped CSS
+  padding?: "none" | "small" | "medium" | "large"; // Vertical padding
+  fullWidth?: boolean; // If true, spans full width without container
+  containerClass?: string; // Optional additional CSS classes for the container
+};
+
 // ===== Section instances with discriminated unions =====
 export type Template1SectionInstance =
   | { type: "Hero"; enabled: boolean; order: number; data: HeroData }
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
   | { type: "AboutUs"; enabled: boolean; order: number; data: AboutUsData }
-  | { type: "BrandCarousel"; enabled: boolean; order: number; data: BrandCarouselData };
+  | { type: "BrandCarousel"; enabled: boolean; order: number; data: BrandCarouselData }
+  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
 
 export type Template2SectionInstance =
   | { type: "HeroLifestyle"; enabled: boolean; order: number; data: HeroLifestyleData }
@@ -392,7 +405,8 @@ export type Template2SectionInstance =
   | { type: "CustomerGallery"; enabled: boolean; order: number; data: CustomerGalleryData }
   | { type: "BrandStory"; enabled: boolean; order: number; data: BrandStoryData }
   | { type: "ReviewsWarranty"; enabled: boolean; order: number; data: ReviewsWarrantyData }
-  | { type: "Newsletter"; enabled: boolean; order: number; data: NewsletterData };
+  | { type: "Newsletter"; enabled: boolean; order: number; data: NewsletterData }
+  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
 
 export type Template3SectionInstance =
   | { type: "HeroBanner"; enabled: boolean; order: number; data: HeroBannerData }
@@ -401,14 +415,16 @@ export type Template3SectionInstance =
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "BundlePromo"; enabled: boolean; order: number; data: BundlePromoData }
   | { type: "InfluencerHighlight"; enabled: boolean; order: number; data: InfluencerHighlightData }
-  | { type: "NewsletterBeauty"; enabled: boolean; order: number; data: NewsletterData };
+  | { type: "NewsletterBeauty"; enabled: boolean; order: number; data: NewsletterData }
+  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
 
 export type Template4SectionInstance =
   | { type: "HeroCategoryGrid"; enabled: boolean; order: number; data: HeroCategoryGridData }
   | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
   | { type: "BrandStrip"; enabled: boolean; order: number; data: BrandStripData }
   | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData }
-  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData };
+  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
+  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
 
 // ===== Homepage config per template =====
 export type Template1Homepage = {

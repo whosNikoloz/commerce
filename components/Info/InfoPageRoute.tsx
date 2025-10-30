@@ -93,7 +93,7 @@ export async function renderInfoPage({ params, slug }: { params: Promise<{ lang:
               Page Not Configured
             </h2>
             <p className="text-gray-600">
-              This info page has not been configured yet. Please add configuration for "{slug}" in your tenant settings.
+              This info page has not been configured yet. Please add configuration for &quot;{slug}&quot; in your tenant settings.
             </p>
           </div>
         </div>

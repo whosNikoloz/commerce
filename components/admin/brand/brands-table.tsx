@@ -2,9 +2,11 @@
 
 import type { BrandModel } from "@/types/brand";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { TriangleAlert, Trash2 } from "lucide-react";
+import dynamic from "next/dynamic";
 
 import UpdateBrandModal from "./update-brad-modal";
 import AddBrandModal from "./add-brand-modal";
@@ -35,6 +37,8 @@ import {
   createBrand,
   deleteBrand,
 } from "@/app/api/services/brandService";
+
+const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
 
 interface Props {
   Brands: BrandModel[];
@@ -80,6 +84,10 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     };
   }, [initialBrands]);
 
+  const handleImagesChanged = (brandId: string, urls: string[]) => {
+    setBrands((prev) => prev.map((p) => (p.id === brandId ? { ...p, images: urls } : p)));
+  };
+
   const handleUpdateBrand = async (
     brandId: string,
     name: string,
@@ -87,10 +95,16 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     origin: string,
   ) => {
     const current = brands.find((p) => p.id === brandId);
-
     if (!current) return;
+
     const prev = brands;
-    const patched: BrandModel = { ...current, name, description, origin };
+    const patched: BrandModel = {
+      ...current,
+      name,
+      description,
+      origin,
+      images: current.images, // keep existing images intact
+    };
 
     setBrands((list) => list.map((p) => (p.id === brandId ? patched : p)));
     try {
@@ -106,7 +120,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
   const handleCreateBrand = async (name: string, description: string, origin: string) => {
     const tempId = `temp-${Date.now()}`;
     const prev = brands;
-    const draft: BrandModel = { id: tempId, name, description, origin };
+    const draft: BrandModel = { id: tempId, name, description, origin, images: [] };
 
     setBrands([draft, ...prev]);
     try {
@@ -142,9 +156,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
   const filteredBrands = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
-
     if (!q) return brands;
-
     return brands.filter(
       (b) => (b.name ?? "").toLowerCase().includes(q) || (b.origin ?? "").toLowerCase().includes(q),
     );
@@ -152,7 +164,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
   return (
     <>
-      <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl">
+      <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-lg" />
         <CardHeader className="relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -197,80 +209,117 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                 <Table>
                   <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
                     <TableRow className="border-b-2 border-slate-200 dark:border-slate-700">
-                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Name</TableHead>
-                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Origin</TableHead>
-                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Description</TableHead>
-                      <TableHead className="text-right text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">Actions</TableHead>
+                      <TableHead className="w-[72px] sm:w-[80px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                        Image
+                      </TableHead>
+                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                        Name
+                      </TableHead>
+                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                        Origin
+                      </TableHead>
+                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                        Description
+                      </TableHead>
+                      <TableHead className="text-right text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
-                {filteredBrands.map((brand, index) => (
-                  <TableRow
-                    key={brand.id}
-                    className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20
-                               transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
-                  >
-                    <TableCell className="font-bold text-slate-900 dark:text-slate-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800">
-                          <span className="text-white font-bold text-sm">{brand?.name?.charAt(0).toUpperCase()}</span>
-                        </div>
-                        <div>
-                          <div className="font-bold">{brand.name}</div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
-                            ID: {brand.id}
+                    {filteredBrands.map((brand) => (
+                      <TableRow
+                        key={brand.id}
+                        className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20
+                                   transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
+                      >
+                        {/* IMAGE CELL */}
+                        <TableCell>
+                          <div className="relative w-16 h-16">
+                            <Image
+                              alt={brand.name ?? "Brand"}
+                              className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
+                              height={64}
+                              width={64}
+                              src={brand.images?.[0] || "/placeholder.png"}
+                            />
+                            {!!brand.images && brand.images.length > 1 && (
+                              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                +{brand.images.length}
+                              </span>
+                            )}
                           </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-slate-700 dark:text-slate-300 font-semibold">
-                      {brand.origin}
-                    </TableCell>
-                    <TableCell className="max-w-[520px] truncate text-slate-600 dark:text-slate-400 font-medium">
-                      {brand.description}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <UpdateBrandModal
-                          brandId={brand.id ?? ""}
-                          initialDescription={brand.description}
-                          initialName={brand.name}
-                          initialOrigin={brand.origin}
-                          onSave={handleUpdateBrand}
-                        />
-                        <Button
-                          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            setDeleteTarget(brand);
-                            setDeleteOpen(true);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                        </TableCell>
 
-                {filteredBrands.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      className="text-center py-12"
-                      colSpan={4}
-                    >
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                          <TriangleAlert className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
-                        <p className="text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
+                        {/* NAME / ID */}
+                        <TableCell className="font-bold text-slate-900 dark:text-slate-100">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <div className="font-bold">{brand.name}</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
+                                ID: {brand.id}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-slate-700 dark:text-slate-300 font-semibold">
+                          {brand.origin}
+                        </TableCell>
+
+                        <TableCell className="max-w-[520px] truncate text-slate-600 dark:text-slate-400 font-medium">
+                          {brand.description}
+                        </TableCell>
+
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <UpdateBrandModal
+                              brandId={brand.id ?? ""}
+                              initialDescription={brand.description}
+                              initialName={brand.name}
+                              initialOrigin={brand.origin}
+                              onSave={handleUpdateBrand}
+                            />
+                            <ReviewImagesModal
+                              brandId={brand.id}
+                              existing={(brand.images ?? []).map((url, idx) => ({
+                                key: idx.toString(),
+                                url,
+                              }))}
+                              maxFiles={8}
+                              maxSizeMB={5}
+                              onChanged={(urls) => handleImagesChanged(brand.id, urls)}
+                            />
+                            <Button
+                              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                setDeleteTarget(brand);
+                                setDeleteOpen(true);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+
+                    {filteredBrands.length === 0 && (
+                      <TableRow>
+                        <TableCell className="text-center py-12" colSpan={5}>
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                              <TriangleAlert className="h-8 w-8 text-slate-400" />
+                            </div>
+                            <p className="text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
+                            <p className="text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -282,14 +331,30 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                     key={brand.id}
                     className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
                   >
+                    {/* Image banner like ProductCard */}
+                    <div className="relative w-full h-40">
+                      <Image
+                        fill
+                        alt={brand.name ?? "Brand"}
+                        className="object-cover"
+                        src={brand.images?.[0] || "/placeholder.png"}
+                        sizes="100vw"
+                        priority={false}
+                      />
+                      {!!brand.images && brand.images.length > 1 && (
+                        <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
+                          +{brand.images.length}
+                        </span>
+                      )}
+                    </div>
+
                     {/* Card Header */}
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
-                          <span className="text-white font-bold text-base">{brand?.name?.charAt(0).toUpperCase()}</span>
-                        </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-black text-slate-900 dark:text-slate-100 text-lg truncate">{brand.name}</h3>
+                          <h3 className="font-black text-slate-900 dark:text-slate-100 text-lg truncate">
+                            {brand.name}
+                          </h3>
                           <p className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
                             ID: {brand.id}
                           </p>
@@ -300,12 +365,20 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                     {/* Card Body */}
                     <div className="p-4 space-y-3">
                       <div>
-                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Origin</div>
-                        <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">{brand.origin}</div>
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
+                          Origin
+                        </div>
+                        <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          {brand.origin}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Description</div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{brand.description}</div>
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
+                          Description
+                        </div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                          {brand.description}
+                        </div>
                       </div>
                     </div>
 
@@ -317,6 +390,16 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                         initialName={brand.name}
                         initialOrigin={brand.origin}
                         onSave={handleUpdateBrand}
+                      />
+                      <ReviewImagesModal
+                        brandId={brand.id}
+                        existing={(brand.images ?? []).map((url, idx) => ({
+                          key: idx.toString(),
+                          url,
+                        }))}
+                        maxFiles={8}
+                        maxSizeMB={5}
+                        onChanged={(urls) => handleImagesChanged(brand.id, urls)}
                       />
                       <Button
                         className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300 gap-2"
@@ -350,7 +433,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       </Card>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-800 shadow-2xl">
+        <AlertDialogContent className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-800 shadow-2xl relative">
           <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-500/5 pointer-events-none rounded-lg" />
           <AlertDialogHeader className="relative">
             <AlertDialogTitle className="flex items-center gap-3 text-slate-900 dark:text-slate-100 text-xl font-bold">

@@ -18,14 +18,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
+import { deleteImage, uploadBrandImages } from "@/app/api/services/brandService";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
 type UploadReply = string[] | UploadReplyItem[];
 
 type ReviewImagesModalProps = {
-  productId: string;
+  brandId: string;
   existing?: ExistingImage[];
   maxFiles?: number;
   maxSizeMB?: number;
@@ -37,7 +37,7 @@ type SelectedImage = { id: string; file: File; url: string };
 const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
 
 export default function ReviewImagesModal({
-  productId,
+  brandId,
   existing,
   maxFiles = 8,
   maxSizeMB = 5,
@@ -164,13 +164,13 @@ export default function ReviewImagesModal({
         .sort((a, b) => b - a);
 
       for (const pos of toDelete) {
-        await deleteImage(productId, String(pos));
+        await deleteImage(brandId, String(pos));
       }
 
       const newFiles = images.map((i) => i.file);
       let uploaded: UploadReply = [];
 
-      if (newFiles.length) uploaded = await uploadProductImages(productId, newFiles);
+      if (newFiles.length) uploaded = await uploadBrandImages(brandId, newFiles);
 
       const uploadedItems: UploadReplyItem[] = Array.isArray(uploaded)
         ? typeof uploaded[0] === "string"
@@ -257,7 +257,7 @@ export default function ReviewImagesModal({
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col">
                     <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
-                      Manage Product Images
+                      Manage Brand Images
                     </h2>
                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                       Upload up to {maxFiles} images • Max {maxSizeMB}MB each

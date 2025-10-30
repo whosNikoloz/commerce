@@ -18,14 +18,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
+import { deleteImage, uploadCategoryImages } from "@/app/api/services/categoryService";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
 type UploadReply = string[] | UploadReplyItem[];
 
 type ReviewImagesModalProps = {
-  productId: string;
+  categoryId: string;
   existing?: ExistingImage[];
   maxFiles?: number;
   maxSizeMB?: number;
@@ -37,7 +37,7 @@ type SelectedImage = { id: string; file: File; url: string };
 const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
 
 export default function ReviewImagesModal({
-  productId,
+  categoryId,
   existing,
   maxFiles = 8,
   maxSizeMB = 5,
@@ -164,13 +164,13 @@ export default function ReviewImagesModal({
         .sort((a, b) => b - a);
 
       for (const pos of toDelete) {
-        await deleteImage(productId, String(pos));
+        await deleteImage(categoryId, String(pos));
       }
 
       const newFiles = images.map((i) => i.file);
       let uploaded: UploadReply = [];
 
-      if (newFiles.length) uploaded = await uploadProductImages(productId, newFiles);
+      if (newFiles.length) uploaded = await uploadCategoryImages(categoryId, newFiles);
 
       const uploadedItems: UploadReplyItem[] = Array.isArray(uploaded)
         ? typeof uploaded[0] === "string"
@@ -250,14 +250,13 @@ export default function ReviewImagesModal({
         <ModalContent>
           {() => (
             <>
-              {/* დეკორატიული gradient overlay — AddFaqModal-ის სტილში */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
 
               <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col">
                     <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
-                      Manage Product Images
+                      Manage Category Images
                     </h2>
                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                       Upload up to {maxFiles} images • Max {maxSizeMB}MB each

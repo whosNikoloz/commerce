@@ -3,4 +3,5 @@ export interface BrandModel {
   name?: string;
   origin?: string;
   description?: string;
+  images?: string[];
 }

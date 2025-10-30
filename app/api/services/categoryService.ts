@@ -36,6 +36,29 @@ export async function deleteCategory(id: string): Promise<string> {
   });
 }
 
+export async function deleteImage(id: string, key: string): Promise<string> {
+  return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
+    method: "DELETE",
+  });
+}
+export async function uploadCategoryImages(categoryid: string, files: File[]): Promise<string[]> {
+  if (!categoryid) throw new Error("category is required");
+  if (!files || files.length === 0) throw new Error("at least one file is required");
+
+  const formData = new FormData();
+
+  formData.append("id", categoryid);
+
+  files.forEach((file) => {
+    formData.append("files", file, file.name);
+  });
+
+  return apiFetch<string[]>(`${API_BASE}/images`, {
+    method: "POST",
+    body: formData,
+  });
+}
+
 // export async function getProductsByCategory(id: string): Promise<ProductResponseModel[]> {
 //     return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
 // }

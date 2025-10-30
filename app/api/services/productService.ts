@@ -149,7 +149,7 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
 
   const formData = new FormData();
 
-  formData.append("productId", productId);
+  formData.append("id", productId);
 
   files.forEach((file) => {
     formData.append("files", file, file.name);

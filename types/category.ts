@@ -6,5 +6,6 @@ export interface CategoryModel {
   description?: string;
   parentId?: string;
   isActive?: boolean;
+  images?: string[];
   facets: FacetModel[];
 }

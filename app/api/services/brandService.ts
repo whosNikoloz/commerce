@@ -39,3 +39,27 @@ export async function deleteBrand(id: string): Promise<string> {
     method: "PUT",
   });
 }
+
+
+export async function deleteImage(id: string, key: string): Promise<string> {
+  return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
+    method: "DELETE",
+  });
+}
+export async function uploadBrandImages(brandId: string, files: File[]): Promise<string[]> {
+  if (!brandId) throw new Error("brand is required");
+  if (!files || files.length === 0) throw new Error("at least one file is required");
+
+  const formData = new FormData();
+
+  formData.append("id", brandId);
+
+  files.forEach((file) => {
+    formData.append("files", file, file.name);
+  });
+
+  return apiFetch<string[]>(`${API_BASE}/images`, {
+    method: "POST",
+    body: formData,
+  });
+}

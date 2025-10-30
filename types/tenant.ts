@@ -388,6 +388,45 @@ export type CustomHTMLData = {
   containerClass?: string; // Optional additional CSS classes for the container
 };
 
+// ===== Info Pages Configuration =====
+export type InfoPageSlug =
+  | "delivery"
+  | "faq"
+  | "guarantee"
+  | "privacy-policy"
+  | "return-policy"
+  | "stores"
+  | "terms-and-conditions"
+  | "about";
+
+export type InfoPageSection = {
+  enabled: boolean;
+  order: number;
+  type: "CustomHTML";
+  data: CustomHTMLData;
+};
+
+export type InfoPageConfig = {
+  sections: InfoPageSection[];
+};
+
+export type InfoPageMetadata = {
+  title: LocalizedText;
+  description: LocalizedText;
+  ogImage?: string;
+  index?: boolean; // Whether to allow search engines to index this page
+};
+
+export type InfoPage = {
+  slug: InfoPageSlug;
+  metadata: InfoPageMetadata;
+  config: InfoPageConfig;
+};
+
+export type InfoPagesConfig = {
+  pages: InfoPage[];
+};
+
 // ===== Section instances with discriminated unions =====
 export type Template1SectionInstance =
   | { type: "Hero"; enabled: boolean; order: number; data: HeroData }
@@ -479,6 +518,7 @@ export type TenantConfig =
     themeColor: string;
     theme: ThemeVars;
     homepage: Template1Homepage;
+    infoPages?: InfoPagesConfig; // Optional info pages configuration
     merchantType?: MerchantType; // FINA users can sync, CUSTOM users add products manually
     siteConfig: SiteConfig; // Site metadata and configuration
   }
@@ -487,6 +527,7 @@ export type TenantConfig =
     themeColor: string;
     theme: ThemeVars;
     homepage: Template2Homepage;
+    infoPages?: InfoPagesConfig;
     merchantType?: MerchantType;
     siteConfig: SiteConfig;
   }
@@ -495,6 +536,7 @@ export type TenantConfig =
     themeColor: string;
     theme: ThemeVars;
     homepage: Template3Homepage;
+    infoPages?: InfoPagesConfig;
     merchantType?: MerchantType;
     siteConfig: SiteConfig;
   }
@@ -503,6 +545,7 @@ export type TenantConfig =
     themeColor: string;
     theme: ThemeVars;
     homepage: Template4Homepage;
+    infoPages?: InfoPagesConfig;
     merchantType?: MerchantType;
     siteConfig: SiteConfig;
   };

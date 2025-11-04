@@ -33,13 +33,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2) Redirect to best locale if missing from path
+  // 2) Handle locale in path
   const locInPath = pathLocale(pathname);
 
   if (!locInPath) {
-    const best = getBestLocale(request);
+    // No locale in path - rewrite to default locale (ka) without redirecting
+    const url = request.nextUrl.clone();
+    url.pathname = `/${defaultLocale}${pathname}`;
+    return NextResponse.rewrite(url);
+  }
 
-    return NextResponse.redirect(new URL(`/${best}${pathname}${search}`, request.url));
+  // 3) If default locale (ka) is explicitly in URL, redirect to hide it
+  if (locInPath === defaultLocale) {
+    const pathWithoutLocale = pathname.replace(`/${defaultLocale}`, '') || '/';
+    return NextResponse.redirect(new URL(`${pathWithoutLocale}${search}`, request.url));
   }
 
   const adminToken = request.cookies.get("admin_token")?.value;

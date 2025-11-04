@@ -41,7 +41,8 @@ export const Navbar = () => {
   const category = slugParts[2] || "";
   const subcategory = (slugParts[3] as string | null) || null;
 
-  const lng = "en";
+  // Get current language from pathname - if /en exists, use en, otherwise default to ka
+  const lng = pathname.startsWith("/en") ? "en" : "ka";
 
   // scroll state
   useEffect(() => {

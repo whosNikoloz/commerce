@@ -20,13 +20,24 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
   const isSSR = useIsSSR();
   const pathname = usePathname();
   const router = useRouter();
-  const currentLanguage: Locale = pathname?.startsWith("/ka") ? "ka" : "en";
+
+  // Check if URL has /en prefix, otherwise it's ka (default)
+  const currentLanguage: Locale = pathname?.startsWith("/en") ? "en" : "ka";
 
   const onChange = () => {
     const newLang: Locale = currentLanguage === "en" ? "ka" : "en";
-    const newPath = pathname?.replace(/^\/(en|ka)/, `/${newLang}`) || `/${newLang}`;
 
-    router.push(newPath);
+    // If switching to English, add /en prefix
+    if (newLang === "en") {
+      // Remove any existing /ka prefix and add /en
+      const cleanPath = pathname?.replace(/^\/(en|ka)/, '') || '';
+      const newPath = `/en${cleanPath || '/'}`;
+      router.push(newPath);
+    } else {
+      // If switching to Georgian (default), remove /en prefix
+      const newPath = pathname?.replace(/^\/en/, '') || '/';
+      router.push(newPath);
+    }
   };
 
   const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } = useSwitch({

@@ -40,6 +40,7 @@ export function Footer() {
     { label: "Return Policy", href: "/info/return-policy" },
     { label: "Stores", href: "/info/stores" },
     { label: "Terms & Conditions", href: "/info/terms-and-conditions" },
+    { label: "About", href: "/info/about" },
   ];
 
   return (

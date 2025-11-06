@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Heart, ShoppingCart } from "lucide-react";
+import { useParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
@@ -67,6 +68,8 @@ export function ProductCard({
   priority = false,
 }: ProductCardProps) {
   const { user } = useUser();
+  const { lang } = useParams<{ lang?: string }>();
+  const currentLang = lang || "en";
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const addToCart = useCartStore((s) => s.addToCart);
@@ -143,13 +146,13 @@ export function ProductCard({
 
       <Link
         aria-label={`View ${product.name || "product"} details`}
-        className="absolute inset-0 z-[5]"
-        href={`/product/${product.id}`}
+        className="absolute inset-0 z-0"
+        href={`/${currentLang}/product/${product.id}`}
         tabIndex={-1}
       />
 
       {/* IMAGE */}
-      <CardContent className="p-0 relative z-10"> {/* ensure image area stays interactive (e.g., heart) */}
+      <CardContent className="p-0 relative pointer-events-none"> {/* prevent blocking clicks to link */}
         <div className="relative">
           <AspectRatio className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)} ratio={1}>
             <Image
@@ -164,7 +167,7 @@ export function ProductCard({
           </AspectRatio>
 
           {discountPercent > 0 && (
-            <div className="absolute left-3 top-3 z-20">
+            <div className="absolute left-3 top-3 pointer-events-none">
               <div className="rounded-full bg-red-500 text-white text-xs font-bold px-2.5 py-1 shadow-sm">
                 -{discountPercent}%
               </div>
@@ -172,7 +175,7 @@ export function ProductCard({
           )}
 
           {template !== 2 && showActions && (
-            <div className="absolute right-3 top-3 z-20">
+            <div className="absolute right-3 top-3 pointer-events-auto">
               <Button
                 className={cn(
                   "rounded-full h-9 w-9 shadow-md",
@@ -198,7 +201,7 @@ export function ProductCard({
       </CardContent>
 
       {/* CONTENT */}
-      <CardFooter className="relative z-10 flex flex-col items-start gap-2.5 p-4 flex-1">
+      <CardFooter className="relative pointer-events-none flex flex-col items-start gap-2.5 p-4 flex-1">
         <h3 className={cn(S.title, "text-zinc-900 dark:text-zinc-100 w-full min-h-[2.5rem]")} itemProp="name">
           {product.name || "Unnamed Product"}
         </h3>
@@ -224,7 +227,7 @@ export function ProductCard({
           </div>
 
           {template === 2 && showActions ? (
-            <div className="w-full flex items-stretch gap-2">
+            <div className="w-full flex items-stretch gap-2 pointer-events-auto">
               <Button
                 className={cn("h-11 flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
                 disabled={!isInStock || product.isComingSoon}
@@ -262,7 +265,7 @@ export function ProductCard({
             </div>
           ) : (
             <Button
-              className={cn("w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
+              className={cn("w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2 pointer-events-auto", S.cta)}
               disabled={!isInStock || product.isComingSoon}
               type="button"
               onClick={(e) => {

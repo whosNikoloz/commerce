@@ -9,6 +9,7 @@ import { Card, CardBody } from "@heroui/card";
 import { useState, memo, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,8 @@ const ProductCard = memo(function ProductCard({
   onSelectImage: (productId: string, idx: number) => void;
 }) {
   const { user } = useUser();
+  const { lang } = useParams<{ lang?: string }>();
+  const currentLang = lang || "en";
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
 
@@ -214,7 +217,7 @@ const ProductCard = memo(function ProductCard({
             {/* Clickable area only (inside Card, wrapped by Link) */}
             <Link
               className="flex flex-col h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-2xl"
-              href={`/product/${product.id}`}
+              href={`/${currentLang}/product/${product.id}`}
             >
               <CardBody className="p-0 flex flex-col h-full">
                 <div className="relative flex-1 flex flex-col">
@@ -379,7 +382,7 @@ const ProductCard = memo(function ProductCard({
           <div className="flex items-center gap-3 sm:gap-4 w-full p-3 sm:p-4 rounded-2xl bg-card">
             <Link
               className="flex flex-1 items-center gap-3 sm:gap-4 min-w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-xl"
-              href={`/product/${product.id}`}
+              href={`/${currentLang}/product/${product.id}`}
             >
               {/* Image */}
               <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm">

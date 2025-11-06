@@ -9,6 +9,7 @@ import { Card, CardBody } from "@heroui/card";
 import { useState, memo, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,6 +59,8 @@ const ProductCard = memo(function ProductCard({
   onSelectImage: (productId: string, idx: number) => void;
 }) {
     const { user } = useUser();
+    const { lang } = useParams<{ lang?: string }>();
+    const currentLang = lang || "en";
   const images =
     product.images && product.images.length > 0 ? product.images : ["/placeholder.png"];
   const inStock = product.status === StockStatus.InStock;
@@ -228,15 +231,13 @@ const ProductCard = memo(function ProductCard({
       <meta content={product.name ?? "Product"} itemProp="name" />
       {images?.[0] && <meta content={images[0]} itemProp="image" />}
 
-      <Link className={viewMode === "grid" ? "flex flex-col h-full" : "block"} href={`/product/${product.id}`}>
-        <Card className={cn("group relative overflow-hidden rounded-2xl shadow-sm md:hover:shadow-2xl transition-all duration-300 transform md:hover:-translate-y-1 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60", viewMode === "grid" && "flex flex-col h-full")}>
-          <CardBody className={viewMode === "grid" ? "p-0 flex flex-col h-full" : "gap-4"}>
-          {viewMode === "grid" ? (
-           <>
+      <Card className={cn("group relative overflow-hidden rounded-2xl shadow-sm md:hover:shadow-2xl transition-all duration-300 transform md:hover:-translate-y-1 bg-brand-surface dark:bg-brand-surfacedark border border-brand-muted/60 dark:border-brand-muteddark/60", viewMode === "grid" && "flex flex-col h-full")}>
+        {viewMode === "grid" ? (
+          <>
             {/* Clickable area only (inside Card, wrapped by Link) */}
             <Link
               className="flex flex-col h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-2xl"
-              href={`/product/${product.id}`}
+              href={`/${currentLang}/product/${product.id}`}
             >
               <CardBody className="p-0 flex flex-col h-full">
                 <div className="relative flex-1 flex flex-col">
@@ -399,7 +400,7 @@ const ProductCard = memo(function ProductCard({
           <div className="flex items-center gap-3 sm:gap-4 w-full p-3 sm:p-4 rounded-2xl bg-card">
             <Link
               className="flex flex-1 items-center gap-3 sm:gap-4 min-w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-xl"
-              href={`/product/${product.id}`}
+              href={`/${currentLang}/product/${product.id}`}
             >
               {/* Image */}
               <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm">
@@ -480,9 +481,7 @@ const ProductCard = memo(function ProductCard({
             <ActionButtons compact />
           </div>
           )}
-        </CardBody>
       </Card>
-      </Link>
     </article>
   );
 });

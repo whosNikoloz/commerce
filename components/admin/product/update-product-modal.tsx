@@ -1,6 +1,7 @@
 "use client";
 
 import type { BrandModel } from "@/types/brand";
+import type { ProductFacetValueModel } from "@/types/facet";
 
 import { useEffect, useState } from "react";
 import { Box, Clock3, Edit, Sparkles } from "lucide-react";
@@ -21,20 +22,24 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { FacetSelector } from "./facet-selector";
 
 interface UpdateProductModalProps {
   productId: string;
   initialDescription?: string;
   initialBrandId?: string;
+  initialCategoryId?: string;
   initialIsLiquidated?: boolean;
   initialIsComingSoon?: boolean;
   initialIsNewArrival?: boolean;
+  initialFacetValues?: ProductFacetValueModel[];
   brands?: BrandModel[];
   onSave: (
     id: string,
     newDescription: string,
     brandId: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
+    facetValues: ProductFacetValueModel[],
   ) => void | Promise<void>;
 }
 
@@ -42,9 +47,11 @@ export default function UpdateProductModal({
   productId,
   initialDescription = "",
   initialBrandId = "",
+  initialCategoryId = "",
   initialIsLiquidated = false,
   initialIsComingSoon = false,
   initialIsNewArrival = false,
+  initialFacetValues = [],
   brands = [],
   onSave,
 }: UpdateProductModalProps) {
@@ -54,6 +61,7 @@ export default function UpdateProductModal({
   const [isLiquidated, setIsLiquidated] = useState(initialIsLiquidated);
   const [isComingSoon, setIsComingSoon] = useState(initialIsComingSoon);
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
+  const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>(initialFacetValues);
   const [loading, setLoading] = useState(false);
 
   const isMobile = useIsMobile();
@@ -68,7 +76,7 @@ export default function UpdateProductModal({
     try {
       setLoading(true);
       await Promise.resolve(
-        onSave(productId, description, brandId, { isLiquidated, isComingSoon, isNewArrival }),
+        onSave(productId, description, brandId, { isLiquidated, isComingSoon, isNewArrival }, selectedFacetValues),
       );
       onClose();
     } finally {
@@ -232,6 +240,17 @@ export default function UpdateProductModal({
                       </span>
                     </div>
                   </div>
+
+                  {/* Facet Selector */}
+                  {initialCategoryId && (
+                    <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60 p-4">
+                      <FacetSelector
+                        categoryId={initialCategoryId}
+                        selectedFacetValues={selectedFacetValues}
+                        onChange={setSelectedFacetValues}
+                      />
+                    </div>
+                  )}
 
                   {/* Editor */}
                   <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/80 shadow-sm">

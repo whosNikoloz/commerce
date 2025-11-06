@@ -20,7 +20,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { CategoryModel } from "@/types/category";
 import { BrandModel } from "@/types/brand";
-import { FacetModel, FacetValueModel } from "@/types/facet";
+import { FacetModel } from "@/types/facet";
 import { FilterModel } from "@/types/filter";
 import { Condition, FacetTypeEnum, StockStatus } from "@/types/enums";
 
@@ -37,10 +37,17 @@ type ProductFiltersProps = {
   onPriceChange: (min?: number, max?: number) => void;
   onFacetToggle: (facetId: string, facetValueId: string) => void;
   onFacetRadioChange: (facetId: string, facetValueId: string) => void;
+
+  onFacetRangeChange?: (facetId: string, min?: number, max?: number) => void;
+  onFacetNumericChange?: (facetId: string, value?: number) => void;
+  onFacetSearchChange?: (facetId: string, text: string) => void;
+  onFacetDateRangeChange?: (facetId: string, from?: string, to?: string) => void;
+
   clearFilters: () => void;
   activeFiltersCount: number;
   buildSubHref: (sub: CategoryModel) => string;
 };
+
 
 function isFacetValueSelected(filter: FilterModel, valueId?: string) {
   if (!valueId) return false;
@@ -60,13 +67,24 @@ function FacetBlock({
   filter,
   onFacetToggle,
   onFacetRadioChange,
+  onFacetRangeChange,
+  onFacetNumericChange,
+  onFacetSearchChange,
+  onFacetDateRangeChange,
 }: {
   facet: FacetModel;
   filter: FilterModel;
   onFacetToggle: (facetId: string, facetValueId: string) => void;
   onFacetRadioChange: (facetId: string, facetValueId: string) => void;
+  onFacetRangeChange?: (facetId: string, min?: number, max?: number) => void;
+  onFacetNumericChange?: (facetId: string, value?: number) => void;
+  onFacetSearchChange?: (facetId: string, text: string) => void;
+  onFacetDateRangeChange?: (facetId: string, from?: string, to?: string) => void;
 }) {
   const values = facet.facetValues ?? [];
+
+  const selectedId = selectedRadioValueId(filter, facet);
+  const firstVal = values[0]; 
 
   switch (facet.displayType) {
     case FacetTypeEnum.CheckboxList:
@@ -79,10 +97,7 @@ function FacetBlock({
                 id={v.id}
                 onCheckedChange={() => v.id && onFacetToggle(facet.id, v.id)}
               />
-              <label
-                className="text-sm cursor-pointer text-text-light dark:text-text-lightdark"
-                htmlFor={v.id}
-              >
+              <label className="text-sm cursor-pointer text-text-light dark:text-text-lightdark" htmlFor={v.id}>
                 {v.value}
               </label>
             </div>
@@ -90,9 +105,7 @@ function FacetBlock({
         </div>
       );
 
-    case FacetTypeEnum.RadioButtonList: {
-      const selectedId = selectedRadioValueId(filter, facet);
-
+    case FacetTypeEnum.RadioButtonList:
       return (
         <RadioGroup
           className="space-y-3"
@@ -102,33 +115,114 @@ function FacetBlock({
           {values.map((v) => (
             <div key={v.id} className="flex items-center space-x-2">
               <RadioGroupItem id={`r-${facet.id}-${v.id}`} value={v.id!} />
-              <Label
-                className="text-text-light dark:text-text-lightdark"
-                htmlFor={`r-${facet.id}-${v.id}`}
-              >
+              <Label className="text-text-light dark:text-text-lightdark" htmlFor={`r-${facet.id}-${v.id}`}>
                 {v.value}
               </Label>
             </div>
           ))}
         </RadioGroup>
       );
+
+    case FacetTypeEnum.RangeSlider: {
+      const disabled = !onFacetRangeChange;
+      const min = 0, max = 1000, step = 10;
+
+      return (
+        <div className="space-y-3 opacity-100">
+          <Slider
+            className="w-full"
+            defaultValue={[min, max]}
+            disabled={disabled}
+            max={max}
+            min={min}
+            step={step}
+            onValueChange={(v: number[]) => onFacetRangeChange?.(facet.id, v?.[0], v?.[1])}
+          />
+          <div className="flex gap-2">
+            <Input
+              className="w-24"
+              disabled={disabled}
+              placeholder={`${min}`}
+              type="number"
+              onBlur={(e) => onFacetRangeChange?.(facet.id, Number(e.target.value) || min, undefined)}
+            />
+            <Input
+              className="w-24"
+              disabled={disabled}
+              placeholder={`${max}`}
+              type="number"
+              onBlur={(e) => onFacetRangeChange?.(facet.id, undefined, Number(e.target.value) || max)}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    case FacetTypeEnum.NumericInput: {
+      const disabled = !onFacetNumericChange;
+
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            className="w-32"
+            disabled={disabled}
+            placeholder={firstVal?.value ?? "Enter value"}
+            type="number"
+            onBlur={(e) => onFacetNumericChange?.(facet.id, e.target.value ? Number(e.target.value) : undefined)}
+          />
+        </div>
+      );
     }
 
     case FacetTypeEnum.BooleanSwitch: {
-      const v: FacetValueModel | undefined = values[0];
-      const checked = isFacetValueSelected(filter, v?.id);
+      const checked = isFacetValueSelected(filter, firstVal?.id);
 
       return (
         <div className="flex items-center justify-between">
           <span className="text-sm text-text-light dark:text-text-lightdark">
-            {v?.value ?? "Enabled"}
+            {firstVal?.value ?? "Enabled"}
           </span>
-          <Switch checked={checked} onCheckedChange={() => v?.id && onFacetToggle(facet.id, v.id)} />
+          <Switch checked={checked} onCheckedChange={() => firstVal?.id && onFacetToggle(facet.id, firstVal.id)} />
+        </div>
+      );
+    }
+
+    case FacetTypeEnum.SearchBox: {
+      const disabled = !onFacetSearchChange;
+
+      return (
+        <Input
+          disabled={disabled}
+          placeholder={firstVal?.value ?? "Search..."}
+          onChange={(e) => onFacetSearchChange?.(facet.id, e.target.value)}
+        />
+      );
+    }
+
+    case FacetTypeEnum.DateRangePicker: {
+      const disabled = !onFacetDateRangeChange;
+
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            className="w-40"
+            disabled={disabled}
+            type="date"
+            onChange={(e) => onFacetDateRangeChange?.(facet.id, e.target.value || undefined, undefined)}
+          />
+          <span className="text-xs text-muted-foreground">to</span>
+          <Input
+            className="w-40"
+            disabled={disabled}
+            type="date"
+            onChange={(e) => onFacetDateRangeChange?.(facet.id, undefined, e.target.value || undefined)}
+          />
         </div>
       );
     }
 
     default:
+      // fallback = checkbox list behavior
       return (
         <div className="space-y-3 text-xs text-text-subtle dark:text-text-subtledark">
           {values.length > 0 ? (
@@ -145,7 +239,7 @@ function FacetBlock({
               </div>
             ))
           ) : (
-            <em>Server should provide values for this facet type.</em>
+            <em>No values</em>
           )}
         </div>
       );
@@ -164,6 +258,10 @@ function SidebarContent({
   onPriceChange,
   onFacetToggle,
   onFacetRadioChange,
+  onFacetRangeChange,      
+  onFacetNumericChange,    
+  onFacetSearchChange,      
+  onFacetDateRangeChange,   
   buildSubHref,
 }: ProductFiltersProps) {
   const minPrice = typeof filter.minPrice === "number" ? filter.minPrice : 0;
@@ -201,7 +299,7 @@ function SidebarContent({
 
       <Accordion collapsible className="w-full" type="single">
         {/* Price */}
-        <AccordionItem value="price" className="border-b border-border/50">
+        <AccordionItem className="border-b border-border/50" value="price">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
               <span className="text-brand-primary">💰</span>
@@ -241,7 +339,7 @@ function SidebarContent({
         </AccordionItem>
 
         {/* Brands */}
-        <AccordionItem value="brands" className="border-b border-border/50">
+        <AccordionItem className="border-b border-border/50" value="brands">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
               <span className="text-brand-primary">🏷️</span>
@@ -274,7 +372,7 @@ function SidebarContent({
         </AccordionItem>
 
         {/* Stock */}
-        <AccordionItem value="stock" className="border-b border-border/50">
+        <AccordionItem className="border-b border-border/50" value="stock">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
               <span className="text-brand-primary">📦</span>
@@ -312,7 +410,7 @@ function SidebarContent({
         </AccordionItem>
 
         {/* Condition */}
-        <AccordionItem value="condition" className="border-b border-border/50">
+        <AccordionItem className="border-b border-border/50" value="condition">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
               <span className="text-brand-primary">✨</span>
@@ -350,7 +448,7 @@ function SidebarContent({
 
         {/* Dynamic facets */}
         {facets.map((f) => (
-          <AccordionItem key={f.id} value={`facet-${f.id}`} className="border-b border-border/50">
+          <AccordionItem key={f.id} className="border-b border-border/50" value={`facet-${f.id}`}>
             <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
               <span className="flex items-center gap-2">
                 <span className="text-brand-primary">🔍</span>
@@ -361,7 +459,11 @@ function SidebarContent({
               <FacetBlock
                 facet={f}
                 filter={filter}
+                onFacetDateRangeChange={onFacetDateRangeChange}
+                onFacetNumericChange={onFacetNumericChange}
                 onFacetRadioChange={onFacetRadioChange}
+                onFacetRangeChange={onFacetRangeChange}
+                onFacetSearchChange={onFacetSearchChange}
                 onFacetToggle={onFacetToggle}
               />
             </AccordionContent>

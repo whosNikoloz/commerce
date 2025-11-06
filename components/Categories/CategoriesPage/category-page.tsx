@@ -79,6 +79,16 @@ export default function CategoryPage({
   const [currentPage, setCurrentPage] = useState(__initialPage ?? 1);
   const itemsPerPage = 12;
 
+  const [facetRanges, setFacetRanges] =
+    useState<Record<string, { min?: number; max?: number }>>({});
+  const [facetNumerics, setFacetNumerics] =
+    useState<Record<string, number | undefined>>({});
+  const [facetSearches, setFacetSearches] =
+    useState<Record<string, string>>({});
+  const [facetDates, setFacetDates] =
+    useState<Record<string, { from?: string; to?: string }>>({});
+
+
   // Filters (init from URL once, then keep URL in sync)
   const [filter, setFilter] = useState<FilterModel>({
     brandIds: [],
@@ -131,6 +141,7 @@ export default function CategoryPage({
       facetFilters: facetIds
         .map((facetValueId) => {
           const facetId = facetValueToFacetId[facetValueId];
+
           return facetId ? { facetId, facetValueId } : null;
         })
         .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
@@ -156,6 +167,7 @@ export default function CategoryPage({
     // Skip fetch on initial mount if we have server data
     if (hasUsedInitialData) {
       setHasUsedInitialData(false);
+
       return;
     }
 
@@ -187,11 +199,18 @@ export default function CategoryPage({
 
       try {
         const res = await searchProductsByFilter({
-          filter: effectiveFilter,
-          page: currentPage,
-          pageSize: itemsPerPage,
-          sortBy,
-        });
+            filter: {
+              ...effectiveFilter,
+              facetRanges,
+              facetNumerics,
+              facetSearches,
+              facetDates,
+            } as any, 
+            page: currentPage,
+            pageSize: itemsPerPage,
+            sortBy,
+          });
+
 
         if (cancelled) return;
         setProducts(res.items ?? []);
@@ -211,8 +230,16 @@ export default function CategoryPage({
     };
   }, [category?.id, filter, sortBy, currentPage, router, startTransition, hasUsedInitialData]);
 
+  // if (notFound) return <CategoryNotFound />;
+  // if (loading || !category) return <Loading />;
   if (notFound) return <CategoryNotFound />;
-  if (loading || !category) return <Loading />;
+    if (loading || !category) {
+      return (
+        <div className="min-h-screen mt-16 container mx-auto px-2 sm:px-4 py-4 lg:py-6">
+          <SkeletonProductGrid count={12} onViewModeChange={() => {}} />
+        </div>
+    );
+  }
 
   const subcategories = category.subcategories ?? [];
   const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
@@ -255,6 +282,27 @@ export default function CategoryPage({
     setCurrentPage(1);
   };
 
+  const onFacetRangeChange = (facetId: string, min?: number, max?: number) => {
+  setFacetRanges(prev => ({ ...prev, [facetId]: { min, max } }));
+  setCurrentPage(1);
+};
+
+const onFacetNumericChange = (facetId: string, value?: number) => {
+  setFacetNumerics(prev => ({ ...prev, [facetId]: value }));
+  setCurrentPage(1);
+};
+
+const onFacetSearchChange = (facetId: string, text: string) => {
+  setFacetSearches(prev => ({ ...prev, [facetId]: text }));
+  setCurrentPage(1);
+};
+
+const onFacetDateRangeChange = (facetId: string, from?: string, to?: string) => {
+  setFacetDates(prev => ({ ...prev, [facetId]: { ...prev[facetId], from, to } }));
+  setCurrentPage(1);
+};
+
+
   const clearFilters = () => {
     setFilter({
       brandIds: [],
@@ -290,7 +338,11 @@ export default function CategoryPage({
             subcategories={subcategories}
             onBrandToggle={onBrandToggle}
             onConditionToggle={onConditionToggle}
+            onFacetDateRangeChange={onFacetDateRangeChange}
+            onFacetNumericChange={onFacetNumericChange}
             onFacetRadioChange={onFacetRadioChange}
+            onFacetRangeChange={onFacetRangeChange}
+            onFacetSearchChange={onFacetSearchChange}
             onFacetToggle={onFacetToggle}
             onPriceChange={onPriceChange}
             onStockChange={onStockChange}

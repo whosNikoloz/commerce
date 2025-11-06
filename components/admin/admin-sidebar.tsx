@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconColorFilter } from "@tabler/icons-react";
+import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconColorFilter, IconBook } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
@@ -26,6 +26,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   // Check if merchant is FINA type (can sync)
   const isFinaMerchant = config?.merchantType === "FINA";
 
+
   // ✅ Auto-close on route change (only on mobile)
   useEffect(() => {
     if (open && isMobile) setOpen(false);
@@ -38,7 +39,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     { label: "Products",   href: `/${currentLang}/admin/products`,   icon: <IconBox className="h-5 w-5 text-cyan-600 dark:text-cyan-400" /> },
     { label: "Faqs",       href: `/${currentLang}/admin/faqs`,       icon: <FileQuestionIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> },
     { label: "Categories", href: `/${currentLang}/admin/categories`, icon: <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
-    // Only show Sync for FINA merchants
+    { label: "Facets", href: `/${currentLang}/admin/facets`, icon: <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
     ...(isFinaMerchant ? [{ label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> }] : []),
     { label: "Payments",    href: `/${currentLang}/admin/payments`,  icon: <CreditCard className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
     //{ label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },

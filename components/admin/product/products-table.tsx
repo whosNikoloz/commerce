@@ -175,6 +175,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     description: string,
     brandId: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
+    facetValues: import("@/types/facet").ProductFacetValueModel[],
   ) => {
     const current = products.find((p) => p.id === productId);
 
@@ -190,7 +191,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       isNewArrival: flags.isNewArrival,
       discountPrice: current.discountPrice ?? undefined,
       images: current.images ?? [],
-      productFacetValues: current.productFacetValues ?? [],
+      productFacetValues: facetValues,
       categoryId: current.categoryId,
     };
 
@@ -354,7 +355,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               <UpdateProductModal
                 brands={brands}
                 initialBrandId={product.brandId}
+                initialCategoryId={product.categoryId}
                 initialDescription={product.description}
+                initialFacetValues={product.productFacetValues ?? []}
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
                 initialIsNewArrival={product.isNewArrival}
@@ -689,7 +692,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                 <UpdateProductModal
                                   brands={brands}
                                   initialBrandId={product.brandId}
+                                  initialCategoryId={product.categoryId}
                                   initialDescription={product.description}
+                                  initialFacetValues={product.productFacetValues ?? []}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}
                                   initialIsNewArrival={product.isNewArrival}

@@ -3,6 +3,7 @@
 import type { ProductRequestModel } from "@/types/product";
 import type { CategoryModel } from "@/types/category";
 import type { BrandModel } from "@/types/brand";
+import type { ProductFacetValueModel } from "@/types/facet";
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
@@ -30,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { StockStatus, Condition } from "@/types/enums";
 import { createProduct } from "@/app/api/services/productService";
+import { FacetSelector } from "./facet-selector";
 
 interface AddProductModalProps {
   categories: CategoryModel[];
@@ -55,6 +57,8 @@ export default function AddProductModal({
     status: StockStatus.InStock.toString(),
     condition: Condition.New.toString(),
   });
+
+  const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +86,7 @@ export default function AddProductModal({
         isComingSoon: false,
         isNewArrival: true,
         images: [],
-        productFacetValues: [],
+        productFacetValues: selectedFacetValues,
       };
 
       await createProduct(productData);
@@ -99,6 +103,7 @@ export default function AddProductModal({
         status: StockStatus.InStock.toString(),
         condition: Condition.New.toString(),
       });
+      setSelectedFacetValues([]);
 
       setOpen(false);
       onProductAdded?.();
@@ -277,6 +282,15 @@ export default function AddProductModal({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Facet Selector */}
+            <div className="grid gap-2 pt-2">
+              <FacetSelector
+                categoryId={formData.categoryId}
+                selectedFacetValues={selectedFacetValues}
+                onChange={setSelectedFacetValues}
+              />
             </div>
           </div>
 

@@ -126,18 +126,6 @@ export type ProductRailData = {
   sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
 };
 
-export type ComparisonBlockData = {
-  title: LocalizedText;
-  description?: LocalizedText;
-  products: Array<{
-    sku: string;
-    name: LocalizedText;
-    image: string;
-    specs: Array<{ label: LocalizedText; value: string }>;
-    price: number;
-    href: string;
-  }>;
-};
 
 export type ReviewsData = {
   title: LocalizedText;
@@ -427,6 +415,33 @@ export type InfoPagesConfig = {
   pages: InfoPage[];
 };
 
+// ===== Dynamic Custom Pages Configuration =====
+// These pages can use ANY section type from the tenant's template (like homepage)
+// Examples: /back-to-school, /summer-sale, /black-friday, etc.
+
+export type DynamicPageMetadata = {
+  title: LocalizedText;
+  description: LocalizedText;
+  ogImage?: string;
+  index?: boolean; // Whether to allow search engines to index this page
+};
+
+// Dynamic pages use the same section types as the homepage based on templateId
+export type DynamicPageConfig = {
+  slug: string; // URL path (e.g., "back-to-school", "summer-sale")
+  metadata: DynamicPageMetadata;
+  sections: Array<{
+    enabled: boolean;
+    order: number;
+    type: string; // Section type depends on template (Hero, ProductRail, CustomHTML, etc.)
+    data: any; // Section-specific data
+  }>;
+};
+
+export type DynamicPagesConfig = {
+  pages: DynamicPageConfig[];
+};
+
 // ===== Section instances with discriminated unions =====
 export type Template1SectionInstance =
   | { type: "Hero"; enabled: boolean; order: number; data: HeroData }
@@ -519,6 +534,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template1Homepage;
     infoPages?: InfoPagesConfig; // Optional info pages configuration
+    dynamicPages?: DynamicPagesConfig; // Optional dynamic custom pages (e.g., /back-to-school)
     merchantType?: MerchantType; // FINA users can sync, CUSTOM users add products manually
     siteConfig: SiteConfig; // Site metadata and configuration
   }
@@ -528,6 +544,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template2Homepage;
     infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
     merchantType?: MerchantType;
     siteConfig: SiteConfig;
   }
@@ -537,6 +554,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template3Homepage;
     infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
     merchantType?: MerchantType;
     siteConfig: SiteConfig;
   }
@@ -546,6 +564,7 @@ export type TenantConfig =
     theme: ThemeVars;
     homepage: Template4Homepage;
     infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
     merchantType?: MerchantType;
     siteConfig: SiteConfig;
   };

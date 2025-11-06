@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
@@ -10,12 +12,15 @@ import { ImageReview } from "./image-review";
 import { ProductResponseModel } from "@/types/product";
 import { getProductById } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
+import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 
 type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
 
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
+  const { user } = useUser();
+  const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const addToCart = useCartStore((s) => s.addToCart);
@@ -71,6 +76,15 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     };
 
     addToCart(item);
+  };
+
+  const handleBuyNow = () => {
+    if (!user) {
+      toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
+      return;
+    }
+    handleAddToCart();
+    router.push("/cart");
   };
 
   useEffect(() => {
@@ -152,7 +166,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             price={price}
             status={product.status}
             onAddToCart={handleAddToCart}
-            onBuyNow={() => {}}
+            onBuyNow={handleBuyNow}
           />
         </div>
 
@@ -204,7 +218,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         status={product.status}
         stock={product.status}
         onAddToCart={handleAddToCart}
-        onBuyNow={() => {}}
+        onBuyNow={handleBuyNow}
       />
     </div>
   );

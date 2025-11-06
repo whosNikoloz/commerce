@@ -2,10 +2,12 @@
 
   import React, { useEffect, useRef, useState } from "react";
   import Link from "next/link";
+  import { useRouter } from "next/navigation";
   import { Button } from "@heroui/button";
   import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
   import { useDisclosure } from "@heroui/modal";
   import Image from "next/image";
+  import { toast } from "sonner";
 
   import { ShoppingCartIcon } from "../icons";
   import { Badge as ShadCnBadge } from "../ui/badge";
@@ -13,10 +15,13 @@
   import HeaderCartButton from "./header-cart-button";
 
   import { useCartStore } from "@/app/context/cartContext";
+  import { useUser } from "@/app/context/userContext";
 
   const fmt = new Intl.NumberFormat("ka-GE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   export default function CartDropdown() {
+    const { user } = useUser();
+    const router = useRouter();
     const cart = useCartStore((s) => s.cart);
     const cartLen = useCartStore((s) => s.cart.length);
     const totalQuantity = useCartStore((s) => s.getCount());
@@ -66,6 +71,15 @@
     }, [cartChanged]);
 
     const handleClickCart = () => (isOpen ? onClose() : onOpen());
+
+    const handleCheckout = () => {
+      if (!user) {
+        toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
+        return;
+      }
+      router.push("/cart");
+      onClose();
+    };
 
     return (
       <div ref={dropdownRef} className="relative">
@@ -259,7 +273,7 @@
                           {mounted ? totalQuantity : 0}
                         </ShadCnBadge>
                       </Button>
-                      <Button className="flex-1 h-12 rounded-xl font-bold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]">
+                      <Button className="flex-1 h-12 rounded-xl font-bold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]" onPress={handleCheckout}>
                         ყიდვა
                       </Button>
                     </div>

@@ -125,12 +125,8 @@ export function FacetSelector({
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-        <Layers className="h-4 w-4" />
-        Product Attributes (Facets)
-      </Label>
-      <ScrollArea className="h-[300px] rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-        <div className="p-4 space-y-3">
+      <ScrollArea className="h-[200px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
+        <div className="p-3 space-y-2">
           {facets.map((facet) => {
             const isExpanded = expandedFacets.has(facet.id);
             const facetValues = facet.facetValues ?? [];
@@ -147,27 +143,27 @@ export function FacetSelector({
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-between p-3 h-auto hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-700"
+                    className="w-full justify-between p-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-md text-sm"
                   >
                     <div className="flex items-center gap-2">
                       {isExpanded ? (
-                        <ChevronDown className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                        <ChevronDown className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                       ) : (
-                        <ChevronRight className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                        <ChevronRight className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                       )}
-                      <span className="font-semibold text-slate-900 dark:text-slate-100">
+                      <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">
                         {facet.name}
                       </span>
                     </div>
                     {selectedCount > 0 && (
-                      <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                        {selectedCount} selected
+                      <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded">
+                        {selectedCount}
                       </span>
                     )}
                   </Button>
                 </CollapsibleTrigger>
 
-                <CollapsibleContent className="mt-2 space-y-1 pl-6">
+                <CollapsibleContent className="mt-1 space-y-0.5 pl-5">
                   {facetValues.length === 0 ? (
                     <p className="text-sm text-slate-500 dark:text-slate-400 py-2">
                       No values available
@@ -180,7 +176,7 @@ export function FacetSelector({
                         <button
                           key={facetValue.id}
                           type="button"
-                          className={`w-full flex items-center gap-2 p-2 rounded-md text-left transition-colors ${
+                          className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left transition-colors text-xs ${
                             isSelected
                               ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400"
                               : "hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300"
@@ -188,11 +184,11 @@ export function FacetSelector({
                           onClick={() => toggleFacetValue(facetValue.id)}
                         >
                           {isSelected ? (
-                            <CheckSquare className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                            <CheckSquare className="h-3 w-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                           ) : (
-                            <Square className="h-4 w-4 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+                            <Square className="h-3 w-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />
                           )}
-                          <span className="text-sm">{facetValue.value}</span>
+                          <span>{facetValue.value}</span>
                         </button>
                       );
                     })

@@ -22,6 +22,7 @@ export interface ProductResponseModel {
   isComingSoon?: boolean;
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueResponseModel[];
+  productGroupId?: string;
 }
 
 export interface ProductRequestModel {
@@ -40,6 +41,7 @@ export interface ProductRequestModel {
   isComingSoon?: boolean;
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueModel[];
+  productGroupId?: string;
 }
 
 export async function mapProducts(

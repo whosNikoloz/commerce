@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StockStatus, Condition } from "@/types/enums";
-import { createProduct } from "@/app/api/services/productService";
+import { createProduct, getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productService";
 import { FacetSelector } from "./facet-selector";
 
 interface AddProductModalProps {
@@ -46,6 +46,8 @@ export default function AddProductModal({
 }: AddProductModalProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [productGroups, setProductGroups] = useState<ProductGroupModel[]>([]);
+  const [loadingGroups, setLoadingGroups] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -54,11 +56,38 @@ export default function AddProductModal({
     description: "",
     categoryId: "",
     brandId: "",
+    productGroupId: "",
     status: StockStatus.InStock.toString(),
     condition: Condition.New.toString(),
   });
 
   const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>([]);
+
+  // Fetch product groups when category or brand changes
+  const fetchProductGroups = async () => {
+    if (!formData.categoryId && !formData.brandId) return;
+
+    setLoadingGroups(true);
+    try {
+      const groups = await getAllProductGroups(
+        formData.categoryId || undefined,
+        formData.brandId || undefined
+      );
+      setProductGroups(groups);
+    } catch (error) {
+      console.error("Failed to fetch product groups:", error);
+      toast.error("Failed to load product groups");
+    } finally {
+      setLoadingGroups(false);
+    }
+  };
+
+  // Fetch groups when category or brand changes
+  useState(() => {
+    if (open && (formData.categoryId || formData.brandId)) {
+      fetchProductGroups();
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +116,7 @@ export default function AddProductModal({
         isNewArrival: true,
         images: [],
         productFacetValues: selectedFacetValues,
+        productGroupId: formData.productGroupId || undefined,
       };
 
       await createProduct(productData);
@@ -100,10 +130,12 @@ export default function AddProductModal({
         description: "",
         categoryId: "",
         brandId: "",
+        productGroupId: "",
         status: StockStatus.InStock.toString(),
         condition: Condition.New.toString(),
       });
       setSelectedFacetValues([]);
+      setProductGroups([]);
 
       setOpen(false);
       onProductAdded?.();
@@ -229,7 +261,10 @@ export default function AddProductModal({
                 <Select
                   required
                   value={formData.brandId}
-                  onValueChange={(value) => setFormData({ ...formData, brandId: value })}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, brandId: value });
+                    fetchProductGroups();
+                  }}
                 >
                   <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                     <SelectValue placeholder="Select brand" />
@@ -243,6 +278,38 @@ export default function AddProductModal({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Product Group Selector */}
+            <div className="grid gap-2">
+              <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="productGroup">
+                Product Group (Variants)
+                <span className="text-xs font-normal text-slate-500 ml-2">
+                  Optional - Connect products that are variants of each other
+                </span>
+              </Label>
+              <Select
+                disabled={loadingGroups || (!formData.categoryId && !formData.brandId)}
+                value={formData.productGroupId || undefined}
+                onValueChange={(value) => setFormData({ ...formData, productGroupId: value === "none" ? "" : value })}
+              >
+                <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+                  <SelectValue placeholder={loadingGroups ? "Loading groups..." : "Select product group (optional)"} />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
+                  <SelectItem value="none">None (standalone product)</SelectItem>
+                  {productGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!formData.categoryId && !formData.brandId && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Select a category or brand first to see available product groups
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

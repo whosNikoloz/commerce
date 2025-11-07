@@ -10,7 +10,7 @@ import { Specifications } from "./specifications";
 import { ImageReview, ImageReviewHandle } from "./image-review";
 
 import { ProductResponseModel } from "@/types/product";
-import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
+import { getProductById, getProductRestsByIds, getProductVariants } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,6 +23,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const { user } = useUser();
   const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
+  const [variants, setVariants] = useState<ProductResponseModel[]>([]);
   const [stockQuantity, setStockQuantity] = useState<number | undefined>(undefined);
   const [stockLoading, setStockLoading] = useState(true);
   const [stockError, setStockError] = useState<string | null>(null);
@@ -65,6 +66,30 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
+
+  // Fetch product variants from the same group
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchVariants = async () => {
+      if (!product.productGroupId) return;
+
+      try {
+        const groupVariants = await getProductVariants(product.id);
+        if (!cancelled) {
+          setVariants(groupVariants || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch variants:", error);
+      }
+    };
+
+    fetchVariants();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [product.id, product.productGroupId]);
 
   // Fetch real-time stock quantity
   const fetchStock = useCallback(async () => {
@@ -226,6 +251,8 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   const specs = useMemo(() => {
     if (!product.productFacetValues?.length) return [];
+
+    // Group current product's facets
     const grouped = product.productFacetValues.reduce(
       (acc, f) => {
         const name = f.facetName ?? "";
@@ -241,17 +268,45 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       {} as Record<string, Array<{ value: string; productVariantId?: string }>>,
     );
 
+    // For each facet group, find all unique values from variants
+    const enrichedSpecs = Object.entries(grouped).map(([facetName, currentFacetData]) => {
+      // Get all possible values for this facet from all variants in the group
+      const allValuesMap = new Map<string, string>(); // value -> productId
+
+      // Add current product's value
+      currentFacetData.forEach(f => {
+        allValuesMap.set(f.value, product.id);
+      });
+
+      // Add values from other variants
+      variants.forEach(variant => {
+        const variantFacet = variant.productFacetValues?.find(
+          vf => vf.facetName === facetName
+        );
+        if (variantFacet && variantFacet.facetValue) {
+          allValuesMap.set(variantFacet.facetValue, variant.id);
+        }
+      });
+
+      // Convert map to array of FacetValue objects
+      const facetValues = Array.from(allValuesMap.entries()).map(([value, productId]) => ({
+        value,
+        productVariantId: productId,
+      }));
+
+      return {
+        facetName,
+        facetValues,
+      };
+    });
+
     return [
       {
         headline: "Specifications",
-        specifications: Object.entries(grouped).map(([facetName, facetData]) => ({
-          facetName,
-          // Keep the full structure with productVariantId for each value
-          facetValues: facetData,
-        })),
+        specifications: enrichedSpecs,
       },
     ];
-  }, [product.productFacetValues]);
+  }, [product.productFacetValues, product.id, variants]);
 
   const price = product.discountPrice ?? product.price;
   const originalPrice = product.discountPrice ? product.price : undefined;

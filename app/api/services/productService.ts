@@ -161,3 +161,30 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
   });
 }
 
+// Product Groups API
+export interface ProductGroupModel {
+  id: string;
+  name: string;
+  categoryId?: string;
+  brandId?: string;
+  productIds?: string[];
+}
+
+export async function getAllProductGroups(
+  categoryId?: string,
+  brandId?: string
+): Promise<ProductGroupModel[]> {
+  const params = new URLSearchParams();
+  if (categoryId) params.append("categoryId", categoryId);
+  if (brandId) params.append("brandId", brandId);
+
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE}/groups?${queryString}` : `${API_BASE}/groups`;
+
+  return apiFetch<ProductGroupModel[]>(url);
+}
+
+export async function getProductVariants(productId: string): Promise<ProductResponseModel[]> {
+  return apiFetch<ProductResponseModel[]>(`${API_BASE}/${productId}/variants`);
+}
+

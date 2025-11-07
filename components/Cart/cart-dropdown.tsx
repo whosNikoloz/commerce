@@ -107,7 +107,7 @@ export default function CartDropdown() {
                 <div className="space-y-4">
                   {cart.map((item, index) => (
                     <div
-                        key={`${item.id}-${item.variantKey ?? ""}`}
+                        key={item.id}
                         className="rounded-xl bg-gray-50/80 dark:bg-gray-800/40 p-2.5 border border-gray-100 dark:border-gray-800"
                       >
                         <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
@@ -130,20 +130,6 @@ export default function CartDropdown() {
                               {item.name}
                             </h4>
 
-                            {/* facets (tiny, single line wrap) */}
-                            {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
-                              <div className="mt-1 flex flex-wrap gap-1">
-                                {Object.entries(item.selectedFacets).map(([k, v]) => (
-                                  <span
-                                    key={k}
-                                    className="text-[10px] rounded-md px-1.5 py-0.5 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
-                                  >
-                                    {k}: {v}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
                             <div className="mt-1.5 flex items-center gap-2">
                               <span className="text-sm font-bold text-text-light dark:text-text-lightdark">
                                 {fmt.format(item.price)} ₾
@@ -164,7 +150,7 @@ export default function CartDropdown() {
                               aria-label="Remove item"
                               className="h-7 w-7 rounded-lg text-red-500 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition"
                               title="Remove"
-                              onClick={() => removeFromCart(item.id, item.variantKey)}
+                              onClick={() => removeFromCart(item.id)}
                             >
                               <span className="text-base leading-none">🗑️</span>
                             </button>
@@ -175,7 +161,7 @@ export default function CartDropdown() {
                                 className="h-8 w-8 rounded-l-full hover:bg-white/10 disabled:opacity-50"
                                 disabled={item.quantity <= 1}
                                 onClick={() =>
-                                  updateCartItem(item.id, Math.max(1, item.quantity - 1), item.variantKey)
+                                  updateCartItem(item.id, Math.max(1, item.quantity - 1))
                                 }
                               >
                                 <span className="text-sm font-bold">−</span>
@@ -185,7 +171,7 @@ export default function CartDropdown() {
                               </div>
                               <button
                                 className="h-8 w-8 rounded-r-full hover:bg-white/10"
-                                onClick={() => updateCartItem(item.id, item.quantity + 1, item.variantKey)}
+                                onClick={() => updateCartItem(item.id, item.quantity + 1)}
                               >
                                 <span className="text-sm font-bold">+</span>
                               </button>

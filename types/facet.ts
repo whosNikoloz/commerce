@@ -3,6 +3,7 @@ import { FacetTypeEnum } from "./enums";
 export interface ProductFacetValueResponseModel {
   facetName?: string;
   facetValue?: string;
+  productVariantId?: string;
 }
 
 export interface FacetFilterModel {

@@ -23,32 +23,52 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const { user } = useUser();
   const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
-  const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const [stockQuantity, setStockQuantity] = useState<number | undefined>(undefined);
   const [stockLoading, setStockLoading] = useState(true);
   const [stockError, setStockError] = useState<string | null>(null);
+  const [isLoadingVariant, setIsLoadingVariant] = useState(false);
   const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
   const imageReviewRef = useRef<ImageReviewHandle>(null);
   const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
-  
-  const setSelectedFacetsSafe = (next: Record<string, string>) =>
-    setSelectedFacets((prev) => {
-      const pk = Object.keys(prev),
-        nk = Object.keys(next);
 
-      if (pk.length === nk.length && pk.every((k) => prev[k] === next[k])) return prev;
+  // Handle facet selection - switch to variant product
+  const handleFacetChange = async (facetName: string, facetValue: string, productVariantId?: string) => {
+    if (!productVariantId || productVariantId === product.id) return;
 
-      return next;
-    });
+    setIsLoadingVariant(true);
+
+    try {
+      // Fetch the variant product
+      const variantProduct = await getProductById(productVariantId);
+
+      // Update URL to the new product variant (without full page reload)
+      const currentPath = window.location.pathname;
+      const newPath = currentPath.replace(product.id, productVariantId);
+      window.history.pushState({}, '', newPath);
+
+      // Update product state
+      setProduct(variantProduct);
+
+      // Reset stock for the new product
+      setStockLoading(true);
+      setStockError(null);
+
+      toast.success(`${facetName}: ${facetValue}`);
+    } catch (error) {
+      toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა");
+    } finally {
+      setIsLoadingVariant(false);
+    }
+  };
 
   const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   // Fetch real-time stock quantity
   const fetchStock = useCallback(async () => {
-    const TIMEOUT_MS = 8000;     // 8s timeout per attempt
+    const TIMEOUT_MS = 8000;     
     const MAX_RETRIES = 3;
 
     let attempt = 0;
@@ -161,7 +181,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
         : 0,
       originalPrice: product.price,
-      selectedFacets,
     };
 
     addToCart(item);
@@ -212,19 +231,23 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         const name = f.facetName ?? "";
 
         if (!acc[name]) acc[name] = [];
-        acc[name].push(f.facetValue ?? "");
+        acc[name].push({
+          value: f.facetValue ?? "",
+          productVariantId: f.productVariantId,
+        });
 
         return acc;
       },
-      {} as Record<string, string[]>,
+      {} as Record<string, Array<{ value: string; productVariantId?: string }>>,
     );
 
     return [
       {
         headline: "Specifications",
-        specifications: Object.entries(grouped).map(([facetName, facetValues]) => ({
+        specifications: Object.entries(grouped).map(([facetName, facetData]) => ({
           facetName,
-          facetValues,
+          // Keep the full structure with productVariantId for each value
+          facetValues: facetData,
         })),
       },
     ];
@@ -290,10 +313,16 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             <span className="w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
             Specifications
           </h2>
+          {/* {isLoadingVariant && (
+            <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-3">
+              <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+              <span className="text-sm text-blue-700 dark:text-blue-300">იტვირთება ვარიანტი...</span>
+            </div>
+          )} */}
           <Specifications
             specs={g.specifications}
-            value={selectedFacets}
-            onChange={setSelectedFacetsSafe}
+            onChange={handleFacetChange}
+            disabled={isLoadingVariant}
           />
         </div>
       ))}

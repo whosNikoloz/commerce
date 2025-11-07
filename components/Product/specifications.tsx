@@ -2,10 +2,19 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+interface FacetValue {
+  value: string;
+  productVariantId?: string;
+}
+
 interface SpecificationsProps {
-  specs: { facetName: string; facetValues: string[] }[];
+  specs: {
+    facetName: string;
+    facetValues: (string | FacetValue)[];
+  }[];
   value?: Record<string, string>;
-  onChange?: (selected: Record<string, string>) => void;
+  onChange?: (facetName: string, facetValue: string, productVariantId?: string) => void;
+  disabled?: boolean;
 }
 
 const shallowEqual = (a: Record<string, string>, b: Record<string, string>) => {
@@ -18,7 +27,7 @@ const shallowEqual = (a: Record<string, string>, b: Record<string, string>) => {
   return true;
 };
 
-export function Specifications({ specs = [], value, onChange }: SpecificationsProps) {
+export function Specifications({ specs = [], value, onChange, disabled = false }: SpecificationsProps) {
   const multiFacetNames = useMemo(() => {
     const s = new Set<string>();
 
@@ -33,7 +42,10 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
     const d: Record<string, string> = {};
 
     specs.forEach((f) => {
-      if (f.facetValues.length) d[f.facetName] = f.facetValues[0];
+      if (f.facetValues.length) {
+        const firstValue = f.facetValues[0];
+        d[f.facetName] = typeof firstValue === 'string' ? firstValue : firstValue.value;
+      }
     });
 
     return d;
@@ -53,39 +65,34 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
     const next: Record<string, string> = {};
 
     specs.forEach(({ facetName, facetValues }) => {
-      const allowed = new Set(facetValues);
+      const allowedValues = facetValues.map(fv => typeof fv === 'string' ? fv : fv.value);
+      const allowed = new Set(allowedValues);
       const candidate =
         (value && value[facetName] !== undefined ? value[facetName] : selectedValues[facetName]) ??
         defaults[facetName];
 
-      next[facetName] = allowed.has(String(candidate)) ? String(candidate) : facetValues[0];
+      const firstValue = facetValues[0];
+      const defaultValue = typeof firstValue === 'string' ? firstValue : firstValue.value;
+      next[facetName] = allowed.has(String(candidate)) ? String(candidate) : defaultValue;
     });
     if (!shallowEqual(selectedValues, next)) setSelectedValues(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [specs, value]);
 
-  // Emit after commit and only if user-driven
-  useEffect(() => {
-    if (!onChange || !userActionRef.current) return;
-    const payload: Record<string, string> = {};
+  // Remove the automatic emit - we now call onChange directly in handleSelect
 
-    Object.keys(selectedValues).forEach((name) => {
-      if (multiFacetNames.has(name)) payload[name] = selectedValues[name];
-    });
-    if (!shallowEqual(lastEmittedRef.current, payload)) {
-      onChange(payload);
-      lastEmittedRef.current = payload;
-    }
-    userActionRef.current = false;
-  }, [selectedValues, multiFacetNames, onChange]);
-
-  const handleSelect = (facetName: string, val: string) => {
+  const handleSelect = (facetName: string, val: string, productVariantId?: string) => {
     setSelectedValues((prev) => {
       if (prev[facetName] === val) return prev;
       userActionRef.current = true;
 
       return { ...prev, [facetName]: val };
     });
+
+    // Immediately call onChange with the variant ID
+    if (onChange) {
+      onChange(facetName, val, productVariantId);
+    }
   };
 
   return (
@@ -115,30 +122,34 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
                       <div className="flex flex-col sm:items-center sm:mt-0 gap-2">
                         {isMulti ? (
                           <div className="flex flex-wrap justify-around gap-2 w-full">
-                            {spec.facetValues.map((v) => {
-                              const isSelected = selected === v;
+                            {spec.facetValues.map((fv) => {
+                              const facetValue = typeof fv === 'string' ? fv : fv.value;
+                              const variantId = typeof fv === 'object' ? fv.productVariantId : undefined;
+                              const isSelected = selected === facetValue;
 
                               return (
                                 <button
-                                  key={v}
+                                  key={facetValue}
                                   aria-pressed={isSelected}
+                                  disabled={disabled}
                                   className={[
                                     "flex-1 min-w-[96px] text-center px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200",
+                                    disabled ? "opacity-50 cursor-not-allowed" : "",
                                     isSelected
                                       ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg"
                                       : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
                                   ].join(" ")}
                                   type="button"
-                                  onClick={() => handleSelect(spec.facetName, v)}
+                                  onClick={() => handleSelect(spec.facetName, facetValue, variantId)}
                                 >
-                                  {v}
+                                  {facetValue}
                                 </button>
                               );
                             })}
                           </div>
                         ) : (
                          <div className="inline-flex items-center justify-center  px-4 py-2 text-sm font-semibold rounded-md border border-brand-primary text-brand-primary bg-brand-primary/5">
-                            {spec.facetValues[0]}
+                            {typeof spec.facetValues[0] === 'string' ? spec.facetValues[0] : spec.facetValues[0].value}
                           </div>
                         )}
                       </div>

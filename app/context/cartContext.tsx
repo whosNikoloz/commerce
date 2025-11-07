@@ -16,8 +16,6 @@ export type CartItem = {
   price: number;
   image: string;
   quantity: number;
-  selectedFacets?: Record<string, string>;
-  variantKey?: string;
 };
 
 type Facets = Record<string, string | undefined | null> | undefined | null;
@@ -26,12 +24,12 @@ type CartState = {
   cart: CartItem[];
 
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string, variantKey?: string) => void;
-  updateCartItem: (id: string, quantity: number, variantKey?: string) => void;
+  removeFromCart: (id: string) => void;
+  updateCartItem: (id: string, quantity: number) => void;
   clearCart: () => void;
 
-  setQuantityDelta: (id: string, delta: number, variantKey?: string) => void;
-  getItem: (id: string, variantKey?: string) => CartItem | undefined;
+  setQuantityDelta: (id: string, delta: number) => void;
+  getItem: (id: string) => CartItem | undefined;
   getCount: () => number;
   getSubtotal: () => number;
 
@@ -56,26 +54,7 @@ const decryptText = (cipher: string): string | null => {
   }
 };
 
-/** ---------------- Facet helpers ---------------- */
-const normalizeFacets = (facets: Facets) => {
-  if (!facets) return null;
-  const entries = Object.entries(facets).filter(([, v]) => v != null && String(v).trim() !== "");
-
-  if (entries.length === 0) return null;
-  entries.sort(([a], [b]) => a.localeCompare(b));
-
-  return Object.fromEntries(entries) as Record<string, string>;
-};
-
-const buildVariantKey = (facets: Facets): string => {
-  const norm = normalizeFacets(facets);
-
-  if (!norm) return "__BASE__";
-
-  return Object.entries(norm)
-    .map(([k, v]) => `${k}:${v}`)
-    .join("|");
-};
+/** ---------------- Removed Facet helpers - variants are separate products now ---------------- */
 
 /** ---------------- Core creator (typed) ---------------- */
 const creator: StateCreator<CartState> = (set, get) => ({
@@ -83,18 +62,15 @@ const creator: StateCreator<CartState> = (set, get) => ({
 
   addToCart: (item) => {
     const id = String(item.id);
-    const variantKey = buildVariantKey(item.selectedFacets);
 
     set((state) => {
-      const existing = state.cart.find(
-        (i) => i.id === id && (i.variantKey ?? "__BASE__") === variantKey,
-      );
+      const existing = state.cart.find((i) => i.id === id);
 
       let newCart: CartItem[];
 
       if (existing) {
         newCart = state.cart.map((i) =>
-          i.id === id && (i.variantKey ?? "__BASE__") === variantKey
+          i.id === id
             ? { ...i, quantity: i.quantity + Math.max(1, item.quantity || 1) }
             : i,
         );
@@ -105,42 +81,29 @@ const creator: StateCreator<CartState> = (set, get) => ({
             ...item,
             id,
             quantity: Math.max(1, item.quantity || 1),
-            variantKey,
-            selectedFacets: normalizeFacets(item.selectedFacets) ?? undefined,
           },
         ];
       }
 
-      const norm = normalizeFacets(item.selectedFacets);
-      const pretty = norm
-        ? " (" +
-        Object.entries(norm)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join(", ") +
-        ")"
-        : "";
-
-      toast.success(`${item.name}${pretty} დაემატა კალათაში`);
+      toast.success(`${item.name} დაემატა კალათაში`);
 
       return { cart: newCart };
     });
   },
 
-  removeFromCart: (id, variantKey) =>
+  removeFromCart: (id) =>
     set((state) => {
-      const newCart = state.cart.filter(
-        (item) => !(item.id === String(id) && (item.variantKey ?? "") === (variantKey ?? "")),
-      );
+      const newCart = state.cart.filter((item) => item.id !== String(id));
 
       toast.success("საქონელი წაიშალა კალათიდან");
 
       return { cart: newCart };
     }),
 
-  updateCartItem: (id, quantity, variantKey) =>
+  updateCartItem: (id, quantity) =>
     set((state) => ({
       cart: state.cart.map((item) =>
-        item.id === String(id) && (item.variantKey ?? "") === (variantKey ?? "")
+        item.id === String(id)
           ? { ...item, quantity: Math.max(1, quantity) }
           : item,
       ),
@@ -148,17 +111,17 @@ const creator: StateCreator<CartState> = (set, get) => ({
 
   clearCart: () => set({ cart: [] }),
 
-  setQuantityDelta: (id, delta, variantKey) =>
+  setQuantityDelta: (id, delta) =>
     set((state) => ({
       cart: state.cart.map((item) =>
-        item.id === String(id) && (item.variantKey ?? "") === (variantKey ?? "")
+        item.id === String(id)
           ? { ...item, quantity: Math.max(1, item.quantity + delta) }
           : item,
       ),
     })),
 
-  getItem: (id, variantKey) =>
-    get().cart.find((i) => i.id === String(id) && (i.variantKey ?? "") === (variantKey ?? "")),
+  getItem: (id) =>
+    get().cart.find((i) => i.id === String(id)),
 
   getCount: () => get().cart.reduce((sum, i) => sum + i.quantity, 0),
 

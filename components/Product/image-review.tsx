@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@heroui/theme";
@@ -18,7 +18,11 @@ interface ImageReviewProps {
   productName: string;
 }
 
-export function ImageReview({ images, productName }: ImageReviewProps) {
+export interface ImageReviewHandle {
+  getCurrentImageElement: () => HTMLImageElement | null;
+}
+
+export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ images, productName }, ref) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
@@ -27,9 +31,14 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
+  const currentImageRef = useRef<HTMLImageElement>(null);
   const zoomResultRef = useRef<HTMLDivElement>(null);
   const thumbnailsContainerRef = useRef<HTMLDivElement>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+
+  useImperativeHandle(ref, () => ({
+    getCurrentImageElement: () => currentImageRef.current,
+  }));
 
   const zoomLevel = 3;
   const placeholder = "/placeholder.png"; // make sure it exists in /public
@@ -177,6 +186,7 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
                     onMouseMove={handleMouseMove}
                   >
                     <Image
+                      ref={index === selectedImage ? currentImageRef as any : null}
                       fill
                       alt={`${productName} view ${index + 1}`}
                       className="object-contain"
@@ -290,6 +300,7 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
                     onMouseMove={handleMouseMove}
                   >
                     <Image
+                      ref={index === selectedImage ? currentImageRef as any : null}
                       fill
                       alt={`${productName} view ${index + 1}`}
                       className="object-contain"
@@ -365,4 +376,6 @@ export function ImageReview({ images, productName }: ImageReviewProps) {
       />
     </div>
   );
-}
+});
+
+ImageReview.displayName = "ImageReview";

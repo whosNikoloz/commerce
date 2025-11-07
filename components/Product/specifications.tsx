@@ -90,9 +90,7 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
 
   return (
     <div className="mb-12">
-      <div className="max-w-5xl">
-       
-
+      <div className="max-w-3xl">
         <div className="rounded-2xl border border-border/40 bg-gradient-to-br from-card/80 to-card backdrop-blur-sm shadow-lg overflow-hidden">
           <div className="divide-y divide-border/30">
             {specs.map((spec, index) => {
@@ -106,50 +104,46 @@ export function Specifications({ specs = [], value, onChange }: SpecificationsPr
                     index % 2 === 0 ? 'bg-muted/10' : ''
                   }`}
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] lg:grid-cols-[250px_1fr] gap-4 items-center">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-brand-primary/60" />
-                      <span className="font-semibold text-foreground text-sm sm:text-base">
-                        {spec.facetName}
-                      </span>
-                    </div>
+                 <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] lg:grid-cols-[250px_1fr]  items-center">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-brand-primary/60" />
+                        <span className="font-semibold text-foreground text-sm sm:text-base">
+                          {spec.facetName}
+                        </span>
+                      </div>
 
-                    <div className="flex-1">
-                      {isMulti ? (
-                        <div className="flex gap-2 flex-wrap">
-                          {spec.facetValues.map((v) => {
-                            const isSelected = selected === v;
+                      <div className="flex flex-col sm:items-center sm:mt-0 gap-2">
+                        {isMulti ? (
+                          <div className="flex flex-wrap justify-around gap-2 w-full">
+                            {spec.facetValues.map((v) => {
+                              const isSelected = selected === v;
 
-                            return (
-                              <button
-                                key={v}
-                                aria-pressed={isSelected}
-                                className={[
-                                  "px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200",
-                                  isSelected
-                                    ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg transform hover:scale-105"
-                                    : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
-                                ].join(" ")}
-                                type="button"
-                                onClick={() => handleSelect(spec.facetName, v)}
-                              >
-                                {v}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div>
-                          <span
-                            className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium
-                                       bg-brand-primary/10 text-brand-primary border border-brand-primary/30"
-                          >
+                              return (
+                                <button
+                                  key={v}
+                                  aria-pressed={isSelected}
+                                  className={[
+                                    "flex-1 min-w-[96px] text-center px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200",
+                                    isSelected
+                                      ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg"
+                                      : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
+                                  ].join(" ")}
+                                  type="button"
+                                  onClick={() => handleSelect(spec.facetName, v)}
+                                >
+                                  {v}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                         <div className="inline-flex items-center justify-center  px-4 py-2 text-sm font-semibold rounded-md border border-brand-primary text-brand-primary bg-brand-primary/5">
                             {spec.facetValues[0]}
-                          </span>
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+
                 </div>
               );
             })}

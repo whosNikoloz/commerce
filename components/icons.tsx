@@ -203,6 +203,84 @@ export const ShoppingCartIcon = ({ size = 24, width, height, ...props }: IconSvg
   </svg>
 );
 
+export const GeorgiaIconMono = ({ size = 24, width, height, ...props }: IconSvgProps) => (
+  <svg
+    viewBox="0 0 36 36"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    role="img"
+    width={size || width}
+    height={size || height}
+    style={{ display: "block" }}
+    {...props}
+  >
+    {/* Background */}
+    <rect width="36" height="36" fill="#fff" />
+
+    {/* Central Cross */}
+    <rect x="15" width="6" height="36" fill="#000" />
+    <rect y="15" width="36" height="6" fill="#000" />
+
+    {/* Small Crosses */}
+    {/* Top-left */}
+    <g fill="#000">
+      <rect x="6.5" y="6" width="1.5" height="6" />
+      <rect x="4" y="8.5" width="6" height="1.5" />
+    </g>
+
+    {/* Top-right */}
+    <g fill="#000">
+      <rect x="28" y="6" width="1.5" height="6" />
+      <rect x="25.5" y="8.5" width="6" height="1.5" />
+    </g>
+
+    {/* Bottom-left */}
+    <g fill="#000">
+      <rect x="6.5" y="24" width="1.5" height="6" />
+      <rect x="4" y="26.5" width="6" height="1.5" />
+    </g>
+
+    {/* Bottom-right */}
+    <g fill="#000">
+      <rect x="28" y="24" width="1.5" height="6" />
+      <rect x="25.5" y="26.5" width="6" height="1.5" />
+    </g>
+  </svg>
+);
+
+
+export const EnglishIconMono = ({ size = 24, width, height, ...props }: IconSvgProps) => (
+  <svg
+    viewBox="0 0 512 512"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    role="img"
+    width={size || width}
+    height={size || height}
+    style={{ display: "block" }}
+    {...props}
+  >
+    {/* Background */}
+    <rect width="512" height="512" fill="#fff" />
+
+    {/* Central Cross */}
+    <rect x="0" y="224" width="512" height="64" fill="#000" />
+    <rect x="224" y="0" width="64" height="512" fill="#000" />
+
+    {/* Diagonal Crosses */}
+    <polygon
+      points="0,32 32,0 512,480 480,512"
+      fill="#000"
+    />
+    <polygon
+      points="480,0 512,32 32,512 0,480"
+      fill="#000"
+    />
+  </svg>
+);
+
+
+
 export const GeorgiaIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     viewBox="0 0 36 36"

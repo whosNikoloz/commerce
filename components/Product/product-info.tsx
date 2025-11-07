@@ -19,6 +19,8 @@ interface ProductInfoProps {
   isNewArrival?: boolean;
   isLiquidated?: boolean;
   freeShipping?: boolean;
+  stockLoading?: boolean;
+  stockError?: string;
   currency?: Currency;
   onAddToCart?: () => void;
   onBuyNow?: () => void;
@@ -38,7 +40,13 @@ const getConditionLabel = (condition?: Condition) => {
   }
 };
 
-const getStatusLabel = (status?: StockStatus, comingSoon?: boolean) => {
+const getStatusLabel = (
+  status?: StockStatus,
+  comingSoon?: boolean,
+  opts?: { loading?: boolean; error?: boolean }
+) => {
+  if (opts?.loading) return "მარაგი იტვირთება…";
+  if (opts?.error) return "მარაგი ვერ ჩაიტვირთა";
   if (comingSoon) return "მალე";
   switch (status) {
     case StockStatus.InStock:
@@ -54,12 +62,6 @@ function formatPrice(v: number, currency: Currency) {
   return v.toFixed(2) + " " + currency;
 }
 
-/* =========================================================
-   Simplified, responsive ProductInfo
-   - No gradients
-   - Mobile: minimal info, perfect button alignment
-   - Desktop: a bit more detail (brand / condition / shipping)
-========================================================= */
 export function ProductInfo({
   price,
   originalPrice,
@@ -69,9 +71,11 @@ export function ProductInfo({
   status,
   stock,
   isComingSoon = false,
-  isNewArrival = false,
+  isNewArrival = false, 
   isLiquidated = false,
   freeShipping = true,
+  stockLoading = false,
+  stockError,
   currency = "₾",
   onAddToCart,
   onBuyNow,
@@ -83,8 +87,23 @@ export function ProductInfo({
       : 0);
 
   const hasDiscount = !!originalPrice && originalPrice > price && computedDiscount > 0;
-  const inStock = status === StockStatus.InStock && !isComingSoon;
-  const isOut = !inStock;
+
+  const isStockKnown = !stockLoading && !stockError;
+  const inStockByStatus = status === StockStatus.InStock && !isComingSoon;
+  const hasPositiveQty = typeof stock === "number" ? stock > 0 : true;
+
+  // Disable buying if loading, error, coming soon, status says out, or qty <= 0
+  const isBuyingDisabled =
+    stockLoading || !!stockError || !inStockByStatus || !hasPositiveQty;
+
+  // Status badge style
+  const statusBadgeClass = stockLoading
+    ? "bg-slate-500 text-white"
+    : stockError
+    ? "bg-red-600 text-white"
+    : !inStockByStatus
+    ? "bg-slate-600 text-white"
+    : "bg-emerald-600 text-white";
 
   return (
     <div className="space-y-5">
@@ -115,14 +134,19 @@ export function ProductInfo({
             )}
           </div>
 
-          {/* Simple status chip (mobile & desktop) */}
+          {/* Status chip (reflects loading/error/coming soon/stock) */}
           <Badge
-            className={`h-7 px-3 text-xs font-semibold ${
-              isOut ? "bg-slate-600 text-white" : "bg-emerald-600 text-white"
-            }`}
-            title={getStatusLabel(status, isComingSoon)}
+            className={`h-7 px-3 text-xs font-semibold ${statusBadgeClass}`}
+            title={getStatusLabel(status, isComingSoon, {
+              loading: stockLoading,
+              error: !!stockError,
+            })}
+            aria-busy={stockLoading || undefined}
           >
-            {getStatusLabel(status, isComingSoon)}
+            {getStatusLabel(status, isComingSoon, {
+              loading: stockLoading,
+              error: !!stockError,
+            })}
           </Badge>
         </div>
 
@@ -133,27 +157,29 @@ export function ProductInfo({
               {brand}
             </Badge>
           )}
-          {typeof stock === "number" && (
+
+          {/* Stock chips – only show concrete numbers when stock is known */}
+          {isStockKnown && typeof stock === "number" && (
             <>
               {stock <= 0 ? (
-                <Badge className="bg-red-600 text-white">
-                  მარაგში არ არის
-                </Badge>
+                <Badge className="bg-red-600 text-white">მარაგში არ არის</Badge>
               ) : stock <= 3 ? (
-                <Badge className="bg-amber-600 text-white">
-                  ბოლო {stock} ც
-                </Badge>
+                <Badge className="bg-amber-600 text-white">ბოლო {stock} ც</Badge>
               ) : stock <= 10 ? (
-                <Badge className="bg-orange-600 text-white">
-                  დარჩა {stock} ც
-                </Badge>
+                <Badge className="bg-orange-600 text-white">დარჩა {stock} ც</Badge>
               ) : (
-                <Badge className="bg-emerald-600 text-white">
-                  მარაგშია ({stock} ც)
-                </Badge>
+                <Badge className="bg-emerald-600 text-white">მარაგშია ({stock} ც)</Badge>
               )}
             </>
           )}
+
+          {/* While loading / error, show a single neutral badge */}
+          {!isStockKnown && (
+            <Badge className={stockError ? "bg-red-600 text-white" : "bg-slate-500 text-white"}>
+              {stockLoading ? "მარაგი იტვირთება…" : "მარაგი ვერ ჩაიტვირთა"}
+            </Badge>
+          )}
+
           {isLiquidated && (
             <Badge className="bg-blue-700 text-white">
               <Tag className="h-3.5 w-3.5 mr-1" /> ლიკვიდაცია
@@ -176,47 +202,67 @@ export function ProductInfo({
           </div>
         )}
 
-        {/* Actions — MOBILE (stacked, equal width, no gradients) */}
+        {/* Actions — MOBILE */}
         <div className="md:hidden mt-5 grid grid-cols-1 gap-2">
           <Button
-            aria-disabled={isOut}
-            disabled={isOut}
+            aria-disabled={isBuyingDisabled}
+            disabled={isBuyingDisabled}
             onClick={onAddToCart}
             className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-5 w-5" />
-            <span>{isComingSoon ? "მალე" : isOut ? "ამოიწურა" : "კალათაში დამატება"}</span>
+            <span>
+              {stockLoading
+                ? "იტვირთება…"
+                : stockError
+                ? "ვერ ჩაიტვირთა"
+                : isComingSoon
+                ? "მალე"
+                : !inStockByStatus || !hasPositiveQty
+                ? "ამოიწურა"
+                : "კალათაში დამატება"}
+            </span>
           </Button>
 
           <Button
-            aria-disabled={isOut}
-            disabled={isOut}
+            aria-disabled={isBuyingDisabled}
+            disabled={isBuyingDisabled}
             onClick={onBuyNow}
             className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ყიდვა
+            {stockLoading ? "იტვირთება…" : stockError ? "ვერ ჩაიტვირთა" : "ყიდვა"}
           </Button>
         </div>
 
-        {/* Actions — DESKTOP (stacked, equal width, no gradients) */}
+        {/* Actions — DESKTOP */}
         <div className="hidden md:grid mt-5 grid-cols-1 gap-2">
           <Button
-            aria-disabled={isOut}
-            disabled={isOut}
+            aria-disabled={isBuyingDisabled}
+            disabled={isBuyingDisabled}
             onClick={onAddToCart}
             className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-5 w-5" />
-            <span>{isComingSoon ? "მალე" : isOut ? "ამოიწურა" : "დამატება"}</span>
+            <span>
+              {stockLoading
+                ? "იტვირთება…"
+                : stockError
+                ? "ვერ ჩაიტვირთა"
+                : isComingSoon
+                ? "მალე"
+                : !inStockByStatus || !hasPositiveQty
+                ? "ამოიწურა"
+                : "დამატება"}
+            </span>
           </Button>
 
           <Button
-            aria-disabled={isOut}
-            disabled={isOut}
+            aria-disabled={isBuyingDisabled}
+            disabled={isBuyingDisabled}
             onClick={onBuyNow}
             className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ყიდვა
+            {stockLoading ? "იტვირთება…" : stockError ? "ვერ ჩაიტვირთა" : "ყიდვა"}
           </Button>
         </div>
       </div>

@@ -32,15 +32,14 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
 
   return (
     <Link
-      className={`group relative block overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+      className={`group relative block overflow-hidden rounded-2xl  transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
       href={banner.href}
     >
-      {/* Desktop Image */}
       <div className="relative hidden md:block h-64 lg:h-80 xl:h-96">
         <Image
           fill
           alt={t(banner.alt, locale)}
-          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+          className="object-cover w-full h-full transition-transform duration-700 "
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           src={desktopImageUrl}
           onError={() => setDesktopError(true)}
@@ -60,17 +59,12 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
       </div>
 
       {/* Badge overlay */}
-      {banner.badge && (
+      {/* {banner.badge && (
         <div className="absolute top-4 left-4 md:top-6 md:left-6 bg-primary text-primary-foreground text-sm md:text-base font-bold px-4 py-2 rounded-full shadow-lg">
           {t(banner.badge, locale)}
         </div>
-      )}
+      )} */}
 
-      {/* Hover overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
-
-      {/* Decorative border on hover */}
-      <div className="absolute inset-0 border-4 border-primary opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500 pointer-events-none" />
     </Link>
   );
 }
@@ -168,7 +162,6 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
             options={
               carouselStyle === "grid"
                 ? {
-                    // Grid-style carousel (multiple cards)
                     type: "slide",
                     gap: "1rem",
                     pagination: false,

@@ -68,7 +68,7 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
                   fill
                   unoptimized
                   alt={t(banner.alt, locale)}
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="object-cover  transition-transform duration-500"
                   priority={index === 0}
                   sizes="(max-width: 1024px) 100vw, 75vw"
                   src={banner.imageUrl}

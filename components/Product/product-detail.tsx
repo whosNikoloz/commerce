@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
 import { Specifications } from "./specifications";
-import { ImageReview } from "./image-review";
+import { ImageReview, ImageReviewHandle } from "./image-review";
 
 import { ProductResponseModel } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
@@ -15,6 +15,7 @@ import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
+import { useFlyToCart } from "@/hooks/use-fly-to-cart";
 
 type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
 
@@ -25,10 +26,13 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const [stockQuantity, setStockQuantity] = useState<number | undefined>(undefined);
   const [stockLoading, setStockLoading] = useState(true);
-  const addToCart = useCartStore((s) => s.addToCart);
+  const [stockError, setStockError] = useState<string | null>(null);
+  const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
-
+  const imageReviewRef = useRef<ImageReviewHandle>(null);
+  const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
+  
   const setSelectedFacetsSafe = (next: Record<string, string>) =>
     setSelectedFacets((prev) => {
       const pk = Object.keys(prev),
@@ -43,37 +47,71 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   // Fetch real-time stock quantity
+  const fetchStock = useCallback(async () => {
+    const TIMEOUT_MS = 8000;     // 8s timeout per attempt
+    const MAX_RETRIES = 3;
+
+    let attempt = 0;
+
+    setStockLoading(true);
+    setStockError(null);
+
+    while (attempt < MAX_RETRIES) {
+      attempt++;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+      try {
+        const stockResponse = await getProductRestsByIds({ prods: [product.id] },);
+
+        clearTimeout(timeout);
+
+        const stockInfo = stockResponse?.summedRests?.find?.((s: any) => s.id === product.id);
+
+        setStockQuantity(stockInfo?.totalRest ?? 0);
+        setStockLoading(false);
+        setStockError(null);
+
+        return; // success
+      } catch (err: any) {
+        clearTimeout(timeout);
+
+        // If aborted or network down, decide to retry or fail fast
+        const isAbort = err?.name === "AbortError";
+        const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
+
+        if (attempt >= MAX_RETRIES || isOffline || isAbort) {
+          setStockQuantity(undefined); // “unknown”
+          setStockLoading(false);
+          setStockError("ვერ მოხერხდა მარაგის შემოწმება");
+
+          return;
+        }
+
+        // Exponential backoff with small jitter
+        const backoff = 500 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 200);
+
+        await new Promise((r) => setTimeout(r, backoff));
+      }
+    }
+  }, [product.id]);
+
   useEffect(() => {
     let cancelled = false;
 
-    const fetchStock = async () => {
-      try {
-        setStockLoading(true);
-        const stockResponse = await getProductRestsByIds({ prods: [product.id] });
-        const stockInfo = stockResponse.summedRests.find((s) => s.id === product.id);
-
-        if (!cancelled) {
-          setStockQuantity(stockInfo?.totalRest ?? 0);
-          setStockLoading(false);
-        }
-      } catch (error) {
-        console.error("Error fetching stock:", error);
-        if (!cancelled) {
-          setStockQuantity(undefined);
-          setStockLoading(false);
-        }
-      }
+    const run = async () => {
+      if (cancelled) return;
+      await fetchStock();
     };
 
-    fetchStock();
-    // Refresh stock every 30 seconds
-    const stockInterval = setInterval(fetchStock, 30_000);
+    run();
+    const stockInterval = setInterval(run, 30_000);
 
     return () => {
       cancelled = true;
       clearInterval(stockInterval);
     };
-  }, [product.id]);
+  }, [fetchStock]);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,10 +134,20 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     };
   }, [product.id]);
 
-  const handleAddToCart = () => {
-    // Validate stock before adding to cart
+  const handleAddToCart = async () => {
+    if (stockLoading) {
+      toast.error("იტვირთება მარაგი… გთხოვთ მოითმინოთ");
+
+      return;
+    }
+    if (stockError) {
+      toast.error("ვერ მოხერხდა მარაგის შემოწმება. სცადეთ თავიდან.");
+
+      return;
+    }
     if (stockQuantity !== undefined && stockQuantity <= 0) {
       toast.error("პროდუქტი მარაგში არ არის");
+
       return;
     }
 
@@ -117,16 +165,22 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     };
 
     addToCart(item);
-    toast.success("დაემატა კალათაში");
+
+    // Trigger fly-to-cart animation
+    const imageElement = imageReviewRef.current?.getCurrentImageElement();
+    if (imageElement) {
+      await flyToCart(imageElement);
+    }
   };
 
   const handleBuyNow = () => {
     if (!user) {
       toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
+
       return;
     }
     handleAddToCart();
-    router.push("/cart");
+    if (!stockLoading && !stockError) router.push("/cart");
   };
 
   useEffect(() => {
@@ -187,30 +241,32 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
         <div className="flex-1 max-w-[800px] order-1 lg:order-1">
-          <ImageReview images={galleryImages} productName={product.name ?? ""} />
+          <ImageReview ref={imageReviewRef} images={galleryImages} productName={product.name ?? ""} />
         </div>
 
         <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">{product.name}</h1>
 
         <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit">
           <ProductInfo
-            brand={product.brand?.name ?? ""}
-            condition={product.condition}
-            discount={
-              originalPrice
-                ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
-                : 0
-            }
-            isComingSoon={product.isComingSoon}
-            isLiquidated={product.isLiquidated}
-            isNewArrival={product.isNewArrival}
-            originalPrice={originalPrice ?? null}
-            price={price}
-            status={product.status}
-            stock={stockQuantity}
-            onAddToCart={handleAddToCart}
-            onBuyNow={handleBuyNow}
-          />
+              brand={product.brand?.name ?? ""}
+              condition={product.condition}
+              discount={
+                originalPrice
+                  ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
+                  : 0
+              }
+              isComingSoon={product.isComingSoon}
+              isLiquidated={product.isLiquidated}
+              isNewArrival={product.isNewArrival}
+              originalPrice={originalPrice ?? null}
+              price={price}
+              status={product.status}
+              stock={stockQuantity}
+              stockError={stockError ?? undefined}   
+              stockLoading={stockLoading} 
+              onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
+            />
         </div>
 
         <div className="order-4 lg:order-2 flex md:items-start place-items-start">

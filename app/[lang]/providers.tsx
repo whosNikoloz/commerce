@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 
 import { TenantProvider } from "../context/tenantContext";
 import { UserProvider } from "../context/userContext";
+import { CartUIProvider } from "../context/cart-ui";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -60,7 +61,9 @@ export function Providers({ children, themeProps, initialTenant }: ProvidersProp
               }
               zIndex={1600}
             />
-            {children}
+              <CartUIProvider>
+                {children}
+              </CartUIProvider>
             <Toaster richColors position="bottom-right" />
           </NextThemesProvider>
         </TenantProvider>

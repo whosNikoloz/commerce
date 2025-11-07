@@ -6,6 +6,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { Heart, ShoppingCart, ArrowLeftRight, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useRef } from "react";
 
 import { cn, resolveImageUrl } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
@@ -22,6 +23,7 @@ import { useUser } from "@/app/context/userContext";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useCompareStore } from "@/app/context/compareContext";
 import { formatPrice } from "@/lib/utils";
+import { useFlyToCart } from "@/hooks/use-fly-to-cart";
 
 interface ProductCardProps {
   product: ProductResponseModel;
@@ -75,9 +77,11 @@ export function ProductCard({
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const addToCart = useCartStore((s) => s.addToCart);
+  const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const { addToCompare, removeFromCompare, isInCompare } = useCompareStore();
   const inCompare = mounted ? isInCompare(product.id) : false;
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
 
   useEffect(() => {
     setMounted(true);
@@ -145,6 +149,7 @@ export function ProductCard({
       if (!stockInfo || stockInfo.totalRest <= 0) {
         toast.error("პროდუქტი მარაგში არ არის");
         setAddingToCart(false);
+
         return;
       }
 
@@ -159,7 +164,7 @@ export function ProductCard({
       };
 
       addToCart(item);
-      toast.success("დაემატა კალათაში");
+      await flyToCart(imgRef.current);
     } catch (error) {
       console.error("Error checking stock:", error);
       toast.error("შეცდომა მარაგის შემოწმებისას");
@@ -177,8 +182,10 @@ export function ProductCard({
       toast.success("შედარებიდან წაიშალა");
     } else {
       const compareItems = useCompareStore.getState().items;
+
       if (compareItems.length >= 4) {
         toast.error("მაქსიმუმ 4 პროდუქტის შედარება შესაძლებელია");
+
         return;
       }
       addToCompare(product);
@@ -207,6 +214,7 @@ export function ProductCard({
         <div className="relative">
           <AspectRatio className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)} ratio={1}>
             <Image
+              ref={imgRef as any}
               fill
               unoptimized
               alt={product.name || "Product image"}
@@ -269,20 +277,7 @@ export function ProductCard({
 
       {/* CONTENT */}
       <CardFooter className="relative pointer-events-none flex flex-col items-start gap-2.5 p-4 flex-1">
-        <h3 className={cn(S.title, "text-zinc-900 dark:text-zinc-100 w-full min-h-[2.5rem]")} itemProp="name">
-          {product.name || "Unnamed Product"}
-        </h3>
-
-        <div className="min-h-[20px]">
-          {conditionLabel && product.condition !== Condition.New && (
-            <span className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300">
-              {conditionLabel}
-            </span>
-          )}
-        </div>
-
-        <div className="mt-auto w-full space-y-2.5">
-          <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
+        <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
             <meta content="USD" itemProp="priceCurrency" />
             <meta content={displayPrice.toString()} itemProp="price" />
             <meta
@@ -292,6 +287,28 @@ export function ProductCard({
             <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(displayPrice)}</span>
             {hasDiscount && <span className={cn("text-sm line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
           </div>
+        <div className="mt-auto w-full space-y-2.5">
+          
+          
+          <h3
+            className={cn(
+              S.title,
+              "text-zinc-900 dark:text-zinc-100 w-full min-h-[2.5rem] text-md line-clamp-2"
+            )}
+            itemProp="name"
+          >
+            {product.name || "Unnamed Product"}
+          </h3>
+
+            {conditionLabel && product.condition !== Condition.New && (
+              <span
+                className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600
+                          dark:border-zinc-700 dark:text-zinc-300 line-clamp-2"
+              >
+                {conditionLabel}
+              </span>
+            )}
+
 
           {template === 2 && showActions ? (
             <div className="w-full flex items-stretch gap-2 pointer-events-auto">

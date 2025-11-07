@@ -15,11 +15,37 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
 
   // Sanitize HTML to prevent XSS attacks
   const sanitizedHTML = useMemo(() => {
-    return DOMPurify.sanitize(data.html, {
+    let sanitized = DOMPurify.sanitize(data.html, {
       ADD_TAGS: ['iframe'], // Allow iframe if needed (be careful!)
       ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], // Allow iframe attributes
       ALLOW_DATA_ATTR: true, // Allow data-* attributes
     });
+
+    // Add XR permissions to iframes to prevent console errors from 3D viewers
+    sanitized = sanitized.replace(
+      /<iframe([^>]*)>/gi,
+      (match, attrs) => {
+        // Check if 'allow' attribute already exists
+        if (attrs.includes('allow=')) {
+          // Add xr-spatial-tracking to existing allow attribute
+          return match.replace(
+            /allow="([^"]*)"/i,
+            (m, allowValue) => {
+              const permissions = allowValue.split(';').map((p: string) => p.trim());
+              if (!permissions.includes('xr-spatial-tracking')) {
+                permissions.push('xr-spatial-tracking');
+              }
+              return `allow="${permissions.join('; ')}"`;
+            }
+          );
+        } else {
+          // Add new allow attribute with xr-spatial-tracking
+          return `<iframe${attrs} allow="xr-spatial-tracking">`;
+        }
+      }
+    );
+
+    return sanitized;
   }, [data.html]);
 
   useEffect(() => {

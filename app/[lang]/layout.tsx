@@ -14,6 +14,7 @@ import { themeToStyle } from "@/lib/applyTheme";
 import { getTenantByHost } from "@/lib/getTenantByHost";
 import ClientUADataFix from "@/components/ClientUADataFix";
 import { generateFontClassNames } from "@/lib/loadTenantFonts";
+import FloatingCompareButton from "@/components/compare/FloatingCompareButton";
 
 function normalizeHost(host?: string) {
   return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
@@ -115,6 +116,7 @@ export default async function RootLayout({
             <ClientUADataFix />
             {children}
             <BackToTopShadcn threshold={320} />
+            <FloatingCompareButton />
           </LayoutWrapper>
         </Providers>
       </body>

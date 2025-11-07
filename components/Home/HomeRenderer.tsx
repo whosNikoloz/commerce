@@ -64,10 +64,12 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
           <Suspense
             key={`${section.type}-${section.order}-${index}`}
             fallback={
-              <div className="w-full h-64 animate-pulse bg-muted" />
+              <div className="" />
             }
-          >
-            <Component data={section.data} locale={locale} />
+          > 
+            <div className="animate-fadeIn">
+              <Component data={section.data} locale={locale} />
+            </div>
           </Suspense>
         );
       })}

@@ -10,7 +10,7 @@ import { Specifications } from "./specifications";
 import { ImageReview } from "./image-review";
 
 import { ProductResponseModel } from "@/types/product";
-import { getProductById } from "@/app/api/services/productService";
+import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,6 +23,8 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
+  const [stockQuantity, setStockQuantity] = useState<number | undefined>(undefined);
+  const [stockLoading, setStockLoading] = useState(true);
   const addToCart = useCartStore((s) => s.addToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
@@ -39,6 +41,39 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
+
+  // Fetch real-time stock quantity
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchStock = async () => {
+      try {
+        setStockLoading(true);
+        const stockResponse = await getProductRestsByIds({ prods: [product.id] });
+        const stockInfo = stockResponse.summedRests.find((s) => s.id === product.id);
+
+        if (!cancelled) {
+          setStockQuantity(stockInfo?.totalRest ?? 0);
+          setStockLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching stock:", error);
+        if (!cancelled) {
+          setStockQuantity(undefined);
+          setStockLoading(false);
+        }
+      }
+    };
+
+    fetchStock();
+    // Refresh stock every 30 seconds
+    const stockInterval = setInterval(fetchStock, 30_000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(stockInterval);
+    };
+  }, [product.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,6 +97,12 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   }, [product.id]);
 
   const handleAddToCart = () => {
+    // Validate stock before adding to cart
+    if (stockQuantity !== undefined && stockQuantity <= 0) {
+      toast.error("პროდუქტი მარაგში არ არის");
+      return;
+    }
+
     const item: CartItem = {
       id: product.id,
       name: product.name ?? "Unnamed Product",
@@ -76,6 +117,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     };
 
     addToCart(item);
+    toast.success("დაემატა კალათაში");
   };
 
   const handleBuyNow = () => {
@@ -165,6 +207,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             originalPrice={originalPrice ?? null}
             price={price}
             status={product.status}
+            stock={stockQuantity}
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
           />
@@ -216,7 +259,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         originalPrice={originalPrice}
         price={price}
         status={product.status}
-        stock={product.status}
+        stock={stockQuantity}
         onAddToCart={handleAddToCart}
         onBuyNow={handleBuyNow}
       />

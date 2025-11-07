@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, ArrowLeftRight, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 
-import { cn } from "@/lib/utils";
+import { cn, resolveImageUrl } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 
@@ -20,6 +20,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
 import { useUser } from "@/app/context/userContext";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
+import { useCompareStore } from "@/app/context/compareContext";
 import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -72,7 +73,15 @@ export function ProductCard({
   const currentLang = lang || "en";
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const addToCart = useCartStore((s) => s.addToCart);
+  const { addToCompare, removeFromCompare, isInCompare } = useCompareStore();
+  const inCompare = mounted ? isInCompare(product.id) : false;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (user && product.id) {
@@ -80,7 +89,7 @@ export function ProductCard({
     }
   }, [user, product.id]);
 
-  const imageUrl = product.images?.[0] || "/placeholder.png";
+  const imageUrl = resolveImageUrl(product.images?.[0]);
   const isInStock = product.status === StockStatus.InStock;
   const hasDiscount = !!product.discountPrice && product.discountPrice < product.price;
   const displayPrice = hasDiscount ? product.discountPrice! : product.price;
@@ -120,19 +129,61 @@ export function ProductCard({
     }
   };
 
-  const handleAddToCart = (p: ProductResponseModel) => {
-    const item: CartItem = {
-      id: p.id,
-      name: p.name ?? "Unnamed Product",
-      price: p.discountPrice ?? p.price,
-      image: p.images?.[0] ?? "/placeholder.png",
-      quantity: 1,
-      discount: discountPercent,
-      originalPrice: p.price,
-    };
+  const handleAddToCart = async (p: ProductResponseModel) => {
+    if (addingToCart) return;
 
-    addToCart(item);
-    toast.success("დაემატა კალათაში");
+    setAddingToCart(true);
+
+    try {
+      // Import the stock check function dynamically
+      const { getProductRestsByIds } = await import("@/app/api/services/productService");
+
+      // Check stock availability
+      const stockResponse = await getProductRestsByIds({ prods: [p.id] });
+      const stockInfo = stockResponse.summedRests.find((s) => s.id === p.id);
+
+      if (!stockInfo || stockInfo.totalRest <= 0) {
+        toast.error("პროდუქტი მარაგში არ არის");
+        setAddingToCart(false);
+        return;
+      }
+
+      const item: CartItem = {
+        id: p.id,
+        name: p.name ?? "Unnamed Product",
+        price: p.discountPrice ?? p.price,
+        image: resolveImageUrl(p.images?.[0]),
+        quantity: 1,
+        discount: discountPercent,
+        originalPrice: p.price,
+      };
+
+      addToCart(item);
+      toast.success("დაემატა კალათაში");
+    } catch (error) {
+      console.error("Error checking stock:", error);
+      toast.error("შეცდომა მარაგის შემოწმებისას");
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleCompareToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (inCompare) {
+      removeFromCompare(product.id);
+      toast.success("შედარებიდან წაიშალა");
+    } else {
+      const compareItems = useCompareStore.getState().items;
+      if (compareItems.length >= 4) {
+        toast.error("მაქსიმუმ 4 პროდუქტის შედარება შესაძლებელია");
+        return;
+      }
+      addToCompare(product);
+      toast.success("დაემატა შედარებაში");
+    }
   };
 
   return (
@@ -175,7 +226,23 @@ export function ProductCard({
           )}
 
           {template !== 2 && showActions && (
-            <div className="absolute right-3 top-3 pointer-events-auto">
+            <div className="absolute right-3 top-3 flex gap-2 pointer-events-auto">
+              {template === 1 && (
+                 <Button
+                className={cn(
+                  "rounded-full h-9 w-9 shadow-md",
+                  "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
+                  inCompare && "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                )}
+                size="icon"
+                type="button"
+                variant="secondary"
+                onClick={handleCompareToggle}
+              >
+                <ArrowLeftRight className="h-4 w-4" />
+                <span className="sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
+              </Button> 
+              )}
               <Button
                 className={cn(
                   "rounded-full h-9 w-9 shadow-md",
@@ -230,7 +297,7 @@ export function ProductCard({
             <div className="w-full flex items-stretch gap-2 pointer-events-auto">
               <Button
                 className={cn("h-11 flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
-                disabled={!isInStock || product.isComingSoon}
+                disabled={!isInStock || product.isComingSoon || addingToCart}
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
@@ -238,8 +305,17 @@ export function ProductCard({
                   handleAddToCart(product);
                 }}
               >
-                <ShoppingCart className="h-4 w-4" />
-                Add to cart
+                {addingToCart ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4" />
+                    Add to cart
+                  </>
+                )}
               </Button>
 
               <Button
@@ -266,7 +342,7 @@ export function ProductCard({
           ) : (
             <Button
               className={cn("w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2 pointer-events-auto", S.cta)}
-              disabled={!isInStock || product.isComingSoon}
+              disabled={!isInStock || product.isComingSoon || addingToCart}
               type="button"
               onClick={(e) => {
                 e.preventDefault();
@@ -274,8 +350,17 @@ export function ProductCard({
                 handleAddToCart(product);
               }}
             >
-              <ShoppingCart className="h-4 w-4" />
-              Add to cart
+              {addingToCart ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="h-4 w-4" />
+                  Add to cart
+                </>
+              )}
             </Button>
           )}
         </div>

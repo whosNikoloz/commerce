@@ -100,7 +100,7 @@ export const Navbar = () => {
               isScrolled && searchModalIsOpen
                 ? "backdrop-blur-xl w-11/12 md:w-10/12 lg:w-6/12 bg-brand-surface/80 dark:bg-brand-surfacedark/80 shadow-md"
                 : isScrolled
-                  ? "backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl md:w-6/12 lg:w-3/12 shadow-md"
+                  ? "backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl md:w-8/12 lg:w-4/12 shadow-md"
                   : "bg-transparent w-11/12 md:w-10/12 lg:w-6/12",
             ].join(" ")}
           >

@@ -415,27 +415,38 @@ export type InfoPagesConfig = {
   pages: InfoPage[];
 };
 
-// ===== Dynamic Custom Pages Configuration =====
-// These pages can use ANY section type from the tenant's template (like homepage)
-// Examples: /back-to-school, /summer-sale, /black-friday, etc.
+
+export type DynamicPageSectionInstance =
+  | {
+      type: "ProductRail";
+      enabled: boolean;
+      order: number;
+      data: ProductRailData;
+    }
+  | {
+      type: "CommercialBanner";
+      enabled: boolean;
+      order: number;
+      data: CommercialBannerData;
+    }
+  | {
+      type: "CustomHTML";
+      enabled: boolean;
+      order: number;
+      data: CustomHTMLData;
+    };
 
 export type DynamicPageMetadata = {
   title: LocalizedText;
   description: LocalizedText;
   ogImage?: string;
-  index?: boolean; // Whether to allow search engines to index this page
+  index?: boolean; 
 };
 
-// Dynamic pages use the same section types as the homepage based on templateId
 export type DynamicPageConfig = {
-  slug: string; // URL path (e.g., "back-to-school", "summer-sale")
+  slug: string;
   metadata: DynamicPageMetadata;
-  sections: Array<{
-    enabled: boolean;
-    order: number;
-    type: string; // Section type depends on template (Hero, ProductRail, CustomHTML, etc.)
-    data: any; // Section-specific data
-  }>;
+  sections: DynamicPageSectionInstance[];
 };
 
 export type DynamicPagesConfig = {

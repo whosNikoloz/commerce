@@ -3,13 +3,15 @@
 
 import Image from "next/image";
 import { Minus, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { useEffect } from "react";
+
+import { AvailabilityMap } from "./cart-page";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/app/context/cartContext";
 import { CartItemType } from "@/types/cart";
-import { useEffect } from "react";
-import { AvailabilityMap } from "./cart-page";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
@@ -20,7 +22,9 @@ const percent = (o: number, c: number) => Math.max(0, Math.round(((o - c) / o) *
 function formatSpecs(facets?: Record<string, string>) {
   if (!facets) return "";
   const entries = Object.entries(facets);
+
   if (!entries.length) return "";
+
   return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
 }
 
@@ -35,6 +39,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
     for (const it of items) {
       const qty = toNumber(it.quantity);
       const maxAvail = Number(availability[String(it.id)] ?? 0);
+
       if (qty > maxAvail) {
         updateCartItem(it.id, Math.max(0, maxAvail), (it as any).variantKey);
       }
@@ -158,11 +163,12 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
                   <Button
                     aria-label="Increase"
                     className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"
+                    disabled={outOfStock || quantity >= available}
                     size="sm"
                     variant="ghost"
-                    disabled={outOfStock || quantity >= available}
                     onClick={() => {
                       const next = Math.min(quantity + 1, available);
+
                       updateCartItem(item.id, next, (item as any).variantKey);
                     }}
                   >

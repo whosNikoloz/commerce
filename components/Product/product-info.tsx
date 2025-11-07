@@ -133,10 +133,26 @@ export function ProductInfo({
               {brand}
             </Badge>
           )}
-          {typeof stock === "number" && stock <= 3 && stock > 0 && (
-            <Badge className="bg-amber-600 text-white">
-              ბოლო {stock} ც
-            </Badge>
+          {typeof stock === "number" && (
+            <>
+              {stock <= 0 ? (
+                <Badge className="bg-red-600 text-white">
+                  მარაგში არ არის
+                </Badge>
+              ) : stock <= 3 ? (
+                <Badge className="bg-amber-600 text-white">
+                  ბოლო {stock} ც
+                </Badge>
+              ) : stock <= 10 ? (
+                <Badge className="bg-orange-600 text-white">
+                  დარჩა {stock} ც
+                </Badge>
+              ) : (
+                <Badge className="bg-emerald-600 text-white">
+                  მარაგშია ({stock} ც)
+                </Badge>
+              )}
+            </>
           )}
           {isLiquidated && (
             <Badge className="bg-blue-700 text-white">

@@ -333,6 +333,11 @@ html {
   .hover\:pause-animation:hover {
     animation-play-state: paused !important;
   }
+
+  /* Fade in animation for smooth content loading */
+  .animate-fadeIn {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
 }
 
 /* Fade in animation for category subcategory overlay */

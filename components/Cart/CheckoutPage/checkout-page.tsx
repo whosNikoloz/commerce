@@ -61,7 +61,6 @@ export default function CheckoutPage() {
       const orderItems = cart.map((i) => ({
         productId: i.id,
         quantity: i.quantity,
-        variant: i.variantKey,
       }));
 
       const orderResponse = await createOrder({

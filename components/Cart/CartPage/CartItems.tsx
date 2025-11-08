@@ -41,7 +41,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
       const maxAvail = Number(availability[String(it.id)] ?? 0);
 
       if (qty > maxAvail) {
-        updateCartItem(it.id, Math.max(0, maxAvail), (it as any).variantKey);
+        updateCartItem(it.id, Math.max(0, maxAvail));
       }
     }
   }, [JSON.stringify(availability)]);
@@ -61,7 +61,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
 
         return (
           <Card
-            key={`${item.id}-${(item as any).variantKey ?? ""}`}
+            key={`${item.id}`}
             className={`p-3 sm:p-4 md:p-5 rounded-xl bg-white dark:bg-gray-900 border shadow-sm transition-all duration-300 ${outOfStock
               ? "border-red-500/50 shadow-red-500/10"
               : "border-gray-200 dark:border-gray-800 hover:border-brand-primary/40 hover:shadow-md"
@@ -152,7 +152,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
                     size="sm"
                     variant="ghost"
                     onClick={() =>
-                      updateCartItem(item.id, Math.max(1, quantity - 1), (item as any).variantKey)
+                      updateCartItem(item.id, Math.max(1, quantity - 1))
                     }
                   >
                     <Minus className="h-4 w-4" />
@@ -169,7 +169,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
                     onClick={() => {
                       const next = Math.min(quantity + 1, available);
 
-                      updateCartItem(item.id, next, (item as any).variantKey);
+                      updateCartItem(item.id, next);
                     }}
                   >
                     <Plus className="h-4 w-4" />
@@ -205,7 +205,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
                     className="text-text-subtle dark:text-text-subtledark hover:text-red-600 dark:hover:text-red-400"
                     size="icon"
                     variant="ghost"
-                    onClick={() => removeFromCart(item.id, (item as any).variantKey)}
+                    onClick={() => removeFromCart(item.id)}
                   >
                     <Trash2 className="h-5 w-5" />
                   </Button>

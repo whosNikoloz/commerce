@@ -9,5 +9,4 @@ export interface CartItemType {
   image: string;
   quantity: number;
   selectedFacets?: Record<string, string>;
-  variantKey?: string;
 }

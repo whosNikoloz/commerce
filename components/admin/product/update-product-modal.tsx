@@ -341,14 +341,16 @@ export default function UpdateProductModal({
                           setProductGroupId(k === "none" ? "" : k ?? "");
                         }}
                       >
-                        <HSelectItem key="none" textValue="None (standalone product)">
-                          None (standalone product)
-                        </HSelectItem>
-                        {productGroups.map((group) => (
-                          <HSelectItem key={group.id} textValue={group.name}>
-                            {group.name}
-                          </HSelectItem>
-                        ))}
+                        {[
+                          <HSelectItem key="none" textValue="None (standalone product)">
+                            None (standalone product)
+                          </HSelectItem>,
+                          ...productGroups.map((group) => (
+                            <HSelectItem key={group.id} textValue={group.name}>
+                              {group.name}
+                            </HSelectItem>
+                          ))
+                        ]}
                       </HSelect>
                     )}
                   </div>

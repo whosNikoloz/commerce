@@ -43,7 +43,7 @@ export default function OrderSummary({
             const originalPrice = item.originalPrice ? toNumber(item.originalPrice) : null;
 
             return (
-              <div key={`${item.id}-${item.variantKey ?? ""}`} className="flex gap-4">
+              <div key={`${item.id}`} className="flex gap-4">
                 <div className="relative">
                   <Image
                     priority
@@ -61,19 +61,6 @@ export default function OrderSummary({
                   <h4 className="font-medium text-sm text-text-light dark:text-text-lightdark">
                     {item.name}
                   </h4>
-                  {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {Object.entries(item.selectedFacets).map(([k, v]) => (
-                        <Badge
-                          key={k}
-                          className="h-5 text-[11px] px-1.5 bg-brand-muted/60 dark:bg-brand-muteddark/50 text-text-light dark:text-text-lightdark border border-brand-muted/60 dark:border-brand-muteddark/50"
-                          variant="secondary"
-                        >
-                          {k}: {v}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
                   <p className="text-sm text-text-subtle dark:text-text-subtledark">
                     {originalPrice && originalPrice > price && (
                       <span className="line-through text-xs mr-2">{`₾${originalPrice.toFixed(2)}`}</span>

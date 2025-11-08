@@ -85,7 +85,7 @@ export default function CartDrawer() {
                   <ul className="flex-1 overflow-y-auto p-6 space-y-4 pb-32">
                     {cart.map((item) => (
                       <li
-                        key={`${item.id}-${item.variantKey ?? ""}`}
+                        key={`${item.id}}`}
                         className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4"
                       >
                         <div className="flex items-center gap-3">
@@ -103,21 +103,6 @@ export default function CartDrawer() {
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                               ₾{item.price.toFixed(2)}
                             </p>
-                            {/* selected facets badges */}
-                            {item.selectedFacets && Object.keys(item.selectedFacets).length > 0 && (
-                              <div className="mt-1 flex flex-wrap gap-1">
-                                {Object.entries(item.selectedFacets).map(([k, v]) => (
-                                  <span
-                                    key={k}
-                                    className="text-[11px] rounded-full border px-2 py-0.5
-                                           bg-gray-50 text-gray-700 border-gray-200
-                                           dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
-                                  >
-                                    {k}: {v}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
                           </div>
                         </div>
 
@@ -128,7 +113,6 @@ export default function CartDrawer() {
                               updateCartItem(
                                 item.id,
                                 Math.max(1, item.quantity - 1),
-                                item.variantKey,
                               )
                             }
                           >
@@ -140,7 +124,7 @@ export default function CartDrawer() {
                           <button
                             className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition-colors"
                             onClick={() =>
-                              updateCartItem(item.id, item.quantity + 1, item.variantKey)
+                              updateCartItem(item.id, item.quantity + 1)
                             }
                           >
                             ➕
@@ -149,7 +133,7 @@ export default function CartDrawer() {
                             aria-label="Remove item"
                             className="ml-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                             title="Remove item"
-                            onClick={() => removeFromCart(item.id, item.variantKey)}
+                            onClick={() => removeFromCart(item.id)}
                           >
                             ✖️
                           </button>

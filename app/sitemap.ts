@@ -17,12 +17,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
   const now = new Date();
 
-  const statics = ["", "/category"].flatMap((p) =>
+  // Static pages including info pages
+  const staticPages = [
+    { path: "", priority: 1.0, changeFrequency: "daily" as const },
+    { path: "/category", priority: 0.9, changeFrequency: "daily" as const },
+    { path: "/info/about", priority: 0.6, changeFrequency: "monthly" as const },
+    { path: "/info/privacy-policy", priority: 0.5, changeFrequency: "monthly" as const },
+    { path: "/info/terms-and-conditions", priority: 0.5, changeFrequency: "monthly" as const },
+    { path: "/info/delivery", priority: 0.6, changeFrequency: "monthly" as const },
+    { path: "/info/return-policy", priority: 0.6, changeFrequency: "monthly" as const },
+    { path: "/info/guarantee", priority: 0.6, changeFrequency: "monthly" as const },
+    { path: "/info/faq", priority: 0.7, changeFrequency: "weekly" as const },
+    { path: "/info/stores", priority: 0.6, changeFrequency: "weekly" as const },
+  ];
+
+  const statics = staticPages.flatMap((page) =>
     locales.map((lng) => ({
-      url: `${base}/${lng}${p}`,
+      url: `${base}/${lng}${page.path}`,
       lastModified: now,
-      changeFrequency: "daily" as const,
-      priority: p === "" ? 1.0 : 0.7,
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
     })),
   );
 

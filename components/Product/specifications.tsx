@@ -55,29 +55,43 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
   const userActionRef = useRef(false);
   const lastEmittedRef = useRef<Record<string, string>>({});
 
-  // Sync local state from props (no onChange here)
-  useEffect(() => {
-    if (!specs.length) {
-      if (!shallowEqual(selectedValues, {})) setSelectedValues({});
+  // Sync local state from props - use ref to avoid infinite loops
+  const prevValueRef = useRef(value);
+  const prevSpecsRef = useRef(specs);
 
+  useEffect(() => {
+    // Only run if value or specs actually changed
+    const valueChanged = !shallowEqual(prevValueRef.current || {}, value || {});
+    const specsChanged = prevSpecsRef.current !== specs;
+
+    if (!valueChanged && !specsChanged) {
       return;
     }
+
+    prevValueRef.current = value;
+    prevSpecsRef.current = specs;
+
+    if (!specs.length) {
+      setSelectedValues({});
+      return;
+    }
+
     const next: Record<string, string> = {};
 
     specs.forEach(({ facetName, facetValues }) => {
       const allowedValues = facetValues.map(fv => typeof fv === 'string' ? fv : fv.value);
       const allowed = new Set(allowedValues);
-      const candidate =
-        (value && value[facetName] !== undefined ? value[facetName] : selectedValues[facetName]) ??
-        defaults[facetName];
+
+      // Use value from props if available, otherwise use default
+      const candidate = value?.[facetName] ?? defaults[facetName];
 
       const firstValue = facetValues[0];
       const defaultValue = typeof firstValue === 'string' ? firstValue : firstValue.value;
       next[facetName] = allowed.has(String(candidate)) ? String(candidate) : defaultValue;
     });
-    if (!shallowEqual(selectedValues, next)) setSelectedValues(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [specs, value]);
+
+    setSelectedValues(next);
+  }, [specs, value, defaults]);
 
   // Remove the automatic emit - we now call onChange directly in handleSelect
 
@@ -107,7 +121,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
               return (
                 <div
                   key={spec.facetName}
-                  className={`p-5 transition-colors duration-200 hover:bg-muted/30 ${
+                  className={`p-5 hover:bg-muted/30 ${
                     index % 2 === 0 ? 'bg-muted/10' : ''
                   }`}
                 >
@@ -133,8 +147,8 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
                                   aria-pressed={isSelected}
                                   disabled={disabled}
                                   className={[
-                                    "flex-1 min-w-[96px] text-center px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200",
-                                    disabled ? "opacity-50 cursor-not-allowed" : "",
+                                    "flex-1 min-w-[96px] text-center px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200 transform",
+                                    disabled ? "opacity-50 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]",
                                     isSelected
                                       ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg"
                                       : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
@@ -148,7 +162,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
                             })}
                           </div>
                         ) : (
-                         <div className="inline-flex items-center justify-center  px-4 py-2 text-sm font-semibold rounded-md border border-brand-primary text-brand-primary bg-brand-primary/5">
+                         <div className="inline-flex items-center text-sm text-foreground font-medium">
                             {typeof spec.facetValues[0] === 'string' ? spec.facetValues[0] : spec.facetValues[0].value}
                           </div>
                         )}

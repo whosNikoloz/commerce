@@ -25,27 +25,42 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
   const tenant = await getTenantByHost(host);
   const site = tenant.siteConfig;
+  const seo = site.seo || {};
 
   const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
   const ogImageAbs = site.ogImage ? `${base}${site.ogImage}` : `${base}/og-image.jpg`;
 
+  // Build verification object
+  const verification: Record<string, string> = {};
+  if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
+  if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
+  if (seo.yandexVerification) verification.yandex = seo.yandexVerification;
+
   return {
     metadataBase: new URL(base),
-    title: { default: site.name, template: `%s • ${site.shortName}` },
+    title: { default: site.name, template: `%s • ${site.shortName || site.name}` },
     description: site.description,
+    keywords: seo.keywords?.ka || seo.keywords?.en,
+    authors: seo.author ? [{ name: seo.author }] : undefined,
+    creator: seo.author,
+    publisher: site.name,
+    verification: Object.keys(verification).length > 0 ? verification : undefined,
     openGraph: {
-      type: "website",
+      type: (seo.ogType as any) || "website",
       url: base,
       title: site.name,
       description: site.description,
-      siteName: site.name,
+      siteName: seo.ogSiteName?.ka || seo.ogSiteName?.en || site.name,
       images: [{ url: ogImageAbs, width: 1200, height: 630 }],
+      locale: seo.ogLocale || "ka_GE",
     },
     twitter: {
-      card: "summary_large_image",
+      card: seo.twitterCard || "summary_large_image",
       title: site.name,
       description: site.description,
       images: [ogImageAbs],
+      site: seo.twitterSite,
+      creator: seo.twitterCreator,
     },
     icons: { icon: site.favicon },
   };
@@ -83,16 +98,18 @@ export default async function RootLayout({
   const organizationJsonLd = await buildOrganizationJsonLd(site);
   const websiteJsonLd = await buildWebsiteJsonLd(site);
 
+  // Get dynamic theme color from PWA config or tenant theme
+  const themeColor = site.pwa?.themeColor || tenant.themeColor || "#000000";
+
   return (
     <html suppressHydrationWarning lang={safeLang} style={style}>
       <head>
         <meta content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" name="viewport" />
         <meta content="IE=edge" httpEquiv="X-UA-Compatible" />
-        <meta content="#ffffff" name="theme-color" />
-        <meta content="#ffffff" name="msapplication-TileColor" />
+        <meta content={themeColor} name="theme-color" />
+        <meta content={themeColor} name="msapplication-TileColor" />
         <link href={site.favicon} rel="icon" sizes="any" />
         <link href={site.favicon} rel="apple-touch-icon" />
-        <link href="/manifest.json" rel="manifest" />
 
         {/* Resource hints for performance */}
         <link href="https://cdnjs.cloudflare.com" rel="preconnect" />

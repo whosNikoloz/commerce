@@ -166,29 +166,51 @@ export async function i18nPageMetadataAsync(args: I18nMetaArgs): Promise<Metadat
   const langs = args.alternatesOverride ?? languages;
   const alternateLocales = locales.filter((l) => l !== args.lang).map(ogLocale);
 
+  // Get SEO config with defaults
+  const seo = siteCfg.seo || {};
+  const keywords = seo.keywords?.[args.lang as Locale] || seo.keywords?.ka;
+  const ogSiteName = seo.ogSiteName?.[args.lang as Locale] || seo.ogSiteName?.ka || siteCfg.name;
+  const twitterCard = seo.twitterCard || "summary_large_image";
+
+  // Build verification object
+  const verification: Record<string, string> = {};
+  if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
+  if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
+  if (seo.yandexVerification) verification.yandex = seo.yandexVerification;
+
+  // Determine if should index
+  const shouldIndex = args.index && !seo.defaultNoIndex;
+
   return {
     title: args.title,
     description: desc,
-    robots: args.index
+    keywords: keywords || undefined,
+    authors: seo.author ? [{ name: seo.author }] : undefined,
+    creator: seo.author,
+    publisher: siteCfg.name,
+    robots: shouldIndex
       ? { index: true, follow: true }
       : { index: false, follow: false, nocache: true },
     metadataBase: new URL(BASE),
     alternates: { canonical, languages: langs },
+    verification: Object.keys(verification).length > 0 ? verification : undefined,
     openGraph: {
-      type: "website",
+      type: (seo.ogType as any) || "website",
       url: canonical,
-      siteName: args.siteName ?? siteCfg.name,
+      siteName: ogSiteName,
       title: args.title,
       description: desc,
       images: absImages,
-      locale: ogLocale(args.lang),
+      locale: seo.ogLocale || ogLocale(args.lang),
       alternateLocale: alternateLocales,
     },
     twitter: {
-      card: "summary_large_image",
+      card: twitterCard,
       title: args.title,
       description: desc,
       images: absImages,
+      site: seo.twitterSite,
+      creator: seo.twitterCreator,
     },
   };
 }
@@ -263,32 +285,90 @@ export function buildItemListJsonLd(items: Array<{ name: string; url: string; im
 
 export async function buildOrganizationJsonLd(siteConfig: SiteConfig) {
   const BASE = await getBASE(siteConfig);
+  const business = siteConfig.business || {};
+  const seo = siteConfig.seo || {};
 
-  return {
+  const orgData: any = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: siteConfig.name,
+    "@type": seo.organizationType || "Organization",
+    name: business.legalName || siteConfig.name,
+    alternateName: siteConfig.name !== business.legalName ? siteConfig.name : undefined,
     url: BASE,
     logo: BASE + siteConfig.logo,
     sameAs: siteConfig.links
       ? Object.values(siteConfig.links).filter((v) => typeof v === "string" && v.startsWith("http"))
       : [],
   };
+
+  // Add contact information
+  if (business.email || business.phone) {
+    orgData.contactPoint = {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      email: business.email,
+      telephone: business.phone?.ka || business.phone?.en,
+    };
+  }
+
+  // Add address
+  if (business.address) {
+    orgData.address = {
+      "@type": "PostalAddress",
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.region,
+      postalCode: business.address.postalCode,
+      addressCountry: business.address.country,
+    };
+  }
+
+  // Add geo location
+  if (business.geo) {
+    orgData.geo = {
+      "@type": "GeoCoordinates",
+      latitude: business.geo.latitude,
+      longitude: business.geo.longitude,
+    };
+  }
+
+  // Add opening hours
+  if (business.openingHours && business.openingHours.length > 0) {
+    orgData.openingHoursSpecification = business.openingHours.map(h => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: h.dayOfWeek,
+      opens: h.opens,
+      closes: h.closes,
+    }));
+  }
+
+  // Add additional properties
+  if (seo.foundingDate) orgData.foundingDate = seo.foundingDate;
+  if (seo.areaServed) orgData.areaServed = seo.areaServed;
+  if (seo.priceRange) orgData.priceRange = seo.priceRange;
+
+  return orgData;
 }
 
 export async function buildWebsiteJsonLd(siteConfig: SiteConfig) {
   const BASE = await getBASE(siteConfig);
+  const seo = siteConfig.seo || {};
   const searchUrl = `${BASE}/${siteConfig.localeDefault}/category?q={search_term_string}`;
 
-  return {
+  const websiteData: any = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
     url: BASE,
-    potentialAction: {
+  };
+
+  // Only add search action if enabled (default: true)
+  if (seo.enableSearchAction !== false) {
+    websiteData.potentialAction = {
       "@type": "SearchAction",
       target: searchUrl,
       "query-input": "required name=search_term_string",
-    },
-  };
+    };
+  }
+
+  return websiteData;
 }

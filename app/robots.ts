@@ -27,21 +27,19 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const BASE = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
 
   // Global or per-host exact allow list (avoid if you don't truly need it)
-  const allowedExact = PER_HOST_ALLOWED_EXACT[host] ?? [
-    "/en/category/0198d5ef-77a7-7ea0-9d44-eaa26609d5d4?page=1&sort=featured&brand=0198eb1d-5ba1-7f41-980a-640e84ea7328&cond=0&stock=0&min=0&max=580",
-  ];
+  // Use canonical tags in your pages instead of explicit allows for query params
+  const allowedExact = PER_HOST_ALLOWED_EXACT[host] ?? [];
 
   // Internal paths never meant for crawling
   const disallowCore = ["/api/", "/_next/", "/static/", "/cdn-cgi/rum"];
 
   // Query patterns that explode URL variants
+  // Note: Only block tracking and redundant parameters, not core functionality
   const disallowQueryPatterns = [
-    "*?q=*",
-    "*sort=*",
-    "*?filter_options=*",
-    "/*utm_*",
-    "/*?max*",
-    "/*?min*",
+    "/*utm_*",        // UTM tracking parameters
+    "/*?fbclid=*",    // Facebook click tracking
+    "/*?gclid=*",     // Google click tracking
+    "/*?ref=*",       // Referral tracking
   ];
 
   // Non-locale top-level sections to block

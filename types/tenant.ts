@@ -517,24 +517,139 @@ export type Homepage = Template1Homepage | Template2Homepage | Template3Homepage
 // ===== Merchant Type =====
 export type MerchantType = "FINA" | "CUSTOM";
 
+// ===== SEO & Analytics Configuration =====
+export type SEOConfig = {
+  // Meta Tags
+  keywords?: LocalizedText; // SEO keywords for meta tags
+  author?: string; // Site author/company name
+  robots?: string; // Default robots meta (e.g., "index, follow")
+
+  // Open Graph (detailed)
+  ogType?: string; // og:type (default: "website")
+  ogSiteName?: LocalizedText; // Can differ from site name
+  ogLocale?: string; // og:locale (e.g., "ka_GE", "en_US")
+
+  // Twitter Card
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player"; // Default: "summary_large_image"
+  twitterSite?: string; // @username for the site
+  twitterCreator?: string; // @username for content creator
+
+  // Verification Tags
+  googleSiteVerification?: string; // Google Search Console verification
+  bingSiteVerification?: string; // Bing Webmaster verification
+  pinterestVerification?: string; // Pinterest domain verification
+  yandexVerification?: string; // Yandex Webmaster verification
+
+  // Analytics & Tracking
+  googleAnalyticsId?: string; // GA4 Measurement ID (G-XXXXXXXXXX)
+  googleTagManagerId?: string; // GTM Container ID (GTM-XXXXXXX)
+  facebookPixelId?: string; // Facebook Pixel ID
+  hotjarId?: string; // Hotjar Site ID
+  clarityId?: string; // Microsoft Clarity Project ID
+
+  // Schema.org / JSON-LD
+  organizationType?: "Organization" | "LocalBusiness" | "Store" | "OnlineStore";
+  foundingDate?: string; // ISO date (e.g., "2020-01-15")
+  areaServed?: string; // Country/region (e.g., "Georgia", "GE")
+  priceRange?: string; // Price range indicator (e.g., "₾₾", "$-$$$")
+
+  // Canonical & Indexing
+  canonicalBaseUrl?: string; // Override for canonical URLs (if different from url)
+  defaultNoIndex?: boolean; // Default noindex for entire site (emergency switch)
+
+  // Additional Features
+  enableBreadcrumbs?: boolean; // Enable breadcrumb JSON-LD
+  enableSearchAction?: boolean; // Enable WebSite search action JSON-LD
+};
+
+export type BusinessInfo = {
+  // Contact Information
+  email?: string; // Business email
+  phone?: LocalizedText; // Business phone (can vary by locale)
+  address?: {
+    street?: string;
+    city?: string;
+    region?: string; // State/Region
+    postalCode?: string;
+    country?: string; // ISO code (e.g., "GE", "US")
+  };
+
+  // Location
+  geo?: {
+    latitude?: number;
+    longitude?: number;
+  };
+
+  // Business Hours (for schema.org)
+  openingHours?: Array<{
+    dayOfWeek: string; // "Monday", "Tuesday", etc.
+    opens: string; // "09:00"
+    closes: string; // "18:00"
+  }>;
+
+  // Legal
+  vatNumber?: string; // Tax/VAT number
+  registrationNumber?: string; // Company registration number
+  legalName?: string; // Official legal name
+};
+
+export type PWAConfig = {
+  enabled?: boolean; // Enable PWA features
+  themeColor?: string; // PWA theme color (hex)
+  backgroundColor?: string; // PWA background color (hex)
+  display?: "standalone" | "fullscreen" | "minimal-ui" | "browser";
+  orientation?: "portrait" | "landscape" | "any";
+  startUrl?: string; // PWA start URL (default: "/")
+  scope?: string; // PWA scope (default: "/")
+  categories?: string[]; // App categories (e.g., ["shopping", "business"])
+  shortcuts?: Array<{
+    name: string;
+    url: string;
+    description?: string;
+  }>;
+};
+
 // ===== Site Configuration (merged into tenant) =====
 export type SiteConfig = {
+  // Basic Identity
   name: string;
   shortName: string;
   description: string;
-  favicon: string;
-  url: string;
-  ogImage: string;
-  logo: string;
-  currency: string;
+  slogan?: LocalizedText; // Optional tagline/slogan
+
+  // URLs & Assets
+  url: string; // Primary site URL
+  logo: string; // Main logo URL
+  logoLight?: string; // Light mode logo (if different)
+  logoDark?: string; // Dark mode logo (if different)
+  favicon: string; // Legacy favicon.ico
+  ogImage: string; // Default Open Graph image
+
+  // Localization
+  currency: string; // Default currency code (GEL, USD, EUR)
+  currencySymbol?: string; // Currency symbol (₾, $, €)
   localeDefault: string;
   locales: string[];
+
+  // Social Media
   links: {
     twitter?: string;
     instagram?: string;
     facebook?: string;
     youtube?: string;
+    linkedin?: string;
+    tiktok?: string;
+    pinterest?: string;
   };
+
+  // SEO & Analytics
+  seo?: SEOConfig;
+
+  // Business Information
+  business?: BusinessInfo;
+
+  // PWA Configuration
+  pwa?: PWAConfig;
 };
 
 // ===== Updated TenantConfig =====

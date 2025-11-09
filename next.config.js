@@ -130,11 +130,11 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
               "img-src 'self' data: blob: https://*.amazonaws.com https://media.veli.store https://picsum.photos https://placehold.co https://extra.ge",
               "font-src 'self' data: https://cdnjs.cloudflare.com",
-              `connect-src ${connectSrc}`,
+              `connect-src ${connectSrc} https://vercel.live wss://ws-us3.pusher.com`,
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

@@ -1,0 +1,16 @@
+# Security Policy
+
+# If you discover any security vulnerabilities, please report them responsibly
+Contact: mailto:security@example.com
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: en, ka
+Canonical: https://example.com/.well-known/security.txt
+
+# Security acknowledgments
+Acknowledgments: https://example.com/security/hall-of-fame
+
+# Our security policy
+Policy: https://example.com/info/security-policy
+
+# Please do not test on our production systems
+# Use our staging environment for security testing

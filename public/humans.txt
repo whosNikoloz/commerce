@@ -1,0 +1,36 @@
+/* TEAM */
+
+Developer: Your Development Team
+Site: https://example.com
+Location: Tbilisi, Georgia
+
+/* THANKS */
+
+Next.js Team
+Vercel
+React Team
+TypeScript Team
+
+/* SITE */
+
+Last update: 2025/01/09
+Language: Georgian / English
+Doctype: HTML5
+IDE: Visual Studio Code
+Standards: HTML5, CSS3, ES2024
+Components: Next.js 15, React 19, TypeScript, Tailwind CSS
+Backend: REST API
+Hosting: Vercel
+
+/* FEATURES */
+
+- Multi-tenant architecture
+- Internationalization (i18n)
+- Progressive Web App (PWA)
+- Server-Side Rendering (SSR)
+- Static Site Generation (SSG)
+- Image Optimization
+- SEO Optimized
+- Accessibility (WCAG 2.1)
+- Security Headers
+- Content Security Policy

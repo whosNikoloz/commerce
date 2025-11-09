@@ -82,21 +82,38 @@ export default function Loading() {
           <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse w-40" />
         </div>
 
-        <div className="space-y-6">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="space-y-3">
-              <div className="h-5 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse w-32" />
-              <div className="flex flex-wrap gap-2">
-                {[...Array(4)].map((_, j) => (
-                  <div
-                    key={j}
-                    className="h-10 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse"
-                    style={{ width: `${Math.random() * 40 + 80}px` }}
-                  />
-                ))}
-              </div>
+        {/* Specifications Card - Matching actual design */}
+        <div className="max-w-3xl">
+          <div className="rounded-2xl border border-border/40 bg-gradient-to-br from-card/80 to-card backdrop-blur-sm shadow-lg overflow-hidden">
+            <div className="divide-y divide-border/30">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`p-5 transition-colors duration-200 ${
+                    i % 2 === 0 ? 'bg-muted/10' : ''
+                  }`}
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] lg:grid-cols-[250px_1fr] items-center gap-4">
+                    {/* Facet Name */}
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-zinc-300 dark:bg-zinc-700 animate-pulse" />
+                      <div className="h-5 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse w-24" />
+                    </div>
+
+                    {/* Facet Values */}
+                    <div className="flex flex-wrap justify-around gap-2 w-full">
+                      {[...Array(3)].map((_, j) => (
+                        <div
+                          key={j}
+                          className="flex-1 min-w-[96px] h-10 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

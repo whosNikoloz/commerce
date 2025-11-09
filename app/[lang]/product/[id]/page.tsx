@@ -13,7 +13,8 @@ import {
 } from "@/lib/seo";
 import ProductDetail from "@/components/Product/product-detail";
 
-export const dynamic = "force-dynamic";
+// Use ISR with revalidation for better performance
+export const revalidate = 60; // Revalidate every 60 seconds
 
 type DetailPageParams = { lang: string; id: string };
 type DetailPageProps = { params: Promise<DetailPageParams> };

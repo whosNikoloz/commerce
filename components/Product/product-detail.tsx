@@ -16,6 +16,7 @@ import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 import { useFlyToCart } from "@/hooks/use-fly-to-cart";
+import { locales, defaultLocale } from "@/i18n.config";
 
 type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
 
@@ -27,7 +28,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [stockLoading, setStockLoading] = useState(true);
   const [stockError, setStockError] = useState<string | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [isLoadingVariant, setIsLoadingVariant] = useState(false);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const isMobile = useIsMobile();
@@ -35,10 +35,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const imageReviewRef = useRef<ImageReviewHandle>(null);
   const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
 
-  const handleFacetChange = async (facetName: string, facetValue: string, productVariantId?: string) => {
-
-    setSelectedFacets(prev => ({ ...prev, [facetName]: facetValue }));
-
+  const handleFacetChange = (facetName: string, facetValue: string, productVariantId?: string) => {
     if (!productVariantId) {
       return;
     }
@@ -47,50 +44,35 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       return;
     }
 
-    if (isLoadingVariant) {
-      return;
-    }
+    // Build the URL path for the variant
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const firstSegment = pathParts[0];
 
-    setIsLoadingVariant(true);
+    // Check if first segment is a valid locale
+    const isValidLocale = locales.includes(firstSegment as any);
+    const lang = isValidLocale ? firstSegment : null;
 
-    try {
-      const variantProduct = await getProductById(productVariantId);
+    // Build the new path
+    // If lang exists and is not default, include it in the URL
+    // If lang is default or doesn't exist, hide it from the URL
+    const newPath = lang && lang !== defaultLocale
+      ? `/${lang}/product/${productVariantId}`
+      : `/product/${productVariantId}`;
 
-      console.log('✅ Variant loaded:', variantProduct.id, variantProduct.name);
-
-      const pathParts = window.location.pathname.split('/').filter(Boolean);
-      const lang = pathParts[0]; // First part is the language
-      const newPath = `/${lang}/product/${productVariantId}`;
-
-      console.log('🔄 Updating URL from', window.location.pathname, 'to', newPath);
-
-      router.replace(newPath, { scroll: false });
-
-      setProduct(variantProduct);
-
-      imageReviewRef.current?.scrollToTop?.();
-
-      setStockLoading(true);
-      setStockError(null);
-      setIsInitialLoad(true);
-
-    } catch (error) {
-      console.error('❌ Failed to load variant:', error);
-      toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა");
-    } finally {
-      setIsLoadingVariant(false);
-    }
+    // Navigate to the new variant page
+    router.push(newPath);
   };
 
   const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   // Initialize selected facets from initial product ONLY on mount
+  // Only select facets where productVariantId matches the current product id
   useEffect(() => {
     const initialFacets: Record<string, string> = {};
 
     initialProduct.productFacetValues?.forEach(facet => {
-      if (facet.facetName && facet.facetValue) {
+      if (facet.facetName && facet.facetValue && facet.productVariantId === initialProduct.id) {
         initialFacets[facet.facetName] = facet.facetValue;
       }
     });
@@ -270,12 +252,9 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   const specs = useMemo(() => {
     if (!product.productFacetValues?.length) {
-      console.log('⚠️ No productFacetValues');
-
       return [];
     }
 
-    console.log('📊 Building specs from facets:', product.productFacetValues);
 
     // Group facets by facetName - each facet can have multiple values with different variant IDs
     const grouped = product.productFacetValues.reduce(
@@ -299,15 +278,12 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       {} as Record<string, Array<{ value: string; productVariantId?: string }>>,
     );
 
-    console.log('📦 Grouped facets:', grouped);
-
     // Convert grouped facets to specifications format
     const enrichedSpecs = Object.entries(grouped).map(([facetName, facetValues]) => ({
       facetName,
       facetValues,
     }));
 
-    console.log('✨ Final specs:', enrichedSpecs);
 
     return [
       {
@@ -324,28 +300,20 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   return (
     <div className="container mx-auto px-4 text-text-light dark:text-text-lightdark relative">
-      {/* Loading overlay when switching variants */}
-      {isLoadingVariant && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col items-center gap-4">
-            <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full" />
-            <div className="text-lg font-medium text-foreground">ვარიანტის ჩატვირთვა...</div>
-          </div>
-        </div>
-      )}
-
-      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
+      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">
+        {product.name ?? "პროდუქტი"}
+      </h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
-        <div className={`flex-1 max-w-[800px] order-1 lg:order-1 transition-opacity duration-300 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
+        <div className="flex-1 max-w-[800px] order-1 lg:order-1">
           <ImageReview ref={imageReviewRef} images={galleryImages} productName={product.name ?? ""} />
         </div>
 
-        <h1 className={`text-3xl md:hidden block font-bold order-2 lg:order-2 transition-opacity duration-300 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
+        <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">
           {product.name}
         </h1>
 
-        <div className={`order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit transition-opacity duration-300 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
+        <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit">
           <ProductInfo
               brand={product.brand?.name ?? ""}
               condition={product.condition}
@@ -389,22 +357,11 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             <span className="w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
             Specifications
           </h2>
-          {isLoadingVariant && (
-            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 rounded-2xl flex items-center justify-center">
-              <div className="flex items-center gap-3 bg-card p-4 rounded-lg shadow-lg">
-                <div className="animate-spin h-5 w-5 border-2 border-brand-primary border-t-transparent rounded-full" />
-                <span className="text-sm font-medium">Loading variant...</span>
-              </div>
-            </div>
-          )}
-          <div className={`transition-opacity duration-200 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
-            <Specifications
-              disabled={isLoadingVariant}
-              specs={g.specifications}
-              value={selectedFacets}
-              onChange={handleFacetChange}
-            />
-          </div>
+          <Specifications
+            specs={g.specifications}
+            value={selectedFacets}
+            onChange={handleFacetChange}
+          />
         </div>
       ))}
 

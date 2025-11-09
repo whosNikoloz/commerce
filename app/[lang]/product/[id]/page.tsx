@@ -51,7 +51,12 @@ export async function generateMetadata({
   }
 
   const title = product?.name ?? "Product";
-  const description = product?.description ?? site.description;
+  // Create a meaningful meta description
+  const description = product?.description
+    ? product.description.length > 160
+      ? product.description.slice(0, 157) + "..."
+      : product.description
+    : `${product?.name ?? "Product"} - ${product.brand?.name ? `by ${product.brand.name}` : ""}${product.category?.name ? ` in ${product.category.name}` : ""}. ${product.price ? `Price: ₾${product.price}` : ""} Shop now at ${site.name}.`.trim();
   const images = await toAbsoluteImages(site, normalizeImages(product?.images, site.ogImage));
 
   return i18nPageMetadataAsync({

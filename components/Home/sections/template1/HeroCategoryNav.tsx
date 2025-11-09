@@ -117,7 +117,7 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
     const onTouchMove = () => closeNow();
 
     // Use capture so it fires even if inner elements handle the event first
-    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
 
@@ -128,10 +128,10 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
       if (pos) setPanelPos(pos);
     };
 
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("scroll", onScroll, { capture: true } as any);
       window.removeEventListener("wheel", onWheel as EventListener);
       window.removeEventListener("touchmove", onTouchMove as EventListener);
       window.removeEventListener("resize", onResize);

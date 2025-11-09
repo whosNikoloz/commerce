@@ -17,8 +17,31 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
   const splideRef = useRef<SplideCore | null>(null);
   const [canGoPrev, setCanGoPrev] = useState(false);
   const [canGoNext, setCanGoNext] = useState(true);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const perPageDesktop = Math.min(Math.max(columns, 5), 8);
+
+  // Lazy load carousel when in viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsIntersecting(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { rootMargin: '50px' }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const splide = splideRef.current?.splide;
@@ -61,7 +84,7 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
   }
 
   return (
-    <div className="relative group">
+    <div ref={containerRef} className="relative group">
       {/* Navigation Buttons - Show on hover */}
       {/* {canGoPrev && (
         <button
@@ -85,6 +108,9 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
         </button>
       )} */}
 
+      {!isIntersecting ? (
+        <div className="h-80 animate-pulse bg-muted rounded-lg" />
+      ) : (
       <Splide
         ref={splideRef as any}
         aria-label="Products"
@@ -119,6 +145,7 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
           </SplideSlide>
         ))}
       </Splide>
+      )}
     </div>
   );
 }

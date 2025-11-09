@@ -3,7 +3,7 @@
 import type { FacetModel, ProductFacetValueModel } from "@/types/facet";
 
 import { useEffect, useState } from "react";
-import { CheckSquare, Square, ChevronDown, ChevronRight, Layers } from "lucide-react";
+import { Circle, CircleDot, ChevronDown, ChevronRight, Layers } from "lucide-react";
 
 import { getAllFacets } from "@/app/api/services/facetService";
 import { Label } from "@/components/ui/label";
@@ -75,16 +75,38 @@ export function FacetSelector({
     return selectedFacetValues.some((pfv) => pfv.facetValueId === facetValueId);
   };
 
-  const toggleFacetValue = (facetValueId: string) => {
-    const isSelected = isFacetValueSelected(facetValueId);
+  const getSelectedFacetValueInFacet = (facetId: string): string | null => {
+    const facet = facets.find((f) => f.id === facetId);
+    if (!facet) return null;
 
-    if (isSelected) {
-      // Remove
-      onChange(selectedFacetValues.filter((pfv) => pfv.facetValueId !== facetValueId));
+    const facetValueIds = facet.facetValues?.map((fv) => fv.id) ?? [];
+    const selected = selectedFacetValues.find((pfv) =>
+      facetValueIds.includes(pfv.facetValueId)
+    );
+
+    return selected?.facetValueId ?? null;
+  };
+
+  const selectFacetValue = (facetId: string, facetValueId: string) => {
+    const facet = facets.find((f) => f.id === facetId);
+    if (!facet) return;
+
+    const facetValueIds = facet.facetValues?.map((fv) => fv.id) ?? [];
+
+    // Remove any existing selection from this facet
+    const withoutCurrentFacet = selectedFacetValues.filter(
+      (pfv) => !facetValueIds.includes(pfv.facetValueId)
+    );
+
+    // Check if clicking the same value (to deselect)
+    const currentSelected = getSelectedFacetValueInFacet(facetId);
+    if (currentSelected === facetValueId) {
+      // Deselect by not adding it back
+      onChange(withoutCurrentFacet);
     } else {
-      // Add
+      // Add the new selection
       onChange([
-        ...selectedFacetValues,
+        ...withoutCurrentFacet,
         {
           id: crypto.randomUUID(),
           facetValueId,
@@ -130,9 +152,8 @@ export function FacetSelector({
           {facets.map((facet) => {
             const isExpanded = expandedFacets.has(facet.id);
             const facetValues = facet.facetValues ?? [];
-            const selectedCount = facetValues.filter((fv) =>
-              isFacetValueSelected(fv.id)
-            ).length;
+            const selectedValueId = getSelectedFacetValueInFacet(facet.id);
+            const hasSelection = selectedValueId !== null;
 
             return (
               <Collapsible
@@ -155,9 +176,9 @@ export function FacetSelector({
                         {facet.name}
                       </span>
                     </div>
-                    {selectedCount > 0 && (
+                    {hasSelection && (
                       <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded">
-                        {selectedCount}
+                        1
                       </span>
                     )}
                   </Button>
@@ -181,12 +202,12 @@ export function FacetSelector({
                               ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400"
                               : "hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300"
                           }`}
-                          onClick={() => toggleFacetValue(facetValue.id)}
+                          onClick={() => selectFacetValue(facet.id, facetValue.id)}
                         >
                           {isSelected ? (
-                            <CheckSquare className="h-3 w-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                            <CircleDot className="h-3 w-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                           ) : (
-                            <Square className="h-3 w-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+                            <Circle className="h-3 w-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />
                           )}
                           <span>{facetValue.value}</span>
                         </button>

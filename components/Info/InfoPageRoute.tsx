@@ -55,7 +55,9 @@ export async function generateInfoPageMetadata({
 
   // Use configured metadata or fallback values
   const title = pageConfig?.metadata.title[lang as keyof typeof pageConfig.metadata.title] || fallbackTitle || slug;
-  const description = pageConfig?.metadata.description[lang as keyof typeof pageConfig.metadata.description] || fallbackDescription || "";
+  const description = pageConfig?.metadata.description[lang as keyof typeof pageConfig.metadata.description]
+    || fallbackDescription
+    || `${title} - ${site.description || 'Learn more about our services and offerings'}`;
   const ogImage = pageConfig?.metadata.ogImage || "/og/info-og.jpg";
   const index = pageConfig?.metadata.index !== false; // Default to true
 

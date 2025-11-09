@@ -394,30 +394,32 @@ const onFacetDateRangeChange = (facetId: string, from?: string, to?: string) => 
               <ProductGrid products={products} viewMode={viewMode} />
             )}
 
-            <div className="flex items-center justify-center gap-2 sm:gap-3 py-8 px-2">
+            <nav aria-label="Pagination" className="flex items-center justify-center gap-2 sm:gap-3 py-8 px-2">
               <button
+                aria-label="Previous page"
                 className="group px-3 sm:px-5 py-2 sm:py-3 rounded-xl border-2 border-border/50 bg-card hover:border-brand-primary hover:bg-brand-primary hover:text-white text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border/50 disabled:hover:bg-card disabled:hover:text-foreground font-semibold shadow-md hover:shadow-lg hover:shadow-brand-primary/20 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               >
-                <span className="text-lg sm:text-xl">←</span>
+                <span aria-hidden="true" className="text-lg sm:text-xl">←</span>
                 <span className="hidden sm:inline">Prev</span>
               </button>
-              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 shadow-md">
+              <div aria-current="page" aria-label={`Page ${currentPage} of ${totalPages}`} className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 shadow-md" role="status">
                 <span className="text-xs sm:text-sm font-semibold text-foreground hidden sm:inline">Page</span>
                 <span className="text-base sm:text-lg font-bold text-brand-primary">{currentPage}</span>
-                <span className="text-xs sm:text-sm text-muted-foreground">/</span>
+                <span aria-hidden="true" className="text-xs sm:text-sm text-muted-foreground">/</span>
                 <span className="text-base sm:text-lg font-bold text-brand-primary">{totalPages}</span>
               </div>
               <button
+                aria-label="Next page"
                 className="group px-3 sm:px-5 py-2 sm:py-3 rounded-xl border-2 border-border/50 bg-card hover:border-brand-primary hover:bg-brand-primary hover:text-white text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border/50 disabled:hover:bg-card disabled:hover:text-foreground font-semibold shadow-md hover:shadow-lg hover:shadow-brand-primary/20 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               >
                 <span className="hidden sm:inline">Next</span>
-                <span className="text-lg sm:text-xl">→</span>
+                <span aria-hidden="true" className="text-lg sm:text-xl">→</span>
               </button>
-            </div>
+            </nav>
           </div>
           </div>
         </div>

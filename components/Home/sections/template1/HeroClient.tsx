@@ -58,6 +58,9 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
           cover: true,
           rewind: true,
           perPage: 1,
+          lazyLoad: 'nearby',
+          preloadPages: 1,
+          updateOnMove: false,
         }}
       >
         {data.banners.map((banner, index) => (
@@ -66,11 +69,13 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
               <div className="relative w-full h-full">
                 <Image
                   fill
-                  unoptimized
                   alt={t(banner.alt, locale)}
-                  className="object-cover  transition-transform duration-500"
+                  className="object-cover transition-transform duration-500"
+                  loading={index === 0 ? "eager" : "lazy"}
                   priority={index === 0}
-                  sizes="(max-width: 1024px) 100vw, 75vw"
+                  fetchPriority={index === 0 ? "high" : "low"}
+                  quality={index === 0 ? 85 : 70}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1200px"
                   src={banner.imageUrl}
                 />
                 {banner.badge && (

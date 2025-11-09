@@ -33,29 +33,66 @@ export default function CartPage() {
     async function load() {
       if (productIds.length === 0) {
         setAvailability({});
-
         return;
       }
-      setLoading(true);
-      try {
-        const res = await getProductRestsByIds({ prods: productIds });
-        const map: AvailabilityMap = {};
 
-        if (!res.ex && Array.isArray(res.summedRests)) {
-          for (const r of res.summedRests) map[String(r.id)] = Number(r.totalRest ?? 0);
+      const TIMEOUT_MS = 8000;
+      const MAX_RETRIES = 3;
+      let attempt = 0;
+
+      setLoading(true);
+
+      while (attempt < MAX_RETRIES && !cancelled) {
+        attempt++;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+        try {
+          const res = await getProductRestsByIds({ prods: productIds });
+          clearTimeout(timeout);
+
+          const map: AvailabilityMap = {};
+
+          if (!res.ex && Array.isArray(res.summedRests)) {
+            for (const r of res.summedRests) map[String(r.id)] = Number(r.totalRest ?? 0);
+          }
+
+          if (!cancelled) {
+            setAvailability(map);
+            setLoading(false);
+          }
+          return; // success
+        } catch (err: any) {
+          clearTimeout(timeout);
+
+          const isAbort = err?.name === "AbortError";
+          const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
+
+          if (attempt >= MAX_RETRIES || isOffline || isAbort) {
+            if (!cancelled) {
+              setAvailability({});
+              setLoading(false);
+            }
+            return;
+          }
+
+          // Exponential backoff with jitter
+          const backoff = 500 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 200);
+          await new Promise((r) => setTimeout(r, backoff));
         }
-        if (!cancelled) setAvailability(map);
-      } catch {
-        if (!cancelled) setAvailability({});
-      } finally {
-        if (!cancelled) setLoading(false);
       }
     }
 
     load();
 
+    // Set up periodic refresh every 30 seconds
+    const refreshInterval = setInterval(() => {
+      if (!cancelled) load();
+    }, 30_000);
+
     return () => {
       cancelled = true;
+      clearInterval(refreshInterval);
     };
   }, [productIds.join("|")]);
 
@@ -83,7 +120,7 @@ export default function CartPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <CartItems availability={availability} />
+            <CartItems availability={availability} loading={loading} />
           </div>
           <div className="lg:sticky lg:top-6 h-fit">
             <CartSummary autoShowLoginPrompt={showLoginPrompt} />

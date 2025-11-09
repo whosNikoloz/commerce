@@ -54,10 +54,12 @@ export default function InfoPageRenderer({ pageConfig, locale }: InfoPageRendere
         <Suspense
           key={`${section.type}-${section.order}-${index}`}
           fallback={
-            <div className="w-full h-64 animate-pulse bg-muted" />
+            <div className="w-full min-h-[400px] animate-pulse bg-muted rounded-lg" />
           }
         >
-          <CustomHTML data={section.data} locale={locale} />
+          <div className="min-h-[200px]">
+            <CustomHTML data={section.data} locale={locale} />
+          </div>
         </Suspense>
       ))}
     </div>

@@ -23,7 +23,9 @@
       "Bash(echo:*)",
       "Bash(curl:*)",
       "Bash(cat:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(nul)",
+      "Bash(timeout 180 npm run build:*)"
     ],
     "deny": [],
     "ask": []

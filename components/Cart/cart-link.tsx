@@ -42,6 +42,7 @@ export default function Cartlink() {
       <Button
         isIconOnly
         as={Link}
+        aria-label="Go to cart"
         className={`relative rounded-full bg-transparent ${cartChanged ? "animate-ping" : ""}`}
         href="/cart"
         variant="solid"

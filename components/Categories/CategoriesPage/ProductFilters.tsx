@@ -302,7 +302,6 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="price">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              <span className="text-brand-primary">💰</span>
               Price Range
             </span>
           </AccordionTrigger>
@@ -342,7 +341,6 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="brands">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              <span className="text-brand-primary">🏷️</span>
               Brands
             </span>
           </AccordionTrigger>
@@ -375,7 +373,6 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="stock">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              <span className="text-brand-primary">📦</span>
               Stock
             </span>
           </AccordionTrigger>
@@ -413,7 +410,6 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="condition">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              <span className="text-brand-primary">✨</span>
               Condition
             </span>
           </AccordionTrigger>
@@ -451,7 +447,6 @@ function SidebarContent({
           <AccordionItem key={f.id} className="border-b border-border/50" value={`facet-${f.id}`}>
             <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
               <span className="flex items-center gap-2">
-                <span className="text-brand-primary">🔍</span>
                 {f.name}
               </span>
             </AccordionTrigger>

@@ -1,0 +1,19 @@
+{
+  "name": "E-commerce Store",
+  "short_name": "Store",
+  "description": "Modern e-commerce platform built with Next.js",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["shopping", "business"],
+  "prefer_related_applications": false
+}

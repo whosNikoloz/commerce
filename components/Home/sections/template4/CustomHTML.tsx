@@ -17,7 +17,7 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
   const sanitizedHTML = useMemo(() => {
     let sanitized = DOMPurify.sanitize(data.html, {
       ADD_TAGS: ['iframe'], // Allow iframe if needed (be careful!)
-      ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], // Allow iframe attributes
+      ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'width', 'height', 'loading'], // Allow iframe attributes
       ALLOW_DATA_ATTR: true, // Allow data-* attributes
     });
 
@@ -42,6 +42,35 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
           // Add new allow attribute with xr-spatial-tracking
           return `<iframe${attrs} allow="xr-spatial-tracking">`;
         }
+      }
+    );
+
+    // Prevent CLS and optimize loading for images
+    let imageCount = 0;
+    sanitized = sanitized.replace(
+      /<img([^>]*)>/gi,
+      (match, attrs) => {
+        imageCount++;
+        // First image gets priority loading for LCP, rest get lazy
+        if (!attrs.includes('loading=')) {
+          const loading = imageCount === 1 ? 'eager' : 'lazy';
+          return `<img${attrs} loading="${loading}"${imageCount === 1 ? ' fetchpriority="high"' : ''}>`;
+        }
+        return match;
+      }
+    );
+
+    // Add aspect-ratio wrapper to iframes without explicit dimensions for CLS prevention
+    sanitized = sanitized.replace(
+      /<iframe([^>]*?)(?:width="(\d+)")?(?:[^>]*?)(?:height="(\d+)")?([^>]*)>/gi,
+      (match, before, width, height, after) => {
+        // If iframe has both width and height, keep as is
+        if (width && height) {
+          return match;
+        }
+        // Wrap in aspect-ratio container (16:9 default)
+        const aspectRatio = width && height ? (height / width) * 100 : 56.25; // 16:9 = 56.25%
+        return `<div style="position: relative; padding-bottom: ${aspectRatio}%; height: 0; overflow: hidden;"><iframe${before}${after} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">`;
       }
     );
 
@@ -106,8 +135,39 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
     >
       {/* Render sanitized custom HTML */}
       <div
+        className="custom-html-content"
         dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+        style={{
+          // Prevent layout shifts from content
+          minHeight: 'auto',
+        }}
       />
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          [data-custom-html="${uniqueId}"] .custom-html-content img:not([width]):not([height]) {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+          }
+          [data-custom-html="${uniqueId}"] .custom-html-content img[width][height] {
+            max-width: 100%;
+            height: auto;
+            display: block;
+          }
+          [data-custom-html="${uniqueId}"] .custom-html-content img:first-of-type {
+            content-visibility: auto;
+          }
+          [data-custom-html="${uniqueId}"] .custom-html-content iframe {
+            max-width: 100%;
+            border: 0;
+          }
+          [data-custom-html="${uniqueId}"] .custom-html-content * {
+            max-width: 100%;
+          }
+        `
+      }} />
     </section>
   );
 }

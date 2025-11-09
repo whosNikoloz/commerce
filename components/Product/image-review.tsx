@@ -20,6 +20,7 @@ interface ImageReviewProps {
 
 export interface ImageReviewHandle {
   getCurrentImageElement: () => HTMLImageElement | null;
+  scrollToTop: () => void;
 }
 
 export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ images, productName }, ref) => {
@@ -38,6 +39,9 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
 
   useImperativeHandle(ref, () => ({
     getCurrentImageElement: () => currentImageRef.current,
+    scrollToTop: () => {
+      imageContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
   }));
 
   const zoomLevel = 3;
@@ -64,6 +68,11 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
       emblaApi.scrollTo(selectedImage);
     }
   }, [selectedImage, emblaApi]);
+
+  // Reset to first image when images change (e.g., when switching product variants)
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [images]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -180,33 +189,19 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
                 <div key={index} className="flex-[0_0_100%]">
                   <Card
                     ref={index === selectedImage ? imageContainerRef : null}
-                    className="relative rounded-lg overflow-hidden aspect-square cursor-crosshair"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseMove={handleMouseMove}
+                    className="relative rounded-lg overflow-hidden aspect-square max-h-[400px] cursor-pointer bg-white dark:bg-neutral-900"
                   >
                     <Image
                       ref={index === selectedImage ? currentImageRef as any : null}
                       fill
                       alt={`${productName} view ${index + 1}`}
-                      className="object-contain"
+                      className="object-contain p-4"
                       loading={index === 0 ? undefined : "eager"}
                       priority={index === 0}
-                      sizes="100vw"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       src={image || placeholder}
                       onClick={handleProductClick}
                     />
-                    {isHovering && index === selectedImage && (
-                      <div
-                        className="absolute border-2 rounded-md border-primary pointer-events-none z-50 bg-primary/10 dark:bg-primary/20"
-                        style={{
-                          left: `${lensPosition.x}px`,
-                          top: `${lensPosition.y}px`,
-                          width: `${lensSize.width}px`,
-                          height: `${lensSize.height}px`,
-                        }}
-                      />
-                    )}
                   </Card>
                 </div>
               ))}
@@ -216,7 +211,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
           {/* Navigation buttons */}
           <button
             aria-label="Previous image"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full p-2 shadow-lg z-20 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               prevImage();
@@ -226,7 +221,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
           </button>
           <button
             aria-label="Next image"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full p-2 shadow-lg z-20 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               nextImage();
@@ -266,6 +261,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
             {images.map((image, index) => (
               <button
                 key={index}
+                aria-label={`View image ${index + 1} of ${images.length}`}
                 className={cn(
                   "flex-shrink-0 border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ease-in-out",
                   selectedImage === index

@@ -92,6 +92,8 @@ export default function UpdateProductModal({
         initialCategoryId || undefined,
         initialBrandId || undefined
       );
+      console.log('🔍 [Update Modal] Fetched product groups:', groups);
+      console.log('🔍 [Update Modal] First group structure:', groups[0]);
       setProductGroups(groups);
     } catch (error) {
       console.error("Failed to fetch product groups:", error);
@@ -338,6 +340,7 @@ export default function UpdateProductModal({
                         variant="bordered"
                         onSelectionChange={(keys) => {
                           const k = Array.from(keys)[0] as string | undefined;
+                          console.log('✅ [Update Modal] Selected productGroupId:', k);
                           setProductGroupId(k === "none" ? "" : k ?? "");
                         }}
                       >
@@ -345,11 +348,14 @@ export default function UpdateProductModal({
                           <HSelectItem key="none" textValue="None (standalone product)">
                             None (standalone product)
                           </HSelectItem>,
-                          ...productGroups.map((group) => (
-                            <HSelectItem key={group.id} textValue={group.name}>
-                              {group.name}
-                            </HSelectItem>
-                          ))
+                          ...productGroups.map((group) => {
+                            console.log('🔍 [Update Modal] Rendering group:', { id: group.id, name: group.name, fullObject: group });
+                            return (
+                              <HSelectItem key={group.id} textValue={group.name}>
+                                {group.name} (ID: {group.id})
+                              </HSelectItem>
+                            );
+                          })
                         ]}
                       </HSelect>
                     )}

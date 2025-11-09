@@ -28,7 +28,13 @@ function formatSpecs(facets?: Record<string, string>) {
   return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
 }
 
-export default function CartItems({ availability = {} as AvailabilityMap }) {
+export default function CartItems({
+  availability = {} as AvailabilityMap,
+  loading = false
+}: {
+  availability?: AvailabilityMap;
+  loading?: boolean;
+}) {
   const cart = useCartStore((s) => s.cart);
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
@@ -36,15 +42,18 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
   const items = (cart as Array<CartItemType & { originalPrice?: number }>) ?? [];
 
   useEffect(() => {
+    // Only adjust quantities when we have loaded availability data
+    if (loading) return;
+
     for (const it of items) {
       const qty = toNumber(it.quantity);
       const maxAvail = Number(availability[String(it.id)] ?? 0);
 
-      if (qty > maxAvail) {
+      if (qty > maxAvail && maxAvail > 0) {
         updateCartItem(it.id, Math.max(0, maxAvail));
       }
     }
-  }, [JSON.stringify(availability)]);
+  }, [JSON.stringify(availability), loading]);
 
   return (
     <div className="space-y-3">
@@ -57,7 +66,8 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
         const specsLine = formatSpecs(item.selectedFacets);
 
         const available = Number(availability[String(item.id)] ?? 0);
-        const outOfStock = available <= 0;
+        const isCheckingStock = loading || !(String(item.id) in availability);
+        const outOfStock = !isCheckingStock && available <= 0;
 
         return (
           <Card
@@ -104,7 +114,11 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
 
                   {/* stock info */}
                   <div className="mt-2 flex items-center gap-2">
-                    {outOfStock ? (
+                    {isCheckingStock ? (
+                      <Badge className="text-[11px] px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 animate-pulse">
+                        მარაგის შემოწმება...
+                      </Badge>
+                    ) : outOfStock ? (
                       <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
                         არ არის მარაგში
                       </Badge>
@@ -113,7 +127,7 @@ export default function CartItems({ availability = {} as AvailabilityMap }) {
                         მარაგი: {available} ც.
                       </Badge>
                     )}
-                    {quantity > available && (
+                    {!isCheckingStock && quantity > available && available > 0 && (
                       <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
                         <AlertTriangle className="h-3.5 w-3.5" />
                         მოთხოვნილი რაოდენობა აღემატება მარაგს — დავაკლამპე {available}-ზე

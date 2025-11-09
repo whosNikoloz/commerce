@@ -86,11 +86,33 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang={safeLang} style={style}>
       <head>
-        <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport" />
+        <meta content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" name="viewport" />
+        <meta content="IE=edge" httpEquiv="X-UA-Compatible" />
+        <meta content="#ffffff" name="theme-color" />
+        <meta content="#ffffff" name="msapplication-TileColor" />
         <link href={site.favicon} rel="icon" sizes="any" />
+        <link href={site.favicon} rel="apple-touch-icon" />
+        <link href="/manifest.json" rel="manifest" />
+
+        {/* Resource hints for performance */}
+        <link href="https://cdnjs.cloudflare.com" rel="preconnect" />
+        <link crossOrigin="anonymous" href="https://cdnjs.cloudflare.com" rel="dns-prefetch" />
+
+        {/* Preconnect to image CDN sources */}
+        <link crossOrigin="anonymous" href="https://media.veli.store" rel="preconnect" />
+        <link crossOrigin="anonymous" href="https://extra.ge" rel="preconnect" />
+        <link crossOrigin="anonymous" href="https://ecommerce-outdoor.s3.eu-north-1.amazonaws.com" rel="preconnect" />
+
+        {/* Font Awesome - loaded with low priority */}
         <link
+          crossOrigin="anonymous"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
           rel="stylesheet"
+        />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `@font-face{font-display:swap;}`,
+          }}
         />
         {/* JSON-LD with per-host site info */}
         <script

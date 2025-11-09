@@ -135,6 +135,7 @@ export default function CategoryDrawer() {
     <>
       <Button
         isIconOnly
+        aria-label="Open categories menu"
         className="relative rounded-full bg-transparent h-6 w-6"
         variant="solid"
         onPress={openDrawer}

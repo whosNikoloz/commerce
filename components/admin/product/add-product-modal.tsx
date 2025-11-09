@@ -73,6 +73,8 @@ export default function AddProductModal({
         formData.categoryId || undefined,
         formData.brandId || undefined
       );
+      console.log('🔍 Fetched product groups:', groups);
+      console.log('🔍 First group structure:', groups[0]);
       setProductGroups(groups);
     } catch (error) {
       console.error("Failed to fetch product groups:", error);
@@ -291,18 +293,24 @@ export default function AddProductModal({
               <Select
                 disabled={loadingGroups || (!formData.categoryId && !formData.brandId)}
                 value={formData.productGroupId || undefined}
-                onValueChange={(value) => setFormData({ ...formData, productGroupId: value === "none" ? "" : value })}
+                onValueChange={(value) => {
+                  console.log('✅ Selected productGroupId:', value);
+                  setFormData({ ...formData, productGroupId: value === "none" ? "" : value });
+                }}
               >
                 <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                   <SelectValue placeholder={loadingGroups ? "Loading groups..." : "Select product group (optional)"} />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
                   <SelectItem value="none">None (standalone product)</SelectItem>
-                  {productGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.name}
-                    </SelectItem>
-                  ))}
+                  {productGroups.map((group) => {
+                    console.log('🔍 Rendering group:', { id: group.id, name: group.name, fullObject: group });
+                    return (
+                      <SelectItem key={group.id} value={group.id}>
+                        {group.name} (ID: {group.id})
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               {!formData.categoryId && !formData.brandId && (

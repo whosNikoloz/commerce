@@ -10,7 +10,7 @@ import { Specifications } from "./specifications";
 import { ImageReview, ImageReviewHandle } from "./image-review";
 
 import { ProductResponseModel } from "@/types/product";
-import { getProductById, getProductRestsByIds, getProductVariants } from "@/app/api/services/productService";
+import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,41 +23,59 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const { user } = useUser();
   const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
-  const [variants, setVariants] = useState<ProductResponseModel[]>([]);
   const [stockQuantity, setStockQuantity] = useState<number | undefined>(undefined);
   const [stockLoading, setStockLoading] = useState(true);
   const [stockError, setStockError] = useState<string | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isLoadingVariant, setIsLoadingVariant] = useState(false);
+  const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
   const addToCart = useCartStore((s) => s.checkAndAddToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
   const imageReviewRef = useRef<ImageReviewHandle>(null);
   const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
 
-  // Handle facet selection - switch to variant product
   const handleFacetChange = async (facetName: string, facetValue: string, productVariantId?: string) => {
-    if (!productVariantId || productVariantId === product.id) return;
+
+    setSelectedFacets(prev => ({ ...prev, [facetName]: facetValue }));
+
+    if (!productVariantId) {
+      return;
+    }
+
+    if (productVariantId === product.id) {
+      return;
+    }
+
+    if (isLoadingVariant) {
+      return;
+    }
 
     setIsLoadingVariant(true);
 
     try {
-      // Fetch the variant product
       const variantProduct = await getProductById(productVariantId);
 
-      // Update URL to the new product variant (without full page reload)
-      const currentPath = window.location.pathname;
-      const newPath = currentPath.replace(product.id, productVariantId);
-      window.history.pushState({}, '', newPath);
+      console.log('✅ Variant loaded:', variantProduct.id, variantProduct.name);
 
-      // Update product state
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const lang = pathParts[0]; // First part is the language
+      const newPath = `/${lang}/product/${productVariantId}`;
+
+      console.log('🔄 Updating URL from', window.location.pathname, 'to', newPath);
+
+      router.replace(newPath, { scroll: false });
+
       setProduct(variantProduct);
 
-      // Reset stock for the new product
+      imageReviewRef.current?.scrollToTop?.();
+
       setStockLoading(true);
       setStockError(null);
+      setIsInitialLoad(true);
 
-      toast.success(`${facetName}: ${facetValue}`);
     } catch (error) {
+      console.error('❌ Failed to load variant:', error);
       toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა");
     } finally {
       setIsLoadingVariant(false);
@@ -67,39 +85,31 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
-  // Fetch product variants from the same group
+  // Initialize selected facets from initial product ONLY on mount
   useEffect(() => {
-    let cancelled = false;
+    const initialFacets: Record<string, string> = {};
 
-    const fetchVariants = async () => {
-      if (!product.productGroupId) return;
-
-      try {
-        const groupVariants = await getProductVariants(product.id);
-        if (!cancelled) {
-          setVariants(groupVariants || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch variants:", error);
+    initialProduct.productFacetValues?.forEach(facet => {
+      if (facet.facetName && facet.facetValue) {
+        initialFacets[facet.facetName] = facet.facetValue;
       }
-    };
+    });
 
-    fetchVariants();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [product.id, product.productGroupId]);
+    setSelectedFacets(initialFacets);
+  }, []); // Empty deps - only run on mount
 
   // Fetch real-time stock quantity
-  const fetchStock = useCallback(async () => {
-    const TIMEOUT_MS = 8000;     
+  const fetchStock = useCallback(async (silent = false) => {
+    const TIMEOUT_MS = 8000;
     const MAX_RETRIES = 3;
 
     let attempt = 0;
 
-    setStockLoading(true);
-    setStockError(null);
+    // Only show loading state on initial load or non-silent updates
+    if (!silent) {
+      setStockLoading(true);
+      setStockError(null);
+    }
 
     while (attempt < MAX_RETRIES) {
       attempt++;
@@ -116,6 +126,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         setStockQuantity(stockInfo?.totalRest ?? 0);
         setStockLoading(false);
         setStockError(null);
+        setIsInitialLoad(false);
 
         return; // success
       } catch (err: any) {
@@ -126,9 +137,13 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
 
         if (attempt >= MAX_RETRIES || isOffline || isAbort) {
-          setStockQuantity(undefined); // “unknown”
+          // Only set error if not silent update
+          if (!silent) {
+            setStockQuantity(undefined); // "unknown"
+            setStockError("ვერ მოხერხდა მარაგის შემოწმება");
+          }
           setStockLoading(false);
-          setStockError("ვერ მოხერხდა მარაგის შემოწმება");
+          setIsInitialLoad(false);
 
           return;
         }
@@ -144,13 +159,16 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   useEffect(() => {
     let cancelled = false;
 
-    const run = async () => {
+    const run = async (silent = false) => {
       if (cancelled) return;
-      await fetchStock();
+      await fetchStock(silent);
     };
 
-    run();
-    const stockInterval = setInterval(run, 30_000);
+    // Initial load - show loading
+    run(false);
+
+    // Subsequent updates - silent (background refresh)
+    const stockInterval = setInterval(() => run(true), 30_000);
 
     return () => {
       cancelled = true;
@@ -180,12 +198,12 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   }, [product.id]);
 
   const handleAddToCart = async () => {
-    if (stockLoading) {
+    if (isInitialLoad && stockLoading) {
       toast.error("იტვირთება მარაგი… გთხოვთ მოითმინოთ");
 
       return;
     }
-    if (stockError) {
+    if (stockError && stockQuantity === undefined) {
       toast.error("ვერ მოხერხდა მარაგის შემოწმება. სცადეთ თავიდან.");
 
       return;
@@ -212,6 +230,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
     // Trigger fly-to-cart animation
     const imageElement = imageReviewRef.current?.getCurrentImageElement();
+
     if (imageElement) {
       await flyToCart(imageElement);
     }
@@ -224,7 +243,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       return;
     }
     handleAddToCart();
-    if (!stockLoading && !stockError) router.push("/cart");
+    if (!(isInitialLoad && stockLoading) && !stockError) router.push("/cart");
   };
 
   useEffect(() => {
@@ -250,55 +269,45 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   );
 
   const specs = useMemo(() => {
-    if (!product.productFacetValues?.length) return [];
+    if (!product.productFacetValues?.length) {
+      console.log('⚠️ No productFacetValues');
 
-    // Group current product's facets
+      return [];
+    }
+
+    console.log('📊 Building specs from facets:', product.productFacetValues);
+
+    // Group facets by facetName - each facet can have multiple values with different variant IDs
     const grouped = product.productFacetValues.reduce(
       (acc, f) => {
         const name = f.facetName ?? "";
 
         if (!acc[name]) acc[name] = [];
-        acc[name].push({
-          value: f.facetValue ?? "",
-          productVariantId: f.productVariantId,
-        });
+
+        // Only add if not already present (based on value)
+        const existing = acc[name].find(item => item.value === f.facetValue);
+
+        if (!existing) {
+          acc[name].push({
+            value: f.facetValue ?? "",
+            productVariantId: f.productVariantId,
+          });
+        }
 
         return acc;
       },
       {} as Record<string, Array<{ value: string; productVariantId?: string }>>,
     );
 
-    // For each facet group, find all unique values from variants
-    const enrichedSpecs = Object.entries(grouped).map(([facetName, currentFacetData]) => {
-      // Get all possible values for this facet from all variants in the group
-      const allValuesMap = new Map<string, string>(); // value -> productId
+    console.log('📦 Grouped facets:', grouped);
 
-      // Add current product's value
-      currentFacetData.forEach(f => {
-        allValuesMap.set(f.value, product.id);
-      });
+    // Convert grouped facets to specifications format
+    const enrichedSpecs = Object.entries(grouped).map(([facetName, facetValues]) => ({
+      facetName,
+      facetValues,
+    }));
 
-      // Add values from other variants
-      variants.forEach(variant => {
-        const variantFacet = variant.productFacetValues?.find(
-          vf => vf.facetName === facetName
-        );
-        if (variantFacet && variantFacet.facetValue) {
-          allValuesMap.set(variantFacet.facetValue, variant.id);
-        }
-      });
-
-      // Convert map to array of FacetValue objects
-      const facetValues = Array.from(allValuesMap.entries()).map(([value, productId]) => ({
-        value,
-        productVariantId: productId,
-      }));
-
-      return {
-        facetName,
-        facetValues,
-      };
-    });
+    console.log('✨ Final specs:', enrichedSpecs);
 
     return [
       {
@@ -306,7 +315,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         specifications: enrichedSpecs,
       },
     ];
-  }, [product.productFacetValues, product.id, variants]);
+  }, [product.productFacetValues]);
 
   const price = product.discountPrice ?? product.price;
   const originalPrice = product.discountPrice ? product.price : undefined;
@@ -314,17 +323,29 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   if (notFound) return <ProductNotFound />;
 
   return (
-    <div className="container mx-auto px-4 text-text-light dark:text-text-lightdark">
+    <div className="container mx-auto px-4 text-text-light dark:text-text-lightdark relative">
+      {/* Loading overlay when switching variants */}
+      {isLoadingVariant && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col items-center gap-4">
+            <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full" />
+            <div className="text-lg font-medium text-foreground">ვარიანტის ჩატვირთვა...</div>
+          </div>
+        </div>
+      )}
+
       <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">{product.name ?? "პროდუქტი"}</h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
-        <div className="flex-1 max-w-[800px] order-1 lg:order-1">
+        <div className={`flex-1 max-w-[800px] order-1 lg:order-1 transition-opacity duration-300 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
           <ImageReview ref={imageReviewRef} images={galleryImages} productName={product.name ?? ""} />
         </div>
 
-        <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">{product.name}</h1>
+        <h1 className={`text-3xl md:hidden block font-bold order-2 lg:order-2 transition-opacity duration-300 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
+          {product.name}
+        </h1>
 
-        <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit">
+        <div className={`order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit transition-opacity duration-300 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
           <ProductInfo
               brand={product.brand?.name ?? ""}
               condition={product.condition}
@@ -340,8 +361,8 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
               price={price}
               status={product.status}
               stock={stockQuantity}
-              stockError={stockError ?? undefined}   
-              stockLoading={stockLoading} 
+              stockError={stockError ?? undefined}
+              stockLoading={isInitialLoad && stockLoading}
               onAddToCart={handleAddToCart}
               onBuyNow={handleBuyNow}
             />
@@ -351,7 +372,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           <div
             dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
             className={[
-              "rich-content max-w-md mx-auto md:ml-5",
+              "rich-content max-w-xs mx-auto md:ml-5",
               "prose prose-sm dark:prose-invert",
               "prose-ul:list-disc prose-ol:list-decimal",
               "prose-li:my-1 prose-p:my-2",
@@ -363,22 +384,27 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       </div>
 
       {specs.map((g, i) => (
-        <div key={i} className="my-12">
+        <div key={i} className="my-12 relative">
           <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
             <span className="w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
             Specifications
           </h2>
-          {/* {isLoadingVariant && (
-            <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-3">
-              <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-              <span className="text-sm text-blue-700 dark:text-blue-300">იტვირთება ვარიანტი...</span>
+          {isLoadingVariant && (
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 rounded-2xl flex items-center justify-center">
+              <div className="flex items-center gap-3 bg-card p-4 rounded-lg shadow-lg">
+                <div className="animate-spin h-5 w-5 border-2 border-brand-primary border-t-transparent rounded-full" />
+                <span className="text-sm font-medium">Loading variant...</span>
+              </div>
             </div>
-          )} */}
-          <Specifications
-            specs={g.specifications}
-            onChange={handleFacetChange}
-            disabled={isLoadingVariant}
-          />
+          )}
+          <div className={`transition-opacity duration-200 ${isLoadingVariant ? 'opacity-50' : 'opacity-100'}`}>
+            <Specifications
+              disabled={isLoadingVariant}
+              specs={g.specifications}
+              value={selectedFacets}
+              onChange={handleFacetChange}
+            />
+          </div>
         </div>
       ))}
 

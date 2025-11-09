@@ -49,25 +49,57 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
     );
   }
 
+  // Create loading skeleton based on section type
+  const getLoadingSkeleton = (sectionType: string) => {
+    const commonClasses = "w-full animate-pulse bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900";
+
+    switch (sectionType) {
+      case 'Hero':
+      case 'HeroLifestyle':
+      case 'HeroBanner':
+      case 'HeroCategoryGrid':
+        return <div className={`${commonClasses} h-[400px] md:h-[500px] rounded-xl mb-4`} />;
+      case 'ProductRail':
+      case 'ProductGrid':
+        return (
+          <div className="py-8">
+            <div className={`${commonClasses} h-12 w-64 rounded-lg mb-6`} />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className={`${commonClasses} h-80 rounded-lg`} />
+              ))}
+            </div>
+          </div>
+        );
+      case 'CommercialBanner':
+        return <div className={`${commonClasses} h-64 rounded-xl mb-4`} />;
+      case 'BrandCarousel':
+      case 'BrandStrip':
+        return <div className={`${commonClasses} h-32 rounded-lg mb-4`} />;
+      default:
+        return <div className={`${commonClasses} h-64 rounded-lg mb-4`} />;
+    }
+  };
+
   return (
-    <div className="homepage-container  max-w-7xl mx-auto">
+    <div className="homepage-container max-w-7xl mx-auto">
       {sections.map((section, index) => {
         const Component = templateDefinition.registry[section.type];
 
         if (!Component) {
           console.warn(`Component not found for section type: ${section.type}`);
-
           return null;
         }
+
+        // First section (usually Hero) gets priority, rest are lazy loaded
+        const isPriority = index === 0;
 
         return (
           <Suspense
             key={`${section.type}-${section.order}-${index}`}
-            fallback={
-              <div className="" />
-            }
-          > 
-            <div className="animate-fadeIn">
+            fallback={getLoadingSkeleton(section.type)}
+          >
+            <div className={isPriority ? "" : "animate-fadeIn"}>
               <Component data={section.data} locale={locale} />
             </div>
           </Suspense>

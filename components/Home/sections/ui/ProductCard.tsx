@@ -216,10 +216,11 @@ export function ProductCard({
             <Image
               ref={imgRef as any}
               fill
-              unoptimized
               alt={product.name || "Product image"}
               className="object-cover"
+              loading={priority ? "eager" : "lazy"}
               priority={priority}
+              quality={priority ? 85 : 75}
               sizes="(max-width:640px) 90vw, (max-width:1024px) 40vw, 20vw"
               src={imageUrl}
             />

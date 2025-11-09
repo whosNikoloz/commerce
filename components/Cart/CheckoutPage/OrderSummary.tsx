@@ -46,10 +46,11 @@ export default function OrderSummary({
               <div key={`${item.id}`} className="flex gap-4">
                 <div className="relative">
                   <Image
-                    priority
                     alt={item.name}
                     className="rounded-lg object-cover"
                     height={80}
+                    loading="lazy"
+                    quality={75}
                     src={item.image || "/placeholder.png"}
                     width={80}
                   />

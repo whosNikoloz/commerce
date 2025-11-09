@@ -196,7 +196,7 @@ export default function CartDropdown() {
                   <div className="flex gap-2">
                     <Button
                       as={Link}
-                      className="flex-1 h-10 rounded-lg font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md hover:shadow-lg"
+                      className="flex-1 h-10 max-w- rounded-lg font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md hover:shadow-lg"
                       href="/cart"
                       onPress={onClose}
                     >

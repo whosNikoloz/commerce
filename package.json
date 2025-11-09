@@ -129,5 +129,11 @@
     "tailwind-variants": "0.1.20",
     "tailwindcss": "3.4.16",
     "typescript": "^5.9.2"
-  }
+  },
+  "browserslist": [
+    "defaults and supports es6-module",
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

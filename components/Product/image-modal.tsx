@@ -234,38 +234,47 @@ export default function ImageModal({
             </div>
 
             {/* Right rail */}
-            <aside className="w-full md:w-[350px] p-4 flex flex-col gap-4 bg-muted text-foreground overflow-y-auto">
+            <aside className="w-full md:w-[350px] p-4 md:p-6 flex flex-col gap-4 bg-background/50 dark:bg-neutral-900/50 border-l border-gray-200 dark:border-gray-800 overflow-y-auto backdrop-blur-sm">
               {!isMobile && (
                 <>
-                  <div className="text-lg font-semibold">{productName}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {description}
-                  </div>
+                  <div className="text-lg font-semibold text-foreground">{productName}</div>
+                  {description && (
+                    <div className="text-sm text-muted-foreground leading-relaxed">
+                      {description}
+                    </div>
+                  )}
                 </>
               )}
 
-              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[60vh] w-full mt-4">
-                {images.map((image, idx) => (
-                  <button
-                    key={idx}
-                    className={cn(
-                      "border rounded-md transition focus:outline-none",
-                      "border-border",
-                      "hover:ring-2 hover:ring-ring",
-                      currentIndex === idx ? "ring-2 ring-ring" : "opacity-80",
-                    )}
-                    onClick={() => setCurrentIndex(idx)}
-                  >
-                    <div className="relative w-16 h-16 md:w-24 md:h-24">
-                      <Image
-                        fill
-                        alt={`Thumbnail ${idx + 1}`}
-                        className="object-cover rounded-md"
-                        src={image}
-                      />
-                    </div>
-                  </button>
-                ))}
+              <div className="flex flex-col gap-3 max-h-[60vh] w-full mt-2">
+                <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
+                  {images.map((image, idx) => (
+                    <button
+                      key={idx}
+                      className={cn(
+                        "relative rounded-lg overflow-hidden transition-all duration-200 focus:outline-none group",
+                        "bg-white dark:bg-neutral-800",
+                        currentIndex === idx
+                          ? "ring-2 ring-primary shadow-lg scale-105"
+                          : "ring-1 ring-gray-200 dark:ring-gray-700 hover:ring-2 hover:ring-primary/50 hover:shadow-md opacity-70 hover:opacity-100",
+                      )}
+                      onClick={() => setCurrentIndex(idx)}
+                    >
+                      <div className="relative aspect-square w-full">
+                        <Image
+                          fill
+                          alt={`Thumbnail ${idx + 1}`}
+                          className="object-contain p-1"
+                          sizes="(max-width: 768px) 100px, 120px"
+                          src={image}
+                        />
+                      </div>
+                      {currentIndex === idx && (
+                        <div className="absolute inset-0 bg-primary/10 pointer-events-none" />
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </aside>
           </div>

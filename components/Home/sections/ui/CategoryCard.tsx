@@ -29,12 +29,13 @@ export function CategoryCard({
 
         <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
           <Image
-            src={imageUrl || "/placeholder.svg"}
             alt={category.name || "Category"}
-            fill
             className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            fill
+            loading="lazy"
+            quality={75}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            unoptimized
+            src={imageUrl || "/placeholder.svg"}
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent group-hover:from-black/90 group-hover:via-black/50 transition-all duration-500" />

@@ -218,6 +218,7 @@ export default function SearchForMobile({
     <>
       {forBottomNav ? (
         <div
+          aria-label="Open search"
           className="flex flex-col items-center h-6"
           role="button"
           tabIndex={0}
@@ -229,6 +230,7 @@ export default function SearchForMobile({
           <SearchIcon height={19} width={19}/>        </div>
       ) : (
         <button
+          aria-label="Open search"
           className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
           onClick={handleOpen}
           onKeyDown={(e) => {

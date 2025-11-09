@@ -193,11 +193,11 @@ export default function ProductHeader({
       </div>
 
       {hasAnyChip && (
-        <nav aria-label="Active filters" className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border/30">
+        <nav aria-label="Active filters" className="flex flex-wrap gap-2">
           {brandIds.map((id) => (
             <Badge
               key={`b-${id}`}
-              className="group gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 text-foreground hover:from-brand-primary/20 hover:to-brand-primary/10 hover:border-brand-primary/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
+              className="mt-4 pt-4 group gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 text-foreground hover:from-brand-primary/20 hover:to-brand-primary/10 hover:border-brand-primary/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
               variant="secondary"
             >
               {brandLookup?.[id] ?? id}
@@ -214,7 +214,7 @@ export default function ProductHeader({
           {conditions.map((c) => (
             <Badge
               key={`cond-${c}`}
-              className="gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 text-foreground hover:from-brand-primary/20 hover:to-brand-primary/10 hover:border-brand-primary/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
+              className="mt-4 pt-4 gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-brand-primary/10 to-brand-primary/5 border border-brand-primary/30 text-foreground hover:from-brand-primary/20 hover:to-brand-primary/10 hover:border-brand-primary/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
               variant="secondary"
             >
               {conditionLabel(c)}
@@ -230,7 +230,7 @@ export default function ProductHeader({
 
           {hasStock && (
             <Badge
-              className="gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border border-emerald-500/30 text-foreground hover:from-emerald-500/20 hover:to-emerald-500/10 hover:border-emerald-500/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
+              className="mt-4 pt-4 gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border border-emerald-500/30 text-foreground hover:from-emerald-500/20 hover:to-emerald-500/10 hover:border-emerald-500/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
               variant="secondary"
             >
               {stockLabel(filter.stockStatus)}
@@ -246,7 +246,7 @@ export default function ProductHeader({
 
           {hasPrice && (
             <Badge
-              className="gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 text-foreground hover:from-purple-500/20 hover:to-purple-500/10 hover:border-purple-500/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
+              className="mt-4 pt-4 gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 text-foreground hover:from-purple-500/20 hover:to-purple-500/10 hover:border-purple-500/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
               variant="secondary"
             >
               {`${filter.minPrice ?? 0}–${filter.maxPrice ?? "∞"}`}
@@ -267,7 +267,7 @@ export default function ProductHeader({
             return (
               <Badge
                 key={`fv-${id}`}
-                className="gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border border-blue-500/30 text-foreground hover:from-blue-500/20 hover:to-blue-500/10 hover:border-blue-500/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
+                className="mt-4 pt-4 gap-2 pl-3 pr-2 py-1.5 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border border-blue-500/30 text-foreground hover:from-blue-500/20 hover:to-blue-500/10 hover:border-blue-500/50 transition-all duration-200 rounded-lg shadow-sm hover:shadow-md"
                 data-facet-id={id}
                 title={`${name} (${id})`}
                 variant="secondary"
@@ -288,7 +288,7 @@ export default function ProductHeader({
           {activeFiltersCount > 0 && (
             <Badge
               aria-label="Clear all filters"
-              className="gap-2 pl-3 pr-2 py-1.5 cursor-pointer border-2 border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg font-semibold"
+              className="mt-4 pt-4 gap-2 pl-3 pr-2 py-1.5 cursor-pointer border-2 border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg font-semibold"
               variant="outline"
               onClick={_clearAll}
             >

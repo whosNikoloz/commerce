@@ -66,7 +66,7 @@ export default async function DynamicPage({
   // Check if the dynamic page exists
   const dynamicPage = tenant.dynamicPages?.pages.find(page => page.slug === slug);
 
-  if (!dynamicPage) {
+  if (!dynamicPage || !dynamicPage.active) {
     notFound();
   }
 

@@ -445,6 +445,7 @@ export type DynamicPageMetadata = {
 
 export type DynamicPageConfig = {
   slug: string;
+  active: boolean;
   metadata: DynamicPageMetadata;
   sections: DynamicPageSectionInstance[];
 };

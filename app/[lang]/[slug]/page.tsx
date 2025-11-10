@@ -23,6 +23,7 @@ export async function generateMetadata({
 
   // Get tenant configuration dynamically from API
   const tenant = await getTenantByHost(host);
+  const site = tenant.siteConfig;
 
   // Find the dynamic page
   const dynamicPage = tenant.dynamicPages?.pages.find(page => page.slug === slug);
@@ -34,12 +35,16 @@ export async function generateMetadata({
     };
   }
 
+  // Use page-specific ogImage, or fallback to site ogImage, or finally to logo
+  const ogImage = dynamicPage.metadata.ogImage
+    || (site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo);
+
   return i18nPageMetadataAsync({
     title: dynamicPage.metadata.title[lang],
     description: dynamicPage.metadata.description[lang],
     lang,
     path: `/${slug}`,
-    images: dynamicPage.metadata.ogImage ? [dynamicPage.metadata.ogImage] : [],
+    images: [ogImage],
     index: dynamicPage.metadata.index ?? true,
   });
 }

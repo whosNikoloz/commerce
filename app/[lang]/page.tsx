@@ -17,6 +17,9 @@ export async function generateMetadata({
   const { lang } = await params;
   const site = await getActiveSite();
 
+  // Use ogImage if available, otherwise fallback to logo
+  const ogImage = site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo;
+
   return i18nPageMetadataAsync({
     title: site.name ?? "Home",
     description:
@@ -24,7 +27,7 @@ export async function generateMetadata({
       "Premium products, fast delivery, secure checkout. Discover what's new, in stock, and on sale.",
     lang,
     path: "/",
-    images: [site.ogImage],
+    images: [ogImage],
     index: true,
   });
 }

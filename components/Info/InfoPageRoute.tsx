@@ -58,7 +58,11 @@ export async function generateInfoPageMetadata({
   const description = pageConfig?.metadata.description[lang as keyof typeof pageConfig.metadata.description]
     || fallbackDescription
     || `${title} - ${site.description || 'Learn more about our services and offerings'}`;
-  const ogImage = pageConfig?.metadata.ogImage || "/og/info-og.jpg";
+
+  // Use page-specific ogImage, or fallback to site ogImage, or finally to logo
+  const ogImage = pageConfig?.metadata.ogImage
+    || (site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo);
+
   const index = pageConfig?.metadata.index !== false; // Default to true
 
   return i18nPageMetadataAsync({

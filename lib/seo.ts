@@ -73,7 +73,16 @@ export async function toAbsoluteImages(siteCfg: SiteConfig, images?: string[]): 
   const BASE = await getBASE(siteCfg);
   const list = (images ?? []).map((src) => (src.startsWith("http") ? src : `${BASE}${src}`));
 
-  return list.length ? list : [BASE + siteCfg.ogImage];
+  // Fallback: use ogImage if available, otherwise use logo
+  const fallbackImage = siteCfg.ogImage && siteCfg.ogImage.trim()
+    ? siteCfg.ogImage
+    : siteCfg.logo;
+
+  const absoluteFallback = fallbackImage.startsWith("http")
+    ? fallbackImage
+    : `${BASE}${fallbackImage}`;
+
+  return list.length ? list : [absoluteFallback];
 }
 
 export async function buildI18nUrls(path: string, lang: string | Locale, siteCfg: SiteConfig) {

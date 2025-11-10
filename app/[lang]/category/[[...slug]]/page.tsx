@@ -110,6 +110,8 @@ export async function generateMetadata({
   let images: string[] | undefined;
   let index = true;
 
+  const site = await getActiveSite();
+
   if (categoryId) {
     const category = await getCategoryById(categoryId).catch(() => null);
 
@@ -118,7 +120,42 @@ export async function generateMetadata({
       description = query
         ? `Products in ${category.name} matching "${query}".`
         : (category.description ?? `Shop ${category.name} products.`);
-      if ((category as any)?.image) images = [(category as any).image as string];
+
+      // Try to get the first product image for better social sharing
+      const facets = ((category as any)?.facets as FacetModel[]) ?? [];
+      const { filter } = buildFilter(categoryId, sp, facets);
+      const firstProduct = await searchProductsByFilter({
+        filter,
+        page: 1,
+        pageSize: 1,
+        sortBy: "featured",
+      }).catch(() => ({ items: [] }));
+
+      // Priority: first product image > category image > site ogImage > site logo
+      if (firstProduct?.items?.[0]) {
+        const p = firstProduct.items[0] as any;
+        const productImage =
+          Array.isArray(p.images) && p.images.length > 0
+            ? p.images[0]
+            : typeof p.image === "string"
+              ? p.image
+              : null;
+
+        if (productImage) {
+          images = [productImage];
+        }
+      }
+
+      // Fallback to category image if no product image
+      if (!images && (category as any)?.image) {
+        images = [(category as any).image as string];
+      }
+
+      // Final fallback to site ogImage or logo
+      if (!images) {
+        images = [site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo];
+      }
+
       index = !query; // don't index search views
     } else {
       title = "Category not found";
@@ -129,6 +166,11 @@ export async function generateMetadata({
     title = query; // "Search results for ..." if you prefer
     description = `Browse products matching "${query}".`;
     index = false;
+  }
+
+  // Ensure images always has a fallback
+  if (!images) {
+    images = [site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo];
   }
 
   const path = categoryId ? `/category/${slug.join("/")}` : "/category";

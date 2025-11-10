@@ -15,6 +15,7 @@ import { getTenantByHost } from "@/lib/getTenantByHost";
 import ClientUADataFix from "@/components/ClientUADataFix";
 import { generateFontClassNames } from "@/lib/loadTenantFonts";
 import FloatingCompareButton from "@/components/compare/FloatingCompareButton";
+import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
 
 function normalizeHost(host?: string) {
   return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
@@ -28,13 +29,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const seo = site.seo || {};
 
   const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
-  const ogImageAbs = site.ogImage ? `${base}${site.ogImage}` : `${base}/og-image.jpg`;
+
+  // Use ogImage if available, otherwise fallback to logo
+  const ogImagePath = site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo;
+  const ogImageAbs = ogImagePath.startsWith("http") ? ogImagePath : `${base}${ogImagePath}`;
 
   // Build verification object
   const verification: Record<string, string> = {};
   if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
   if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
   if (seo.yandexVerification) verification.yandex = seo.yandexVerification;
+  if (seo.pinterestVerification) verification.pinterest = seo.pinterestVerification;
 
   return {
     metadataBase: new URL(base),
@@ -91,6 +96,7 @@ export default async function RootLayout({
   const tenant = await getTenantByHost(host);
   //console.log("🏗️ [LAYOUT SSR] Tenant loaded for host:", host, "→", tenant.siteConfig.name);
   const site = tenant.siteConfig;
+  const seo = site.seo || {};
   const style = themeToStyle(tenant.theme);
   const fontClassNames = generateFontClassNames(tenant.theme);
 
@@ -140,6 +146,9 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
           type="application/ld+json"
         />
+
+        {/* Analytics and Tracking Scripts */}
+        <AnalyticsScripts seo={seo} />
       </head>
       <body
         className={clsx(
@@ -147,6 +156,19 @@ export default async function RootLayout({
           fontClassNames,
         )}
       >
+        {/* GTM noscript fallback for body */}
+        {seo.googleTagManagerId && (
+          <noscript>
+            <iframe
+              height="0"
+              src={`https://www.googletagmanager.com/ns.html?id=${seo.googleTagManagerId}`}
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+              width="0"
+            />
+          </noscript>
+        )}
+
         <Providers
           initialTenant={tenant}
           themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}

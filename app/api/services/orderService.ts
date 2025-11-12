@@ -4,9 +4,8 @@ import { jwtDecode } from "jwt-decode";
 
 import { apiFetch } from "../client/fetcher";
 
-import { OrderDetail, OrderSummary, PagedResult, TrackingStep, WishlistItem } from "@/types/orderTypes";
+import { OrderDetail, OrderSummary, PagedResult, TrackingStep, UpdateOrderStatusModel, WishlistItem, OrderStatus } from "@/types/orderTypes";
 
-const SHOP_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Shop/";
 const ORDER_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Order/";
 const WISHLIST_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Wishlist/";
 
@@ -26,7 +25,24 @@ function getUserIdFromToken(): string {
   }
 }
 
-// Helper to convert C# model property names (PascalCase) to TypeScript (camelCase)
+// Helper to convert OrderStatus string from C# to enum number
+function convertOrderStatus(status: string | number): OrderStatus {
+  if (typeof status === 'number') return status as OrderStatus;
+
+  // Map string names to enum values
+  const statusMap: Record<string, OrderStatus> = {
+    'Pending': OrderStatus.Pending,
+    'Paid': OrderStatus.Paid,
+    'Processing': OrderStatus.Processing,
+    'Shipped': OrderStatus.Shipped,
+    'Delivered': OrderStatus.Delivered,
+    'Cancelled': OrderStatus.Cancelled,
+    'Refunded': OrderStatus.Refunded,
+  };
+
+  return statusMap[status] ?? OrderStatus.Pending;
+}
+
 function toCamelCase(obj: any): any {
   if (obj === null || obj === undefined) return obj;
   if (Array.isArray(obj)) return obj.map(toCamelCase);
@@ -37,8 +53,14 @@ function toCamelCase(obj: any): any {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+      let value = toCamelCase(obj[key]);
 
-      result[camelKey] = toCamelCase(obj[key]);
+      // Convert status field to enum number
+      if (camelKey === 'status' && typeof value === 'string') {
+        value = convertOrderStatus(value);
+      }
+
+      result[camelKey] = value;
     }
   }
 
@@ -92,24 +114,26 @@ export async function getMyOrders(page = 1, pageSize = 10): Promise<PagedResult<
         method: "GET",
     } as any);
 
-    // Convert PascalCase from C# to camelCase for TypeScript
     return toCamelCase(res) as PagedResult<OrderSummary>;
 }
 
-export async function getOrderById(id: string): Promise<OrderDetail> {
+export async function getOrderByIdForClient(id: string): Promise<OrderDetail> {
+    const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}?userId=${encodeURIComponent(getUserIdFromToken())}`;
 
-    const userId = getUserIdFromToken();
-    const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`;
+    const res = await apiFetch<any>(url, { method: "GET", requireAuth: true , failIfUnauthenticated : true  } as any);
 
-    const res = await apiFetch<any>(url, { method: "GET" } as any);
+    return toCamelCase(res) as OrderDetail;
+}
 
-    // Convert PascalCase from C# to camelCase for TypeScript
+export async function getOrderByIdForAdmin(id: string): Promise<OrderDetail> {
+    const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}`;
+
+    const res = await apiFetch<any>(url, { method: "GET", requireAuth: true , failIfUnauthenticated : true } as any);
+
     return toCamelCase(res) as OrderDetail;
 }
 
 export async function getTracking(trackingNumber: string): Promise<TrackingStep[]> {
-    // Note: This endpoint might not exist in your backend yet
-    // You may need to implement it or adjust the tracking retrieval logic
     const url = `${ORDER_BASE}track/${encodeURIComponent(trackingNumber)}`;
     const res = await apiFetch<ApiEnvelope<{ steps: TrackingStep[] }>>(url, { method: "GET" } as any);
 
@@ -117,12 +141,6 @@ export async function getTracking(trackingNumber: string): Promise<TrackingStep[
     throw new Error(res.error || "Failed to load tracking");
 }
 
-export async function cancelOrder(orderId: string): Promise<void> {
-    const userId = getUserIdFromToken();
-    const url = `${ORDER_BASE}cancel-order-${encodeURIComponent(orderId)}?userId=${encodeURIComponent(userId)}`;
-
-    await apiFetch<{ message: string }>(url, { method: "POST" } as any);
-}
 
 export async function downloadInvoiceFile(id: string) {
     const url = `${ORDER_BASE}${encodeURIComponent(id)}/invoice`;
@@ -180,4 +198,56 @@ export async function clearWishlist(): Promise<void> {
     const url = `${WISHLIST_BASE}clear-wishlist?userId=${encodeURIComponent(userId)}`;
 
     await apiFetch<{ message: string }>(url, { method: "DELETE" } as any);
+}
+
+export async function updateOrderStatus(statusModel: UpdateOrderStatusModel): Promise<void> {
+
+    const url = `${ORDER_BASE}update-order-status`;
+
+    const payload = {
+        OrderId: statusModel.orderId,
+        Status: statusModel.status,
+        Description: statusModel.description || null,
+        TrackingNumber: statusModel.trackingNumber || null,
+        EstimatedDelivery: statusModel.estimatedDelivery || null
+    };
+
+    await apiFetch<{ message: string }>(url, {
+        method: "PUT",
+        body: JSON.stringify(payload), requireAuth: true , failIfUnauthenticated : true 
+    } as any);
+}
+
+export async function getAllOrders(page = 1, pageSize = 10): Promise<PagedResult<OrderSummary>> {
+
+    const url = `${ORDER_BASE}get-all-orders?page=${page}&pageSize=${pageSize}`;
+    const res = await apiFetch<any>(url, {
+        method: "GET",
+        requireAuth: true,
+    } as any);
+
+    return toCamelCase(res) as PagedResult<OrderSummary>;
+}
+
+export async function cancelOrder(
+  id: string,
+  userId: string,
+  reason: string
+): Promise<{ message: string }> {
+  const url =
+    `${ORDER_BASE}cancel-order-${encodeURIComponent(id)}` +
+    `?userId=${encodeURIComponent(userId)}&reason=${encodeURIComponent(reason)}`;
+
+  try {
+    const res = await apiFetch<any>(url, { method: "POST", requireAuth: true , failIfUnauthenticated : true } as any);
+
+    return toCamelCase(res) as { message: string };
+  } catch (err: any) {
+    const msg =
+      err?.message ||
+      err?.response?.message ||
+      "Failed to cancel order. Please try again.";
+
+    throw new Error(msg);
+  }
 }

@@ -48,26 +48,26 @@ export async function createFacet(data: CreateFacetRequest) {
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
-    },
+    }, requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function updateFacet(model: FacetModel) {
   return apiFetch<OkString>(`${API_BASE}/update-facet`, {
     method: "PUT",
-    body: JSON.stringify(model),
+    body: JSON.stringify(model), requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function deleteFacet(facetId: string) {
   return apiFetch<OkString>(
     `${API_BASE}/delete-facet?facetId=${encodeURIComponent(facetId)}`,
-    { method: "DELETE" }
+    { method: "DELETE", requireAuth: true , failIfUnauthenticated : true  }
   );
 }
 
 export async function deleteFacetById(id: string) {
   return apiFetch<OkString>(`${API_BASE}/delete-facet-by-${id}`, {
-    method: "DELETE",
+    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }

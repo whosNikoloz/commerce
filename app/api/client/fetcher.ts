@@ -1,7 +1,23 @@
-export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
+export class AuthRequiredError extends Error {
+  status = 401 as const;
+  code = "AUTH_REQUIRED" as const;
+  constructor(message = "Authentication required") {
+    super(message);
+    this.name = "AuthRequiredError";
+  }
+}
+
+export interface ApiFetchOptions extends RequestInit {
+  requireAuth?: boolean;
+  failIfUnauthenticated?: boolean;
+}
+
+export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): Promise<T> {
   const isServer = typeof window === "undefined";
   const method = (options.method ?? "GET").toUpperCase();
-  const needsAuth = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
+
+  const needsAuth = ["POST", "PUT", "PATCH", "DELETE"].includes(method) ||
+                    options.requireAuth === true;
 
   const headers = new Headers(options.headers as Record<string, string> | undefined);
 
@@ -12,9 +28,9 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     headers.set("Content-Type", "application/json");
   }
 
-  if (needsAuth) {
-    let token: string | null | undefined;
+  let token: string | null | undefined = null;
 
+  if (needsAuth) {
     if (isServer) {
       const { cookies } = await import("next/headers");
 
@@ -28,8 +44,14 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
         token = null;
       }
     }
-    if (token)
+
+    if (!token && (options.failIfUnauthenticated)) {
+      throw new AuthRequiredError();
+    }
+
+    if (token) {
       headers.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
+    }
   }
 
   // if (!headers.has("X-Client-Domain")) {
@@ -46,9 +68,6 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   //     headers.set("X-Client-Domain", "ecom.resorter360.ge");
   //   }
   // }
-
-
-
   if (!headers.has("X-Client-Domain")) {
     if (isServer) {
       try {

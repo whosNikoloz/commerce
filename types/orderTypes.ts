@@ -1,11 +1,13 @@
-export type OrderStatus =
-    | "Pending"
-    | "Paid"
-    | "Processing"
-    | "Shipped"
-    | "Delivered"
-    | "Cancelled"
-    | "Refunded";
+// Enum matching DomainLayer.Common.Enums.OrderStatus from C# backend
+export enum OrderStatus {
+    Pending = 0,      // Order created, awaiting payment
+    Paid = 1,         // Payment successful
+    Processing = 2,   // Order being prepared/packaged
+    Shipped = 3,      // Order shipped to customer
+    Delivered = 4,    // Order delivered successfully
+    Cancelled = 5,    // Order cancelled by customer/admin
+    Refunded = 6      // Payment refunded to customer
+}
 
 export interface OrderItem {
     id: string;             // OrderItem ID (Guid from backend)
@@ -15,7 +17,6 @@ export interface OrderItem {
     price: number;          // numeric; format in UI
     quantity: number;
     sku?: string | null;
-    variant?: string | null; // OPTIONAL
 }
 
 export interface TrackingStep {
@@ -33,12 +34,22 @@ export interface OrderSummary {
     total: number;          // numeric
 }
 
+export interface UserModel {
+    id : string;
+    firstName : string;
+    lastName : string;
+    userName : string;
+    phoneNumber : string;
+    email : string;
+}
+
 export interface OrderDetail extends OrderSummary {
     orderItems: OrderItem[];
     shippingAddress: string;
     trackingNumber?: string | null;
     estimatedDelivery?: string | null;
     trackingSteps: TrackingStep[];
+    user : UserModel;
     currency: string;
 }
 
@@ -56,4 +67,13 @@ export interface WishlistItem {
     image?: string | null;
     price: number;
     currency: string;
+}
+
+
+export interface UpdateOrderStatusModel {
+    orderId: string;
+    status: OrderStatus;
+    description?: string;
+    trackingNumber?: string;
+    estimatedDelivery?: string;
 }

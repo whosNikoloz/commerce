@@ -23,19 +23,19 @@ export async function createFaq(
 
   return apiFetch<string>(`${API_BASE}/add-faq`, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function updateFaq(data: FAQModel): Promise<string> {
   return apiFetch<string>(`${API_BASE}/update-faq`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function deleteFaq(id: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-faq-by-${id}`, {
-    method: "DELETE",
+    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }

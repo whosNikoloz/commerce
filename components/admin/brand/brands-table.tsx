@@ -124,7 +124,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
     setBrands([draft, ...prev]);
     try {
-      const createdId: string = await createBrand(name, origin, description);
+      const createdId: string = await createBrand(name, origin, description, []);
 
       setBrands((list) => list.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
       toast.success("ბრენდი წარმატებით დაემატა.");

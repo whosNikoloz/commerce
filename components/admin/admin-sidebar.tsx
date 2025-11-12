@@ -1,11 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconColorFilter, IconBook } from "@tabler/icons-react";
+import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconBook } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
 import Link from "next/link";
-import { CreditCard, FileQuestionIcon } from "lucide-react";
+import { CreditCard, FileQuestionIcon, Package, TruckIcon } from "lucide-react";
+
+import { ProfileIcon } from "../icons";
 
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -42,6 +44,9 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     { label: "Facets", href: `/${currentLang}/admin/facets`, icon: <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
     ...(isFinaMerchant ? [{ label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> }] : []),
     { label: "Payments",    href: `/${currentLang}/admin/payments`,  icon: <CreditCard className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    { label: "Orders",    href: `/${currentLang}/admin/orders`,  icon: <Package className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    { label: "Customers",    href: `/${currentLang}/admin/customers`,  icon: <ProfileIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    { label: "Shippings",    href: `/${currentLang}/admin/shipping`,  icon: <TruckIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
     //{ label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
   ];
 
@@ -126,7 +131,7 @@ export const Logo = () => (
       className="whitespace-pre text-slate-900 dark:text-slate-100 font-bold text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 tracking-tight"
       initial={{ opacity: 0 }}
     >
-      Fina Devs
+      Demo
     </motion.span>
   </Link>
 );

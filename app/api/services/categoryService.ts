@@ -19,26 +19,26 @@ export async function getCategoryWithSubCategoriesById(id: string): Promise<Cate
 export async function updateCategory(data: CategoryModel): Promise<string> {
   return apiFetch<string>(`${API_BASE}/update-category`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function createCategory(data: CategoryModel): Promise<string> {
   return apiFetch<string>(`${API_BASE}/add-category`, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function deleteCategory(id: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-category-by-${id}`, {
-    method: "DELETE",
+    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function deleteImage(id: string, key: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
-    method: "DELETE",
+    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 export async function uploadCategoryImages(categoryid: string, files: File[]): Promise<string[]> {
@@ -55,7 +55,7 @@ export async function uploadCategoryImages(categoryid: string, files: File[]): P
 
   return apiFetch<string[]>(`${API_BASE}/images`, {
     method: "POST",
-    body: formData,
+    body: formData, requireAuth: true , failIfUnauthenticated : true 
   });
 }
 

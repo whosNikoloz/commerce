@@ -57,21 +57,21 @@ export async function syncProduct(finaProductId: number): Promise<SyncOk> {
 
   return apiFetch<SyncOk>(`${API_FINA_BASE}/sync-product/${finaProductId}`, {
     method: "POST",
-    body: "",
+    body: "", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function syncCharacteristics(): Promise<SyncOk> {
   return apiFetch<SyncOk>(`${API_FINA_BASE}/sync-characteristics`, {
     method: "POST",
-    body: "",
+    body: "", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 export async function fullSync(): Promise<SyncOk> {
   return apiFetch<SyncOk>(`${API_FINA_BASE}/full-sync`, {
     method: "POST",
-    body: "",
+    body: "", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 

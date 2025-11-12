@@ -64,12 +64,12 @@ export default function AddCategoryModal({
         parentId: formData.parentId || undefined,
         isActive: true,
         facets: [],
+        images: [],
       };
 
       await createCategory(categoryData);
       toast.success("Category created successfully");
 
-      // Reset form
       setFormData({
         name: "",
         description: "",

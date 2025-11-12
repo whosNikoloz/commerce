@@ -1,6 +1,8 @@
 "use client"
 
 import type React from "react"
+import type { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/orderTypes"
+
 
 import { useEffect, useMemo, useState } from "react"
 import {
@@ -28,6 +30,7 @@ import {
   CheckCircle2,
 } from "lucide-react"
 
+import { OrderStatus } from "@/types/orderTypes"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -40,12 +43,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
   getMyOrders,
   getWishlist,
-  getOrderById,
+  getOrderByIdForClient as getOrderById,
   getTracking,
   downloadInvoiceFile,
   removeFromWishlist,
 } from "@/app/api/services/orderService"
-import type { OrderDetail, OrderItem, OrderSummary, TrackingStep, WishlistItem } from "@/types/orderTypes"
 import { useUser } from "@/app/context/userContext"
 
 function cx(...cls: Array<string | false | null | undefined>) {
@@ -53,6 +55,10 @@ function cx(...cls: Array<string | false | null | undefined>) {
 }
 const currency = "GEL"
 const fmtMoney = (n: number) => new Intl.NumberFormat(undefined, { style: "currency", currency }).format(n ?? 0)
+
+function getStatusName(status: OrderStatus): string {
+  return OrderStatus[status] || "Unknown";
+}
 
 function NotificationArea({
   notifications,
@@ -140,6 +146,7 @@ export default function UserPanel() {
   // load orders
   useEffect(() => {
     let mounted = true
+
     ;(async () => {
       try {
         setLoadingOrders(true)
@@ -165,6 +172,7 @@ export default function UserPanel() {
   // load wishlist
   useEffect(() => {
     let mounted = true
+
     ;(async () => {
       try {
         setLoadingWishlist(true)
@@ -263,9 +271,24 @@ export default function UserPanel() {
     }))
 
   const handleViewOrder = async (orderId: string) => {
-    setActiveTab("orders")
+    // First load the order details
     await ensureOrderDetailLoaded(orderId)
-    setTimeout(() => toggleOrderExpansion(orderId), 60)
+    // Switch to orders tab
+    setActiveTab("orders")
+    // Wait for tab transition to complete, then expand the order
+    setTimeout(() => {
+      // Ensure the order is not already expanded
+      if (!expandedOrders.includes(orderId)) {
+        toggleOrderExpansion(orderId)
+      }
+      // Scroll to the order element if possible
+      setTimeout(() => {
+        const element = document.querySelector(`[data-order-id="${orderId}"]`)
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+      }, 100)
+    }, 150)
   }
 
   const dismissNotification = (orderId: string) =>
@@ -414,10 +437,10 @@ export default function UserPanel() {
                 <div className="flex items-center justify-between sm:justify-end gap-3">
                   <Badge
                     variant={
-                      order.status === "Delivered" ? "default" : order.status === "Shipped" ? "secondary" : "outline"
+                      order.status === OrderStatus.Delivered ? "default" : order.status === OrderStatus.Shipped ? "secondary" : "outline"
                     }
                   >
-                    {order.status}
+                    {getStatusName(order.status)}
                   </Badge>
                   <p className="font-semibold text-sm">{fmtMoney((order as OrderDetail).total ?? 0)}</p>
                   <Button size="sm" variant="outline" onClick={() => onView(order.id)}>
@@ -511,7 +534,7 @@ export default function UserPanel() {
 
               return (
                 <Collapsible key={order.id} open={expanded}>
-                  <div className="border rounded-lg overflow-hidden">
+                  <div className="border rounded-lg overflow-hidden" data-order-id={order.id}>
                     <CollapsibleTrigger asChild>
                       <div
                         aria-expanded={expanded}
@@ -549,14 +572,14 @@ export default function UserPanel() {
                         <div className="flex items-center justify-between sm:justify-end gap-3">
                           <Badge
                             variant={
-                              order.status === "Delivered"
+                              order.status === OrderStatus.Delivered
                                 ? "default"
-                                : order.status === "Shipped"
+                                : order.status === OrderStatus.Shipped
                                   ? "secondary"
                                   : "outline"
                             }
                           >
-                            {order.status}
+                            {getStatusName(order.status)}
                           </Badge>
                           {expanded ? (
                             <ChevronUp className="h-5 w-5 text-muted-foreground shrink-0" />
@@ -590,7 +613,6 @@ export default function UserPanel() {
                                     <p className="font-medium text-sm truncate">{item.name}</p>
                                     <p className="text-xs text-muted-foreground">
                                       Qty: {item.quantity}
-                                      {item.variant ? ` • ${item.variant}` : ""}
                                     </p>
                                   </div>
                                   <p className="font-semibold text-sm">{fmtMoney(item.price)}</p>
@@ -685,9 +707,9 @@ export default function UserPanel() {
                           <div className="flex flex-col sm:flex-row gap-2 pt-2">
                             <Button
                               className="flex-1 bg-transparent"
+                              disabled={orderActions[`track-${detail.id}`] === true || !detail.trackingNumber}
                               size="sm"
                               variant="outline"
-                              disabled={orderActions[`track-${detail.id}`] === true || !detail.trackingNumber}
                               onClick={() => handleTrackPackage(detail.id, detail.trackingNumber)}
                             >
                               <Truck className="h-4 w-4 mr-2" />
@@ -695,15 +717,15 @@ export default function UserPanel() {
                             </Button>
                             <Button
                               className="flex-1 bg-transparent"
+                              disabled={orderActions[`invoice-${detail.id}`] === true}
                               size="sm"
                               variant="outline"
-                              disabled={orderActions[`invoice-${detail.id}`] === true}
                               onClick={() => handleDownloadInvoice(detail.id)}
                             >
                               <Download className="h-4 w-4 mr-2" />
                               {orderActions[`invoice-${detail.id}`] ? "Downloading..." : "Invoice"}
                             </Button>
-                            {detail.status === "Delivered" && (
+                            {detail.status === OrderStatus.Delivered && (
                               <Button className="flex-1" size="sm" onClick={() => handleLeaveReview(detail.id)}>
                                 <Star className="h-4 w-4 mr-2" />
                                 Review
@@ -880,7 +902,7 @@ export default function UserPanel() {
         <CardContent className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center gap-3">
-              <img src="/visa.svg" alt="Visa" className="h-6 w-auto" />
+              <img alt="Visa" className="h-6 w-auto" src="/visa.svg" />
               <p className="font-medium">**** **** **** 1234</p>
               <Badge variant="secondary">Primary</Badge>
             </div>
@@ -895,7 +917,7 @@ export default function UserPanel() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center gap-3">
-              <img src="/mastercard.svg" alt="Mastercard" className="h-6 w-auto" />
+              <img alt="Mastercard" className="h-6 w-auto" src="/mastercard.svg" />
               <p className="font-medium">**** **** **** 5678</p>
             </div>
             <div className="flex gap-2">
@@ -946,7 +968,7 @@ export default function UserPanel() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14 border-2">
-            <AvatarImage src={"/avatars/default.png"} alt={user?.userName} />
+            <AvatarImage alt={user?.userName} src={"/avatars/default.png"} />
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
               {user?.userName?.charAt(0).toUpperCase() || "?"}
             </AvatarFallback>
@@ -970,7 +992,7 @@ export default function UserPanel() {
 
       <NotificationArea notifications={notifications} onDismiss={dismissNotification} />
 
-      <Tabs defaultValue={activeTab} onValueChange={(v) => setActiveTab(v)}>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v)}>
         <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="dashboard">
             <UserIcon className="h-4 w-4 mr-2" /> Dashboard

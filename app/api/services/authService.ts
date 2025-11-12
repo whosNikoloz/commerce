@@ -54,6 +54,8 @@ export async function loginAdmin({ email, password }: LoginRequest): Promise<Log
 
   return apiFetch<LoginAdminResponse>(`${AUTH_BASE}user-login?${params.toString()}`, {
     method: "POST",
+    requireAuth: false,
+    failIfUnauthenticated: false,
   });
 }
 

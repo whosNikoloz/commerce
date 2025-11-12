@@ -1,4 +1,5 @@
 import { Package, ShoppingCart, Users, DollarSign, TrendingUp, ArrowUpRight, Eye, BarChart3, Plus } from "lucide-react";
+import Link from "next/link";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -116,13 +117,16 @@ export default function AdminDashboard() {
                 </CardDescription>
               </div>
               <Button
+                asChild
                 className="border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 font-semibold shadow-sm hover:shadow-md"
                 size="sm"
                 variant="outline"
               >
-                <Eye className="mr-2 h-4 w-4" />
-                View All
-                <ArrowUpRight className="ml-2 h-4 w-4" />
+                <Link href="/admin/orders">
+                  <Eye className="mr-2 h-4 w-4" />
+                  View All
+                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </CardHeader>

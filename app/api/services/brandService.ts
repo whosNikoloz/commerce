@@ -15,15 +15,17 @@ export async function getBrandById(id: string): Promise<BrandModel> {
 export async function updateBrand(brand: BrandModel): Promise<string> {
   return apiFetch<string>(`${API_BASE}/update-brand`, {
     method: "PUT",
-    body: JSON.stringify(brand),
+    body: JSON.stringify(brand), requireAuth: true , failIfUnauthenticated : true 
   });
 }
+
 export async function createBrand(
   name: string,
   origin: string,
   description: string,
+  images: string[]
 ): Promise<string> {
-  const data = { name, origin, description };
+  const data = { name, origin, description, images };
 
   return apiFetch<string>(`${API_BASE}/add-brand`, {
     method: "POST",
@@ -31,19 +33,22 @@ export async function createBrand(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
 }
 
+
 export async function deleteBrand(id: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-brand-by-${id}`, {
-    method: "PUT",
+    method: "PUT", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 
 
 export async function deleteImage(id: string, key: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
-    method: "DELETE",
+    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 export async function uploadBrandImages(brandId: string, files: File[]): Promise<string[]> {
@@ -60,6 +65,6 @@ export async function uploadBrandImages(brandId: string, files: File[]): Promise
 
   return apiFetch<string[]>(`${API_BASE}/images`, {
     method: "POST",
-    body: formData,
+    body: formData, requireAuth: true , failIfUnauthenticated : true 
   });
 }

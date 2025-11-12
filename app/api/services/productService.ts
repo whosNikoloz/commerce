@@ -158,6 +158,7 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
   return apiFetch<string[]>(`${API_BASE}/images`, {
     method: "POST",
     body: formData,
+    requireAuth: true , failIfUnauthenticated : true 
   });
 }
 

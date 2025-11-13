@@ -32,9 +32,11 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
             /allow="([^"]*)"/i,
             (m, allowValue) => {
               const permissions = allowValue.split(';').map((p: string) => p.trim());
+
               if (!permissions.includes('xr-spatial-tracking')) {
                 permissions.push('xr-spatial-tracking');
               }
+
               return `allow="${permissions.join('; ')}"`;
             }
           );
@@ -47,6 +49,7 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
 
     // Prevent CLS and optimize loading for images
     let imageCount = 0;
+
     sanitized = sanitized.replace(
       /<img([^>]*)>/gi,
       (match, attrs) => {
@@ -54,8 +57,10 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
         // First image gets priority loading for LCP, rest get lazy
         if (!attrs.includes('loading=')) {
           const loading = imageCount === 1 ? 'eager' : 'lazy';
+
           return `<img${attrs} loading="${loading}"${imageCount === 1 ? ' fetchpriority="high"' : ''}>`;
         }
+
         return match;
       }
     );
@@ -70,6 +75,7 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
         }
         // Wrap in aspect-ratio container (16:9 default)
         const aspectRatio = width && height ? (height / width) * 100 : 56.25; // 16:9 = 56.25%
+
         return `<div style="position: relative; padding-bottom: ${aspectRatio}%; height: 0; overflow: hidden;"><iframe${before}${after} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">`;
       }
     );
@@ -85,6 +91,7 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
       const styleElement = document.createElement('style');
       // Scope all CSS selectors to this specific container
       const scopedCSS = scopeCSSToContainer(data.css, `[data-custom-html="${uniqueId}"]`);
+
       styleElement.textContent = scopedCSS;
       containerRef.current.appendChild(styleElement);
     }
@@ -106,12 +113,14 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
           ) {
             return match;
           }
+
           // Add scope selector
           return `${scopeSelector} ${selector.trim()}${separator}`;
         }
       );
     } catch (error) {
       console.error('Error scoping CSS:', error);
+
       return css;
     }
   };
@@ -135,8 +144,8 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
     >
       {/* Render sanitized custom HTML */}
       <div
-        className="custom-html-content"
         dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+        className="custom-html-content"
         style={{
           // Prevent layout shifts from content
           minHeight: 'auto',

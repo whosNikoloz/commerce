@@ -9,6 +9,7 @@ import EmptyCart from "./EmptyCart";
 import CartItems from "./CartItems";
 
 import { useCartStore } from "@/app/context/cartContext";
+import { getCachedMerchantType } from "@/app/context/tenantContext";
 import { getProductRestsByIds } from "@/app/api/services/productService";
 
 export type AvailabilityMap = Record<string, number>;
@@ -31,6 +32,14 @@ export default function CartPage() {
     let cancelled = false;
 
     async function load() {
+      // Only check availability for FINA merchants
+      const merchantType = getCachedMerchantType();
+      if (merchantType !== "FINA") {
+        setAvailability({});
+        setLoading(false);
+        return;
+      }
+
       if (productIds.length === 0) {
         setAvailability({});
         return;

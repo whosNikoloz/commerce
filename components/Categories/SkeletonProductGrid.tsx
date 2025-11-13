@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+
 import { SkeletonProductCard } from "./SkeletonProductCard";
 
 import { useIsMobile } from "@/hooks/use-mobile";

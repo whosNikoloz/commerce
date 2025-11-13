@@ -25,7 +25,11 @@ export default function AdminPage() {
 
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/auth/check", { method: "GET", cache: "no-store" });
+        const res = await fetch("/api/auth/check", {
+          method: "GET",
+          cache: "no-store",
+          credentials: "same-origin",
+        });
         const data = await res.json();
 
         if (cancelled) return;

@@ -5,9 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import ProductFilters from "./ProductFilters";
 import ProductHeader from "./ProductHeader";
-import ProductGrid from "./ProductGrid";
-import CategoryNotFound from "./not-found";
-import { SkeletonProductGrid } from "./SkeletonProductGrid";
 
 import { CategoryModel } from "@/types/category";
 import { BrandModel } from "@/types/brand";
@@ -20,6 +17,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import Loading from "@/app/[lang]/category/[[...slug]]/loading";
 import { buildFacetValueToFacetIdMap } from "@/lib/urlState";
+import ProductGrid from "../ProductGrid";
+import { SkeletonProductGrid } from "../SkeletonProductGrid";
+import CategoryNotFound from "./not-found";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 

@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 import { getProductRestsByIds } from "../api/services/productService";
 
+import { getCachedMerchantType } from "./tenantContext";
+
 export type CartItem = {
   discount: any;
   originalPrice?: ReactNode;
@@ -34,6 +36,7 @@ type CartState = {
   getSubtotal: () => number;
 
   checkAndAddToCart: (item: CartItem) => Promise<void>;
+  smartAddToCart: (item: CartItem) => Promise<void>;
 };
 
 /** ---------------- Secrets + Keys ---------------- */
@@ -127,37 +130,6 @@ const creator: StateCreator<CartState> = (set, get) => ({
 
   getSubtotal: () => get().cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
 
-  // checkAndAddToCart: async (item) => {
-  //   const variantKey = buildVariantKey(item.selectedFacets);
-
-  //   try {
-  //     const res =
-  //       typeof window !== "undefined"
-  //         ? await fetch("/api/check-product", {
-  //             method: "POST",
-  //             headers: { "Content-Type": "application/json" },
-  //             body: JSON.stringify({ id: item.id, variantKey }),
-  //           })
-  //         : null;
-
-  //     const ok =
-  //       !!res && res.ok
-  //         ? ((await res.json()) as { available: boolean; price?: number })
-  //         : { available: true };
-
-  //     if (!ok.available) {
-  //       toast.error("მარაგში აღარ არის");
-
-  //       return;
-  //     }
-
-  //     const merged = ok.price && ok.price > 0 ? { ...item, price: ok.price } : item;
-
-  //     get().addToCart(merged);
-  //   } catch {
-  //     toast.error("სერვერთან შემოწმება ვერ მოხერხდა");
-  //   }
-  // },
   checkAndAddToCart: async (item) => {
     try {
       const rests = await getProductRestsByIds({ prods: [item.id] });
@@ -180,7 +152,15 @@ const creator: StateCreator<CartState> = (set, get) => ({
       toast.error("სერვერთან კავშირი ვერ მოხერხდა");
     }
   },
+  smartAddToCart: async (item) => {
+    const merchantType = getCachedMerchantType();
 
+    if (merchantType === "FINA") {
+      await get().checkAndAddToCart(item);
+    } else {
+      get().addToCart(item);
+    }
+  },
 });
 
 const encryptedStorage: StateStorage = {

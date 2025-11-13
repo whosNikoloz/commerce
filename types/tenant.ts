@@ -1,19 +1,17 @@
-// ===== Core i18n types =====
 export type Locale = "ka" | "en";
 export type LocalizedText = { ka: string; en: string };
 export type LocalizedRich = { ka: string; en: string };
 
-// ===== Theme types =====
 export type ThemeVars = {
   mode: "light" | "dark";
   brand: {
-    primary: string; // "37 99 235"
-    primaryDark: string; // "44 109 238"
-    surface: string; // "241 245 249"
-    surfaceDark: string; // "2 6 23"
-    muted: string; // "226 232 240"
-    mutedDark: string; // "16 24 41"
-    accent?: string; // optional extras
+    primary: string;
+    primaryDark: string;
+    surface: string;
+    surfaceDark: string;
+    muted: string;
+    mutedDark: string;
+    accent?: string;
   };
   text: {
     light: string;
@@ -30,327 +28,12 @@ export type ThemeVars = {
   };
 };
 
-// ===== Template 1: Clean Sections =====
-export type Template1SectionType =
-  | "Hero"
-  | "ProductRail"
-  | "CommercialBanner"
-  | "AboutUs"
-  | "BrandCarousel"
-  | "CustomHTML";
-
-export type HeroData = {
-  categoriesTitle?: LocalizedText;
-  maxCategories?: number;
-  banners: Array<{
-    imageUrl: string;
-    mobileImageUrl?: string;
-    href: string;
-    alt: LocalizedText;
-    badge?: LocalizedText;
-    title?: LocalizedText;
-    description?: LocalizedText;
-  }>;
-  bannerHeight?: string;
-};
-
-export type HeroWithSearchData = {
-  headline: LocalizedText;
-  subheadline: LocalizedText;
-  searchPlaceholder: LocalizedText;
-  promoBadge?: LocalizedText;
-  imageUrl?: string;
-  cta?: { label: LocalizedText; href: string };
-};
-
-export type CategoryGridData = {
-  title: LocalizedText;
-  categories: Array<{
-    name: LocalizedText;
-    imageUrl: string;
-    href: string;
-    productCount?: number;
-  }>;
-};
-
-export type BrandCarouselData = {
-  title?: LocalizedText;
-};
-
-export type AboutUsData = {
-  title: LocalizedText;
-  description: LocalizedRich;
-  imageUrl?: string;
-  videoUrl?: string;
-  stats?: Array<{
-    value: string;
-    label: LocalizedText;
-  }>;
-  cta?: { label: LocalizedText; href: string };
-};
-
-export type DealCountdownData = {
-  title: LocalizedText;
-  endsAtISO: string;
-  dealItems: Array<{
-    sku: string;
-    title: LocalizedText;
-    image: string;
-    price: number;
-    originalPrice?: number;
-    href: string;
-  }>;
-};
-
 export type ProductRailData = {
-  customName?: string; // Optional custom name to identify this rail in admin (e.g., "Liquidated Laptops", "Premium Phones")
-  title: LocalizedText;
-  subtitle?: LocalizedText;
-  layout: "carousel" | "grid"; // Display as carousel or grid
-  columns?: 2 | 3 | 4 | 5 | 6; // Grid column count (only for grid layout)
-  limit: number;
-  viewAllHref: string;
-  // Filter options - use any combination
-  filterBy?: {
-    categoryIds?: string[]; // Filter by category IDs
-    brandIds?: string[]; // Filter by brand IDs
-    condition?: number[]; // Filter by condition enum (0=New, 1=Used, 2=LikeNew)
-    stockStatus?: number; // Filter by stock status enum (0=InStock, 1=OutOfStock)
-    isNewArrival?: boolean; // Filter for new arrivals
-    isLiquidated?: boolean; // Filter for liquidated items
-    isComingSoon?: boolean; // Filter for coming soon items
-    hasDiscount?: boolean; // Filter for items with discount
-    minPrice?: number;
-    maxPrice?: number;
-  };
-  sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
-};
-
-
-export type ReviewsData = {
-  title: LocalizedText;
-  reviews: Array<{
-    author: string;
-    rating: number;
-    text: LocalizedText;
-    date: string;
-    productName?: LocalizedText;
-  }>;
-};
-
-export type TrustBadgesData = {
-  badges: Array<{
-    icon: string;
-    title: LocalizedText;
-    description: LocalizedText;
-  }>;
-};
-
-export type NewsletterAppData = {
-  title: LocalizedText;
-  description: LocalizedText;
-  emailPlaceholder: LocalizedText;
-  ctaLabel: LocalizedText;
-  appLinks?: {
-    ios?: string;
-    android?: string;
-  };
-};
-
-// ===== Template 2: Home / Furniture =====
-export type Template2SectionType =
-  | "HeroLifestyle"
-  | "CategoryGrid"
-  | "ConfiguratorBlock"
-  | "ProductRail"
-  | "CustomerGallery"
-  | "BrandStory"
-  | "ReviewsWarranty"
-  | "Newsletter"
-  | "CustomHTML";
-
-export type HeroLifestyleData = {
-  headline: LocalizedText;
-  subheadline: LocalizedText;
-  imageUrl: string;
-  overlayOpacity?: number;
-  cta?: { label: LocalizedText; href: string };
-  secondaryCta?: { label: LocalizedText; href: string };
-};
-
-export type ConfiguratorBlockData = {
-  title: LocalizedText;
-  description?: LocalizedText;
-  steps: Array<{
-    label: LocalizedText;
-    options: Array<LocalizedText>;
-  }>;
-  cta?: { label: LocalizedText; href: string };
-};
-
-export type CustomerGalleryData = {
-  title: LocalizedText;
-  subtitle?: LocalizedText;
-  images: Array<{
-    url: string;
-    caption?: LocalizedText;
-    author?: string;
-  }>;
-  hashtag?: LocalizedText;
-};
-
-export type BrandStoryData = {
-  title: LocalizedText;
-  story: LocalizedRich;
-  imageUrl?: string;
-  videoUrl?: string;
-  stats?: Array<{
-    value: string;
-    label: LocalizedText;
-  }>;
-};
-
-export type ReviewsWarrantyData = {
-  title: LocalizedText;
-  reviews: Array<{
-    author: string;
-    rating: number;
-    text: LocalizedText;
-    date: string;
-  }>;
-  warrantyInfo: {
-    title: LocalizedText;
-    details: LocalizedText[];
-    icon?: string;
-  };
-};
-
-export type NewsletterData = {
-  title: LocalizedText;
-  description: LocalizedText;
-  emailPlaceholder: LocalizedText;
-  ctaLabel: LocalizedText;
-  privacyNote?: LocalizedText;
-};
-
-// ===== Template 3: Beauty / Health =====
-export type Template3SectionType =
-  | "HeroBanner"
-  | "CategoryGrid"
-  | "ReviewsWall"
-  | "ProductRail"
-  | "BundlePromo"
-  | "InfluencerHighlight"
-  | "NewsletterBeauty"
-  | "CustomHTML";
-
-// ===== Template 4: Casual Ecommerce =====
-export type Template4SectionType =
-  | "HeroCategoryGrid"
-  | "CommercialBanner"
-  | "BrandStrip"
-  | "CategoryCarousel"
-  | "ProductRail"
-  | "CustomHTML";
-
-export type HeroBannerData = {
-  headline: LocalizedText;
-  subheadline?: LocalizedText;
-  backgroundImage: string;
-  mobileBackgroundImage?: string;
-  cta?: { label: LocalizedText; href: string };
-  badge?: LocalizedText;
-};
-
-export type ReviewsWallData = {
-  title: LocalizedText;
-  reviews: Array<{
-    author: string;
-    avatar?: string;
-    rating: number;
-    text: LocalizedText;
-    verified: boolean;
-    productName?: LocalizedText;
-  }>;
-};
-
-export type BundlePromoData = {
-  title: LocalizedText;
-  description: LocalizedText;
-  bundles: Array<{
-    name: LocalizedText;
-    products: Array<{
-      sku: string;
-      name: LocalizedText;
-      image: string;
-    }>;
-    price: number;
-    originalPrice?: number;
-    savings?: LocalizedText;
-    href: string;
-  }>;
-};
-
-export type InfluencerHighlightData = {
-  title: LocalizedText;
-  videoUrl?: string;
-  images: string[];
-  influencer?: {
-    name: string;
-    handle: string;
-    avatar?: string;
-  };
-  captions?: LocalizedText[];
-  cta?: { label: LocalizedText; href: string };
-};
-
-// ===== Template 4 Section Data Types =====
-export type HeroCategoryGridData = {
-  headline: LocalizedText;
-  subheadline?: LocalizedText;
-  description?: LocalizedText;
-  badge?: LocalizedText;
-  backgroundImage?: string;
-  primaryCta?: { label: LocalizedText; href: string };
-  stats?: Array<{
-    value: string;
-    label: LocalizedText;
-  }>;
-  features?: Array<LocalizedText>;
-};
-
-export type BrandStripData = {
-  title?: LocalizedText;
-};
-
-export type CommercialBannerData = {
-  layout: "carousel" | "grid";
-  columns?: 1 | 2 | 3 | 4 | 5; // Grid column count (only for grid layout)
-  carouselStyle?: "full-width" | "grid"; // Carousel display style (only for carousel layout)
-  banners: Array<{
-    imageUrl: string;
-    mobileImageUrl?: string;
-    href: string;
-    alt: LocalizedText;
-    badge?: LocalizedText;
-  }>;
-};
-
-export type CategoryCarouselData = {
-  title: LocalizedText;
-  categories: Array<{
-    name: LocalizedText;
-    imageUrl: string;
-    href: string;
-    productCount?: number;
-  }>;
-};
-
-export type ProductGridData = {
   customName?: string;
   title: LocalizedText;
   subtitle?: LocalizedText;
-  columns?: 2 | 3 | 4; // Grid column count
+  layout: "carousel" | "grid";
+  columns?: 2 | 3 | 4 | 5 | 6;
   limit: number;
   viewAllHref: string;
   filterBy?: {
@@ -368,13 +51,116 @@ export type ProductGridData = {
   sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
 };
 
-export type CustomHTMLData = {
-  html: string; // The custom HTML content
-  css?: string; // Optional scoped CSS
-  padding?: "none" | "small" | "medium" | "large"; // Vertical padding
-  fullWidth?: boolean; // If true, spans full width without container
-  containerClass?: string; // Optional additional CSS classes for the container
+export type CommercialBannerData = {
+  layout: "carousel" | "grid";
+  columns?: 1 | 2 | 3 | 4 | 5;
+  carouselStyle?: "full-width" | "grid";
+  banners: Array<{
+    imageUrl: string;
+    mobileImageUrl?: string;
+    href: string;
+    alt: LocalizedText;
+    badge?: LocalizedText;
+  }>;
 };
+
+export type CustomHTMLData = {
+  html: string;
+  css?: string;
+  padding?: "none" | "small" | "medium" | "large";
+  fullWidth?: boolean;
+  containerClass?: string;
+};
+
+
+export type CommonSectionType =
+  | "CommercialBanner"
+  | "ProductRail"
+  | "CustomHTML";
+
+export type CommonSectionInstance =
+  | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
+  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
+  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
+
+export const COMMON_ALLOWED = [
+  "CommercialBanner",
+  "ProductRail",
+  "CustomHTML",
+] as const;
+
+export type HeroData = {
+  categoriesTitle?: LocalizedText;
+  maxCategories?: number;
+  banners: Array<{
+    imageUrl: string;
+    mobileImageUrl?: string;
+    href: string;
+    alt: LocalizedText;
+    badge?: LocalizedText;
+    title?: LocalizedText;
+    description?: LocalizedText;
+  }>;
+  bannerHeight?: string;
+};
+
+
+export type Template1SectionType = "Hero" | CommonSectionType;
+
+export type Template1SectionInstance =
+  | { type: "Hero"; enabled: boolean; order: number; data: HeroData }
+  | CommonSectionInstance;
+
+export const TEMPLATE_1_ALLOWED = ["Hero", ...COMMON_ALLOWED] as const;
+
+export type Template1Homepage = {
+  templateId: 1;
+  sections: Template1SectionInstance[];
+};
+
+export type HeroBrandData = {
+  backgroundImage?: string;
+  slides?: Array<{
+    imageUrl: string;
+    mobileImageUrl?: string;
+    href?: string;
+    alt: LocalizedText;
+    badge?: LocalizedText;
+    title?: LocalizedText;
+    description?: LocalizedText;
+  }>;
+
+  headline: LocalizedText;
+  subheadline?: LocalizedText;
+  badge?: LocalizedText;
+
+  primaryCta?: { label: LocalizedText; href: string };
+  secondaryCta?: { label: LocalizedText; href: string };
+
+  tiles?: Array<{
+    imageUrl: string;
+    href: string;
+    title: LocalizedText;
+    subtitle?: LocalizedText;
+  }>;
+};
+
+export type Template2SectionType = "HeroBrand" | CommonSectionType;
+
+export type Template2SectionInstance =
+  | { type: "HeroBrand"; enabled: boolean; order: number; data: HeroBrandData }
+  | CommonSectionInstance;
+
+export const TEMPLATE_2_ALLOWED = ["HeroBrand", ...COMMON_ALLOWED] as const;
+
+export type Template2Homepage = {
+  templateId: 2;
+  sections: Template2SectionInstance[];
+};
+
+export type Homepage = Template1Homepage | Template2Homepage;
+
+
 
 // ===== Info Pages Configuration =====
 export type InfoPageSlug =
@@ -415,7 +201,6 @@ export type InfoPagesConfig = {
   pages: InfoPage[];
 };
 
-
 export type DynamicPageSectionInstance =
   | {
       type: "ProductRail";
@@ -454,66 +239,7 @@ export type DynamicPagesConfig = {
   pages: DynamicPageConfig[];
 };
 
-// ===== Section instances with discriminated unions =====
-export type Template1SectionInstance =
-  | { type: "Hero"; enabled: boolean; order: number; data: HeroData }
-  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
-  | { type: "AboutUs"; enabled: boolean; order: number; data: AboutUsData }
-  | { type: "BrandCarousel"; enabled: boolean; order: number; data: BrandCarouselData }
-  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
 
-export type Template2SectionInstance =
-  | { type: "HeroLifestyle"; enabled: boolean; order: number; data: HeroLifestyleData }
-  | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
-  | { type: "ConfiguratorBlock"; enabled: boolean; order: number; data: ConfiguratorBlockData }
-  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "CustomerGallery"; enabled: boolean; order: number; data: CustomerGalleryData }
-  | { type: "BrandStory"; enabled: boolean; order: number; data: BrandStoryData }
-  | { type: "ReviewsWarranty"; enabled: boolean; order: number; data: ReviewsWarrantyData }
-  | { type: "Newsletter"; enabled: boolean; order: number; data: NewsletterData }
-  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
-
-export type Template3SectionInstance =
-  | { type: "HeroBanner"; enabled: boolean; order: number; data: HeroBannerData }
-  | { type: "CategoryGrid"; enabled: boolean; order: number; data: CategoryGridData }
-  | { type: "ReviewsWall"; enabled: boolean; order: number; data: ReviewsWallData }
-  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "BundlePromo"; enabled: boolean; order: number; data: BundlePromoData }
-  | { type: "InfluencerHighlight"; enabled: boolean; order: number; data: InfluencerHighlightData }
-  | { type: "NewsletterBeauty"; enabled: boolean; order: number; data: NewsletterData }
-  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
-
-export type Template4SectionInstance =
-  | { type: "HeroCategoryGrid"; enabled: boolean; order: number; data: HeroCategoryGridData }
-  | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
-  | { type: "BrandStrip"; enabled: boolean; order: number; data: BrandStripData }
-  | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData }
-  | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
-
-// ===== Homepage config per template =====
-export type Template1Homepage = {
-  templateId: 1;
-  sections: Template1SectionInstance[];
-};
-
-export type Template2Homepage = {
-  templateId: 2;
-  sections: Template2SectionInstance[];
-};
-
-export type Template3Homepage = {
-  templateId: 3;
-  sections: Template3SectionInstance[];
-};
-
-export type Template4Homepage = {
-  templateId: 4;
-  sections: Template4SectionInstance[];
-};
-
-export type Homepage = Template1Homepage | Template2Homepage | Template3Homepage | Template4Homepage;
 
 // ===== Merchant Type =====
 export type MerchantType = "FINA" | "CUSTOM";
@@ -653,45 +379,36 @@ export type SiteConfig = {
   pwa?: PWAConfig;
 };
 
-// ===== Updated TenantConfig =====
+export type NavbarVariant = 1 | 2;
+
+export type CartVariant = "dropdown" | "drawer";
+
+export type UIConfig = {
+  navbarVariant?: NavbarVariant;
+  cartVariant?: CartVariant;     
+};
+
+
 export type TenantConfig =
   | {
-    templateId: 1;
-    themeColor: string;
-    theme: ThemeVars;
-    homepage: Template1Homepage;
-    infoPages?: InfoPagesConfig; // Optional info pages configuration
-    dynamicPages?: DynamicPagesConfig; // Optional dynamic custom pages (e.g., /back-to-school)
-    merchantType?: MerchantType; // FINA users can sync, CUSTOM users add products manually
-    siteConfig: SiteConfig; // Site metadata and configuration
-  }
+      templateId: 1;
+      themeColor: string;
+      theme: ThemeVars;
+      homepage: Template1Homepage;
+      infoPages?: InfoPagesConfig;
+      dynamicPages?: DynamicPagesConfig;
+      merchantType?: MerchantType;
+      siteConfig: SiteConfig;
+      ui?: UIConfig;
+    }
   | {
-    templateId: 2;
-    themeColor: string;
-    theme: ThemeVars;
-    homepage: Template2Homepage;
-    infoPages?: InfoPagesConfig;
-    dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
-    siteConfig: SiteConfig;
-  }
-  | {
-    templateId: 3;
-    themeColor: string;
-    theme: ThemeVars;
-    homepage: Template3Homepage;
-    infoPages?: InfoPagesConfig;
-    dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
-    siteConfig: SiteConfig;
-  }
-  | {
-    templateId: 4;
-    themeColor: string;
-    theme: ThemeVars;
-    homepage: Template4Homepage;
-    infoPages?: InfoPagesConfig;
-    dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
-    siteConfig: SiteConfig;
-  };
+      templateId: 2;
+      themeColor: string;
+      theme: ThemeVars;
+      homepage: Template2Homepage;
+      infoPages?: InfoPagesConfig;
+      dynamicPages?: DynamicPagesConfig;
+      merchantType?: MerchantType;
+      siteConfig: SiteConfig;
+      ui?: UIConfig;
+    };

@@ -33,8 +33,21 @@ export async function getAllProducts(): Promise<ProductResponseModel[]> {
   return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-all-products`);
 }
 
-export async function getProductById(id: string): Promise<ProductResponseModel> {
-  return apiFetch<ProductResponseModel>(`${API_BASE}/get-products-by-${id}`);
+export async function getProductById(
+  id: string,
+  currentProductId?: string,
+  targetFacetValueId?: string
+): Promise<ProductResponseModel> {
+  const params = new URLSearchParams();
+  if (currentProductId) params.append('CurrentProductId', currentProductId);
+  if (targetFacetValueId) params.append('TargetFacetValueId', targetFacetValueId);
+
+  const queryString = params.toString();
+  const url = queryString
+    ? `${API_BASE}/get-products-by-${id}?${queryString}`
+    : `${API_BASE}/get-products-by-${id}`;
+
+  return apiFetch<ProductResponseModel>(url);
 }
 
 export async function getProductsByCategory(id: string): Promise<ProductRequestModel[]> {

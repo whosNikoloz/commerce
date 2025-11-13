@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Splide, SplideSlide, Splide as SplideCore } from "@splidejs/react-splide";
-import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 

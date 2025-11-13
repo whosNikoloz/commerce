@@ -10,7 +10,6 @@ interface HomeRendererProps {
 }
 
 export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
-  // 1) Validate homepage configuration
   let validatedHomepage;
 
   try {
@@ -55,8 +54,7 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
 
     switch (sectionType) {
       case 'Hero':
-      case 'HeroLifestyle':
-      case 'HeroBanner':
+      case 'HeroBrand':
       case 'HeroCategoryGrid':
         return <div className={`${commonClasses} h-[400px] md:h-[500px] rounded-xl mb-4`} />;
       case 'ProductRail':
@@ -73,16 +71,13 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
         );
       case 'CommercialBanner':
         return <div className={`${commonClasses} h-64 rounded-xl mb-4`} />;
-      case 'BrandCarousel':
-      case 'BrandStrip':
-        return <div className={`${commonClasses} h-32 rounded-lg mb-4`} />;
       default:
         return <div className={`${commonClasses} h-64 rounded-lg mb-4`} />;
     }
   };
 
   return (
-    <div className="homepage-container max-w-7xl mx-auto">
+    <div className="">
       {sections.map((section, index) => {
         const Component = templateDefinition.registry[section.type];
 

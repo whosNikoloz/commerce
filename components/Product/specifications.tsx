@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 interface FacetValue {
   value: string;
-  productVariantId?: string;
+  facetValueId?: string;
+  isReachable?: boolean;
+  isSelected?: boolean;
 }
 
 interface SpecificationsProps {
@@ -13,19 +15,9 @@ interface SpecificationsProps {
     facetValues: (string | FacetValue)[];
   }[];
   value?: Record<string, string>;
-  onChange?: (facetName: string, facetValue: string, productVariantId?: string) => void;
+  onChange?: (facetName: string, facetValue: string, facetValueId?: string) => void;
   disabled?: boolean;
 }
-
-const shallowEqual = (a: Record<string, string>, b: Record<string, string>) => {
-  const ak = Object.keys(a),
-    bk = Object.keys(b);
-
-  if (ak.length !== bk.length) return false;
-  for (const k of ak) if (a[k] !== b[k]) return false;
-
-  return true;
-};
 
 export function Specifications({ specs = [], value, onChange, disabled = false }: SpecificationsProps) {
   const multiFacetNames = useMemo(() => {
@@ -51,61 +43,37 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
     return d;
   }, [specs]);
 
-  const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
-  const userActionRef = useRef(false);
-  const lastEmittedRef = useRef<Record<string, string>>({});
-
-  // Sync local state from props - use ref to avoid infinite loops
-  const prevValueRef = useRef(value);
-  const prevSpecsRef = useRef(specs);
-
-  useEffect(() => {
-    // Only run if value or specs actually changed
-    const valueChanged = !shallowEqual(prevValueRef.current || {}, value || {});
-    const specsChanged = prevSpecsRef.current !== specs;
-
-    if (!valueChanged && !specsChanged) {
-      return;
-    }
-
-    prevValueRef.current = value;
-    prevSpecsRef.current = specs;
-
-    if (!specs.length) {
-      setSelectedValues({});
-      return;
-    }
+  // Compute selected values directly from specs and props during render
+  const computedSelectedValues = useMemo(() => {
+    if (!specs.length) return {};
 
     const next: Record<string, string> = {};
 
     specs.forEach(({ facetName, facetValues }) => {
-      const allowedValues = facetValues.map(fv => typeof fv === 'string' ? fv : fv.value);
-      const allowed = new Set(allowedValues);
+      // First, check if any value has isSelected=true
+      const selectedFromData = facetValues.find(fv =>
+        typeof fv === 'object' && fv.isSelected === true
+      );
 
-      // Use value from props if available, otherwise use default
-      const candidate = value?.[facetName] ?? defaults[facetName];
-
-      const firstValue = facetValues[0];
-      const defaultValue = typeof firstValue === 'string' ? firstValue : firstValue.value;
-      next[facetName] = allowed.has(String(candidate)) ? String(candidate) : defaultValue;
+      if (selectedFromData && typeof selectedFromData === 'object') {
+        next[facetName] = selectedFromData.value;
+      } else {
+        // Fallback to value prop or first value
+        const allowedValues = facetValues.map(fv => typeof fv === 'string' ? fv : fv.value);
+        const allowed = new Set(allowedValues);
+        const candidate = value?.[facetName] ?? defaults[facetName];
+        const firstValue = facetValues[0];
+        const defaultValue = typeof firstValue === 'string' ? firstValue : firstValue.value;
+        next[facetName] = allowed.has(String(candidate)) ? String(candidate) : defaultValue;
+      }
     });
 
-    setSelectedValues(next);
+    return next;
   }, [specs, value, defaults]);
 
-  // Remove the automatic emit - we now call onChange directly in handleSelect
-
-  const handleSelect = (facetName: string, val: string, productVariantId?: string) => {
-    setSelectedValues((prev) => {
-      if (prev[facetName] === val) return prev;
-      userActionRef.current = true;
-
-      return { ...prev, [facetName]: val };
-    });
-
-    // Immediately call onChange with the variant ID
+  const handleSelect = (facetName: string, val: string, facetValueId?: string) => {
     if (onChange) {
-      onChange(facetName, val, productVariantId);
+      onChange(facetName, val, facetValueId);
     }
   };
 
@@ -116,7 +84,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
           <div className="divide-y divide-border/30">
             {specs.map((spec, index) => {
               const isMulti = spec.facetValues.length > 1;
-              const selected = selectedValues[spec.facetName];
+              const selected = computedSelectedValues[spec.facetName];
 
               return (
                 <div
@@ -138,23 +106,25 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
                           <div className="flex flex-wrap justify-around gap-2 w-full">
                             {spec.facetValues.map((fv) => {
                               const facetValue = typeof fv === 'string' ? fv : fv.value;
-                              const variantId = typeof fv === 'object' ? fv.productVariantId : undefined;
+                              const facetValueId = typeof fv === 'object' ? fv.facetValueId : undefined;
+                              const isReachable = typeof fv === 'object' ? fv.isReachable ?? true : true;
                               const isSelected = selected === facetValue;
+                              const isDisabled = disabled || !isReachable;
 
                               return (
                                 <button
                                   key={facetValue}
                                   aria-pressed={isSelected}
-                                  disabled={disabled}
+                                  disabled={isDisabled}
                                   className={[
                                     "flex-1 min-w-[96px] text-center px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200 transform",
-                                    disabled ? "opacity-50 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]",
+                                    isDisabled ? "opacity-50 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]",
                                     isSelected
                                       ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg"
                                       : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
                                   ].join(" ")}
                                   type="button"
-                                  onClick={() => handleSelect(spec.facetName, facetValue, variantId)}
+                                  onClick={() => !isDisabled && handleSelect(spec.facetName, facetValue, facetValueId)}
                                 >
                                   {facetValue}
                                 </button>

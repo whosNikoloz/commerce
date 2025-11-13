@@ -1,9 +1,11 @@
 import { FacetTypeEnum } from "./enums";
 
 export interface ProductFacetValueResponseModel {
+  facetValueId: string;
   facetName?: string;
   facetValue?: string;
-  productVariantId?: string;
+  isReachable?: boolean,
+  isSelected?: boolean
 }
 
 export interface FacetFilterModel {

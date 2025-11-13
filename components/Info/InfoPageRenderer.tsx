@@ -2,7 +2,7 @@ import type { Locale } from "@/types/tenant";
 
 import { Suspense } from "react";
 
-import CustomHTML from "@/components/Home/sections/template4/CustomHTML";
+import CustomHTML from "@/components/Home/sections/ui/CustomHTML";
 
 interface InfoPageSection {
   enabled: boolean;

@@ -23,118 +23,78 @@ const nextConfig = {
         hostname: "finasyncecomm.s3.eu-central-1.amazonaws.com",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-        pathname: "/**",
-      },
+      { protocol: "https", hostname: "placehold.co", pathname: "/**" },
     ],
+    // ⚠️ Allowing SVGs is risky unless you sanitize them.
     dangerouslyAllowSVG: true,
-    contentDispositionType: "attachment",
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Remove the 'attachment' (it makes images download instead of display)
+    // contentDispositionType: "inline", // or just omit
+    // Let Next manage image CSP headers; keep your global CSP below.
+    // contentSecurityPolicy: undefined,
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 86400,
     unoptimized: false,
   },
-  // Enable compression
+
   compress: true,
-  // Enable React strict mode
   reactStrictMode: true,
-  // Performance optimizations
   poweredByHeader: false,
-  // Optimize package imports to reduce bundle size
+
   experimental: {
+    // Works with Turbopack – keeps bundles small by auto-modularizing imports
     optimizePackageImports: [
-      'lucide-react',
-      '@heroui/system',
-      '@heroui/card',
-      '@heroui/button',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-popover',
-      '@radix-ui/react-tabs',
-      '@radix-ui/react-select',
-      '@radix-ui/react-tooltip',
+      "lucide-react",
+      "@heroui/system",
+      "@heroui/card",
+      "@heroui/button",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-select",
+      "@radix-ui/react-tooltip",
     ],
   },
-  // Webpack optimizations for code splitting
-  webpack: (config, { isServer, dev }) => {
-    if (!isServer && !dev) {
-      // Better code splitting for heavy libraries
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          ...config.optimization.splitChunks,
-          cacheGroups: {
-            ...config.optimization.splitChunks?.cacheGroups,
-            // Separate heavy carousel libraries
-            carousel: {
-              test: /[\\/]node_modules[\\/](embla-carousel|swiper)[\\/]/,
-              name: 'carousel',
-              priority: 20,
-              reuseExistingChunk: true,
-            },
-            // Separate UI libraries
-            ui: {
-              test: /[\\/]node_modules[\\/](@heroui|@radix-ui)[\\/]/,
-              name: 'ui-libs',
-              priority: 15,
-              reuseExistingChunk: true,
-            },
-            // Separate icon libraries
-            icons: {
-              test: /[\\/]node_modules[\\/](lucide-react|@tabler)[\\/]/,
-              name: 'icons',
-              priority: 10,
-              reuseExistingChunk: true,
-            },
-          },
-        },
-      };
-    }
-    return config;
-  },
-  // Add security and caching headers
+
+  // ❌ Remove webpack() block – Turbopack ignores it and shows the warning.
+  // If you MUST keep it for production builds, see the dual-config example below.
+
   async headers() {
     const apiDomain = getApiDomain();
-    const connectSrc = ["'self'", "https://*.amazonaws.com", apiDomain].filter(Boolean).join(" ");
+    const connectSrcParts = [
+      "'self'",
+      "https://*.amazonaws.com",
+      apiDomain,
+      "https://vercel.live",
+      "wss://ws-us3.pusher.com",
+      // HMR / dev over your LAN + localhost
+      "ws://localhost:3000",
+      "ws://192.168.1.105:3000",
+    ].filter(Boolean);
 
     return [
       {
         source: "/:path*",
         headers: [
-          {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
-          // Content Security Policy
+          { key: "X-DNS-Prefetch-Control", value: "on" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://vercel.live",
+              // Dev often needs 'unsafe-inline' and 'unsafe-eval' (source maps/HMR)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
               "img-src 'self' data: blob: https://*.amazonaws.com https://media.veli.store https://picsum.photos https://placehold.co https://extra.ge",
               "font-src 'self' data: https://cdnjs.cloudflare.com",
-              `connect-src ${connectSrc} https://vercel.live wss://ws-us3.pusher.com`,
+              `connect-src ${connectSrcParts.join(" ")}`,
+              // Helpful for dev tools and HMR
+              "worker-src 'self' blob:",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
@@ -144,21 +104,11 @@ const nextConfig = {
       },
       {
         source: "/fonts/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
         source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
         source: "/_next/image/:path*",

@@ -50,12 +50,14 @@ const ProductCard = memo(function ProductCard({
   onAdd,
   selectedImageIndex,
   onSelectImage,
+  size = "default",
 }: {
   product: ProductResponseModel;
   viewMode: "grid" | "list";
   onAdd: (id: string) => void;
   selectedImageIndex: number;
   onSelectImage: (productId: string, idx: number) => void;
+  size?: "default" | "compact";
 }) {
   const { user } = useUser();
   const { lang } = useParams<{ lang?: string }>();
@@ -78,9 +80,9 @@ const ProductCard = memo(function ProductCard({
   const displayPrice = hasDiscount ? product.discountPrice! : product.price;
   const originalPrice = hasDiscount ? product.price : undefined;
 
-  const size = product.productFacetValues?.find((f) => f.facetName?.toLowerCase() === "size")?.facetValue;
+  //const size = product.productFacetValues?.find((f) => f.facetName?.toLowerCase() === "size")?.facetValue;
   const color = product.productFacetValues?.find((f) => f.facetName?.toLowerCase() === "color")?.facetValue;
-  const metaLine = [product.brand?.name, color, size, formatCondition(product.condition)]
+  const metaLine = [product.brand?.name, color, formatCondition(product.condition)]
     .filter(Boolean)
     .join(" • ");
 
@@ -91,6 +93,15 @@ const ProductCard = memo(function ProductCard({
   const discountPct = hasDiscount
     ? Math.max(0, Math.round(((product.price - product.discountPrice!) / product.price) * 100))
     : 0;
+
+  const isCompact = size === "compact";
+  const cardPadding = isCompact ? "p-1 sm:p-1.5 md:p-2" : "p-1 sm:p-2 md:p-3";
+  const titleSize = isCompact ? "text-[10px] sm:text-xs md:text-sm" : "text-xs sm:text-sm md:text-base lg:text-lg";
+  const priceSize = isCompact ? "text-sm sm:text-base md:text-lg" : "text-base sm:text-xl md:text-xl lg:text-2xl";
+  const metaSize = isCompact ? "text-[9px] sm:text-[10px]" : "text-[10px] sm:text-xs";
+  const badgeSize = isCompact ? "text-[8px] sm:text-[9px] px-1.5 py-0.5" : "text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1";
+  const minTitleHeight = isCompact ? "min-h-[1.5rem] sm:min-h-[2rem]" : "min-h-[2.5rem]";
+  const imageHeight = isCompact ? "h-40 sm:h-44 md:h-48" : "h-48 sm:h-56 md:h-64";
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: images.length > 1,
@@ -223,27 +234,27 @@ const ProductCard = memo(function ProductCard({
                 <div className="relative flex-1 flex flex-col">
                   <div
                     aria-live="polite"
-                    className="relative overflow-hidden rounded-t-2xl group/image bg-gradient-to-br from-muted/30 to-muted/10"
+                    className={cn("relative overflow-hidden rounded-t-2xl group/image bg-gradient-to-br from-muted/30 to-muted/10", isCompact && imageHeight)}
                   >
                     {/* Badges (left top) */}
                     <div className="absolute left-2 sm:left-3 top-2 sm:top-3 z-20 flex flex-col gap-1.5 sm:gap-2">
                       {showComingSoon && (
-                        <Badge className="bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-700 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-semibold">
+                        <Badge className={cn("bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-700 text-white border-0 shadow-xl backdrop-blur-md font-semibold", badgeSize)}>
                           <Clock3 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> Coming Soon
                         </Badge>
                       )}
                       {showNew && (
-                        <Badge className="bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-semibold">
+                        <Badge className={cn("bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 text-white border-0 shadow-xl backdrop-blur-md font-semibold", badgeSize)}>
                           <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> NEW
                         </Badge>
                       )}
                       {showClearance && (
-                        <Badge className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
+                        <Badge className={cn("bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white border-0 shadow-xl backdrop-blur-md font-bold", badgeSize)}>
                           <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> CLEARANCE
                         </Badge>
                       )}
                       {discountPct > 0 && (
-                        <Badge className="bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 text-white border-0 shadow-xl backdrop-blur-md text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 font-bold">
+                        <Badge className={cn("bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 text-white border-0 shadow-xl backdrop-blur-md font-bold", badgeSize)}>
                           −{discountPct}%
                         </Badge>
                       )}
@@ -259,7 +270,7 @@ const ProductCard = memo(function ProductCard({
                                 alt={`${product.name ?? "Product image"} ${idx + 1}`}
                                 className={cn(
                                   "w-full object-cover transition-transform duration-500 md:group-hover/image:scale-105",
-                                  viewMode === "grid" ? "aspect-square" : "h-40"
+                                  viewMode === "grid" ? (isCompact ? "h-full" : "aspect-square") : "h-40"
                                 )}
                                 height={800}
                                 priority={idx === 0}
@@ -324,14 +335,14 @@ const ProductCard = memo(function ProductCard({
                     )}
                   </div>
 
-                  <div className="p-1 sm:p-2 md:p-3 bg-gradient-to-b from-background/50 to-background mt-auto">
+                  <div className={cn("bg-gradient-to-b from-background/50 to-background mt-auto", cardPadding)}>
                     <div className="space-y-1">
                       {metaLine && (
-                        <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-medium truncate">
+                        <p className={cn("uppercase tracking-wider text-muted-foreground font-medium truncate", metaSize)}>
                           {metaLine}
                         </p>
                       )}
-                      <h3 className="font-semibold text-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-tight line-clamp-2 min-h-[2.5rem] md:group-hover:text-brand-primary transition-colors duration-300">
+                      <h3 className={cn("font-semibold text-foreground leading-tight line-clamp-2 md:group-hover:text-brand-primary transition-colors duration-300", titleSize, minTitleHeight)}>
                         {product.name ?? "Unnamed Product"}
                       </h3>
                     </div>
@@ -339,7 +350,7 @@ const ProductCard = memo(function ProductCard({
                     <div className="flex items-baseline gap-1.5 sm:gap-2 mt-1">
                       <span
                         itemScope
-                        className="font-bold text-base sm:text-xl md:text-xl lg:text-2xl text-foreground bg-clip-text"
+                        className={cn("font-bold text-foreground bg-clip-text", priceSize)}
                         itemProp="offers"
                         itemType="https://schema.org/Offer"
                       >
@@ -347,7 +358,7 @@ const ProductCard = memo(function ProductCard({
                         <span itemProp="price">{formatPrice(displayPrice)}</span>
                       </span>
                       {originalPrice && (
-                        <span className="text-xs sm:text-sm md:text-base text-muted-foreground/70 line-through">
+                        <span className={cn("text-muted-foreground/70 line-through", metaSize)}>
                           {formatPrice(originalPrice)}
                         </span>
                       )}
@@ -357,7 +368,7 @@ const ProductCard = memo(function ProductCard({
                       {inStock ? (
                         <>
                           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
-                          <span className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                          <span className={cn("text-emerald-700 dark:text-emerald-400 font-medium", metaSize)}>
                             In Stock
                           </span>
                         </>
@@ -471,7 +482,7 @@ const ProductCard = memo(function ProductCard({
 
 
 export default function ProductGrid({ products, viewMode }: ProductGridProps) {
-  const addToCart = useCartStore((s) => s.checkAndAddToCart);
+  const addToCart = useCartStore((s) => s.smartAddToCart);
   const [selectedImages, setSelectedImages] = useState<Record<string, number>>({});
 
   const handleAddToCart = (productId: string) => {
@@ -521,6 +532,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
               viewMode={viewMode}
               onAdd={handleAddToCart}
               onSelectImage={handleImageSelect}
+              size="compact"
             />
           </div>
         ) : (

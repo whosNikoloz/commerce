@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Heart, ShoppingCart, ArrowLeftRight, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useRef } from "react";
 
-import { cn, resolveImageUrl } from "@/lib/utils";
+import { cn, resolveImageUrl, formatPrice } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 
@@ -22,15 +21,15 @@ import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/servi
 import { useUser } from "@/app/context/userContext";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useCompareStore } from "@/app/context/compareContext";
-import { formatPrice } from "@/lib/utils";
 import { useFlyToCart } from "@/hooks/use-fly-to-cart";
 
 interface ProductCardProps {
   product: ProductResponseModel;
-  template?: 1 | 2 | 3;
+  template?: 1 | 2 ;
   className?: string;
   showActions?: boolean;
   priority?: boolean;
+  size?: "default" | "compact";
 }
 
 const templateStyles = {
@@ -52,15 +51,6 @@ const templateStyles = {
     cta: "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-white/90",
     oldPrice: "text-neutral-400 dark:text-zinc-500",
   },
-  3: {
-    card:
-      "rounded-lg border bg-white border-zinc-200 " +
-      "dark:bg-zinc-950 dark:border-zinc-800/80",
-    imageRadius: "rounded-t-lg",
-    title: "text-sm font-medium leading-snug line-clamp-2",
-    cta: "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-white/90",
-    oldPrice: "text-zinc-400 dark:text-zinc-500",
-  },
 } as const;
 
 export function ProductCard({
@@ -69,6 +59,7 @@ export function ProductCard({
   className,
   showActions = true,
   priority = false,
+  size = "default",
 }: ProductCardProps) {
   const { user } = useUser();
   const { lang } = useParams<{ lang?: string }>();
@@ -77,7 +68,7 @@ export function ProductCard({
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const addToCart = useCartStore((s) => s.checkAndAddToCart);
+  const addToCart = useCartStore((s) => s.smartAddToCart);
   const { addToCompare, removeFromCompare, isInCompare } = useCompareStore();
   const inCompare = mounted ? isInCompare(product.id) : false;
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -111,6 +102,19 @@ export function ProductCard({
       : "";
 
   const S = templateStyles[template];
+  const isCompact = size === "compact";
+  const titleSize = isCompact ? "text-[12px] sm:text-[13px]" : undefined;
+  const priceSize = isCompact ? "text-sm sm:text-base" : "text-xl";
+  const oldPriceSize = isCompact ? "text-[11px] sm:text-xs" : "text-sm";
+  const footerPadding = isCompact ? "p-2.5" : "p-4";
+  const actionIconSize = isCompact ? "h-7 w-7" : "h-9 w-9";
+  const addBtnHeight = isCompact ? "h-9" : "h-11";
+  const iconDimension = isCompact ? "h-3 w-3 sm:h-3.5 sm:w-3.5" : "h-4 w-4";
+  const minTitleHeight = isCompact ? "min-h-[1.75rem]" : "min-h-[2.5rem]";
+  const discountBadge = isCompact ? "text-[9px] px-1.5 py-[2px]" : "text-xs px-2.5 py-1";
+  const imgSizes = isCompact
+    ? "(max-width:640px) 45vw, (max-width:1024px) 24vw, 12vw"
+    : "(max-width:640px) 90vw, (max-width:1024px) 40vw, 20vw";
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -139,20 +143,6 @@ export function ProductCard({
     setAddingToCart(true);
 
     try {
-      // Import the stock check function dynamically
-      const { getProductRestsByIds } = await import("@/app/api/services/productService");
-
-      // Check stock availability
-      const stockResponse = await getProductRestsByIds({ prods: [p.id] });
-      const stockInfo = stockResponse.summedRests.find((s) => s.id === p.id);
-
-      if (!stockInfo || stockInfo.totalRest <= 0) {
-        toast.error("პროდუქტი მარაგში არ არის");
-        setAddingToCart(false);
-
-        return;
-      }
-
       const item: CartItem = {
         id: p.id,
         name: p.name ?? "Unnamed Product",
@@ -163,11 +153,13 @@ export function ProductCard({
         originalPrice: p.price,
       };
 
-      addToCart(item);
+      // smartAddToCart will handle stock check for FINA merchants
+      // and skip it for CUSTOM merchants
+      await addToCart(item);
       await flyToCart(imgRef.current);
     } catch (error) {
-      console.error("Error checking stock:", error);
-      toast.error("შეცდომა მარაგის შემოწმებისას");
+      console.error("Error adding to cart:", error);
+      toast.error("შეცდომა კალათაში დამატებისას");
     } finally {
       setAddingToCart(false);
     }
@@ -185,7 +177,6 @@ export function ProductCard({
 
       if (compareItems.length >= 4) {
         toast.error("მაქსიმუმ 4 პროდუქტის შედარება შესაძლებელია");
-
         return;
       }
       addToCompare(product);
@@ -220,15 +211,15 @@ export function ProductCard({
               className="object-cover"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
-              quality={priority ? 85 : 75}
-              sizes="(max-width:640px) 90vw, (max-width:1024px) 40vw, 20vw"
+              quality={priority ? 85 : 72}
+              sizes={imgSizes}
               src={imageUrl}
             />
           </AspectRatio>
 
           {discountPercent > 0 && (
             <div className="absolute left-3 top-3 pointer-events-none">
-              <div className="rounded-full bg-red-500 text-white text-xs font-bold px-2.5 py-1 shadow-sm">
+              <div className={cn("rounded-full bg-red-500 text-white font-bold shadow-sm", discountBadge)}>
                 -{discountPercent}%
               </div>
             </div>
@@ -237,24 +228,26 @@ export function ProductCard({
           {template !== 2 && showActions && (
             <div className="absolute right-3 top-3 flex gap-2 pointer-events-auto">
               {template === 1 && (
-                 <Button
-                className={cn(
-                  "rounded-full h-9 w-9 shadow-md",
-                  "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
-                  inCompare && "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                )}
-                size="icon"
-                type="button"
-                variant="secondary"
-                onClick={handleCompareToggle}
-              >
-                <ArrowLeftRight className="h-4 w-4" />
-                <span className="sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
-              </Button> 
+                <Button
+                  className={cn(
+                    "rounded-full shadow-md",
+                    actionIconSize,
+                    "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
+                    inCompare && "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                  )}
+                  size="icon"
+                  type="button"
+                  variant="secondary"
+                  onClick={handleCompareToggle}
+                >
+                  <ArrowLeftRight className={cn(iconDimension)} />
+                  <span className="sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
+                </Button>
               )}
               <Button
                 className={cn(
-                  "rounded-full h-9 w-9 shadow-md",
+                  "rounded-full shadow-md",
+                  actionIconSize,
                   "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
                   inWishlist && "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                 )}
@@ -268,7 +261,7 @@ export function ProductCard({
                   handleWishlistToggle(e);
                 }}
               >
-                <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+                <Heart className={cn(iconDimension, inWishlist && "fill-current")} />
                 <span className="sr-only">{inWishlist ? "Remove from wishlist" : "Add to wishlist"}</span>
               </Button>
             </div>
@@ -277,44 +270,40 @@ export function ProductCard({
       </CardContent>
 
       {/* CONTENT */}
-      <CardFooter className="relative pointer-events-none flex flex-col items-start gap-2.5 p-4 flex-1">
+      <CardFooter className={cn("relative pointer-events-none flex flex-col items-start gap-2.5 flex-1", footerPadding)}>
         <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
-            <meta content="USD" itemProp="priceCurrency" />
-            <meta content={displayPrice.toString()} itemProp="price" />
-            <meta
-              content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
-              itemProp="availability"
-            />
-            <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(displayPrice)}</span>
-            {hasDiscount && <span className={cn("text-sm line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
-          </div>
+          <meta content="USD" itemProp="priceCurrency" />
+          <meta content={displayPrice.toString()} itemProp="price" />
+          <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
+          <span className={cn(priceSize, "font-bold text-zinc-900 dark:text-zinc-100")}>{formatPrice(displayPrice)}</span>
+          {hasDiscount && <span className={cn(oldPriceSize, "line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
+        </div>
         <div className="mt-auto w-full space-y-2.5">
-          
-          
           <h3
             className={cn(
               S.title,
-              "text-zinc-900 dark:text-zinc-100 w-full min-h-[2.5rem] text-md line-clamp-2"
+              titleSize,
+              "text-zinc-900 dark:text-zinc-100 w-full",
+              minTitleHeight,
+              "line-clamp-2"
             )}
             itemProp="name"
           >
             {product.name || "Unnamed Product"}
           </h3>
 
-            {conditionLabel && product.condition !== Condition.New && (
-              <span
-                className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600
-                          dark:border-zinc-700 dark:text-zinc-300 line-clamp-2"
-              >
-                {conditionLabel}
-              </span>
-            )}
-
+          {conditionLabel && product.condition !== Condition.New && (
+            <span
+              className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300 line-clamp-2"
+            >
+              {conditionLabel}
+            </span>
+          )}
 
           {template === 2 && showActions ? (
             <div className="w-full flex items-stretch gap-2 pointer-events-auto">
               <Button
-                className={cn("h-11 flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
+                className={cn(addBtnHeight, "flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
                 disabled={!isInStock || product.isComingSoon || addingToCart}
                 type="button"
                 onClick={(e) => {
@@ -325,13 +314,15 @@ export function ProductCard({
               >
                 {addingToCart ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Checking...
+                    <Loader2 className={cn(iconDimension, "animate-spin")} />
+                    <span className="hidden sm:inline">Checking...</span>
+                    <span className="sm:hidden">Wait...</span>
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="h-4 w-4" />
-                    Add to cart
+                    <ShoppingCart className={cn(iconDimension)} />
+                    <span className="hidden sm:inline">Add to cart</span>
+                    <span className="sm:hidden">Add</span>
                   </>
                 )}
               </Button>
@@ -339,7 +330,8 @@ export function ProductCard({
               <Button
                 aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                 className={cn(
-                  "h-11 w-11 shrink-0 rounded-full border shadow-sm",
+                  addBtnHeight,
+                  "w-11 shrink-0 rounded-full border shadow-sm",
                   "bg-white hover:bg-white border-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:border-zinc-700",
                   inWishlist &&
                     "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
@@ -354,12 +346,12 @@ export function ProductCard({
                   handleWishlistToggle(e as any);
                 }}
               >
-                <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+                <Heart className={cn(iconDimension, inWishlist && "fill-current")} />
               </Button>
             </div>
           ) : (
             <Button
-              className={cn("w-full h-11 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2 pointer-events-auto", S.cta)}
+              className={cn("w-full rounded-xl font-medium shadow-sm flex items-center justify-center gap-2 pointer-events-auto", addBtnHeight, S.cta)}
               disabled={!isInStock || product.isComingSoon || addingToCart}
               type="button"
               onClick={(e) => {
@@ -370,13 +362,15 @@ export function ProductCard({
             >
               {addingToCart ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Checking...
+                  <Loader2 className={cn(iconDimension, "animate-spin")} />
+                  <span className="hidden sm:inline">Checking...</span>
+                  <span className="sm:hidden">Wait...</span>
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="h-4 w-4" />
-                  Add to cart
+                  <ShoppingCart className={cn(iconDimension)} />
+                  <span className="hidden sm:inline">Add to cart</span>
+                  <span className="sm:hidden">Add</span>
                 </>
               )}
             </Button>
@@ -388,7 +382,7 @@ export function ProductCard({
 }
 
 
-export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2 | 3 }) {
+export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2  }) {
   const S = templateStyles[template];
 
   return (

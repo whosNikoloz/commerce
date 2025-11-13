@@ -7,8 +7,6 @@ import type { PagedList } from "@/types/pagination";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import ProductGrid from "../CategoriesPage/ProductGrid";
-import { SkeletonProductGrid } from "../CategoriesPage/SkeletonProductGrid";
 
 import ProductHeader from "./ProductHeader";
 import ProductPagination from "./ProductPagination";
@@ -18,6 +16,8 @@ import { searchProducts, mapSort } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import ProductGrid from "../ProductGrid";
+import { SkeletonProductGrid } from "../SkeletonProductGrid";
 
 export default function SearchPage({ query = "" }: { query?: string }) {
   // ✅ store ALL categories (flat)

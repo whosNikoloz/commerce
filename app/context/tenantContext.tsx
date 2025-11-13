@@ -17,6 +17,33 @@ const TenantContext = createContext<TenantContextType>({
   refresh: async () => false,
 });
 
+export const getCachedTenantConfig = (): TenantConfig | null => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as Cached;
+
+    if (!parsed?.data || parsed.v !== CACHE_VERSION) return null;
+
+    return parsed.data;
+  } catch {
+    return null;
+  }
+};
+
+export const getCachedMerchantType = (): string | null => {
+  const cfg = getCachedTenantConfig();
+
+  console.log("📦 Cached tenant config:", cfg);
+  console.log("📦 Merchant Type from config:", cfg?.merchantType);
+
+  return cfg?.merchantType ?? null;
+};
+
 export const useTenant = () => useContext(TenantContext);
 
 const CACHE_KEY = "tenantConfig";

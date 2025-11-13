@@ -17,7 +17,7 @@ import CarouselRail from "@/components/rails/CarouselRail";
 interface ProductRailProps {
   data: ProductRailData;
   locale: Locale;
-  template?: 1 | 2 | 3;
+  template?: 1 | 2;
   className?: string;
 }
 
@@ -63,12 +63,24 @@ export default async function ProductRail({
   const isCarousel = data.layout === "carousel";
   const columns = data.columns || 4;
 
+  // Map column numbers to actual Tailwind classes
+  const getGridClass = (cols: number) => {
+    const colsMap: Record<number, string> = {
+      2: "grid grid-cols-2 md:grid-cols-2",
+      3: "grid grid-cols-2 md:grid-cols-3",
+      4: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
+      5: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5",
+      6: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
+    };
+    return colsMap[cols] || colsMap[4];
+  };
+
   const gridClass = isCarousel
-    ? "flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
-    : `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-${columns} gap-4 md:gap-6`;
+    ? "flex gap-3 md:gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+    : `${getGridClass(columns)} gap-3 md:gap-4`;
 
   const loadingSkeleton = (
-    <div className={className || "py-20 "}>
+    <div className={className || ""}>
       <div className="container mx-auto px-4">
         <div className="h-12 bg-muted rounded-lg w-64 mb-10 animate-pulse" />
         <div className={gridClass}>
@@ -93,7 +105,7 @@ export default async function ProductRail({
 
   return (
     <SectionContainer
-      className={className || "py-20 "}
+      className={className || ""}
       emptyMessage={getEmptyMessage()}
       error={error}
       isEmpty={!products || products.length === 0}
@@ -124,7 +136,7 @@ export default async function ProductRail({
           <div className={gridClass}>
             {products?.map((product) => (
               <div key={product.id} className="h-full">
-                <ProductCard product={product} showActions={true} template={template} />
+                <ProductCard product={product} showActions={true} size="compact" template={template} />
               </div>
             ))}
           </div>

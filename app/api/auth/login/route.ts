@@ -11,7 +11,8 @@ export async function POST(req: Request) {
 
     (await cookies()).set("admin_token", token, {
       httpOnly: true,
-      secure: true,
+      // Use secure cookies only in production to avoid issues on http://localhost
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 60 * 2,
       sameSite: "lax",

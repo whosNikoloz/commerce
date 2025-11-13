@@ -12,6 +12,7 @@ import { ImageReview, ImageReviewHandle } from "./image-review";
 import { ProductResponseModel } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
+import { getCachedMerchantType } from "@/app/context/tenantContext";
 import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
@@ -28,60 +29,87 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [stockLoading, setStockLoading] = useState(true);
   const [stockError, setStockError] = useState<string | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({});
-  const addToCart = useCartStore((s) => s.checkAndAddToCart);
+
+  // Initialize selectedFacets synchronously to avoid hydration mismatch
+  const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>(() => {
+    const initialFacets: Record<string, string> = {};
+
+    initialProduct.productFacetValues?.forEach(facet => {
+      if (facet.facetName && facet.facetValue && facet.isSelected) {
+        initialFacets[facet.facetName] = facet.facetValue;
+      }
+    });
+
+    return initialFacets;
+  });
+  const addToCart = useCartStore((s) => s.smartAddToCart);
   const isMobile = useIsMobile();
   const [notFound, setNotFound] = useState(false);
   const imageReviewRef = useRef<ImageReviewHandle>(null);
   const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
 
-  const handleFacetChange = (facetName: string, facetValue: string, productVariantId?: string) => {
-    if (!productVariantId) {
+  const handleFacetChange = async (facetName: string, facetValue: string, targetFacetValueId?: string) => {
+
+    if (!targetFacetValueId) {
+      console.log("Available product facet values:", product.productFacetValues);
+      toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა - facetValueId არ არის");
+
       return;
     }
 
-    if (productVariantId === product.id) {
-      return;
+    try {
+      const targetProduct = await getProductById(
+        product.id, 
+        product.id,
+        targetFacetValueId
+      );
+
+      if (!targetProduct || !targetProduct.id) {
+        toast.error("პროდუქტის ვარიანტი არ მოიძებნა");
+
+        return;
+      }
+
+      if (targetProduct.id === product.id) {
+        // Same variant, no need to navigate
+        return;
+      }
+
+      // Build the URL path for the variant
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const firstSegment = pathParts[0];
+
+      // Check if first segment is a valid locale
+      const isValidLocale = locales.includes(firstSegment as any);
+      const lang = isValidLocale ? firstSegment : null;
+
+      // Build the new path
+      const newPath = lang && lang !== defaultLocale
+        ? `/${lang}/product/${targetProduct.id}`
+        : `/product/${targetProduct.id}`;
+
+      // Navigate to the new variant page
+      router.push(newPath);
+    } catch (error) {
+      console.error("Error fetching product variant:", error);
+      toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა");
     }
-
-    // Build the URL path for the variant
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const firstSegment = pathParts[0];
-
-    // Check if first segment is a valid locale
-    const isValidLocale = locales.includes(firstSegment as any);
-    const lang = isValidLocale ? firstSegment : null;
-
-    // Build the new path
-    // If lang exists and is not default, include it in the URL
-    // If lang is default or doesn't exist, hide it from the URL
-    const newPath = lang && lang !== defaultLocale
-      ? `/${lang}/product/${productVariantId}`
-      : `/product/${productVariantId}`;
-
-    // Navigate to the new variant page
-    router.push(newPath);
   };
 
   const [similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
-  // Initialize selected facets from initial product ONLY on mount
-  // Only select facets where productVariantId matches the current product id
-  useEffect(() => {
-    const initialFacets: Record<string, string> = {};
-
-    initialProduct.productFacetValues?.forEach(facet => {
-      if (facet.facetName && facet.facetValue && facet.productVariantId === initialProduct.id) {
-        initialFacets[facet.facetName] = facet.facetValue;
-      }
-    });
-
-    setSelectedFacets(initialFacets);
-  }, []); // Empty deps - only run on mount
-
   // Fetch real-time stock quantity
   const fetchStock = useCallback(async (silent = false) => {
+    const merchantType = getCachedMerchantType();
+
+    if (merchantType !== "FINA") {
+      setStockLoading(false);
+      setIsInitialLoad(false);
+
+      return;
+    }
+
     const TIMEOUT_MS = 8000;
     const MAX_RETRIES = 3;
 
@@ -180,20 +208,25 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   }, [product.id]);
 
   const handleAddToCart = async () => {
-    if (isInitialLoad && stockLoading) {
-      toast.error("იტვირთება მარაგი… გთხოვთ მოითმინოთ");
+    // Only validate stock for FINA merchants
+    const merchantType = getCachedMerchantType();
 
-      return;
-    }
-    if (stockError && stockQuantity === undefined) {
-      toast.error("ვერ მოხერხდა მარაგის შემოწმება. სცადეთ თავიდან.");
+    if (merchantType === "FINA") {
+      if (isInitialLoad && stockLoading) {
+        toast.error("იტვირთება მარაგი… გთხოვთ მოითმინოთ");
 
-      return;
-    }
-    if (stockQuantity !== undefined && stockQuantity <= 0) {
-      toast.error("პროდუქტი მარაგში არ არის");
+        return;
+      }
+      if (stockError && stockQuantity === undefined) {
+        toast.error("ვერ მოხერხდა მარაგის შემოწმება. სცადეთ თავიდან.");
 
-      return;
+        return;
+      }
+      if (stockQuantity !== undefined && stockQuantity <= 0) {
+        toast.error("პროდუქტი მარაგში არ არის");
+
+        return;
+      }
     }
 
     const item: CartItem = {
@@ -208,7 +241,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       originalPrice: product.price,
     };
 
-    addToCart(item);
+    await addToCart(item);
 
     // Trigger fly-to-cart animation
     const imageElement = imageReviewRef.current?.getCurrentImageElement();
@@ -263,19 +296,32 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
         if (!acc[name]) acc[name] = [];
 
-        // Only add if not already present (based on value)
-        const existing = acc[name].find(item => item.value === f.facetValue);
+        // Check if this value already exists
+        const existingIndex = acc[name].findIndex(item => item.value === f.facetValue);
 
-        if (!existing) {
+        if (existingIndex >= 0) {
+          // Update existing entry, prioritizing isSelected=true
+          const existing = acc[name][existingIndex];
+
+          acc[name][existingIndex] = {
+            value: f.facetValue ?? "",
+            facetValueId: f.facetValueId ?? existing.facetValueId,
+            isReachable: f.isReachable ?? existing.isReachable,
+            isSelected: f.isSelected || existing.isSelected, // Keep true if either is true
+          };
+        } else {
+          // Value doesn't exist yet, add it
           acc[name].push({
             value: f.facetValue ?? "",
-            productVariantId: f.productVariantId,
+            facetValueId: f.facetValueId,
+            isReachable: f.isReachable,
+            isSelected: f.isSelected,
           });
         }
 
         return acc;
       },
-      {} as Record<string, Array<{ value: string; productVariantId?: string }>>,
+      {} as Record<string, Array<{ value: string; facetValueId?: string; isReachable?: boolean; isSelected?: boolean }>>,
     );
 
     // Convert grouped facets to specifications format
@@ -283,7 +329,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       facetName,
       facetValues,
     }));
-
 
     return [
       {

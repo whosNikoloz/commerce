@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useRef, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, ShoppingCartIcon, MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
+import HeaderCartButton from "./header-cart-button";
+
 
 import { useCartStore } from "@/app/context/cartContext";
 
 export default function CartDrawer() {
-  // 🔹 selectors (fine-grained)
   const cart = useCartStore((s) => s.cart);
   const cartLines = useCartStore((s) => s.cart.length);
   const totalQuantity = useCartStore((s) => s.getCount());
@@ -22,6 +23,7 @@ export default function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const quantityRef = useRef(cartLines);
   const closeCart = () => setIsOpen(false);
+  const handleClickCart = () => (isOpen ? setIsOpen(false) : setIsOpen(true));
 
   useEffect(() => {
     if (cartLines > 0 && cartLines !== quantityRef.current) {
@@ -31,16 +33,8 @@ export default function CartDrawer() {
 
   return (
     <>
-      <Badge color="danger" content={totalQuantity}>
-        <Button
-          isIconOnly
-          className="relative rounded-full bg-transparent"
-          variant="solid"
-          onPress={() => setIsOpen((v) => !v)}
-        >
-          <ShoppingCartIcon className="h-6 w-6" />
-        </Button>
-      </Badge>
+      <HeaderCartButton className="bg-transparent" onClick={handleClickCart} />
+      
 
       <Transition show={isOpen}>
         <Dialog className="relative z-50" onClose={closeCart}>
@@ -65,92 +59,101 @@ export default function CartDrawer() {
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <Dialog.Panel className="fixed right-0 top-0 h-full w-96 max-w-full bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 shadow-2xl rounded-l-xl overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">🛒 My Cart</h2>
-                <button className="hover:rotate-90 transition-transform" onClick={closeCart}>
-                  <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <Dialog.Panel className="fixed right-0 top-0 h-full w-[85%] sm:w-80 max-w-sm bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl rounded-l-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-3 py-3 sm:px-4 sm:py-3.5 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2">
+                  <ShoppingCartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-300" />
+                  <h2 className="text-sm sm:text-base font-bold text-gray-800 dark:text-white">My Cart</h2>
+                </div>
+                <button
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all hover:rotate-90"
+                  onClick={closeCart}
+                  aria-label="Close cart"
+                >
+                  <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-300" />
                 </button>
               </div>
 
               {cartLines === 0 ? (
-                <div className="flex flex-col items-center justify-center flex-1 p-6 text-center">
-                  <ShoppingCartIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
-                  <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
+                <div className="flex flex-col items-center justify-center flex-1 p-4 text-center">
+                  <ShoppingCartIcon className="h-12 w-12 sm:h-14 sm:w-14 text-gray-400 dark:text-gray-500" />
+                  <p className="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                     Your cart is empty.
                   </p>
                 </div>
               ) : (
                 <div className="flex flex-col h-full">
-                  <ul className="flex-1 overflow-y-auto p-6 space-y-4 pb-32">
+                  <ul className="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 pb-26">
                     {cart.map((item) => (
                       <li
                         key={`${item.id}}`}
-                        className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4"
+                        className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-2 gap-2"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
                           <Image
                             alt={item.name}
-                            className="w-16 h-16 object-cover rounded-md border border-gray-200 dark:border-gray-700"
-                            height={64}
+                            className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded border border-gray-200 dark:border-gray-700 flex-shrink-0"
+                            height={56}
                             src={item.image}
-                            width={64}
+                            width={56}
                           />
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-white truncate leading-tight">
                               {item.name}
                             </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">
                               ₾{item.price.toFixed(2)}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <button
-                            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition-colors"
+                            className="p-1 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             onClick={() =>
                               updateCartItem(
                                 item.id,
                                 Math.max(1, item.quantity - 1),
                               )
                             }
+                            aria-label="Decrease quantity"
                           >
-                            ➖
+                            <MinusIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                           </button>
-                          <span className="w-6 text-center font-medium text-gray-800 dark:text-white">
+                          <span className="w-5 text-center font-medium text-xs text-gray-800 dark:text-white">
                             {item.quantity}
                           </span>
                           <button
-                            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition-colors"
+                            className="p-1 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             onClick={() =>
                               updateCartItem(item.id, item.quantity + 1)
                             }
+                            aria-label="Increase quantity"
                           >
-                            ➕
+                            <PlusIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                           </button>
                           <button
                             aria-label="Remove item"
-                            className="ml-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                            className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors ml-0.5"
                             title="Remove item"
                             onClick={() => removeFromCart(item.id)}
                           >
-                            ✖️
+                            <TrashIcon className="h-3.5 w-3.5 text-red-500 dark:text-red-400" />
                           </button>
                         </div>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="sticky bottom-0 p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
-                    <div className="flex justify-between text-xl font-bold mb-4">
+                  <div className="sticky bottom-0 px-3 py-3 sm:px-4 sm:py-3.5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
+                    <div className="flex justify-between items-center text-sm sm:text-base font-bold mb-2.5">
                       <span className="text-gray-700 dark:text-gray-300">Total:</span>
-                      <span className="text-green-600 dark:text-green-400">
+                      <span className="text-brand-primary dark:text-brand-primaryDark">
                         ₾{subtotal.toFixed(2)}
                       </span>
                     </div>
-                    <button className="w-full py-3 text-center bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-colors mb-safe-area">
-                      🛒 Proceed to Checkout
+                    <button className="w-full py-2 sm:py-2.5 text-center bg-brand-primary dark:bg-brand-primaryDark hover:opacity-90 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98]">
+                      Proceed to Checkout
                     </button>
                   </div>
                 </div>

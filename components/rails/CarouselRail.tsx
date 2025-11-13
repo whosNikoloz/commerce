@@ -9,7 +9,7 @@ import '@splidejs/react-splide/css';
 
 type Props = {
   products: any[];
-  template?: 1 | 2 | 3;
+  template?: 1 | 2 ;
   columns?: number;
 };
 
@@ -20,9 +20,8 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
   const [isIntersecting, setIsIntersecting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const perPageDesktop = Math.min(Math.max(columns, 5), 8);
+  const perPageDesktop = 7;
 
-  // Lazy load carousel when in viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -73,10 +72,10 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
   // Don't show carousel for very few items
   if (products.length <= perPageDesktop) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
         {products.map((p) => (
           <div key={p.id} className="h-full">
-            <ProductCard product={p} showActions={true} template={template} />
+            <ProductCard product={p} showActions={true} template={template} size="compact" />
           </div>
         ))}
       </div>
@@ -121,27 +120,26 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
           arrows: true,
           drag: "free",
           trimSpace: true,    
-           snap: false,
+          snap: false,
           omitEnd: true,      
           focus: 0,
           perMove: 0,          
           flickPower: 500,
-          perPage: perPageDesktop,
           breakpoints: {
-            1536: { perPage: 6, gap: "1rem" },
-            1280: { perPage: 5, gap: "0.75rem" },
-            1024: { perPage: 4, gap: "0.75rem" },
-            768:  { perPage: 3, gap: "0.5rem" },
-            640:  { perPage: 2, gap: "0.5rem" },
+            2000: { perPage: perPageDesktop, gap: "0.75rem" },
+            1280: { perPage: 7, gap: "0.75rem" },
+            1024: { perPage: 6, gap: "0.75rem" },
+            768:  { perPage: 4, gap: "0.5rem" },
+            640:  { perPage: 3, gap: "0.5rem"},
             480:  { perPage: 2, gap: "0.5rem" },
           },
+
+         
         }}
       >
         {products.map((p) => (
-          <SplideSlide key={p.id} className="!h-auto">
-            <div className="h-full scale-90 sm:scale-95">
-              <ProductCard product={p} showActions={true} template={template} />
-            </div>
+          <SplideSlide key={p.id}>
+            <ProductCard product={p} showActions={true} template={template} size="compact" />
           </SplideSlide>
         ))}
       </Splide>

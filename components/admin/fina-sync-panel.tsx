@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { syncAll, fullSync, finaAuthenticate } from "@/app/api/services/syncService";
+import { syncAll, finaAuthenticate } from "@/app/api/services/syncService";
 import { downloadSyncLog, ChangeType } from "@/types/sync";
 
 type LogLevel = "info" | "success" | "error";
@@ -35,7 +35,8 @@ const levelColor: Record<LogLevel, string> = {
 };
 
 export default function FinaSyncPanel() {
-  const [status, setStatus] = useState<FinaSyncStatus | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [status, _setStatus] = useState<FinaSyncStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [logs, setLogs] = useState<LogItem[]>([]);
   const [lastSyncResult, setLastSyncResult] = useState<DetailedSyncResult | null>(null);
@@ -80,6 +81,7 @@ export default function FinaSyncPanel() {
       addLog("Sync-All started…", "info");
 
       const result = await syncAll();
+
       setLastSyncResult(result);
 
       // Check if backend provides detailed tracking
@@ -139,6 +141,7 @@ export default function FinaSyncPanel() {
         toast.success(`Sync completed! ${result.successCount} successful, ${result.failureCount} failed`);
       }
     } catch (e: any) {
+      // eslint-disable-next-line no-console
       console.error(e);
       addLog(`❌ Sync-All failed: ${e?.message ?? "Unknown error"}`, "error");
       toast.error("Sync-All failed");
@@ -155,6 +158,7 @@ export default function FinaSyncPanel() {
       addLog("Authorization finished.", "success");
       toast.success("Authorization finished");
     } catch (e: any) {
+      // eslint-disable-next-line no-console
       console.error(e);
       addLog(`Authorization failed: ${e?.message ?? "Unknown error"}`, "error");
       toast.error("Authorization failed");
@@ -163,21 +167,23 @@ export default function FinaSyncPanel() {
     }
   };
 
-  const onFullSync = async () => {
-    try {
-      setBusy(true);
-      addLog("Full Sync started…", "info");
-      await fullSync();
-      addLog("Full Sync finished.", "success");
-      toast.success("Full Sync finished");
-    } catch (e: any) {
-      console.error(e);
-      addLog(`Full Sync failed: ${e?.message ?? "Unknown error"}`, "error");
-      toast.error("Full Sync failed");
-    } finally {
-      setBusy(false);
-    }
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const _onFullSync = async () => {
+  //   try {
+  //     setBusy(true);
+  //     addLog("Full Sync started…", "info");
+  //     await fullSync();
+  //     addLog("Full Sync finished.", "success");
+  //     toast.success("Full Sync finished");
+  //   } catch (e: any) {
+  //     // eslint-disable-next-line no-console
+  //     console.error(e);
+  //     addLog(`Full Sync failed: ${e?.message ?? "Unknown error"}`, "error");
+  //     toast.error("Full Sync failed");
+  //   } finally {
+  //     setBusy(false);
+  //   }
+  // };
 
   const progressLabel = useMemo(() => {
     if (!status) return "—";
@@ -314,8 +320,8 @@ export default function FinaSyncPanel() {
                       <Button
                         className="gap-1.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                         size="sm"
-                        onClick={() => downloadSyncLog(lastSyncResult, "csv")}
                         title="Download sync log as CSV (Excel-compatible)"
+                        onClick={() => downloadSyncLog(lastSyncResult, "csv")}
                       >
                         <FileSpreadsheet className="h-3.5 w-3.5" />
                         CSV
@@ -323,8 +329,8 @@ export default function FinaSyncPanel() {
                       <Button
                         className="gap-1.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                         size="sm"
-                        onClick={() => downloadSyncLog(lastSyncResult, "json")}
                         title="Download sync log as JSON"
+                        onClick={() => downloadSyncLog(lastSyncResult, "json")}
                       >
                         <FileJson className="h-3.5 w-3.5" />
                         JSON
@@ -335,8 +341,8 @@ export default function FinaSyncPanel() {
                     <Button
                       className="gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                       size="sm"
-                      onClick={() => downloadSyncLog(lastSyncResult, "json")}
                       title="Download sync summary as JSON"
+                      onClick={() => downloadSyncLog(lastSyncResult, "json")}
                     >
                       <FileJson className="h-3.5 w-3.5" />
                       Download JSON

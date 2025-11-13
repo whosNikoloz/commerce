@@ -15,6 +15,7 @@ export function tOpt(
   locale: Locale
 ): string | undefined {
   if (!field) return undefined;
+
   return field[locale] || field.en;
 }
 

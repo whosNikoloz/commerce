@@ -190,6 +190,7 @@ const Search = ({
             exit={{ opacity: 0, y: -10 }}
             initial={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
+            // eslint-disable-next-line react/jsx-sort-props
             id="search-results"
             // Prevent input blur when clicking inside the panel
             onMouseDown={(e) => e.preventDefault()}

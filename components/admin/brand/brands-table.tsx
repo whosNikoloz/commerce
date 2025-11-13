@@ -72,6 +72,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
         setBrands(response || []);
         setError(null);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("Error fetching brands:", err);
         if (!cancelled) setError("Failed to load brands.");
       } finally {
@@ -95,6 +96,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     origin: string,
   ) => {
     const current = brands.find((p) => p.id === brandId);
+
     if (!current) return;
 
     const prev = brands;
@@ -111,6 +113,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       await updateBrand(patched);
       toast.success("ბრენდი წარმატებით განახლდა.");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to update brand", err);
       setBrands(prev);
       toast.error("ბრენდის განახლება ვერ მოხერხდა.");
@@ -129,6 +132,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       setBrands((list) => list.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
       toast.success("ბრენდი წარმატებით დაემატა.");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to create brand", err);
       setBrands(prev);
       toast.error("ბრენდის დამატება ვერ მოხერხდა.");
@@ -144,6 +148,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       await deleteBrand(brandId);
       toast.success("ბრენდი წაიშალა.");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to delete brand", err);
       setBrands(prev);
       toast.error("ბრენდის წაშლა ვერ მოხერხდა.");
@@ -156,7 +161,9 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
   const filteredBrands = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+
     if (!q) return brands;
+
     return brands.filter(
       (b) => (b.name ?? "").toLowerCase().includes(q) || (b.origin ?? "").toLowerCase().includes(q),
     );
@@ -241,8 +248,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                               alt={brand.name ?? "Brand"}
                               className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
                               height={64}
-                              width={64}
                               src={brand.images?.[0] || "/placeholder.png"}
+                              width={64}
                             />
                             {!!brand.images && brand.images.length > 1 && (
                               <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
@@ -337,9 +344,9 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                         fill
                         alt={brand.name ?? "Brand"}
                         className="object-cover"
-                        src={brand.images?.[0] || "/placeholder.png"}
-                        sizes="100vw"
                         priority={false}
+                        sizes="100vw"
+                        src={brand.images?.[0] || "/placeholder.png"}
                       />
                       {!!brand.images && brand.images.length > 1 && (
                         <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">

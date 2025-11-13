@@ -68,7 +68,8 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
         throw new Error(result.message || "Unauthorized");
       }
       onSuccess?.();
-    } catch (err: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_err: any) {
       setLoginError(
         lng === "ka" ? "მომხმარებელი ან პაროლი არასწორია" : "Invalid email or password",
       );
@@ -101,6 +102,7 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
 
       setTimeout(() => setLogLoader(false), 1000);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error:", error);
     }
   };

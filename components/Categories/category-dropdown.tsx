@@ -36,6 +36,7 @@ export default function CategoryDropdown() {
         setCategories(Array.isArray(data) ? data : []);
         hasLoadedRef.current = true;
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error("Failed to load categories", e);
       } finally {
         setLoading(false);

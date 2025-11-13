@@ -38,6 +38,7 @@ export async function getSubFacetValues(facetValueId: string) {
 
 
 export async function createFacet(data: CreateFacetRequest) {
+  // eslint-disable-next-line no-console
   console.log("Facet API Request:", {
     url: `${API_BASE}/add-facet`,
     payload: data,

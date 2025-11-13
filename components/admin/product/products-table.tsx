@@ -23,7 +23,6 @@ import {
 
 import { useTenant } from "@/app/context/tenantContext";
 import { getAllBrands } from "@/app/api/services/brandService";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -86,7 +85,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
   const [brands, setBrands] = useState<BrandModel[]>([]);
-  const [brandsLoading, setBrandsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_brandsLoading, setBrandsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearch = useDebounced(searchTerm, 250);
 
@@ -96,8 +96,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [sortBy, setSortBy] = useState<SortOption>("name");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_mounted, setMounted] = useState(false);
 
   const [isPending, startTransition] = useTransition();
 
@@ -113,10 +115,12 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     setBrandsLoading(true);
     getAllBrands()
       .then((data) => {
+        // eslint-disable-next-line no-console
         //console.log("✅ Brands loaded:", data);
         setBrands(data);
       })
       .catch((err) => {
+        // eslint-disable-next-line no-console
         console.error("❌ Failed to load brands:", err);
         toast.error("Failed to load brands");
       })
@@ -147,6 +151,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       } catch (err) {
         if (!aborted) {
           setError("Failed to load products");
+          // eslint-disable-next-line no-console
           console.error("Failed to fetch products", err);
         }
       } finally {
@@ -165,6 +170,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       setProducts((prev) => prev.filter((p) => p.id !== productId));
       toast.success("პროდუქტი წარმატებით წაიშალა");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to delete product", err);
       toast.error("პროდუქტის წაშლა ვერ მოხერხდა");
     }
@@ -201,6 +207,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       await updateProduct(patched);
       toast.success("პროდუქტი წარმატებით განახლდა");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to update product", err);
       toast.error("პროდუქტის განახლება ვერ მოხერხდა");
       setProducts(prev);
@@ -233,6 +240,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       await updateProduct(payload);
       toast.success("პროდუქტის ხილვადობა შეიცვალა");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to update product", err);
       toast.error("პროდუქტის განახლება ვერ მოხერხდა");
       setProducts(prev);
@@ -405,6 +413,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                         if (selectedCategoryId) {
                           getProductsByCategory(selectedCategoryId)
                             .then(setProducts)
+                            // eslint-disable-next-line no-console
                             .catch(console.error);
                         }
                       }}

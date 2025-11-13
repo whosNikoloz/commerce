@@ -176,8 +176,10 @@ const Template2HomepageSchema = z.object({
 });
 
 export type SectionComponent<T = any> = ComponentType<{ data: T; locale: "ka" | "en" }>;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-export type TemplateDefinition<TSectionType extends string = string, TSectionInstance = any> = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type TemplateDefinition<TSectionType extends string = string, _TSectionInstance = any> = {
   allowedSections: readonly TSectionType[];
   schema: z.ZodType;
   registry: Record<TSectionType, SectionComponent>;

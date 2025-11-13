@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Button } from "@heroui/button";
 
 import { type OAuthProvider } from "@/lib/oauth";
 import { useUser, Tokens } from "@/app/context/userContext";
-import { Button } from "@heroui/button";
 
 interface OAuthButtonsProps {
   onSuccess?: () => void;
@@ -32,6 +32,7 @@ export function OAuthButtons({ onSuccess, variant = "bordered", className }: OAu
 
         setConfig(data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Failed to fetch OAuth config:", error);
         toast.error("Failed to load OAuth configuration");
       }

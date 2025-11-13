@@ -8,6 +8,8 @@ import { Edit } from "lucide-react";
 import { toast } from "sonner";
 
 import FacetValuesEditor from "./facet-values-editor";
+import DisplayTypePicker from "./display-type-picker";
+import { DisplayTypePreview } from "./displaytype-preview";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +25,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { updateFacet } from "@/app/api/services/facetService";
 import { FacetValueNode } from "@/types/facet-ui";
-import DisplayTypePicker from "./display-type-picker";
-import { DisplayTypePreview } from "./displaytype-preview";
 
 function toTree(list: FacetValueModel[]): FacetValueNode[] {
   const map = new Map<string, FacetValueNode>();
@@ -111,6 +111,7 @@ export default function UpdateFacetModal({
       onUpdated?.(model);
       setOpen(false);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       toast.error("განახლება ვერ მოხერხდა");
     } finally {

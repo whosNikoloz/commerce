@@ -218,7 +218,7 @@ const ProductCard = memo(function ProductCard({
   );
 
   return (
-    <article itemScope itemType="https://schema.org/Product" className={viewMode === "grid" ? "flex flex-col h-full" : ""}>
+    <article itemScope className={viewMode === "grid" ? "flex flex-col h-full" : ""} itemType="https://schema.org/Product">
       <meta content={product.name ?? "Product"} itemProp="name" />
       {imgSrc && <meta content={imgSrc} itemProp="image" />}
 
@@ -529,10 +529,10 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
             <ProductCard
               product={product}
               selectedImageIndex={selectedImages[product.id] ?? 0}
+              size="compact"
               viewMode={viewMode}
               onAdd={handleAddToCart}
               onSelectImage={handleImageSelect}
-              size="compact"
             />
           </div>
         ) : (

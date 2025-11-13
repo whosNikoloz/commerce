@@ -39,6 +39,7 @@ export async function getProductById(
   targetFacetValueId?: string
 ): Promise<ProductResponseModel> {
   const params = new URLSearchParams();
+
   if (currentProductId) params.append('CurrentProductId', currentProductId);
   if (targetFacetValueId) params.append('TargetFacetValueId', targetFacetValueId);
 
@@ -189,6 +190,7 @@ export async function getAllProductGroups(
   brandId?: string
 ): Promise<ProductGroupModel[]> {
   const params = new URLSearchParams();
+
   if (categoryId) params.append("categoryId", categoryId);
   if (brandId) params.append("brandId", brandId);
 

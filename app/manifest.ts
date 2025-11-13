@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+
 import { headers } from "next/headers";
 
 import { getTenantByHost } from "@/lib/getTenantByHost";

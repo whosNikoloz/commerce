@@ -9,6 +9,8 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
+import { FacetSelector } from "./facet-selector";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,7 +33,6 @@ import {
 } from "@/components/ui/select";
 import { StockStatus, Condition } from "@/types/enums";
 import { createProduct, getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productService";
-import { FacetSelector } from "./facet-selector";
 
 interface AddProductModalProps {
   categories: CategoryModel[];
@@ -73,10 +74,14 @@ export default function AddProductModal({
         formData.categoryId || undefined,
         formData.brandId || undefined
       );
+
+      // eslint-disable-next-line no-console
       console.log('🔍 Fetched product groups:', groups);
+      // eslint-disable-next-line no-console
       console.log('🔍 First group structure:', groups[0]);
       setProductGroups(groups);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to fetch product groups:", error);
       toast.error("Failed to load product groups");
     } finally {
@@ -96,6 +101,7 @@ export default function AddProductModal({
 
     if (!formData.name || !formData.price || !formData.categoryId || !formData.brandId) {
       toast.error("Please fill in all required fields");
+
       return;
     }
 
@@ -142,6 +148,7 @@ export default function AddProductModal({
       setOpen(false);
       onProductAdded?.();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to create product:", error);
       toast.error("Failed to create product");
     } finally {
@@ -294,6 +301,7 @@ export default function AddProductModal({
                 disabled={loadingGroups || (!formData.categoryId && !formData.brandId)}
                 value={formData.productGroupId || undefined}
                 onValueChange={(value) => {
+                  // eslint-disable-next-line no-console
                   console.log('✅ Selected productGroupId:', value);
                   setFormData({ ...formData, productGroupId: value === "none" ? "" : value });
                 }}
@@ -304,7 +312,9 @@ export default function AddProductModal({
                 <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
                   <SelectItem value="none">None (standalone product)</SelectItem>
                   {productGroups.map((group) => {
+                    // eslint-disable-next-line no-console
                     console.log('🔍 Rendering group:', { id: group.id, name: group.name, fullObject: group });
+
                     return (
                       <SelectItem key={group.id} value={group.id}>
                         {group.name} (ID: {group.id})

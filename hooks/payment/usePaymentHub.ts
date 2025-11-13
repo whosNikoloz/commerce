@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { PaymentHubClient } from '@/lib/signalr-client';
 import type { PaymentStatusUpdate } from '@/types/payment';
+
+import { useEffect, useRef, useState } from 'react';
+
+import { PaymentHubClient } from '@/lib/signalr-client';
 
 export function usePaymentHub(paymentId: string | null, enabled: boolean = true) {
   const [status, setStatus] = useState<PaymentStatusUpdate | null>(null);
@@ -16,6 +18,7 @@ export function usePaymentHub(paymentId: string | null, enabled: boolean = true)
     const setupHub = async () => {
       try {
         const hub = new PaymentHubClient(paymentId);
+
         hubRef.current = hub;
 
         await hub.connect();
@@ -23,10 +26,12 @@ export function usePaymentHub(paymentId: string | null, enabled: boolean = true)
         setError(null);
 
         hub.onPaymentStatus((update) => {
+          // eslint-disable-next-line no-console
           console.log('Payment status update:', update);
           setStatus(update);
         });
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Failed to connect to payment hub:', err);
         setError('Failed to connect to payment updates');
         setIsConnected(false);

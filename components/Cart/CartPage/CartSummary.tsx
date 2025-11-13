@@ -32,7 +32,8 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
 
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<keyof typeof PROMO_CODES | null>(null);
-  const [shippingOption, setShippingOption] = useState<"standard" | "express" | "overnight">(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [shippingOption, _setShippingOption] = useState<"standard" | "express" | "overnight">(
     "standard",
   );
   const [showLoginPrompt, setShowLoginPrompt] = useState(autoShowLoginPrompt);
@@ -55,7 +56,8 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
   const tax = (subtotal - promoDiscount) * 0.08;
   const total = subtotal - promoDiscount + shipping + tax;
 
-  const applyPromoCode = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _applyPromoCode = () => {
     const code = promoCode.trim().toUpperCase() as keyof typeof PROMO_CODES;
 
     if (PROMO_CODES[code]) {
@@ -64,7 +66,8 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
     }
   };
 
-  const removePromoCode = () => setAppliedPromo(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _removePromoCode = () => setAppliedPromo(null);
 
   // Update showLoginPrompt when autoShowLoginPrompt changes
   useEffect(() => {
@@ -76,6 +79,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
   const handleCheckoutClick = () => {
     if (!user) {
       setShowLoginPrompt(true);
+
       return;
     }
     router.push("/cart/checkout");

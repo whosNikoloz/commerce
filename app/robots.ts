@@ -1,5 +1,6 @@
 // app/robots.ts
 import type { MetadataRoute } from "next";
+
 import { headers } from "next/headers";
 
 import { locales } from "@/i18n.config";

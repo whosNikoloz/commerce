@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
@@ -120,13 +121,13 @@ function ProductCardSkeleton() {
 function ProductGridSkeleton({ count }: { count: number }) {
   return (
     <div
-      role="list"
       className={cn(
         // EXACT SAME LAYOUT AS REAL GRID:
         "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6",
         // ensure items stretch (no right-side stacking)
         "justify-items-stretch items-stretch w-full"
       )}
+      role="list"
     >
       {Array.from({ length: count }).map((_, i) => (
         <ProductCardSkeleton key={i} />

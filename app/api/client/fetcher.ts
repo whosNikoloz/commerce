@@ -98,6 +98,7 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
 
   const res = await fetch(url, fetchOptions);
 
+  // eslint-disable-next-line no-console
   //console.log("Fetch", method, url, res.status, options.body ? options.body : "");
 
   const ct = res.headers.get("content-type") || "";
@@ -107,6 +108,7 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
       ? JSON.stringify(await res.json())
       : await res.text();
 
+    // eslint-disable-next-line no-console
     console.error(`❌ API Error [${method} ${url}]:`, res.status, msg);
     throw new Error(`Error ${res.status}: ${msg}`);
   }
@@ -115,6 +117,7 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
 
   // Log tenant configuration responses for debugging
   if (url.includes("/Tenant/tenant-configuration")) {
+    // eslint-disable-next-line no-console
     //console.log("📦 Tenant config response:", JSON.stringify(result, null, 2));
   }
 

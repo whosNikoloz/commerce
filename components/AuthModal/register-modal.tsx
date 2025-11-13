@@ -152,6 +152,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
 
     // Validate password with all rules
     const passwordValidation = validatePassword(password);
+
     if (!passwordValidation.isValid) {
       setRegPasswordError(passwordValidation.errors.join(", "));
 
@@ -186,13 +187,15 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
     setIsLoading(true);
     try {
       // Submit with verification code
-      const tokens = await registerCustomer({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const _tokens = await registerCustomer({
         firstName: username,
         lastName: "",
         email,
         password,
         verifyCode: Number(verifyCode) || 0,
       });
+
       onSwitchMode("login");
     } catch (e: any) {
       setRegError(typeof e?.message === "string" ? e.message : "Registration failed");
@@ -218,6 +221,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
     if (!password) return;
 
     const passwordValidation = validatePassword(password);
+
     setRegPasswordError(
       passwordValidation.isValid ? "" : passwordValidation.errors.join(", ")
     );

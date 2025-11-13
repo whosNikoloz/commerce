@@ -4,17 +4,19 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, ShoppingCartIcon, MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { Badge } from "@heroui/badge";
-import { Button } from "@heroui/button";
+
 import HeaderCartButton from "./header-cart-button";
 
 
 import { useCartStore } from "@/app/context/cartContext";
+import Link from "next/link";
+import { Button } from "@heroui/button";
 
 export default function CartDrawer() {
   const cart = useCartStore((s) => s.cart);
   const cartLines = useCartStore((s) => s.cart.length);
-  const totalQuantity = useCartStore((s) => s.getCount());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _totalQuantity = useCartStore((s) => s.getCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
 
   const updateCartItem = useCartStore((s) => s.updateCartItem);
@@ -66,9 +68,9 @@ export default function CartDrawer() {
                   <h2 className="text-sm sm:text-base font-bold text-gray-800 dark:text-white">My Cart</h2>
                 </div>
                 <button
+                  aria-label="Close cart"
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all hover:rotate-90"
                   onClick={closeCart}
-                  aria-label="Close cart"
                 >
                   <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -109,6 +111,7 @@ export default function CartDrawer() {
 
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <button
+                            aria-label="Decrease quantity"
                             className="p-1 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             onClick={() =>
                               updateCartItem(
@@ -116,7 +119,6 @@ export default function CartDrawer() {
                                 Math.max(1, item.quantity - 1),
                               )
                             }
-                            aria-label="Decrease quantity"
                           >
                             <MinusIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                           </button>
@@ -124,11 +126,11 @@ export default function CartDrawer() {
                             {item.quantity}
                           </span>
                           <button
+                            aria-label="Increase quantity"
                             className="p-1 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             onClick={() =>
                               updateCartItem(item.id, item.quantity + 1)
                             }
-                            aria-label="Increase quantity"
                           >
                             <PlusIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                           </button>
@@ -145,6 +147,8 @@ export default function CartDrawer() {
                     ))}
                   </ul>
 
+                  
+
                   <div className="sticky bottom-0 px-3 py-3 sm:px-4 sm:py-3.5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
                     <div className="flex justify-between items-center text-sm sm:text-base font-bold mb-2.5">
                       <span className="text-gray-700 dark:text-gray-300">Total:</span>
@@ -152,9 +156,14 @@ export default function CartDrawer() {
                         ₾{subtotal.toFixed(2)}
                       </span>
                     </div>
-                    <button className="w-full py-2 sm:py-2.5 text-center bg-brand-primary dark:bg-brand-primaryDark hover:opacity-90 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98]">
-                      Proceed to Checkout
-                    </button>
+                    <Button
+                      as={Link}
+                      className="flex-1 w-full bottom-0 h-10 rounded-lg font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md hover:shadow-lg"
+                      href="/cart"
+                      onPress={closeCart}
+                    >
+                      <span className="text-sm">ნახვა</span>
+                    </Button>
                   </div>
                 </div>
               )}

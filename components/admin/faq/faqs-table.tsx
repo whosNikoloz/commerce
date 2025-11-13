@@ -126,6 +126,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
         lastSavedOrderRef.current = map;
         setError(null);
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e);
         if (!isCancelled) setError("ჩატვირთვა ვერ მოხერხდა.");
       } finally {
@@ -187,6 +188,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       setOrderDirty(false);
       toast.success("რიგი შენახულია.");
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       setOrderDirty(true);
       toast.error("რიგის შენახვა ვერ მოხერხდა.");
@@ -228,6 +230,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       setFaqs((list) => list.map((x) => (x.id === tempId ? { ...x, id } : x)));
       toast.success("FAQ დაემატა.");
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
       toast.error("დამატება ვერ მოხერხდა.");
@@ -254,6 +257,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       await updateFaq(patched);
       toast.success("განახლდა.");
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
       toast.error("განახლება ვერ მოხერხდა.");
@@ -273,6 +277,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
     try {
       await updateFaq(patched);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
       toast.error("ვერ შეიცვალა.");
@@ -290,6 +295,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       setFaqs((list) => list.map((f, idx) => ({ ...f, orderNum: idx + 1 })));
       setOrderDirty(true);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
       toast.error("წაშლა ვერ მოხერხდა.");

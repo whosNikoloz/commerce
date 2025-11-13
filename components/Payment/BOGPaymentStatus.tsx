@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useBOGPayment } from '@/hooks/payment/useBOGPayment';
 import type { BOGPaymentDetails } from '@/types/payment';
+
+import { useEffect, useState } from 'react';
+
+import { useBOGPayment } from '@/hooks/payment/useBOGPayment';
 
 interface BOGPaymentStatusProps {
   orderId: string;
@@ -27,6 +29,7 @@ export default function BOGPaymentStatus({
     const fetchStatus = async () => {
       try {
         const details = await getPaymentStatus(orderId);
+
         if (details) {
           setPaymentDetails(details);
           setError(null);
@@ -37,11 +40,13 @@ export default function BOGPaymentStatus({
 
           // Stop polling if payment is in final state
           const finalStatuses = ['COMPLETED', 'APPROVED', 'FAILED', 'CANCELLED', 'VOIDED'];
+
           if (finalStatuses.includes(details.status.toUpperCase()) && intervalId) {
             clearInterval(intervalId);
           }
         }
-      } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_err) {
         setError('Failed to fetch payment status');
         if (intervalId) {
           clearInterval(intervalId);
@@ -66,6 +71,7 @@ export default function BOGPaymentStatus({
 
   const getStatusColor = (status: string) => {
     const statusUpper = status.toUpperCase();
+
     switch (statusUpper) {
       case 'COMPLETED':
       case 'APPROVED':
@@ -84,12 +90,13 @@ export default function BOGPaymentStatus({
 
   const getStatusIcon = (status: string) => {
     const statusUpper = status.toUpperCase();
+
     switch (statusUpper) {
       case 'COMPLETED':
       case 'APPROVED':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
         );
       case 'FAILED':
@@ -97,14 +104,14 @@ export default function BOGPaymentStatus({
       case 'CANCELLED':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
         );
       case 'CREATED':
       case 'PENDING':
         return (
           <svg className="h-5 w-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
         );
       default:
@@ -123,7 +130,7 @@ export default function BOGPaymentStatus({
   if (loading && !paymentDetails) {
     return (
       <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
         <span className="ml-2 text-sm text-gray-600">Loading payment status...</span>
       </div>
     );

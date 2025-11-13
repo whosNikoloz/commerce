@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePaymentHub } from '@/hooks/payment/usePaymentHub';
+
 import PaymentStatus from './PaymentStatus';
+
+import { usePaymentHub } from '@/hooks/payment/usePaymentHub';
 
 interface PaymentStatusWithHubProps {
   paymentId: string;
@@ -16,7 +18,8 @@ export default function PaymentStatusWithHub({
   useRealtime = true,
 }: PaymentStatusWithHubProps) {
   const { status: hubStatus, isConnected, error: hubError } = usePaymentHub(paymentId, useRealtime);
-  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_currentStatus, setCurrentStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (hubStatus) {
@@ -31,7 +34,7 @@ export default function PaymentStatusWithHub({
     <div className="space-y-4">
       {useRealtime && (
         <div className="flex items-center gap-2 text-sm">
-          <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+          <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-300'}`} />
           <span className="text-gray-600">
             {isConnected ? 'Real-time updates active' : 'Connecting to real-time updates...'}
           </span>
@@ -45,10 +48,10 @@ export default function PaymentStatusWithHub({
       )}
 
       <PaymentStatus
-        paymentId={paymentId}
-        onStatusChange={onStatusChange}
         autoRefresh={!isConnected || !!hubError}
+        paymentId={paymentId}
         refreshInterval={5000}
+        onStatusChange={onStatusChange}
       />
 
       {hubStatus && (

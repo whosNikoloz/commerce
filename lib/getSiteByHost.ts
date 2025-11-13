@@ -1,4 +1,5 @@
 import type { SiteConfig } from "@/types/tenant";
+
 import { headers } from "next/headers";
 
 import { getTenantByHost } from "./getTenantByHost";

@@ -21,10 +21,12 @@ export async function finaAuthenticate(): Promise<FinaAuthResponse> {
 
   // Immediately fail if token is null or undefined
   if (!response || !response.token) {
+    // eslint-disable-next-line no-console
     console.error("❌ Fina Authentication failed: Token is null or undefined", response);
     throw new Error("Authentication failed: No valid token received from Fina");
   }
 
+  // eslint-disable-next-line no-console
   console.log("✅ Fina Authentication successful:", {
     tokenReceived: true,
     expires: response.expires

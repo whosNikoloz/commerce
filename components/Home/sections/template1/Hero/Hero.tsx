@@ -43,6 +43,7 @@ export default async function Hero({ data, locale }: HeroProps) {
 
     topCategories = categoriesWithData
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error("Failed to load categories for hero:", e)
   }
 

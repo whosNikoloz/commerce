@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(tokens);
   } catch (error: any) {
+    // eslint-disable-next-line no-console
     console.error("Token refresh error:", error);
 
     return NextResponse.json(

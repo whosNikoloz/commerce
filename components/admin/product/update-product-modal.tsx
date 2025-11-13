@@ -6,8 +6,6 @@ import type { ProductFacetValueModel } from "@/types/facet";
 import { useEffect, useState } from "react";
 import { Box, Clock3, Edit, Sparkles, Layers } from "lucide-react";
 import { toast } from "sonner";
-
-import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productService";
 import {
   Modal,
   ModalBody,
@@ -21,11 +19,14 @@ import { Select as HSelect, SelectItem as HSelectItem } from "@heroui/select";
 import { CustomEditor } from "../../wysiwyg-text-custom";
 import { GoBackButton } from "../../go-back-button";
 
+import { FacetSelector } from "./facet-selector";
+
+import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productService";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { FacetSelector } from "./facet-selector";
+
 
 interface UpdateProductModalProps {
   productId: string;
@@ -92,10 +93,14 @@ export default function UpdateProductModal({
         initialCategoryId || undefined,
         initialBrandId || undefined
       );
+
+      // eslint-disable-next-line no-console
       console.log('🔍 [Update Modal] Fetched product groups:', groups);
+      // eslint-disable-next-line no-console
       console.log('🔍 [Update Modal] First group structure:', groups[0]);
       setProductGroups(groups);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to fetch product groups:", error);
       toast.error("Failed to load product groups");
     } finally {
@@ -261,6 +266,7 @@ export default function UpdateProductModal({
                         variant="bordered"
                         onSelectionChange={(keys) => {
                           const k = Array.from(keys)[0] as string | undefined;
+
                           setBrandId(k ?? "");
                         }}
                       >
@@ -340,6 +346,8 @@ export default function UpdateProductModal({
                         variant="bordered"
                         onSelectionChange={(keys) => {
                           const k = Array.from(keys)[0] as string | undefined;
+
+                          // eslint-disable-next-line no-console
                           console.log('✅ [Update Modal] Selected productGroupId:', k);
                           setProductGroupId(k === "none" ? "" : k ?? "");
                         }}
@@ -349,7 +357,9 @@ export default function UpdateProductModal({
                             None (standalone product)
                           </HSelectItem>,
                           ...productGroups.map((group) => {
+                            // eslint-disable-next-line no-console
                             console.log('🔍 [Update Modal] Rendering group:', { id: group.id, name: group.name, fullObject: group });
+
                             return (
                               <HSelectItem key={group.id} textValue={group.name}>
                                 {group.name} (ID: {group.id})

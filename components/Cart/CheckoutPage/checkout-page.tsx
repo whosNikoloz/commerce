@@ -51,6 +51,7 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     if (!user?.id) {
       setError("User not logged in");
+
       return;
     }
 
@@ -150,11 +151,11 @@ export default function CheckoutPage() {
           <CheckoutForm value={provider} onChange={setProvider} />
           <OrderSummary
             isProcessing={isProcessing}
-            onSubmit={handleSubmit}
             submitButtonLabel={
               isProcessing ? "Redirecting..." : `Pay Securely • ₾${total.toFixed(2)}`
             }
             totalOverride={total}
+            onSubmit={handleSubmit}
           />
         </div>
       </div>

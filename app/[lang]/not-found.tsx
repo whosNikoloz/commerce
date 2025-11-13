@@ -10,14 +10,14 @@ export default function NotFound() {
         </h2>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/"
             className="inline-block px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90 transition-colors"
+            href="/"
           >
             მთავარ გვერდზე დაბრუნება
           </Link>
           <Link
-            href="/category"
             className="inline-block px-6 py-3 border border-brand-primary text-brand-primary rounded-lg hover:bg-brand-primary/5 transition-colors"
+            href="/category"
           >
             კატეგორიების ნახვა
           </Link>

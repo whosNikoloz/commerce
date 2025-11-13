@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 
 interface FacetValue {
   value: string;
@@ -20,7 +20,8 @@ interface SpecificationsProps {
 }
 
 export function Specifications({ specs = [], value, onChange, disabled = false }: SpecificationsProps) {
-  const multiFacetNames = useMemo(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _multiFacetNames = useMemo(() => {
     const s = new Set<string>();
 
     specs.forEach((f) => {
@@ -36,6 +37,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
     specs.forEach((f) => {
       if (f.facetValues.length) {
         const firstValue = f.facetValues[0];
+
         d[f.facetName] = typeof firstValue === 'string' ? firstValue : firstValue.value;
       }
     });
@@ -64,6 +66,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
         const candidate = value?.[facetName] ?? defaults[facetName];
         const firstValue = facetValues[0];
         const defaultValue = typeof firstValue === 'string' ? firstValue : firstValue.value;
+
         next[facetName] = allowed.has(String(candidate)) ? String(candidate) : defaultValue;
       }
     });
@@ -115,7 +118,6 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
                                 <button
                                   key={facetValue}
                                   aria-pressed={isSelected}
-                                  disabled={isDisabled}
                                   className={[
                                     "flex-1 min-w-[96px] text-center px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-all duration-200 transform",
                                     isDisabled ? "opacity-50 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]",
@@ -123,6 +125,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
                                       ? "bg-brand-primary text-white border-brand-primary shadow-md hover:shadow-lg"
                                       : "bg-background text-foreground border-border/60 hover:border-brand-primary/60 hover:bg-brand-primary/5 hover:shadow-sm",
                                   ].join(" ")}
+                                  disabled={isDisabled}
                                   type="button"
                                   onClick={() => !isDisabled && handleSelect(spec.facetName, facetValue, facetValueId)}
                                 >

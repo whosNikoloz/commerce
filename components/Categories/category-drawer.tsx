@@ -2,11 +2,12 @@
 
 import type { CategoryModel } from "@/types/category";
 
-import { useEffect, useMemo, useRef, useState, Fragment } from "react";
+import { useMemo, useRef, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, ChevronRightIcon, ArrowLeftIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "@heroui/button";
+
 import { getAllCategories } from "@/app/api/services/categoryService";
 
 type ChildrenMap = Record<string, CategoryModel[]>;
@@ -20,8 +21,10 @@ function normalizeId(id?: string | null) {
 /** Build children map strictly by parentId; guard against cycles/missing parents. */
 function buildTree(categories: CategoryModel[]) {
   const map: ChildrenMap = {};
+
   for (const c of categories) {
     const parent = normalizeId(c.parentId) || ROOT_KEY;
+
     if (!map[parent]) map[parent] = [];
     map[parent].push(c);
   }
@@ -30,6 +33,7 @@ function buildTree(categories: CategoryModel[]) {
     map[k].sort((a, b) => (a.name ?? a.id ?? "").localeCompare(b.name ?? b.id ?? ""))
   );
   const roots = map[ROOT_KEY] ?? [];
+
   return { childrenMap: map, roots };
 }
 
@@ -85,9 +89,11 @@ export default function CategoryDrawer() {
     setError(null);
     try {
       const data = await getAllCategories();
+
       setCategories(Array.isArray(data) ? data : []);
       hasLoadedRef.current = true;
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       setError("Failed to load categories");
     } finally {
@@ -107,8 +113,8 @@ export default function CategoryDrawer() {
           className={`group flex items-center justify-between rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-all px-4`}
         >
           <Link
-            href={`/category/${id}`}
             className="flex-1 py-3 pr-2 text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate"
+            href={`/category/${id}`}
             onClick={closeDrawer}
           >
             {node.name ?? "Category"}
@@ -118,8 +124,8 @@ export default function CategoryDrawer() {
             <button
               aria-label="View subcategories"
               className="p-2 mr-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-              onClick={() => navigateToCategory(id)}
               type="button"
+              onClick={() => navigateToCategory(id)}
             >
               <ChevronRightIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
             </button>
@@ -176,8 +182,8 @@ export default function CategoryDrawer() {
                     <button
                       aria-label="Go back"
                       className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                      onClick={goBack}
                       type="button"
+                      onClick={goBack}
                     >
                       <ArrowLeftIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
                     </button>
@@ -236,7 +242,7 @@ export default function CategoryDrawer() {
 
               {/* Footer */}
               <div className="p-5 border-t border-gray-200 dark:border-gray-700">
-                <Button as={Link} href="/category" fullWidth color="primary" onPress={closeDrawer}>
+                <Button fullWidth as={Link} color="primary" href="/category" onPress={closeDrawer}>
                   View all categories
                 </Button>
               </div>

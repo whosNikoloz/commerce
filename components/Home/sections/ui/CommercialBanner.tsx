@@ -70,8 +70,10 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
 
 export default function CommercialBanner({ data, locale }: CommercialBannerProps) {
   const splideRef = useRef<SplideCore | null>(null);
-  const [canGoPrev, setCanGoPrev] = useState(false);
-  const [canGoNext, setCanGoNext] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_canGoPrev, setCanGoPrev] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_canGoNext, setCanGoNext] = useState(true);
 
   const isCarousel = data.layout === "carousel";
   const columns = data.columns || 1;

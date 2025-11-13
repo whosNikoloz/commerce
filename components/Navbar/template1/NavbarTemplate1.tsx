@@ -75,6 +75,7 @@ export const NavbarTemplate1 = () => {
       } catch (err) {
         // Log error only in development
         if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
           console.error("Failed to fetch category/subcategory", err);
         }
       }

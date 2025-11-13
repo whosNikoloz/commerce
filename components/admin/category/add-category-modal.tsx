@@ -51,6 +51,7 @@ export default function AddCategoryModal({
 
     if (!formData.name) {
       toast.error("Please enter a category name");
+
       return;
     }
 
@@ -79,6 +80,7 @@ export default function AddCategoryModal({
       setOpen(false);
       onCategoryAdded?.();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to create category:", error);
       toast.error("Failed to create category");
     } finally {

@@ -1,5 +1,6 @@
-import { useState } from "react";
 import type { BOGPaymentCreationResult, BOGPaymentDetails } from "@/types/payment";
+
+import { useState } from "react";
 
 export function useBOGPayment() {
   const [loading, setLoading] = useState(false);
@@ -32,14 +33,18 @@ export function useBOGPayment() {
 
       if (!response.ok) {
         const errorData = await response.json();
+
         throw new Error(errorData.error || "Failed to create BOG payment");
       }
 
       const result = await response.json();
+
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
+
       setError(errorMessage);
+
       return null;
     } finally {
       setLoading(false);
@@ -57,14 +62,18 @@ export function useBOGPayment() {
 
       if (!response.ok) {
         const errorData = await response.json();
+
         throw new Error(errorData.error || "Failed to get BOG payment status");
       }
 
       const result = await response.json();
+
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
+
       setError(errorMessage);
+
       return null;
     } finally {
       setLoading(false);
@@ -88,14 +97,18 @@ export function useBOGPayment() {
 
       if (!response.ok) {
         const errorData = await response.json();
+
         throw new Error(errorData.error || "Failed to cancel BOG payment");
       }
 
       const result = await response.json();
+
       return result.success;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
+
       setError(errorMessage);
+
       return false;
     } finally {
       setLoading(false);

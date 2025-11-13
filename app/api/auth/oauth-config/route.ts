@@ -11,6 +11,7 @@ export async function GET() {
       facebookClientId: credentials.facebookClientId,
     });
   } catch (error: any) {
+    // eslint-disable-next-line no-console
     console.error("Failed to fetch OAuth credentials:", error);
 
     return NextResponse.json({

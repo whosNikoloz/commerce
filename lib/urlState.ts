@@ -86,6 +86,7 @@ export function toUrlState(
  */
 export function buildFacetValueToFacetIdMap(facets: FacetModel[]): Record<string, string> {
   const map: Record<string, string> = {};
+
   facets.forEach((facet) => {
     (facet.facetValues ?? []).forEach((value) => {
       if (value.id) {
@@ -93,6 +94,7 @@ export function buildFacetValueToFacetIdMap(facets: FacetModel[]): Record<string
       }
     });
   });
+
   return map;
 }
 
@@ -108,6 +110,7 @@ export function toFilterFromUrl(u: UrlState, facets: FacetModel[] = []): Partial
     facetFilters: (u.facet ?? [])
       .map((facetValueId) => {
         const facetId = facetValueToFacetId[facetValueId];
+
         return facetId ? { facetId, facetValueId } : null;
       })
       .filter((f): f is { facetId: string; facetValueId: string } => f !== null),

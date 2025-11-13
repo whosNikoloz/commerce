@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { FilterModel } from "@/types/filter";
 import type { Condition, StockStatus } from "@/types/enums";
 import type { Locale } from "@/i18n.config";
+import type { FacetModel } from "@/types/facet";
 
 import Script from "next/script";
 import { notFound } from "next/navigation";
@@ -23,7 +24,6 @@ import {
 import { getAllBrands } from "@/app/api/services/brandService";
 import { searchProductsByFilter } from "@/app/api/services/productService";
 import { buildFacetValueToFacetIdMap } from "@/lib/urlState";
-import type { FacetModel } from "@/types/facet";
 
 export const revalidate = 300; // 5 minutes
 
@@ -82,6 +82,7 @@ function buildFilter(
       facetFilters: facetValueIds
         .map((facetValueId) => {
           const facetId = facetValueToFacetId[facetValueId];
+
           return facetId ? { facetId, facetValueId } : null;
         })
         .filter((f): f is { facetId: string; facetValueId: string } => f !== null),

@@ -57,6 +57,7 @@ export default async function ProductRail({
     products = list.slice(0, data.limit);
   } catch (e) {
     error = e as Error;
+    // eslint-disable-next-line no-console
     console.error("Failed to load products:", e);
   }
 
@@ -72,6 +73,7 @@ export default async function ProductRail({
       5: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5",
       6: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
     };
+
     return colsMap[cols] || colsMap[4];
   };
 

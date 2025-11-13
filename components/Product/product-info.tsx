@@ -1,6 +1,7 @@
 "use client";
 
 import { ShoppingCart, Truck, Tag } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Condition, StockStatus } from "@/types/enums";
@@ -71,7 +72,7 @@ export function ProductInfo({
   status,
   stock,
   isComingSoon = false,
-  isNewArrival = false, 
+  isNewArrival: _isNewArrival = false, 
   isLiquidated = false,
   freeShipping = true,
   stockLoading = false,
@@ -136,12 +137,12 @@ export function ProductInfo({
 
           {/* Status chip (reflects loading/error/coming soon/stock) */}
           <Badge
+            aria-busy={stockLoading || undefined}
             className={`h-7 px-3 text-xs font-semibold ${statusBadgeClass}`}
             title={getStatusLabel(status, isComingSoon, {
               loading: stockLoading,
               error: !!stockError,
             })}
-            aria-busy={stockLoading || undefined}
           >
             {getStatusLabel(status, isComingSoon, {
               loading: stockLoading,
@@ -153,7 +154,7 @@ export function ProductInfo({
         {/* Subtle info row (desktop only, mobile hides clutter) */}
         <div className="hidden md:flex flex-wrap items-center gap-2 mt-4">
           {brand && (
-            <Badge variant="secondary" className="bg-muted text-foreground border">
+            <Badge className="bg-muted text-foreground border" variant="secondary">
               {brand}
             </Badge>
           )}
@@ -186,7 +187,7 @@ export function ProductInfo({
             </Badge>
           )}
           {condition != null && (
-            <Badge variant="secondary" className="bg-muted text-foreground border">
+            <Badge className="bg-muted text-foreground border" variant="secondary">
               {getConditionLabel(condition)}
             </Badge>
           )}
@@ -206,9 +207,9 @@ export function ProductInfo({
         <div className="md:hidden mt-5 grid grid-cols-1 gap-2">
           <Button
             aria-disabled={isBuyingDisabled}
+            className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isBuyingDisabled}
             onClick={onAddToCart}
-            className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-5 w-5" />
             <span>
@@ -226,9 +227,9 @@ export function ProductInfo({
 
           <Button
             aria-disabled={isBuyingDisabled}
+            className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isBuyingDisabled}
             onClick={onBuyNow}
-            className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {stockLoading ? "იტვირთება…" : stockError ? "ვერ ჩაიტვირთა" : "ყიდვა"}
           </Button>
@@ -238,9 +239,9 @@ export function ProductInfo({
         <div className="hidden md:grid mt-5 grid-cols-1 gap-2">
           <Button
             aria-disabled={isBuyingDisabled}
+            className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isBuyingDisabled}
             onClick={onAddToCart}
-            className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-5 w-5" />
             <span>
@@ -258,9 +259,9 @@ export function ProductInfo({
 
           <Button
             aria-disabled={isBuyingDisabled}
+            className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isBuyingDisabled}
             onClick={onBuyNow}
-            className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {stockLoading ? "იტვირთება…" : stockError ? "ვერ ჩაიტვირთა" : "ყიდვა"}
           </Button>

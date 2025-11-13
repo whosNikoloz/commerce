@@ -182,6 +182,7 @@ export function formatSyncResultAsCSV(result: DetailedSyncResult): string {
         product.fieldChanges.forEach((change) => {
           const oldVal = (change.oldValue || "").replace(/"/g, '""');
           const newVal = (change.newValue || "").replace(/"/g, '""');
+
           lines.push(
             `${product.changeType},"${product.productName}",${product.finaId},${product.internalId},"${change.fieldName}","${oldVal}","${newVal}"`
           );
@@ -244,6 +245,7 @@ export function downloadSyncLog(
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);

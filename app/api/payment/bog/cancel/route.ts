@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error: any) {
+    // eslint-disable-next-line no-console
     console.error("BOG Payment cancellation error:", error);
 
     return NextResponse.json(

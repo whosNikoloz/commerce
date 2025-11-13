@@ -66,10 +66,8 @@ export default function ProductHeader({
   onViewModeChange,
   filter,
   brandLookup,
-  categoryLookup,
   facetValueLookup,
   onRemoveBrand,
-  onRemoveCategory,
   onRemoveCondition,
   onClearStockStatus,
   onClearPrice,
@@ -95,8 +93,10 @@ export default function ProductHeader({
 
   const _removeBrand = (id: string) =>
     onRemoveBrand ? onRemoveBrand(id) : onFilterChange?.("brandIds:remove", id);
-  const _removeCategory = (id: string) =>
-    onRemoveCategory ? onRemoveCategory(id) : onFilterChange?.("categoryIds:remove", id);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const __removeCategory = (id: string) =>
+  //   onRemoveCategory ? onRemoveCategory(id) : onFilterChange?.("categoryIds:remove", id);
   const _removeCondition = (c: Condition) =>
     onRemoveCondition ? onRemoveCondition(c) : onFilterChange?.("condition:remove", c);
   const _clearStock = () =>
@@ -140,11 +140,11 @@ export default function ProductHeader({
               className="bg-card/95 backdrop-blur-md border-2 border-border/50 rounded-xl shadow-2xl min-w-[200px]"
             >
               <DropdownMenuRadioGroup value={sortBy} onValueChange={onSortChange}>
-                <DropdownMenuRadioItem value="featured" className="cursor-pointer rounded-lg hover:bg-brand-primary/10">Featured</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="newest" className="cursor-pointer rounded-lg hover:bg-brand-primary/10">Newest</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="price-low" className="cursor-pointer rounded-lg hover:bg-brand-primary/10">Price: Low to High</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="price-high" className="cursor-pointer rounded-lg hover:bg-brand-primary/10">Price: High to Low</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="rating" className="cursor-pointer rounded-lg hover:bg-brand-primary/10">Highest Rated</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem className="cursor-pointer rounded-lg hover:bg-brand-primary/10" value="featured">Featured</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem className="cursor-pointer rounded-lg hover:bg-brand-primary/10" value="newest">Newest</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem className="cursor-pointer rounded-lg hover:bg-brand-primary/10" value="price-low">Price: Low to High</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem className="cursor-pointer rounded-lg hover:bg-brand-primary/10" value="price-high">Price: High to Low</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem className="cursor-pointer rounded-lg hover:bg-brand-primary/10" value="rating">Highest Rated</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>

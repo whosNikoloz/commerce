@@ -32,10 +32,12 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
       // Remove any existing /ka prefix and add /en
       const cleanPath = pathname?.replace(/^\/(en|ka)/, '') || '';
       const newPath = `/en${cleanPath || '/'}`;
+
       router.push(newPath);
     } else {
       // If switching to Georgian (default), remove /en prefix
       const newPath = pathname?.replace(/^\/en/, '') || '/';
+
       router.push(newPath);
     }
   };

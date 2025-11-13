@@ -1,5 +1,6 @@
-import * as signalR from '@microsoft/signalr';
 import type { PaymentStatusUpdate } from '@/types/payment';
+
+import * as signalR from '@microsoft/signalr';
 
 export class PaymentHubClient {
   private connection: signalR.HubConnection | null = null;
@@ -24,10 +25,12 @@ export class PaymentHubClient {
 
     try {
       await this.connection.start();
+      // eslint-disable-next-line no-console
       console.log('SignalR Connected');
 
       await this.connection.invoke('JoinPaymentGroup', this.paymentId);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('SignalR Connection Error:', err);
       throw err;
     }
@@ -46,11 +49,13 @@ export class PaymentHubClient {
       try {
         await this.connection.invoke('LeavePaymentGroup', this.paymentId);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Error leaving payment group:', err);
       }
 
       await this.connection.stop();
       this.connection = null;
+      // eslint-disable-next-line no-console
       console.log('SignalR Disconnected');
     }
   }

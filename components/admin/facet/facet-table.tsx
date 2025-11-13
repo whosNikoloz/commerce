@@ -57,6 +57,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
 
         if (!ab) setFacets(data);
       } catch (e) {
+        // eslint-disable-next-line no-console
         if (!ab) { setError("Failed to load facets"); console.error(e); }
       } finally { if (!ab) setLoading(false); }
     })();
@@ -79,6 +80,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
       setFacets(prev => prev.filter(f => f.id !== id));
       toast.success("ფასეტი წაიშალა");
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
       toast.error("წაშლა ვერ მოხერხდა");
     }
@@ -105,6 +107,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                   presetCategoryId={selectedCategoryId ?? undefined}
                   onCreated={() => {
                     if (selectedCategoryId) {
+                      // eslint-disable-next-line no-console
                       getAllFacets(selectedCategoryId).then(setFacets).catch(console.error);
                     }
                   }}

@@ -74,14 +74,14 @@ function PaymentSuccessContent() {
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
             <Link
-              href="/"
               className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+              href="/"
             >
               Continue Shopping
             </Link>
             <Link
-              href="/orders"
               className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+              href="/orders"
             >
               View My Orders
             </Link>
@@ -96,7 +96,7 @@ export default function PaymentSuccessPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
       </div>
     }>
       <PaymentSuccessContent />

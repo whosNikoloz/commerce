@@ -10,12 +10,10 @@ import { useParams } from "next/navigation";
 import { cn, resolveImageUrl, formatPrice } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
-
 // shadcn/ui
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-
 // services
 import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
 import { useUser } from "@/app/context/userContext";
@@ -158,6 +156,7 @@ export function ProductCard({
       await addToCart(item);
       await flyToCart(imgRef.current);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error adding to cart:", error);
       toast.error("შეცდომა კალათაში დამატებისას");
     } finally {
@@ -177,6 +176,7 @@ export function ProductCard({
 
       if (compareItems.length >= 4) {
         toast.error("მაქსიმუმ 4 პროდუქტის შედარება შესაძლებელია");
+
         return;
       }
       addToCompare(product);

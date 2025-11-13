@@ -22,7 +22,8 @@ export async function GET(req: Request) {
     const config = await getTenantByHost(host);
 
     return NextResponse.json(config, { status: 200 });
-  } catch (e) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_e) {
     return NextResponse.json({ error: "Failed to resolve tenant" }, { status: 500 });
   }
 }

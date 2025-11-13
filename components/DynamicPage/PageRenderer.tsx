@@ -45,6 +45,7 @@ export default function PageRenderer({ tenant, locale, pageSlug }: PageRendererP
         const Component = templateDefinition.registry[section.type];
 
         if (!Component) {
+          // eslint-disable-next-line no-console
           console.warn(`Component not found for section type: ${section.type}`);
 
           return null;

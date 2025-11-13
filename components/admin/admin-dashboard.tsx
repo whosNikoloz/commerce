@@ -59,7 +59,7 @@ export default function AdminDashboard() {
     <div className="space-y-8 w-full">
       {/* Stat Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => {
+        {stats.map((stat, _index) => {
           const Icon = stat.icon;
 
           return (

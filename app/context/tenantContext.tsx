@@ -38,7 +38,9 @@ export const getCachedTenantConfig = (): TenantConfig | null => {
 export const getCachedMerchantType = (): string | null => {
   const cfg = getCachedTenantConfig();
 
+  // eslint-disable-next-line no-console
   console.log("📦 Cached tenant config:", cfg);
+  // eslint-disable-next-line no-console
   console.log("📦 Merchant Type from config:", cfg?.merchantType);
 
   return cfg?.merchantType ?? null;
@@ -55,6 +57,7 @@ export const TenantProvider: React.FC<{
   children: React.ReactNode;
   initialConfig?: TenantConfig | null;
 }> = ({ children, initialConfig = null }) => {
+  // eslint-disable-next-line no-console
   //console.log("🔧 TenantProvider initialized with:", initialConfig ? `${initialConfig.siteConfig.name}` : "null");
   const [config, setConfig] = useState<TenantConfig | null>(initialConfig);
   const [isLoading, setIsLoading] = useState(!initialConfig);
@@ -63,6 +66,7 @@ export const TenantProvider: React.FC<{
   // Apply theme immediately on mount/updates
   useEffect(() => {
     if (config?.theme) {
+      // eslint-disable-next-line no-console
       //console.log("🎨 Applying theme for:", config.siteConfig.name);
       applyThemeOnDocument(config.theme);
       try {
@@ -80,12 +84,14 @@ export const TenantProvider: React.FC<{
     const boot = async () => {
       // If SSR provided config, we're done.
       if (initialConfig) {
+        // eslint-disable-next-line no-console
         //console.log("✅ Using SSR config, skipping client fetch:", initialConfig.siteConfig.name);
         setIsLoading(false);
 
         return;
       }
 
+      // eslint-disable-next-line no-console
       //console.log("⚠️ No SSR config, attempting client-side fetch...");
 
       // Try cache
@@ -96,9 +102,11 @@ export const TenantProvider: React.FC<{
           const parsed = JSON.parse(raw) as Cached;
 
           if (parsed?.v === CACHE_VERSION && parsed?.data) {
+            // eslint-disable-next-line no-console
             //console.log("📦 Loaded cached config:", parsed.data.siteConfig.name);
             setConfig(parsed.data);
           } else {
+            // eslint-disable-next-line no-console
             //console.log("🗑️ Clearing invalid/old cache");
             localStorage.removeItem(CACHE_KEY);
           }
@@ -111,18 +119,22 @@ export const TenantProvider: React.FC<{
       //When your endpoint is ready, uncomment this block:
       try {
         const host = window.location.host;
+        // eslint-disable-next-line no-console
         //console.log("🌐 Fetching tenant config from /api/tenant-config for:", host);
         const res = await fetch(`/api/tenant-config?host=${encodeURIComponent(host)}`, { cache: "no-store" });
 
         if (res.ok) {
           const fresh = (await res.json()) as TenantConfig;
 
+          // eslint-disable-next-line no-console
           //console.log("🔄 Updating config from client fetch:", fresh.siteConfig.name);
           if (mounted.current) setConfig(fresh);
         } else {
+          // eslint-disable-next-line no-console
           console.error("❌ Failed to fetch tenant config:", res.status);
         }
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error("❌ Error fetching tenant config:", e);
       }
       finally {

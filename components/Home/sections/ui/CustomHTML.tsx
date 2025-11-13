@@ -9,7 +9,7 @@ interface CustomHTMLProps {
   locale: Locale;
 }
 
-export default function CustomHTML({ data, locale }: CustomHTMLProps) {
+export default function CustomHTML({ data, locale: _locale }: CustomHTMLProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const uniqueId = useId().replace(/:/g, '-'); // React's useId for SSR-safe unique IDs
 
@@ -119,6 +119,7 @@ export default function CustomHTML({ data, locale }: CustomHTMLProps) {
         }
       );
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error scoping CSS:', error);
 
       return css;

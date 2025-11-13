@@ -49,14 +49,16 @@ export default function HeaderCartButton({ onClick, className }: HeaderCartButto
     <div ref={iconContainerRef}>
       <Badge
         color="danger"
+        size="sm"
+        // eslint-disable-next-line react/jsx-sort-props
         data-badge
         /* render nothing on the server, real count after mount */
+        // eslint-disable-next-line react/jsx-sort-props
         content={
           mounted ? (
             <AnimatedCount animKey={animKey} value={total} />
           ) : null
         }
-        size="sm"
       >
         <Button
           isIconOnly

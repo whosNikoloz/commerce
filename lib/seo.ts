@@ -1,11 +1,13 @@
 // src/lib/seo.ts
 import type { Metadata } from "next";
+import type { SiteConfig } from "@/types/tenant";
 
 import { headers } from "next/headers";
 
-import type { SiteConfig, TenantConfig } from "@/types/tenant";
-import { locales, type Locale, defaultLocale } from "@/i18n.config";
 import { getTenantByHost } from "./getTenantByHost";
+
+import { locales, type Locale, defaultLocale } from "@/i18n.config";
+
 
 /* ---------- site resolvers ---------- */
 
@@ -27,8 +29,10 @@ export async function getActiveSite(siteOverride?: SiteConfig): Promise<SiteConf
 }
 
 // Helper to get a default fallback config for situations where we need sync access
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 // This should be avoided when possible - prefer using getActiveSite()
-async function getDefaultSiteConfig(): Promise<SiteConfig> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function _getDefaultSiteConfig(): Promise<SiteConfig> {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
 
@@ -183,6 +187,7 @@ export async function i18nPageMetadataAsync(args: I18nMetaArgs): Promise<Metadat
 
   // Build verification object
   const verification: Record<string, string> = {};
+
   if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
   if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
   if (seo.yandexVerification) verification.yandex = seo.yandexVerification;

@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useTBCPayment } from '@/hooks/payment/useTBCPayment';
 import type { TBCPaymentDetails } from '@/types/payment';
+
+import { useEffect, useState } from 'react';
+
+import { useTBCPayment } from '@/hooks/payment/useTBCPayment';
 
 interface PaymentStatusProps {
   paymentId: string;
@@ -27,6 +29,7 @@ export default function PaymentStatus({
     const fetchStatus = async () => {
       try {
         const details = await getPaymentStatus(paymentId);
+
         if (details) {
           setPaymentDetails(details);
           setError(null);
@@ -37,11 +40,13 @@ export default function PaymentStatus({
 
           // Stop polling if payment is in final state
           const finalStatuses = ['SUCCEEDED', 'FAILED', 'CANCELED', 'CANCELLED'];
+
           if (finalStatuses.includes(details.status.toUpperCase()) && intervalId) {
             clearInterval(intervalId);
           }
         }
-      } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_err) {
         setError('Failed to fetch payment status');
         if (intervalId) {
           clearInterval(intervalId);
@@ -66,6 +71,7 @@ export default function PaymentStatus({
 
   const getStatusColor = (status: string) => {
     const statusUpper = status.toUpperCase();
+
     switch (statusUpper) {
       case 'SUCCEEDED':
         return 'text-green-600 bg-green-50 border-green-200';
@@ -83,11 +89,12 @@ export default function PaymentStatus({
 
   const getStatusIcon = (status: string) => {
     const statusUpper = status.toUpperCase();
+
     switch (statusUpper) {
       case 'SUCCEEDED':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
         );
       case 'FAILED':
@@ -95,14 +102,14 @@ export default function PaymentStatus({
       case 'CANCELLED':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
         );
       case 'PENDING':
       case 'CREATED':
         return (
           <svg className="h-5 w-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
         );
       default:
@@ -121,7 +128,7 @@ export default function PaymentStatus({
   if (loading && !paymentDetails) {
     return (
       <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
         <span className="ml-2 text-sm text-gray-600">Loading payment status...</span>
       </div>
     );

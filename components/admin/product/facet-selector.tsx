@@ -3,10 +3,9 @@
 import type { FacetModel, ProductFacetValueModel } from "@/types/facet";
 
 import { useEffect, useState } from "react";
-import { Circle, CircleDot, ChevronDown, ChevronRight, Layers } from "lucide-react";
+import { Circle, CircleDot, ChevronDown, ChevronRight } from "lucide-react";
 
 import { getAllFacets } from "@/app/api/services/facetService";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -33,6 +32,7 @@ export function FacetSelector({
   useEffect(() => {
     if (!categoryId) {
       setFacets([]);
+
       return;
     }
 
@@ -42,12 +42,14 @@ export function FacetSelector({
       setLoading(true);
       try {
         const data = await getAllFacets(categoryId);
+
         if (!aborted) {
           setFacets(data);
           // Auto-expand all facets
           setExpandedFacets(new Set(data.map(f => f.id)));
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Failed to load facets:", error);
       } finally {
         if (!aborted) setLoading(false);
@@ -62,11 +64,13 @@ export function FacetSelector({
   const toggleFacetExpanded = (facetId: string) => {
     setExpandedFacets((prev) => {
       const next = new Set(prev);
+
       if (next.has(facetId)) {
         next.delete(facetId);
       } else {
         next.add(facetId);
       }
+
       return next;
     });
   };
@@ -77,6 +81,7 @@ export function FacetSelector({
 
   const getSelectedFacetValueInFacet = (facetId: string): string | null => {
     const facet = facets.find((f) => f.id === facetId);
+
     if (!facet) return null;
 
     const facetValueIds = facet.facetValues?.map((fv) => fv.id) ?? [];
@@ -89,6 +94,7 @@ export function FacetSelector({
 
   const selectFacetValue = (facetId: string, facetValueId: string) => {
     const facet = facets.find((f) => f.id === facetId);
+
     if (!facet) return;
 
     const facetValueIds = facet.facetValues?.map((fv) => fv.id) ?? [];
@@ -100,6 +106,7 @@ export function FacetSelector({
 
     // Check if clicking the same value (to deselect)
     const currentSelected = getSelectedFacetValueInFacet(facetId);
+
     if (currentSelected === facetValueId) {
       // Deselect by not adding it back
       onChange(withoutCurrentFacet);
@@ -163,8 +170,8 @@ export function FacetSelector({
               >
                 <CollapsibleTrigger asChild>
                   <Button
-                    variant="ghost"
                     className="w-full justify-between p-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-md text-sm"
+                    variant="ghost"
                   >
                     <div className="flex items-center gap-2">
                       {isExpanded ? (
@@ -196,12 +203,12 @@ export function FacetSelector({
                       return (
                         <button
                           key={facetValue.id}
-                          type="button"
                           className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left transition-colors text-xs ${
                             isSelected
                               ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400"
                               : "hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300"
                           }`}
+                          type="button"
                           onClick={() => selectFacetValue(facet.id, facetValue.id)}
                         >
                           {isSelected ? (

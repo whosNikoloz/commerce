@@ -31,7 +31,8 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Initialize selectedFacets synchronously to avoid hydration mismatch
-  const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedFacets, _setSelectedFacets] = useState<Record<string, string>>(() => {
     const initialFacets: Record<string, string> = {};
 
     initialProduct.productFacetValues?.forEach(facet => {
@@ -51,6 +52,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const handleFacetChange = async (facetName: string, facetValue: string, targetFacetValueId?: string) => {
 
     if (!targetFacetValueId) {
+      // eslint-disable-next-line no-console
       console.log("Available product facet values:", product.productFacetValues);
       toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა - facetValueId არ არის");
 
@@ -91,12 +93,14 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       // Navigate to the new variant page
       router.push(newPath);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error fetching product variant:", error);
       toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა");
     }
   };
 
-  const [similar] = useState(initialSimilar);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   // Fetch real-time stock quantity
@@ -344,7 +348,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   if (notFound) return <ProductNotFound />;
 
   return (
-    <div className="container mx-auto px-4 text-text-light dark:text-text-lightdark relative">
+    <div className="container mx-auto text-text-light dark:text-text-lightdark relative">
       <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">
         {product.name ?? "პროდუქტი"}
       </h1>

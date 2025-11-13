@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
-import type { BrandModel } from "@/types/brand";
 import type { Locale } from "@/i18n.config";
 
-import { cache } from "react";
 
 import { BrandsTable } from "@/components/admin/brand/brands-table";
 import { i18nPageMetadataAsync } from "@/lib/seo"; // ← use async helper
 import { getAllBrands } from "@/app/api/services/brandService";
 
-const getBrandsCached = cache(async (): Promise<BrandModel[]> => {
-  return await getAllBrands();
-});
+// const _getBrandsCached = cache(async (): Promise<BrandModel[]> => {
+//   return await getAllBrands();
+// });
 
 export async function generateMetadata({
   params,

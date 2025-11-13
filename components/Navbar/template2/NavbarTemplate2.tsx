@@ -75,6 +75,7 @@ export const NavbarTemplate2 = () => {
       } catch (err) {
         // Log error only in development
         if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
           console.error("Failed to fetch category/subcategory", err);
         }
       }
@@ -190,22 +191,22 @@ export const NavbarTemplate2 = () => {
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
               <div className="flex items-center justify-center gap-8 h-12">
                 <Link
-                  href={`/${lng}`}
                   className="text-sm font-light tracking-widest uppercase text-text-light dark:text-text-lightdark hover:text-brand-primary dark:hover:text-brand-primarydark transition-colors duration-300 relative group"
+                  href={`/${lng}`}
                 >
                   {lng === "en" ? "New Arrivals" : "ახალი"}
                   <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
                 </Link>
                 <Link
-                  href={`/${lng}`}
                   className="text-sm font-light tracking-widest uppercase text-text-light dark:text-text-lightdark hover:text-brand-primary dark:hover:text-brand-primarydark transition-colors duration-300 relative group"
+                  href={`/${lng}`}
                 >
                   {lng === "en" ? "Collections" : "კოლექცია"}
                   <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
                 </Link>
                 <Link
-                  href={`/${lng}`}
                   className="text-sm font-light tracking-widest uppercase text-text-light dark:text-text-lightdark hover:text-brand-primary dark:hover:text-brand-primarydark transition-colors duration-300 relative group"
+                  href={`/${lng}`}
                 >
                   {lng === "en" ? "Sale" : "ფასდაკლება"}
                   <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />

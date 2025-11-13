@@ -24,7 +24,8 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
     email: "",
   });
 
-  const [forgotError, setForgotError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [forgotError, _setForgotError] = useState("");
   const [forgotEmailError, setForgotEmailError] = useState("");
   const [forgotEmailLoader, setForgotEmailLoader] = useState(false);
   const [forgotEmailHasBlurred, setEmailForgotHasBlurred] = useState(false);
@@ -76,6 +77,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
         setForgotEmailLoader(false);
       }, 1000);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error:", error);
     }
   };

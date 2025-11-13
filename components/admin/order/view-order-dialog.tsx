@@ -89,6 +89,7 @@ function fullName(u?: OrderDetail["user"] | null) {
   if (!u) return "-";
   const f = (u.firstName || "").trim();
   const l = (u.lastName || "").trim();
+
   return (f || l) ? `${f}${f && l ? " " : ""}${l}` : (u.userName || "-");
 }
 function safe(v?: string | null) {
@@ -176,11 +177,8 @@ export default function OrderDetailsModal({
   detailLoading,
   detailError,
   updating,
-  activeTab,
-  setActiveTab,
   onClose,
   onUpdateStatus,
-  onCancel,
 }: Props) {
   // ---------------- memoized order ----------------
   const normalizedDetail = useMemo(
@@ -344,8 +342,8 @@ export default function OrderDetailsModal({
                         <div className="text-slate-500">Email</div>
                         {normalizedDetail?.user?.email ? (
                           <a
-                            href={`mailto:${normalizedDetail.user.email}`}
                             className="font-medium text-blue-600 hover:underline"
+                            href={`mailto:${normalizedDetail.user.email}`}
                           >
                             {normalizedDetail.user.email}
                           </a>
@@ -358,8 +356,8 @@ export default function OrderDetailsModal({
                         <div className="text-slate-500">Phone</div>
                         {normalizedDetail?.user?.phoneNumber ? (
                           <a
-                            href={`tel:${normalizedDetail.user.phoneNumber}`}
                             className="font-medium text-blue-600 hover:underline"
+                            href={`tel:${normalizedDetail.user.phoneNumber}`}
                           >
                             {normalizedDetail.user.phoneNumber}
                           </a>

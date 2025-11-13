@@ -9,6 +9,8 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import FacetValuesEditor from "./facet-values-editor";
+import DisplayTypePicker from "./display-type-picker";
+import { DisplayTypePreview } from "./displaytype-preview";
 
 import { FacetValueNode, hasChildren } from "@/types/facet-ui";
 import { Button } from "@/components/ui/button";
@@ -21,8 +23,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createFacet, type CreateFacetRequest } from "@/app/api/services/facetService";
-import DisplayTypePicker from "./display-type-picker";
-import { DisplayTypePreview } from "./displaytype-preview";
 
 export default function AddFacetModal({
   categories,
@@ -83,6 +83,7 @@ export default function AddFacetModal({
     }
     setLoading(true);
     try {
+      // eslint-disable-next-line no-console
       console.log("Creating facet with payload:", JSON.stringify(payload, null, 2));
       await createFacet(payload);
       toast.success("Facet created");
@@ -93,6 +94,7 @@ export default function AddFacetModal({
       if (!presetCategoryId) setSelectedCategories([]);
       onCreated?.();
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error("Failed to create facet:", e);
       toast.error("შექმნა ვერ მოხერხდა - Check console for details");
     } finally {

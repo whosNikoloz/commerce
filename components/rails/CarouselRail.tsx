@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Splide, SplideSlide, Splide as SplideCore } from "@splidejs/react-splide";
-import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { ProductCard } from "../Home/sections/ui/ProductCard";
 import '@splidejs/react-splide/css';
@@ -13,10 +12,13 @@ type Props = {
   columns?: number;
 };
 
-export default function CarouselRail({ products, template = 1, columns = 4 }: Props) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function CarouselRail({ products, template = 1, columns: _columns = 4 }: Props) {
   const splideRef = useRef<SplideCore | null>(null);
-  const [canGoPrev, setCanGoPrev] = useState(false);
-  const [canGoNext, setCanGoNext] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_canGoPrev, setCanGoPrev] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_canGoNext, setCanGoNext] = useState(true);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +77,7 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
         {products.map((p) => (
           <div key={p.id} className="h-full">
-            <ProductCard product={p} showActions={true} template={template} size="compact" />
+            <ProductCard product={p} showActions={true} size="compact" template={template} />
           </div>
         ))}
       </div>
@@ -139,7 +141,7 @@ export default function CarouselRail({ products, template = 1, columns = 4 }: Pr
       >
         {products.map((p) => (
           <SplideSlide key={p.id}>
-            <ProductCard product={p} showActions={true} template={template} size="compact" />
+            <ProductCard product={p} showActions={true} size="compact" template={template} />
           </SplideSlide>
         ))}
       </Splide>

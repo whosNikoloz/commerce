@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import type { FAQModel } from "@/types/faq";
+import type { SiteConfig } from "@/types/tenant";
 
 import NextLink from "next/link";
 import { HelpCircle } from "lucide-react";
 
 import { i18nPageMetadataAsync, getActiveSite, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
-import type { SiteConfig } from "@/types/tenant";
 import { getAllFaqs } from "@/app/api/services/faqService";
 import { FAQList } from "@/components/Info/faq/FAQList";
 

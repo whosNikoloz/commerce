@@ -1,8 +1,8 @@
 "use client"
 
 import type { HeroData, Locale } from "@/types/tenant"
-import { useEffect, useState } from "react"
 
+import { useEffect, useState } from "react"
 import { Splide, SplideSlide } from "@splidejs/react-splide"
 import "@splidejs/react-splide/css"
 import "@splidejs/react-splide/css/core"
@@ -71,9 +71,9 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
                   fill
                   alt={t(banner.alt, locale)}
                   className="object-cover transition-transform duration-500"
+                  fetchPriority={index === 0 ? "high" : "low"}
                   loading={index === 0 ? "eager" : "lazy"}
                   priority={index === 0}
-                  fetchPriority={index === 0 ? "high" : "low"}
                   quality={index === 0 ? 85 : 70}
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1200px"
                   src={banner.imageUrl}

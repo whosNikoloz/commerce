@@ -205,7 +205,8 @@ const initialCustomers: Customer[] = [
 ];
 
 export function CustomersTable() {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [customers, _setCustomers] = useState<Customer[]>(initialCustomers);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredCustomers = customers.filter(

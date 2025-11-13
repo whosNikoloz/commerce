@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/types/tenant";
 
 import { generateInfoPageMetadata, renderInfoPage } from "@/components/Info/InfoPageRoute";
-import type { Locale } from "@/types/tenant";
 
 export const revalidate = 300;
 

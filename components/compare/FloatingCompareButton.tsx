@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useCompareStore } from "@/app/context/compareContext";
-import { Button } from "@/components/ui/button";
 import { ArrowLeftRight, X, ChevronDown, ChevronUp } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { cn, resolveImageUrl } from "@/lib/utils";
 import Image from "next/image";
+
+import { useCompareStore } from "@/app/context/compareContext";
+import { Button } from "@/components/ui/button";
+import { cn, resolveImageUrl } from "@/lib/utils";
+
 
 export default function FloatingCompareButton() {
   const { items, removeFromCompare } = useCompareStore();
@@ -19,6 +21,7 @@ export default function FloatingCompareButton() {
 
   const handleCompare = () => {
     const ids = items.map((item) => item.id).join(",");
+
     router.push(`/${currentLang}/compare-products?ids=${encodeURIComponent(ids)}`);
   };
 
@@ -27,8 +30,8 @@ export default function FloatingCompareButton() {
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {/* Header - Always visible */}
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
           className="w-full px-4 py-3 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center gap-2">
             <ArrowLeftRight className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -50,17 +53,17 @@ export default function FloatingCompareButton() {
                 <div key={item.id} className="relative group">
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
                     <Image
-                      src={resolveImageUrl(item.images?.[0])}
-                      alt={item.name || "Product"}
-                      width={64}
-                      height={64}
-                      className="object-cover w-full h-full"
                       unoptimized
+                      alt={item.name || "Product"}
+                      className="object-cover w-full h-full"
+                      height={64}
+                      src={resolveImageUrl(item.images?.[0])}
+                      width={64}
                     />
                   </div>
                   <button
-                    onClick={() => removeFromCompare(item.id)}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => removeFromCompare(item.id)}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -81,12 +84,12 @@ export default function FloatingCompareButton() {
             {/* Compare button */}
             <div className="px-3 pb-3">
               <Button
-                onClick={handleCompare}
-                disabled={items.length < 2}
                 className={cn(
                   "w-full bg-blue-600 hover:bg-blue-700 text-white font-medium",
                   items.length < 2 && "opacity-50 cursor-not-allowed"
                 )}
+                disabled={items.length < 2}
+                onClick={handleCompare}
               >
                 <ArrowLeftRight className="h-4 w-4 mr-2" />
                 შედარება

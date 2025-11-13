@@ -3,8 +3,12 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import ProductGrid from "../ProductGrid";
+import { SkeletonProductGrid } from "../SkeletonProductGrid";
+
 import ProductFilters from "./ProductFilters";
 import ProductHeader from "./ProductHeader";
+import CategoryNotFound from "./not-found";
 
 import { CategoryModel } from "@/types/category";
 import { BrandModel } from "@/types/brand";
@@ -15,11 +19,8 @@ import { Condition, StockStatus } from "@/types/enums";
 import { searchProductsByFilter } from "@/app/api/services/productService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import Loading from "@/app/[lang]/category/[[...slug]]/loading";
 import { buildFacetValueToFacetIdMap } from "@/lib/urlState";
-import ProductGrid from "../ProductGrid";
-import { SkeletonProductGrid } from "../SkeletonProductGrid";
-import CategoryNotFound from "./not-found";
+
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
@@ -61,7 +62,8 @@ export default function CategoryPage({
   const isMobile = useIsMobile();
   const router = useRouter();
   const params = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_isPending, startTransition] = useTransition();
 
   const [category] = useState<CategoryWithSubs | null>(__initialCategory ?? null);
   const [brands] = useState<BrandModel[]>(__initialBrands ?? []);
@@ -108,6 +110,7 @@ export default function CategoryPage({
       setNotFound(true);
       setLoading(false);
     }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   }, [categoryId, __initialCategory]);
 
   const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
@@ -146,6 +149,7 @@ export default function CategoryPage({
         })
         .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
     });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   }, [category?.id, params, __initialPage, __initialSort, facetValueToFacetId]);
 
   const facetValueLookup = useMemo(() => {

@@ -111,7 +111,14 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                   isHighlighted && !isSelected ? "ring-2 ring-blue-300 dark:ring-blue-700" : "",
                 ].join(" ")}
                 role="button"
+                tabIndex={0}
                 onClick={() => handleCategorySelect(cat.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCategorySelect(cat.id);
+                  }
+                }}
               >
                 {/* Toggle */}
                 {hasChildCategories ? (
@@ -267,7 +274,14 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
                 ].join(" ")}
                 role="button"
+                tabIndex={0}
                 onClick={() => handleCategorySelect(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCategorySelect(null);
+                  }
+                }}
               >
                 <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
                 <span className={`text-sm font-semibold ${selectedCategory === null ? "text-blue-900 dark:text-blue-300" : "text-slate-900 dark:text-slate-100"}`}>

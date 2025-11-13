@@ -8,6 +8,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
+import ProductGrid from "../ProductGrid";
+import { SkeletonProductGrid } from "../SkeletonProductGrid";
+
 import ProductHeader from "./ProductHeader";
 import ProductPagination from "./ProductPagination";
 import SideBarCategories from "./SideBarCategories";
@@ -16,13 +19,12 @@ import { searchProducts, mapSort } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import ProductGrid from "../ProductGrid";
-import { SkeletonProductGrid } from "../SkeletonProductGrid";
 
 export default function SearchPage({ query = "" }: { query?: string }) {
   // ✅ store ALL categories (flat)
   const [allCategories, setAllCategories] = useState<CategoryModel[]>([]);
-  const [loadingCats, setLoadingCats] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_loadingCats, setLoadingCats] = useState(false);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("featured");
@@ -139,6 +141,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
             <ProductHeader
               productCount={totalCount}
               sortBy={sortBy}
+              // eslint-disable-next-line react/jsx-sort-props
               onSortChange={(v) => {
                 setSortBy(v);
                 setCurrentPage(1);

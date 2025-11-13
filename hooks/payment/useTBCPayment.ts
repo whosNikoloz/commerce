@@ -1,5 +1,6 @@
-import { useState } from "react";
 import type { TBCPaymentCreationResult, TBCPaymentDetails } from "@/types/payment";
+
+import { useState } from "react";
 
 export function useTBCPayment() {
   const [loading, setLoading] = useState(false);
@@ -34,14 +35,18 @@ export function useTBCPayment() {
 
       if (!response.ok) {
         const errorData = await response.json();
+
         throw new Error(errorData.error || "Failed to create payment");
       }
 
       const result = await response.json();
+
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
+
       setError(errorMessage);
+
       return null;
     } finally {
       setLoading(false);
@@ -59,14 +64,18 @@ export function useTBCPayment() {
 
       if (!response.ok) {
         const errorData = await response.json();
+
         throw new Error(errorData.error || "Failed to get payment status");
       }
 
       const result = await response.json();
+
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
+
       setError(errorMessage);
+
       return null;
     } finally {
       setLoading(false);
@@ -91,14 +100,18 @@ export function useTBCPayment() {
 
       if (!response.ok) {
         const errorData = await response.json();
+
         throw new Error(errorData.error || "Failed to cancel payment");
       }
 
       const result = await response.json();
+
       return result.success;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
+
       setError(errorMessage);
+
       return false;
     } finally {
       setLoading(false);

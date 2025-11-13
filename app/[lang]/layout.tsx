@@ -36,6 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Build verification object
   const verification: Record<string, string> = {};
+
   if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
   if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
   if (seo.yandexVerification) verification.yandex = seo.yandexVerification;

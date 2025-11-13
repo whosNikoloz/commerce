@@ -1,8 +1,9 @@
 // components/admin/facets/DisplayTypePreview.tsx
 "use client";
 
-import { FacetTypeEnum } from "@/types/enums";
 import type { FacetValueModel } from "@/types/facet";
+
+import { FacetTypeEnum } from "@/types/enums";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -48,16 +49,16 @@ export function DisplayTypePreview({
     case FacetTypeEnum.RangeSlider:
       return (
         <div className="space-y-3">
-          <Slider defaultValue={[100, 600]} min={0} max={1000} step={10} />
+          <Slider defaultValue={[100, 600]} max={1000} min={0} step={10} />
           <div className="flex gap-2">
-            <Input className="w-24" placeholder="Min" defaultValue="100" />
-            <Input className="w-24" placeholder="Max" defaultValue="600" />
+            <Input className="w-24" defaultValue="100" placeholder="Min" />
+            <Input className="w-24" defaultValue="600" placeholder="Max" />
           </div>
         </div>
       );
 
     case FacetTypeEnum.NumericInput:
-      return <Input className="w-40" type="number" placeholder={first?.value || "Enter number"} />;
+      return <Input className="w-40" placeholder={first?.value || "Enter number"} type="number" />;
 
     case FacetTypeEnum.BooleanSwitch:
       return (
@@ -73,9 +74,9 @@ export function DisplayTypePreview({
     case FacetTypeEnum.DateRangePicker:
       return (
         <div className="flex items-center gap-2">
-          <Input type="date" className="w-44" />
+          <Input className="w-44" type="date" />
           <span className="text-xs text-muted-foreground">to</span>
-          <Input type="date" className="w-44" />
+          <Input className="w-44" type="date" />
         </div>
       );
 

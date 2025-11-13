@@ -205,45 +205,45 @@ export const ShoppingCartIcon = ({ size = 24, width, height, ...props }: IconSvg
 
 export const GeorgiaIconMono = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
-    viewBox="0 0 36 36"
-    xmlns="http://www.w3.org/2000/svg"
     aria-hidden="true"
-    role="img"
-    width={size || width}
     height={size || height}
+    role="img"
     style={{ display: "block" }}
+    viewBox="0 0 36 36"
+    width={size || width}
+    xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
     {/* Background */}
-    <rect width="36" height="36" fill="#fff" />
+    <rect fill="#fff" height="36" width="36" />
 
     {/* Central Cross */}
-    <rect x="15" width="6" height="36" fill="#000" />
-    <rect y="15" width="36" height="6" fill="#000" />
+    <rect fill="#000" height="36" width="6" x="15" />
+    <rect fill="#000" height="6" width="36" y="15" />
 
     {/* Small Crosses */}
     {/* Top-left */}
     <g fill="#000">
-      <rect x="6.5" y="6" width="1.5" height="6" />
-      <rect x="4" y="8.5" width="6" height="1.5" />
+      <rect height="6" width="1.5" x="6.5" y="6" />
+      <rect height="1.5" width="6" x="4" y="8.5" />
     </g>
 
     {/* Top-right */}
     <g fill="#000">
-      <rect x="28" y="6" width="1.5" height="6" />
-      <rect x="25.5" y="8.5" width="6" height="1.5" />
+      <rect height="6" width="1.5" x="28" y="6" />
+      <rect height="1.5" width="6" x="25.5" y="8.5" />
     </g>
 
     {/* Bottom-left */}
     <g fill="#000">
-      <rect x="6.5" y="24" width="1.5" height="6" />
-      <rect x="4" y="26.5" width="6" height="1.5" />
+      <rect height="6" width="1.5" x="6.5" y="24" />
+      <rect height="1.5" width="6" x="4" y="26.5" />
     </g>
 
     {/* Bottom-right */}
     <g fill="#000">
-      <rect x="28" y="24" width="1.5" height="6" />
-      <rect x="25.5" y="26.5" width="6" height="1.5" />
+      <rect height="6" width="1.5" x="28" y="24" />
+      <rect height="1.5" width="6" x="25.5" y="26.5" />
     </g>
   </svg>
 );
@@ -251,30 +251,30 @@ export const GeorgiaIconMono = ({ size = 24, width, height, ...props }: IconSvgP
 
 export const EnglishIconMono = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
-    viewBox="0 0 512 512"
-    xmlns="http://www.w3.org/2000/svg"
     aria-hidden="true"
-    role="img"
-    width={size || width}
     height={size || height}
+    role="img"
     style={{ display: "block" }}
+    viewBox="0 0 512 512"
+    width={size || width}
+    xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
     {/* Background */}
-    <rect width="512" height="512" fill="#fff" />
+    <rect fill="#fff" height="512" width="512" />
 
     {/* Central Cross */}
-    <rect x="0" y="224" width="512" height="64" fill="#000" />
-    <rect x="224" y="0" width="64" height="512" fill="#000" />
+    <rect fill="#000" height="64" width="512" x="0" y="224" />
+    <rect fill="#000" height="512" width="64" x="224" y="0" />
 
     {/* Diagonal Crosses */}
     <polygon
-      points="0,32 32,0 512,480 480,512"
       fill="#000"
+      points="0,32 32,0 512,480 480,512"
     />
     <polygon
-      points="480,0 512,32 32,512 0,480"
       fill="#000"
+      points="480,0 512,32 32,512 0,480"
     />
   </svg>
 );
@@ -283,42 +283,44 @@ export const EnglishIconMono = ({ size = 24, width, height, ...props }: IconSvgP
 
 export const GeorgiaIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
-    viewBox="0 0 36 36"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlnsXlink="http://www.w3.org/1999/xlink"
     aria-hidden="true"
-    role="img"
     className="iconify iconify--twemoji"
     preserveAspectRatio="xMidYMid meet"
+    role="img"
+    viewBox="0 0 36 36"
     width={size || width}
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+    // eslint-disable-next-line react/jsx-sort-props
     height={size || height}
     // remove global fill + prevent theme inheritance
+    // eslint-disable-next-line react/jsx-sort-props
     style={{ display: "block", color: "transparent" }}
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
-      <path fill="#EEE" d="M32 5H20.5v10.5H36V9a4 4 0 0 0-4-4z" />
-      <path fill="#E8112D" d="M20.5 5h-5v10.5H0v5h15.5V31h5V20.5H36v-5H20.5z" />
+      <path d="M32 5H20.5v10.5H36V9a4 4 0 0 0-4-4z" fill="#EEE" />
+      <path d="M20.5 5h-5v10.5H0v5h15.5V31h5V20.5H36v-5H20.5z" fill="#E8112D" />
       <path
-        fill="#E8112D"
         d="M28.915 9.585a13.58 13.58 0 0 1 .221-1.86a7.18 7.18 0 0 1-1.77 0c.117.615.19 1.237.221 1.86a13.58 13.58 0 0 1-1.86-.221a7.18 7.18 0 0 1 0 1.77a13.56 13.56 0 0 1 1.86-.221a13.58 13.58 0 0 1-.221 1.86a7.18 7.18 0 0 1 1.77 0a13.56 13.56 0 0 1-.221-1.86a13.58 13.58 0 0 1 1.86.221a7.18 7.18 0 0 1 0-1.77c-.616.118-1.237.191-1.86.221z"
-      />
-      <path fill="#EEE" d="M15.5 5H4a4 4 0 0 0-4 4v6.5h15.5V5z" />
-      <path
         fill="#E8112D"
+      />
+      <path d="M15.5 5H4a4 4 0 0 0-4 4v6.5h15.5V5z" fill="#EEE" />
+      <path
         d="M8.415 9.585a13.58 13.58 0 0 1 .221-1.86a7.18 7.18 0 0 1-1.77 0c.117.615.19 1.237.221 1.86a13.58 13.58 0 0 1-1.86-.221a7.18 7.18 0 0 1 0 1.77a13.56 13.56 0 0 1 1.86-.221a13.58 13.58 0 0 1-.221 1.86a7.18 7.18 0 0 1 1.77 0a13.56 13.56 0 0 1-.221-1.86a13.58 13.58 0 0 1 1.86.221a7.18 7.18 0 0 1 0-1.77c-.616.118-1.237.191-1.86.221z"
-      />
-      <path fill="#EEE" d="M36 27v-6.5H20.5V31H32a4 4 0 0 0 4-4z" />
-      <path
         fill="#E8112D"
+      />
+      <path d="M36 27v-6.5H20.5V31H32a4 4 0 0 0 4-4z" fill="#EEE" />
+      <path
         d="M28.915 26.415c.031.623.104 1.244.221 1.86a7.18 7.18 0 0 0-1.77 0c.117-.615.19-1.237.221-1.86a13.58 13.58 0 0 0-1.86.221a7.18 7.18 0 0 0 0-1.77c.615.117 1.237.19 1.86.221a13.58 13.58 0 0 0-.221-1.86a7.18 7.18 0 0 0 1.77 0a13.56 13.56 0 0 0-.221 1.86a13.58 13.58 0 0 0 1.86-.221a7.18 7.18 0 0 0 0 1.77a13.274 13.274 0 0 0-1.86-.221z"
-      />
-      <path fill="#EEE" d="M15.5 20.5H0V27a4 4 0 0 0 4 4h11.5V20.5z" />
-      <path
         fill="#E8112D"
+      />
+      <path d="M15.5 20.5H0V27a4 4 0 0 0 4 4h11.5V20.5z" fill="#EEE" />
+      <path
         d="M8.415 26.415c.031.623.104 1.244.221 1.86a7.18 7.18 0 0 0-1.77 0c.117-.615.19-1.237.221-1.86a13.58 13.58 0 0 0-1.86.221a7.18 7.18 0 0 0 0-1.77c.615.117 1.237.19 1.86.221a13.58 13.58 0 0 0-.221-1.86a7.18 7.18 0 0 0 1.77 0a13.56 13.56 0 0 0-.221 1.86a13.58 13.58 0 0 0 1.86-.221a7.18 7.18 0 0 0 0 1.77a13.274 13.274 0 0 0-1.86-.221z"
+        fill="#E8112D"
       />
     </g>
   </svg>

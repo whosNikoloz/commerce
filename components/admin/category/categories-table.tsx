@@ -48,8 +48,10 @@ export function CategoriesTable({ initialCategories }: Props) {
   const refreshCategories = async () => {
     try {
       const fresh = await getAllCategories();
+
       setCategories(fresh ?? []);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to refresh categories", error);
     }
   };
@@ -67,6 +69,7 @@ export function CategoriesTable({ initialCategories }: Props) {
       setCategories((prev) => prev.filter((c) => c.id !== categoryId));
       toast.success("Category deleted successfully");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to delete category", err);
       toast.error("Failed to delete category");
     }
@@ -74,9 +77,11 @@ export function CategoriesTable({ initialCategories }: Props) {
 
   const toggleCategoryVisibility = async (categoryId: string, nextVal: boolean) => {
     const current = categories.find((p) => p.id === categoryId);
+
     if (!current) return;
 
     const prev = categories;
+
     setCategories((list) =>
       list.map((c) => (c.id === categoryId ? { ...c, isActive: nextVal } : c)),
     );
@@ -88,6 +93,7 @@ export function CategoriesTable({ initialCategories }: Props) {
       await updateCategory(payload);
       toast.success("კატეგორია წარმატებით განახლდა.");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to update category", err);
       setCategories(prev);
       toast.error("კატეგორიის განახლება ვერ მოხერხდა.");
@@ -96,7 +102,9 @@ export function CategoriesTable({ initialCategories }: Props) {
 
   const filtered = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+
     if (!q) return categories;
+
     return categories.filter(
       (c) =>
         (c.name ?? "").toLowerCase().includes(q) ||
@@ -180,8 +188,8 @@ export function CategoriesTable({ initialCategories }: Props) {
                           alt={category.name ?? "Category"}
                           className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
                           height={64}
-                          width={64}
                           src={category.images?.[0] || "/placeholder.png"}
+                          width={64}
                         />
                         {!!category.images && category.images.length > 1 && (
                           <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
@@ -332,9 +340,9 @@ export function CategoriesTable({ initialCategories }: Props) {
                     fill
                     alt={category.name ?? "Category"}
                     className="object-cover"
+                    priority={false}
                     sizes="100vw"
                     src={category.images?.[0] || "/placeholder.png"}
-                    priority={false}
                   />
                   {!!category.images && category.images.length > 1 && (
                     <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">

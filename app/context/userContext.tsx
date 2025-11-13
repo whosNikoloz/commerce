@@ -156,6 +156,7 @@ export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
         logout();
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Refresh error:", error);
       logout();
     } finally {

@@ -1,6 +1,5 @@
 "use client";
 
-import type { FacetValueModel } from "@/types/facet";
 
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
@@ -147,5 +146,6 @@ function removeNode(tree: FacetValueNode[], id: string): FacetValueNode[] {
         ...n,
         children: n.children ? walk(n.children) : n.children,
       }));
+
   return walk(tree);
 }

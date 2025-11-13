@@ -8,8 +8,8 @@ export const isLocale = (v: string): v is Locale =>
   (locales as readonly string[]).includes(v as Locale);
 
 export const toLocale = (v: string): Locale => (isLocale(v) ? v : defaultLocale);
-
-function getBestLocale(req: NextRequest): Locale {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _getBestLocale(req: NextRequest): Locale {
   const headers: Record<string, string> = {};
 
   req.headers.forEach((v, k) => (headers[k] = v));
@@ -39,13 +39,16 @@ export function middleware(request: NextRequest) {
   if (!locInPath) {
     // No locale in path - rewrite to default locale (ka) without redirecting
     const url = request.nextUrl.clone();
+
     url.pathname = `/${defaultLocale}${pathname}`;
+
     return NextResponse.rewrite(url);
   }
 
   // 3) If default locale (ka) is explicitly in URL, redirect to hide it
   if (locInPath === defaultLocale) {
     const pathWithoutLocale = pathname.replace(`/${defaultLocale}`, '') || '/';
+
     return NextResponse.redirect(new URL(`${pathWithoutLocale}${search}`, request.url));
   }
 

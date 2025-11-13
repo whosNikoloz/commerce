@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import type { Locale, InfoPageSlug, SiteConfig } from "@/types/tenant";
 
 import { headers } from "next/headers";
 
+import InfoPageRenderer from "./InfoPageRenderer";
+
 import { i18nPageMetadataAsync, getActiveSite, buildBreadcrumbJsonLd, buildI18nUrls } from "@/lib/seo";
 import { getTenantByHost } from "@/lib/getTenantByHost";
-import type { Locale, InfoPageSlug, SiteConfig } from "@/types/tenant";
-import InfoPageRenderer from "./InfoPageRenderer";
 
 interface InfoPageRouteProps {
   params: Promise<{ lang: Locale }>;
@@ -112,7 +113,7 @@ export async function renderInfoPage({ params, slug }: { params: Promise<{ lang:
   return (
     <>
       {await JsonLd({ lang, site, slug, title: pageTitle })}
-      <InfoPageRenderer pageConfig={pageConfig.config} locale={lang} />
+      <InfoPageRenderer locale={lang} pageConfig={pageConfig.config} />
     </>
   );
 }

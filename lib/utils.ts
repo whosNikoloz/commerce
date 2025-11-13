@@ -28,6 +28,7 @@ export function resolveImageUrl(imagePath: string | null | undefined): string {
   // If it's a local path (starts with /), check if it's an asset from backend
   if (imagePath.startsWith("/assets/")) {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "";
+
     return `${baseUrl}${imagePath}`;
   }
 

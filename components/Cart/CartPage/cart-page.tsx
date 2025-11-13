@@ -34,14 +34,17 @@ export default function CartPage() {
     async function load() {
       // Only check availability for FINA merchants
       const merchantType = getCachedMerchantType();
+
       if (merchantType !== "FINA") {
         setAvailability({});
         setLoading(false);
+
         return;
       }
 
       if (productIds.length === 0) {
         setAvailability({});
+
         return;
       }
 
@@ -58,6 +61,7 @@ export default function CartPage() {
 
         try {
           const res = await getProductRestsByIds({ prods: productIds });
+
           clearTimeout(timeout);
 
           const map: AvailabilityMap = {};
@@ -70,6 +74,7 @@ export default function CartPage() {
             setAvailability(map);
             setLoading(false);
           }
+
           return; // success
         } catch (err: any) {
           clearTimeout(timeout);
@@ -82,11 +87,13 @@ export default function CartPage() {
               setAvailability({});
               setLoading(false);
             }
+
             return;
           }
 
           // Exponential backoff with jitter
           const backoff = 500 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 200);
+
           await new Promise((r) => setTimeout(r, backoff));
         }
       }

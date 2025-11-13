@@ -53,6 +53,7 @@ export default function AdminPage() {
     };
 
     checkAuth();
+
     return () => void (cancelled = true);
   }, [onOpen, router, next]);
 
@@ -113,6 +114,7 @@ export default function AdminPage() {
                     setIsAuthorized(true);
                     onClose();
                     const fallback = `/${currentLang}/admin`;
+
                     router.replace(next && next.startsWith(`/${currentLang}/admin`) ? next : fallback);
                   }}
                 />

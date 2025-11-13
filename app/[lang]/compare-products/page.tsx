@@ -39,8 +39,10 @@ export default function CompareProductsPage() {
         const productsData = await Promise.all(ids.map((id) => getProductById(id.trim())))
 
         setProducts(productsData.filter(Boolean) as ProductResponseModel[])
-      } catch (error) {
-        console.error("Error fetching products:", error)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (__error) {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching products:", __error)
         toast.error("შეცდომა პროდუქტების ჩატვირთვისას")
       } finally {
         setLoading(false)
@@ -76,7 +78,8 @@ export default function CompareProductsPage() {
         title: "პროდუქტების შედარება",
         url: window.location.href,
       })
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_error) {
       navigator.clipboard.writeText(window.location.href)
       toast.success("ბმული დაკოპირებულია")
     }

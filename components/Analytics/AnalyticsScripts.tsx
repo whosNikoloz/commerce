@@ -3,9 +3,10 @@
  * Renders tracking scripts based on tenant SEO configuration
  */
 
+import type { SEOConfig } from "@/types/tenant";
+
 import Script from "next/script";
 
-import type { SEOConfig } from "@/types/tenant";
 
 interface AnalyticsScriptsProps {
   seo?: SEOConfig;
@@ -102,6 +103,7 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
       {/* Facebook Pixel noscript fallback */}
       {seo.facebookPixelId && (
         <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             alt=""
             height="1"

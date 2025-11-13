@@ -10,6 +10,7 @@ export function useBodyScrollLock(locked: boolean) {
         const body = document.body;
         const html = document.documentElement;
         const prev = html.style.scrollBehavior;
+
         html.style.scrollBehavior = "auto";
 
         body.style.position = "fixed";

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { apiFetch } from "@/app/api/client/fetcher";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
@@ -17,7 +18,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json(response);
   } catch (error: any) {
+    // eslint-disable-next-line no-console
     console.error("BOG Payment status error:", error);
+
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

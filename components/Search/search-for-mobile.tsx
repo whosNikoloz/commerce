@@ -5,25 +5,21 @@ import type { ProductResponseModel } from "@/types/product";
 import type { PagedList } from "@/types/pagination";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@headlessui/react";
 import { motion } from "framer-motion";
-import { MessageCircleIcon, ShoppingBag, Shirt, Watch, Smartphone, Laptop, Home, Package, Grid3x3 } from "lucide-react";
+import { ShoppingBag, Shirt, Watch, Smartphone, Laptop, Home, Package } from "lucide-react";
 
-import { HomeIcon, SearchIcon } from "../icons";
-import Cartlink from "../Cart/cart-link";
+import { SearchIcon } from "../icons";
 import { GoBackButton } from "../go-back-button";
 
 import { searchProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
-import CategoryDrawer from "../Categories/category-drawer";
-import AuthModal from "../AuthModal/auth-modal";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 

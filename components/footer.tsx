@@ -22,6 +22,7 @@ function getLocalized(obj?: LocalizedText, lng?: string) {
   if (!obj) return "";
   if (lng && obj[lng]) return obj[lng];
   const first = Object.values(obj)[0];
+
   return first ?? "";
 }
 
@@ -31,6 +32,7 @@ function formatAddress(addr?: {
 }) {
   if (!addr) return "";
   const parts = [addr.street, addr.city, addr.region, addr.postalCode, addr.country].filter(Boolean);
+
   return parts.join(", ");
 }
 
@@ -44,9 +46,11 @@ function groupOpeningHours(rows?: OpeningHour[]) {
   const byOrder = [...rows].sort((a, b) => order.indexOf(a.dayOfWeek) - order.indexOf(b.dayOfWeek));
 
   const out: { days: string[]; hours: string }[] = [];
+
   for (const r of byOrder) {
     const hours = `${r.opens}–${r.closes}`;
     const last = out[out.length - 1];
+
     if (last && last.hours === hours) last.days.push(r.dayOfWeek);
     else out.push({ days: [r.dayOfWeek], hours });
   }
@@ -63,6 +67,7 @@ function buildMapsLink(addressStr: string, geo?: { latitude?: number; longitude?
   if (addressStr) {
     return `https://maps.google.com/?q=${encodeURIComponent(addressStr)}`;
   }
+
   return "";
 }
 
@@ -83,6 +88,7 @@ export function Footer() {
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // eslint-disable-next-line no-console
     console.log("Newsletter signup:", email);
     setEmail("");
   };
@@ -377,7 +383,7 @@ export function Footer() {
       </div>
 
       {/* JSON-LD structured data */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} type="application/ld+json" />
     </footer>
   );
 }

@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import type { CategoryModel } from "@/types/category";
 import type { Locale } from "@/i18n.config";
 
-import { Suspense, cache } from "react";
+import { Suspense } from "react";
 
 import { ProductsTable } from "@/components/admin/product/products-table";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { i18nPageMetadataAsync } from "@/lib/seo"; // ← async SEO helper
 
-const getCategoriesCached = cache(async (): Promise<CategoryModel[]> => {
-  return await getAllCategories();
-});
+// const _getCategoriesCached = cache(async (): Promise<CategoryModel[]> => {
+//   return await getAllCategories();
+// });
 
 export async function generateMetadata({
   params,

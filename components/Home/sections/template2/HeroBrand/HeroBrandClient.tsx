@@ -7,7 +7,6 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
-import { Badge as UIBadge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type Slide = {

@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Since we're using implicit flow (client-side), this just serves the page
  * The actual token handling happens in client-side JavaScript
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   // For implicit flow, the access token is in the URL fragment (#access_token=...)
   // We can't access it server-side, so we return an HTML page that handles it client-side
 

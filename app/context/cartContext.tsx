@@ -20,7 +20,7 @@ export type CartItem = {
   quantity: number;
 };
 
-type Facets = Record<string, string | undefined | null> | undefined | null;
+// type Facets = Record<string, string | undefined | null> | undefined | null;
 
 type CartState = {
   cart: CartItem[];

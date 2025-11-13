@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Eye, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
+import { toast } from "sonner";
 
 import OrderDetailsModal from "./view-order-dialog";
 
@@ -19,7 +20,6 @@ import {
   updateOrderStatus as updateOrderStatusApi,
   cancelOrder as cancelOrderApi,
 } from "@/app/api/services/orderService";
-import { toast } from "sonner";
 
 const STATUS_OPTIONS: OrderStatus[] = [
   OrderStatus.Pending,

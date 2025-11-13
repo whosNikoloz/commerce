@@ -166,7 +166,7 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
         <nav className="py-2">
           {categories?.length ? (
             <ul className="space-y-0.5">
-              {categories.map(({ category, productCount, subcategories }) => {
+              {categories.map(({ category, productCount: _productCount, subcategories }) => {
                 const hasSubs = !!subcategories?.length;
 
                 return (

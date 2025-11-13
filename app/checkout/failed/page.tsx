@@ -12,6 +12,7 @@ function PaymentFailedContent() {
 
   useEffect(() => {
     const reason = searchParams.get('reason');
+
     if (reason) {
       setPaymentInfo({ reason });
     }
@@ -68,8 +69,8 @@ function PaymentFailedContent() {
           </div>
 
           <div className="space-y-3">
-            <button onClick={handleRetry}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
+            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
+              onClick={handleRetry}
             >
               <RefreshCw className="h-5 w-5" />
               Try Again
@@ -101,7 +102,7 @@ export default function PaymentFailedPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
       </div>
     }>
       <PaymentFailedContent />

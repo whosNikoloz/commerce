@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+
 import { useTBCPayment } from '@/hooks/payment/useTBCPayment';
 import { useBOGPayment } from '@/hooks/payment/useBOGPayment';
 import { usePaymentHub } from '@/hooks/payment/usePaymentHub';
@@ -26,6 +27,7 @@ function PaymentCallbackContent() {
     if (!paymentId && !orderId) {
       setStatus('failed');
       setMessage('Payment ID or Order ID not found');
+
       return;
     }
 
@@ -85,7 +87,8 @@ function PaymentCallbackContent() {
             router.push('/checkout/failed?reason=Invalid+payment+information');
           }, 2000);
         }
-      } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_error) {
         setStatus('failed');
         setMessage('Error checking payment status');
         setTimeout(() => {
@@ -125,7 +128,7 @@ function PaymentCallbackContent() {
         <div className="text-center">
           {loading || status === 'checking' || status === 'pending' ? (
             <>
-              <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+              <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
               <h2 className="mb-2 text-2xl font-semibold text-gray-800">Processing Payment</h2>
               <p className="text-gray-600">{message}</p>
             </>
@@ -133,7 +136,7 @@ function PaymentCallbackContent() {
             <>
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                 <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
                 </svg>
               </div>
               <h2 className="mb-2 text-2xl font-semibold text-green-800">Payment Successful!</h2>
@@ -144,14 +147,14 @@ function PaymentCallbackContent() {
             <>
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                 <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
                 </svg>
               </div>
               <h2 className="mb-2 text-2xl font-semibold text-red-800">Payment Failed</h2>
               <p className="text-gray-600">{message}</p>
               <button
-                onClick={() => router.push('/checkout')}
                 className="mt-6 rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
+                onClick={() => router.push('/checkout')}
               >
                 Try Again
               </button>
@@ -167,7 +170,7 @@ export default function PaymentCallbackPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
       </div>
     }>
       <PaymentCallbackContent />

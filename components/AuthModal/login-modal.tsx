@@ -7,12 +7,6 @@ import { Button } from "@heroui/button";
 import { InputLoadingBtn } from "./input-loading-button";
 
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-
-
-// ✅ NEW: use real CustomerAuth API (no old authService)
-
 import { useUser } from "@/app/context/userContext";
 import { loginCustomer, validateUser } from "@/app/api/services/authService";
 
@@ -44,7 +38,8 @@ export default function LoginModal({
 
   const [isLoading, setIsLoading] = useState(false);
   const [loginState, setLoginState] = useState({ email: "", password: "" });
-  const [showMockUsers, setShowMockUsers] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_showMockUsers, _setShowMockUsers] = useState(false);
 
   const [loginError, setLoginError] = useState("");
   const [loginEmailError, setLoginEmailError] = useState("");

@@ -4,13 +4,13 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, ShoppingCartIcon, MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@heroui/button";
 
 import HeaderCartButton from "./header-cart-button";
 
 
 import { useCartStore } from "@/app/context/cartContext";
-import Link from "next/link";
-import { Button } from "@heroui/button";
 
 export default function CartDrawer() {
   const cart = useCartStore((s) => s.cart);

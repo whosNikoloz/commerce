@@ -94,9 +94,14 @@ export const DesktopSidebar = ({
           width: animate ? (open ? "300px" : "60px") : "300px",
         }}
         className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-brand-mute dark:bg-brand-muteddark w-[300px] shrink-0",
+          "h-full px-4 py-4 hidden md:flex md:flex-col bg-brand-mute dark:bg-brand-muteddark w-[300px] shrink-0 overflow-hidden will-change-[width]",
           className,
         )}
+        transition={{
+          duration: 0.2,
+          ease: [0.25, 0.1, 0.25, 1],
+          type: "tween"
+        }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         {...props}
@@ -160,26 +165,26 @@ type SidebarLinkProps = Omit<ComponentPropsWithoutRef<typeof Link>, "href"> & {
 };
 
 export const SidebarLink = ({ link, className, ...props }: SidebarLinkProps) => {
-  const { open, animate } = useSidebar();
+  const { open } = useSidebar();
 
   return (
     <Link
       className={cn("flex items-center justify-start gap-2 group/sidebar py-2", className)}
       href={link.href}
       prefetch={false}
-      {...props} // now you can pass onClick, onKeyDown, etc.
+      {...props}
     >
-      {link.icon}
+      <span className="shrink-0 flex items-center justify-center w-5 h-5">{link.icon}</span>
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      <span
+        className={cn(
+          "text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block transition-all duration-150",
+          "group-hover/sidebar:translate-x-1",
+          open ? "opacity-100" : "opacity-0 w-0 overflow-hidden absolute pointer-events-none"
+        )}
       >
         {link.label}
-      </motion.span>
+      </span>
     </Link>
   );
 };

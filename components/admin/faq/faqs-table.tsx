@@ -329,7 +329,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                placeholder="🔍 ძებნა კითხვით ან პასუხით…"
+                placeholder="ძებნა კითხვით ან პასუხით…"
                 size="lg"
                 startContent={
                   <svg className="text-slate-400" height="16" viewBox="0 0 24 24" width="16">

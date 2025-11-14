@@ -33,7 +33,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2) Handle locale in path
+  // 2) Let Next.js metadata routes bypass (manifest, robots, sitemap, etc.)
+  if (/^\/(?:manifest\.webmanifest|robots\.txt|sitemap\.xml)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
+  // 3) Handle locale in path
   const locInPath = pathLocale(pathname);
 
   if (!locInPath) {
@@ -45,7 +50,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  // 3) If default locale (ka) is explicitly in URL, redirect to hide it
+  // 4) If default locale (ka) is explicitly in URL, redirect to hide it
   if (locInPath === defaultLocale) {
     const pathWithoutLocale = pathname.replace(`/${defaultLocale}`, '') || '/';
 

@@ -113,9 +113,6 @@ export default function AddFaqModal({
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
             <ModalHeader className="flex flex-col items-center gap-2 pb-4 pt-8 relative">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-orange-600 rounded-2xl shadow-lg mb-2">
-                <Star className="h-6 w-6 text-white fill-white" />
-              </div>
               <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100">
                 FAQ-ის დამატება
               </h2>

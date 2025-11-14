@@ -181,7 +181,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                            text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
                            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 dark:focus:border-blue-600
                            shadow-sm hover:shadow-md transition-all duration-300 font-medium"
-                placeholder="🔍 Search by name or origin..."
+                placeholder="Search by name or origin..."
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

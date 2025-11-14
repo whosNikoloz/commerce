@@ -1,11 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconBook } from "@tabler/icons-react";
-import { motion } from "framer-motion";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
-import Link from "next/link";
-import { CreditCard, FileQuestionIcon, Package, TruckIcon } from "lucide-react";
+import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon } from "lucide-react";
 
 import { ProfileIcon } from "../icons";
 
@@ -21,7 +19,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const { config } = useTenant();
 
   const router = useRouter();
-  const pathname = usePathname();                 // ⬅️ current route
+  const pathname = usePathname();                 
   const { lang } = useParams<{ lang?: string }>();
   const currentLang = lang || "en";
 
@@ -47,6 +45,8 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     { label: "Orders",    href: `/${currentLang}/admin/orders`,  icon: <Package className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
     { label: "Customers",    href: `/${currentLang}/admin/customers`,  icon: <ProfileIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
     { label: "Shippings",    href: `/${currentLang}/admin/shipping`,  icon: <TruckIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    { label: "Analytics",    href: `/${currentLang}/admin/analytics`,  icon: <Database className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+
     //{ label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
   ];
 
@@ -82,9 +82,8 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl">
           <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
-            {open ? <Logo /> : <LogoIcon />}
-
-            <div className="mt-8 flex flex-col gap-2">
+            {/* <Logo /> */}
+            <div className="flex flex-col gap-2">
               {links.map((link) => (
                 <SidebarLink
                   key={link.href}
@@ -97,18 +96,21 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
 
           <Button
             className={cn(
-              "flex items-center justify-start gap-2 group/sidebar py-2 p-0 bg-transparent hover:bg-red-50/80 dark:hover:bg-red-900/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md",
+              "flex items-center justify-start gap-2 group/sidebar py-2 p-0 bg-transparent hover:bg-red-50/80 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md",
               "text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 backdrop-blur-sm",
             )}
             onPress={handleLogout}
           >
-            <IconArrowLeft className="h-5 w-5 text-red-500 dark:text-red-400 transition-transform group-hover/sidebar:-translate-x-0.5" />
-            <motion.span
-              animate={{ display: open ? "inline-block" : "none", opacity: open ? 1 : 0 }}
-              className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 font-semibold"
+            <IconArrowLeft className="h-5 w-5 text-red-500 dark:text-red-400 transition-transform group-hover/sidebar:-translate-x-0.5 shrink-0" />
+            <span
+              className={cn(
+                "text-sm whitespace-nowrap inline-block font-semibold transition-all duration-150",
+                "group-hover/sidebar:translate-x-1",
+                open ? "opacity-100" : "opacity-0 w-0 overflow-hidden absolute pointer-events-none"
+              )}
             >
               Logout
-            </motion.span>
+            </span>
           </Button>
         </SidebarBody>
       </Sidebar>
@@ -118,31 +120,25 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const Logo = () => (
-  <Link
-    className="relative z-20 flex items-center space-x-3 py-2 text-sm font-medium group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-blue-950/30 dark:hover:to-purple-950/30 rounded-xl px-3 transition-all duration-300 shadow-sm hover:shadow-lg"
-    href="#"
-  >
-    <div className="h-8 w-8 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 flex items-center justify-center">
-      <span className="text-white font-bold text-sm">F</span>
-    </div>
-    <motion.span
-      animate={{ opacity: 1 }}
-      className="whitespace-pre text-slate-900 dark:text-slate-100 font-bold text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 tracking-tight"
-      initial={{ opacity: 0 }}
-    >
-      Demo
-    </motion.span>
-  </Link>
-);
+// export const Logo = () => {
+//   const { open } = useSidebar();
 
-export const LogoIcon = () => (
-  <Link
-    className="relative z-20 flex items-center justify-center py-2 text-sm font-medium group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-blue-950/30 dark:hover:to-purple-950/30 rounded-xl p-2 transition-all duration-300"
-    href="#"
-  >
-    <div className="h-8 w-8 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 flex items-center justify-center">
-      <span className="text-white font-bold text-sm">F</span>
-    </div>
-  </Link>
-);
+//   return (
+//     <Link
+//       className={cn(
+//         "relative z-20 flex items-center py-2 text-sm font-medium group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-blue-950/30 dark:hover:to-purple-950/30 rounded-xl transition-colors duration-150",
+//         open ? "space-x-3 px-3" : "justify-center p-2"
+//       )}
+//       href="#"
+//     >
+//       <div className="h-8 w-8 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center">
+//         <span className="text-white font-bold text-sm">F</span>
+//       </div>
+//       {open && (
+//         <span className="whitespace-nowrap text-slate-900 dark:text-slate-100 font-bold text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150 tracking-tight">
+//           Demo
+//         </span>
+//       )}
+//     </Link>
+//   );
+// };

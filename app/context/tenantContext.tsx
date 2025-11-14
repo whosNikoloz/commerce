@@ -39,9 +39,9 @@ export const getCachedMerchantType = (): string | null => {
   const cfg = getCachedTenantConfig();
 
   // eslint-disable-next-line no-console
-  console.log("📦 Cached tenant config:", cfg);
+  //console.log("📦 Cached tenant config:", cfg);
   // eslint-disable-next-line no-console
-  console.log("📦 Merchant Type from config:", cfg?.merchantType);
+  //console.log("📦 Merchant Type from config:", cfg?.merchantType);
 
   return cfg?.merchantType ?? null;
 };

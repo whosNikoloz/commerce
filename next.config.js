@@ -96,6 +96,7 @@ const nextConfig = {
               // Helpful for dev tools and HMR
               "worker-src 'self' blob:",
               "frame-ancestors 'self'",
+              "frame-src 'self' https://vercel.live",
               "base-uri 'self'",
               "form-action 'self'",
             ].join("; "),

@@ -95,9 +95,9 @@ export default function UpdateProductModal({
       );
 
       // eslint-disable-next-line no-console
-      console.log('🔍 [Update Modal] Fetched product groups:', groups);
+      //console.log('🔍 [Update Modal] Fetched product groups:', groups);
       // eslint-disable-next-line no-console
-      console.log('🔍 [Update Modal] First group structure:', groups[0]);
+      //console.log('🔍 [Update Modal] First group structure:', groups[0]);
       setProductGroups(groups);
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -358,7 +358,7 @@ export default function UpdateProductModal({
                           </HSelectItem>,
                           ...productGroups.map((group) => {
                             // eslint-disable-next-line no-console
-                            console.log('🔍 [Update Modal] Rendering group:', { id: group.id, name: group.name, fullObject: group });
+                            //console.log('🔍 [Update Modal] Rendering group:', { id: group.id, name: group.name, fullObject: group });
 
                             return (
                               <HSelectItem key={group.id} textValue={group.name}>

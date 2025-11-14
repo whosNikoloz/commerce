@@ -189,7 +189,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-zinc-800 bg-[rgb(var(--brand-surface-dark))] text-[rgb(var(--text-light-dark))]">
+    <footer className="border-t md:pb-0 pb-10 border-zinc-800 bg-[rgb(var(--brand-surface-dark))] text-[rgb(var(--text-light-dark))]">
       <div className="container mx-auto px-4 py-12">
         {/* TOP: logo + slogan + theme */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

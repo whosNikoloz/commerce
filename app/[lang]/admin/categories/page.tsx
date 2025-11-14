@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import type { Locale } from "@/i18n.config";
 
 
-import { CategoriesTable } from "@/components/admin/category/categories-table";
+import { CategoriesTreeView } from "@/components/admin/category/categories-tree-view";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { i18nPageMetadataAsync } from "@/lib/seo"; // ← async SEO helper
 
@@ -40,7 +40,7 @@ export default async function CategoriesPage() {
           Organize your product hierarchy and facets
         </p>
       </div>
-      <CategoriesTable initialCategories={categories} />
+      <CategoriesTreeView initialCategories={categories} />
     </div>
   );
 }

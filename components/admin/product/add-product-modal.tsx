@@ -76,9 +76,9 @@ export default function AddProductModal({
       );
 
       // eslint-disable-next-line no-console
-      console.log('🔍 Fetched product groups:', groups);
+      //console.log('🔍 Fetched product groups:', groups);
       // eslint-disable-next-line no-console
-      console.log('🔍 First group structure:', groups[0]);
+      //console.log('🔍 First group structure:', groups[0]);
       setProductGroups(groups);
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -313,7 +313,7 @@ export default function AddProductModal({
                   <SelectItem value="none">None (standalone product)</SelectItem>
                   {productGroups.map((group) => {
                     // eslint-disable-next-line no-console
-                    console.log('🔍 Rendering group:', { id: group.id, name: group.name, fullObject: group });
+                    //console.log('🔍 Rendering group:', { id: group.id, name: group.name, fullObject: group });
 
                     return (
                       <SelectItem key={group.id} value={group.id}>

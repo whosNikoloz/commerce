@@ -127,7 +127,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                          text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
                          focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 dark:focus:border-emerald-600
                          shadow-sm hover:shadow-md transition-all duration-300 font-medium"
-              placeholder="🔍 Search categories..."
+              placeholder="Search categories..."
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

@@ -327,7 +327,7 @@ export default function ReviewImagesModal({
                             className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           >
                             <Image
-                              alt="Existing"
+                              alt="Existing brand image"
                               className="h-36 w-full object-cover"
                               height={200}
                               src={img.url}
@@ -376,7 +376,7 @@ export default function ReviewImagesModal({
                             className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           >
                             <Image
-                              alt="Pending upload"
+                              alt="Brand image pending upload"
                               className="h-36 w-full object-cover"
                               height={200}
                               src={img.url || "/placeholder.png"}

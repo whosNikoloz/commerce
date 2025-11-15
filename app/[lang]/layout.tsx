@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { Providers } from "./providers";
 import { LayoutWrapper } from "./LayoutWrapper";
 
+import FontAwesomeLoader from "@/components/FontAwesomeLoader";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import { locales, defaultLocale } from "@/i18n.config";
 import BackToTopShadcn from "@/components/back_to_top";
@@ -95,7 +96,6 @@ export default async function RootLayout({
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
   const tenant = await getTenantByHost(host);
-  //console.log("🏗️ [LAYOUT SSR] Tenant loaded for host:", host, "→", tenant.siteConfig.name);
   const site = tenant.siteConfig;
   const seo = site.seo || {};
   const style = themeToStyle(tenant.theme);
@@ -126,13 +126,17 @@ export default async function RootLayout({
         <link crossOrigin="anonymous" href="https://media.veli.store" rel="preconnect" />
         <link crossOrigin="anonymous" href="https://extra.ge" rel="preconnect" />
         <link crossOrigin="anonymous" href="https://ecommerce-outdoor.s3.eu-north-1.amazonaws.com" rel="preconnect" />
+        <link crossOrigin="anonymous" href="https://finasyncecomm.s3.eu-central-1.amazonaws.com" rel="dns-prefetch" />
 
-        {/* Font Awesome - loaded with low priority */}
-        <link
-          crossOrigin="anonymous"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-          rel="stylesheet"
-        />
+        {/* API preconnect for better performance */}
+        {process.env.NEXT_PUBLIC_API_URL && (
+          <link crossOrigin="anonymous" href={new URL(process.env.NEXT_PUBLIC_API_URL).origin} rel="preconnect" />
+        )}
+
+        {/* Preload critical images */}
+        <link as="image" href={site.logo} rel="preload" />
+        {site.ogImage && site.ogImage !== site.logo && <link as="image" href={site.ogImage} rel="preload" />}
+
         <style
           dangerouslySetInnerHTML={{
             __html: `@font-face{font-display:swap;}`,
@@ -174,9 +178,13 @@ export default async function RootLayout({
           initialTenant={tenant}
           themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
         >
+          <FontAwesomeLoader />
+          {/* <WebVitals /> */}
           <LayoutWrapper>
             <ClientUADataFix />
-            {children}
+            <main id="main-content">
+              {children}
+            </main>
             <BackToTopShadcn threshold={320} />
             <FloatingCompareButton />
           </LayoutWrapper>

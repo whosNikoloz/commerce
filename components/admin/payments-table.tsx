@@ -567,7 +567,7 @@ export function PaymentsTable() {
                     <div className="relative flex-shrink-0">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 rounded-2xl flex items-center justify-center border-2 border-red-200 dark:border-red-800/50 shadow-md">
                         <Image
-                                    alt={"Bank of Georgia"}
+                                    alt="Bank of Georgia logo"
                                     className="rounded bg-white object-contain"
                                     height={32}
                                     src={"/logos/bog.png"}
@@ -741,7 +741,7 @@ export function PaymentsTable() {
                     <div className="relative flex-shrink-0">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-2xl flex items-center justify-center border-2 border-blue-200 dark:border-blue-800/50 shadow-md">
                         <Image
-                                    alt={"Tbc Bank"}
+                                    alt="TBC Bank logo"
                                     className="rounded bg-white object-contain"
                                     height={32}
                                     src={"/logos/tbc.png"}

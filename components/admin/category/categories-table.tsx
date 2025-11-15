@@ -123,6 +123,7 @@ export function CategoriesTable({ initialCategories }: Props) {
 
           <div className="relative flex-1 max-w-md">
             <input
+              aria-label="Search categories"
               className="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2.5 text-sm
                          text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
                          focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 dark:focus:border-emerald-600

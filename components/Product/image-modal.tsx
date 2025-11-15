@@ -192,12 +192,14 @@ export default function ImageModal({
             <div className="flex-1 flex items-center justify-center relative bg-muted/5">
               {/* Nav buttons */}
               <button
+                aria-label="Previous image"
                 className="absolute left-4 z-10 rounded-full p-2 text-foreground bg-muted/60 hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={handlePrevious}
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
               <button
+                aria-label="Next image"
                 className="absolute right-4 z-10 rounded-full p-2 text-foreground bg-muted/60 hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={handleNext}
               >

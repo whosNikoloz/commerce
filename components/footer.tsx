@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -77,13 +77,16 @@ export function Footer() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
-  const year = useMemo(() => new Date().getFullYear(), []);
+  const [year, setYear] = useState(2025); // Default to avoid hydration mismatch
   const { config, isLoading } = useTenant();
   const t = useTranslation();
   const params = useParams();
   const lng = (params.lang as string) || "ka";
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    setYear(new Date().getFullYear()); // Set actual year on client mount
+  }, []);
   const toggleTheme = () => mounted && setTheme(resolvedTheme === "dark" ? "light" : "dark");
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {

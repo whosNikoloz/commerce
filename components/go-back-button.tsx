@@ -11,6 +11,7 @@ export const GoBackButton: React.FC<GoBackButtonProps> = ({ className, size = 25
   return (
     <Button
       isIconOnly
+      aria-label="Go back"
       className={`flex items-center bg-transparent gap-2 ${className || ""}`}
       onPress={onClick}
     >

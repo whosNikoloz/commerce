@@ -27,7 +27,8 @@
       "Bash(nul)",
       "Bash(timeout 180 npm run build:*)",
       "Bash(find:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(del /f \"D:\\MyProjects\\nextjs\\commerce\\components\\OptimizedImage.tsx\" \"D:\\MyProjects\\nextjs\\commerce\\lib\\accessibility.ts\" \"D:\\MyProjects\\nextjs\\commerce\\LIGHTHOUSE_OPTIMIZATION_GUIDE.md\" \"D:\\MyProjects\\nextjs\\commerce\\ACCESSIBILITY_CHECKLIST.md\")"
     ],
     "deny": [],
     "ask": []

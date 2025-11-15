@@ -130,6 +130,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   return (
     <>
       <div
+        aria-label="Open profile menu"
         className="flex flex-col items-center bg-transparent"
         role="button"
         tabIndex={0}
@@ -262,6 +263,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                     </Link>
 
                     <div
+                      aria-label="Open search"
                       className="flex flex-col items-center bg-transparent"
                       role="button"
                       tabIndex={0}
@@ -278,6 +280,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                     </Link>
 
                     <div
+                      aria-label="Close profile menu"
                       className="flex flex-col items-center bg-transparent"
                       role="button"
                       tabIndex={0}

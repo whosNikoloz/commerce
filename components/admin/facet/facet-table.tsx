@@ -130,7 +130,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                 {/* Search */}
                 <div className="relative flex-1">
                   <Tags className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500 dark:text-cyan-400 h-4 w-4" />
-                  <Input className="pl-10" placeholder="Search facets..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                  <Input aria-label="Search facets" className="pl-10" placeholder="Search facets..." value={search} onChange={(e) => setSearch(e.target.value)} />
                 </div>
               </div>
 

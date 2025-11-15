@@ -160,6 +160,7 @@ export default function CartDropdown() {
                             {/* qty pill (keeps your brand orange as-is) */}
                             <div className="inline-flex items-center h-8 rounded-full bg-brand-primary text-white shadow-sm">
                               <button
+                                aria-label="Decrease quantity"
                                 className="h-8 w-8 rounded-l-full hover:bg-white/10 disabled:opacity-50"
                                 disabled={item.quantity <= 1}
                                 onClick={() =>
@@ -172,6 +173,7 @@ export default function CartDropdown() {
                                 {item.quantity}
                               </div>
                               <button
+                                aria-label="Increase quantity"
                                 className="h-8 w-8 rounded-r-full hover:bg-white/10"
                                 onClick={() => updateCartItem(item.id, item.quantity + 1)}
                               >

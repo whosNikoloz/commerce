@@ -174,6 +174,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           <div className="flex-shrink-0 w-5 sm:w-6">
             {hasChildCategories ? (
               <button
+                aria-label={isExpanded ? "Collapse category" : "Expand category"}
                 className="p-0.5 sm:p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -306,7 +307,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           <div className="md:hidden flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="h-8 w-8 p-0" size="sm" variant="ghost">
+                <Button aria-label="Category actions menu" className="h-8 w-8 p-0" size="sm" variant="ghost">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -413,6 +414,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
             <div className="relative flex-1 sm:max-w-md">
               <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <Input
+                aria-label="Search categories"
                 className="pl-8 sm:pl-9 text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 focus:border-emerald-400 dark:focus:border-emerald-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm h-9"
                 placeholder="Search categories..."
                 type="text"

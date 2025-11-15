@@ -2,7 +2,7 @@
 
 import type { Locale } from "@/i18n.config";
 
-import { FC } from "react";
+import { FC, useId } from "react";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { SwitchProps, useSwitch } from "@heroui/switch";
 import { useIsSSR } from "@react-aria/ssr";
@@ -20,6 +20,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
   const isSSR = useIsSSR();
   const pathname = usePathname();
   const router = useRouter();
+  const switchId = useId();
 
   // Check if URL has /en prefix, otherwise it's ka (default)
   const currentLanguage: Locale = pathname?.startsWith("/en") ? "en" : "ka";
@@ -43,6 +44,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
   };
 
   const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } = useSwitch({
+    id: switchId,
     isSelected: currentLanguage === "ka" || isSSR,
     "aria-label": `Switch to ${currentLanguage === "ka" ? "English" : "Georgian"} mode`,
     onChange,

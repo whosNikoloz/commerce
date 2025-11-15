@@ -55,11 +55,49 @@ const nextConfig = {
       "@radix-ui/react-tabs",
       "@radix-ui/react-select",
       "@radix-ui/react-tooltip",
+      "framer-motion",
+      "recharts",
     ],
   },
 
-  // ❌ Remove webpack() block – Turbopack ignores it and shows the warning.
-  // If you MUST keep it for production builds, see the dual-config example below.
+  // Optimize bundle splitting for production
+  webpack: (config, { isServer, dev }) => {
+    if (!isServer && !dev) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Vendor chunk for node_modules
+            vendor: {
+              name: 'vendor',
+              chunks: 'all',
+              test: /node_modules/,
+              priority: 20,
+            },
+            // Common chunk for shared code
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'async',
+              priority: 10,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
+            // Separate chunk for large libraries
+            lib: {
+              test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+              name: 'lib',
+              priority: 30,
+            },
+          },
+        },
+      };
+    }
+    return config;
+  },
 
   async headers() {
     const apiDomain = getApiDomain();

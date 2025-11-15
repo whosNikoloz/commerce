@@ -158,10 +158,10 @@ const Search = ({
         <SearchIcon className="text-gray-500" />
         <Input
           aria-controls="search-results"
-          aria-expanded={isOpen}
-          aria-label="Search"
+          aria-label="Search products"
           autoComplete="off"
-          className="w-full pl-2 py-3 bg-transparent  rounded-full text-foreground placeholder-muted-foreground outline-none ring-0  transition-all"
+          className="w-full pl-2 py-3 bg-transparent rounded-full text-foreground placeholder-muted-foreground transition-all
+                    outline-none focus:outline-none ring-0 focus:ring-0 focus:border-transparent"
           id="search-input"
           placeholder="What are you looking for?"
           type="search"
@@ -179,9 +179,9 @@ const Search = ({
             }
           }}
         />
+
       </div>
 
-      {/* Results / History panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div

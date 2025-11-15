@@ -226,6 +226,7 @@ export default function SearchForMobile({
           <SearchIcon height={19} width={19}/>        </div>
       ) : (
         <button
+          aria-expanded={isModalOpen}
           aria-label="Open search"
           className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-11/12 mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300"
           onClick={handleOpen}
@@ -237,9 +238,15 @@ export default function SearchForMobile({
           <Input
             readOnly
             aria-controls="search-results"
-            aria-expanded={isModalOpen}
-            aria-label="Search"
-            className="w-full pl-2 py-3 bg-transparent text-[16px]  rounded-full text-foreground placeholder-muted-foreground outline-none ring-0  transition-all"
+            aria-label="Search products"
+            className="w-full pl-2 py-3 bg-transparent text-[16px]  rounded-full text-foreground
+                focus:outline-none
+                focus:ring-0
+                focus:border-transparent
+                focus-visible:outline-none
+                focus-visible:ring-0
+                focus-visible:border-transparent
+                 placeholder-muted-foreground outline-none ring-0  transition-all"
             id="search-input"
             placeholder="What are you looking for?"
             type="search"
@@ -280,8 +287,7 @@ export default function SearchForMobile({
                   <SearchIcon className="text-gray-400 dark:text-gray-500 w-5 h-5 flex-shrink-0" />
                   <Input
                     aria-controls="search-results"
-                    aria-expanded={isModalOpen}
-                    aria-label="Search"
+                    aria-label="Search products"
                     autoComplete="off"
                     className="w-full bg-transparent border-none focus:outline-none text-gray-900 dark:text-gray-100 text-[16px] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                     id="search-input"

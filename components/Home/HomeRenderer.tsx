@@ -18,8 +18,6 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
       tenant.templateId
     ) as { sections: Array<{ enabled: boolean; order: number; type: string; data: any }> };
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("Homepage validation failed:", error);
     validatedHomepage = null;
   }
 
@@ -83,9 +81,6 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
         const Component = templateDefinition.registry[section.type];
 
         if (!Component) {
-          // eslint-disable-next-line no-console
-          console.warn(`Component not found for section type: ${section.type}`);
-
           return null;
         }
 

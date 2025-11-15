@@ -268,6 +268,7 @@ export default function OrdersTable() {
             </div>
             <div className="flex items-center gap-2">
               <Input
+                aria-label="Search orders"
                 className="w-64"
                 placeholder="Search by ID / status / date…"
                 value={searchTerm}

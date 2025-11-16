@@ -84,7 +84,7 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
                   </div>
                 )}
                 {(banner.title || banner.description) && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end">
+                  <div className="absolute inset-0 flex items-end">
                     <div className="p-8 text-white">
                       {banner.title && (
                         <h3 className="text-3xl md:text-4xl font-bold mb-2">

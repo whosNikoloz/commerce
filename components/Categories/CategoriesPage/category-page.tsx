@@ -181,12 +181,19 @@ export default function CategoryPage({
     (async () => {
       setLoadingProducts(true);
 
-      // reflect in URL
+      // reflect in URL - only add non-default parameters
       startTransition(() => {
         const next = new URLSearchParams();
 
-        next.set("page", String(currentPage));
-        next.set("sort", sortBy);
+        // Only add page if not 1
+        if (currentPage > 1) {
+          next.set("page", String(currentPage));
+        }
+
+        // Only add sort if not default
+        if (sortBy !== "featured") {
+          next.set("sort", sortBy);
+        }
 
         (effectiveFilter.brandIds ?? []).forEach((b) => next.append("brand", b));
         (effectiveFilter.condition ?? []).forEach((c) => next.append("cond", String(c)));
@@ -198,7 +205,9 @@ export default function CategoryPage({
           next.set("max", String(effectiveFilter.maxPrice));
         (effectiveFilter.facetFilters ?? []).forEach((f) => next.append("facet", f.facetValueId));
 
-        router.replace(`?${next.toString()}`, { scroll: false });
+        const queryString = next.toString();
+        const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+        router.replace(newUrl, { scroll: false });
       });
 
       try {
@@ -209,7 +218,7 @@ export default function CategoryPage({
               facetNumerics,
               facetSearches,
               facetDates,
-            } as any, 
+            } as any,
             page: currentPage,
             pageSize: itemsPerPage,
             sortBy,
@@ -232,7 +241,7 @@ export default function CategoryPage({
     return () => {
       cancelled = true;
     };
-  }, [category?.id, filter, sortBy, currentPage, router, startTransition, hasUsedInitialData]);
+  }, [category?.id, filter, sortBy, currentPage, router, startTransition, hasUsedInitialData, facetRanges, facetNumerics, facetSearches, facetDates]);
 
   // if (notFound) return <CategoryNotFound />;
   // if (loading || !category) return <Loading />;

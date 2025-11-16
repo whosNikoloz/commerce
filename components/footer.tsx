@@ -129,7 +129,9 @@ export function Footer() {
   };
 
   // pick logo based on theme
-  const logoSrc = (resolvedTheme === "dark" ? site.logoDark : site.logoLight) || site.logo || "/logo.svg";
+  //const logoSrc = (resolvedTheme === "dark" ? site.logoDark : site.logoLight) || site.logo || "/logo.svg";
+  const logoSrc = site.logoDark || site.logo || "/logo.svg";
+
 
   // BusinessInfo fields
   const phoneLocalized = getLocalized(business.phone as LocalizedText | undefined, lng);

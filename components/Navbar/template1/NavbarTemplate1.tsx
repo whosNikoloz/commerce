@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 import { HomeIcon } from "../../icons";
 import { LanguageSwitch } from "../../Switch/language";
@@ -26,6 +27,7 @@ export const NavbarTemplate1 = () => {
   const { config, isLoading } = useTenant();
   const site = config?.siteConfig;
   const cartVariant = config?.ui?.cartVariant ?? "dropdown";
+  const { resolvedTheme } = useTheme();
 
   // All hooks must be called unconditionally before any early returns
   const [isScrolled, setIsScrolled] = useState(false);
@@ -90,7 +92,7 @@ export const NavbarTemplate1 = () => {
   if (isLoading || !site) {
     return null;
   }
-
+  const logoSrc = (resolvedTheme === "dark" ? site.logoDark : site.logoLight) || site.logo || "/logo.svg";
 
   return (
     <>
@@ -115,7 +117,7 @@ export const NavbarTemplate1 = () => {
                       alt="Site Logo"
                       className=" select-none transition-transform duration-300 group-hover:scale-105 object-contain"
                       height={100}
-                      src={site.logo}
+                      src={logoSrc}
                       width={100}
                     />
 

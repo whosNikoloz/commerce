@@ -76,7 +76,7 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
   };
 
   return (
-    <div className="">
+    <>
       {sections.map((section, index) => {
         const Component = templateDefinition.registry[section.type];
 
@@ -98,6 +98,6 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
           </Suspense>
         );
       })}
-    </div>
+    </>
   );
 }

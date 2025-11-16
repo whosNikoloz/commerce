@@ -2,7 +2,7 @@
 
 import type { Locale } from "@/i18n.config";
 
-import { FC, useId } from "react";
+import { FC, useState, useEffect } from "react";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { SwitchProps, useSwitch } from "@heroui/switch";
 import { useIsSSR } from "@react-aria/ssr";
@@ -20,7 +20,11 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
   const isSSR = useIsSSR();
   const pathname = usePathname();
   const router = useRouter();
-  const switchId = useId();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Check if URL has /en prefix, otherwise it's ka (default)
   const currentLanguage: Locale = pathname?.startsWith("/en") ? "en" : "ka";
@@ -44,11 +48,24 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
   };
 
   const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } = useSwitch({
-    id: switchId,
     isSelected: currentLanguage === "ka" || isSSR,
     "aria-label": `Switch to ${currentLanguage === "ka" ? "English" : "Georgian"} mode`,
     onChange,
   });
+
+  // Show a static placeholder during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div
+        className={clsx(
+          "px-px cursor-pointer flex items-center justify-center p-2",
+          className,
+        )}
+      >
+        <GeorgiaIcon size={30} />
+      </div>
+    );
+  }
 
   return (
     <Component

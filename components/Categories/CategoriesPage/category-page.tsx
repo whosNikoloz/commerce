@@ -207,6 +207,7 @@ export default function CategoryPage({
 
         const queryString = next.toString();
         const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+
         router.replace(newUrl, { scroll: false });
       });
 

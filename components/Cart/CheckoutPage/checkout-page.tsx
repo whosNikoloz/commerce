@@ -15,6 +15,7 @@ import { useCartStore } from "@/app/context/cartContext";
 import { apiPost } from "@/app/api/payment/helpers";
 import { useUser } from "@/app/context/userContext";
 import { createOrder } from "@/app/api/services/orderService";
+import { useGA4 } from "@/hooks/useGA4";
 
 export default function CheckoutPage() {
   const { user } = useUser();
@@ -24,6 +25,7 @@ export default function CheckoutPage() {
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
+  const { trackCheckoutBegin, trackPaymentInfo } = useGA4();
 
   const [provider, setProvider] = useState<PaymentProvider>("bog");
   const router = useRouter();
@@ -45,6 +47,13 @@ export default function CheckoutPage() {
       router.push("/cart?login=required");
     }
   }, [user, router]);
+
+  // Track begin checkout event
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      trackCheckoutBegin(cart);
+    }
+  }, [cart.length, trackCheckoutBegin]);
 
   if (cartLen === 0) return null;
 
@@ -73,6 +82,9 @@ export default function CheckoutPage() {
       } , user.id);
 
       const orderId = orderResponse.id;
+
+      // Track payment info being added
+      trackPaymentInfo(cart, provider.toUpperCase());
 
       let data: { orderId?: string; paymentId?: string; redirectUrl: string };
 

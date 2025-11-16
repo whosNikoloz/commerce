@@ -20,6 +20,7 @@ import { searchProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { useGA4 } from "@/hooks/useGA4";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
@@ -42,6 +43,7 @@ export default function SearchForMobile({
 }: SearchForMobileProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { trackSearchQuery } = useGA4();
 
   // ✅ history hook
   const {
@@ -134,6 +136,10 @@ export default function SearchForMobile({
     try {
       setIsLoading(true);
       setError(null);
+
+      // Track search query in GA4
+      trackSearchQuery(term);
+
       const resp = await searchProducts(term, "name", "asc", 1, pageSize);
       const items = (resp as PagedList<ProductResponseModel>).items ?? [];
 

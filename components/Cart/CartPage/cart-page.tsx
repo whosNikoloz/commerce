@@ -11,6 +11,7 @@ import CartItems from "./CartItems";
 import { useCartStore } from "@/app/context/cartContext";
 import { getCachedMerchantType } from "@/app/context/tenantContext";
 import { getProductRestsByIds } from "@/app/api/services/productService";
+import { useGA4 } from "@/hooks/useGA4";
 
 export type AvailabilityMap = Record<string, number>;
 
@@ -18,6 +19,7 @@ export default function CartPage() {
   const searchParams = useSearchParams();
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
+  const { trackCartView } = useGA4();
 
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(false);
@@ -120,6 +122,13 @@ export default function CartPage() {
       setShowLoginPrompt(true);
     }
   }, [searchParams]);
+
+  // Track view cart event
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      trackCartView(cart);
+    }
+  }, [cart.length, trackCartView]);
 
   if (cartLen === 0) return <EmptyCart />;
 

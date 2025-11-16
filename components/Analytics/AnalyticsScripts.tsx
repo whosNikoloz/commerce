@@ -15,10 +15,20 @@ interface AnalyticsScriptsProps {
 export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
   if (!seo) return null;
 
+  // Helper to check if a value is a valid non-empty string
+  const isValidString = (value: any): value is string => {
+    return typeof value === 'string' && value.trim().length > 0;
+  };
+
+  // Helper to check if a value is a valid number
+  const isValidNumber = (value: any): value is number => {
+    return typeof value === 'number' && !isNaN(value) && value > 0;
+  };
+
   return (
     <>
       {/* Google Analytics 4 */}
-      {seo.googleAnalyticsId && (
+      {isValidString(seo.googleAnalyticsId) && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${seo.googleAnalyticsId}`}
@@ -31,6 +41,12 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
               gtag('js', new Date());
               gtag('config', '${seo.googleAnalyticsId}', {
                 page_path: window.location.pathname,
+                send_page_view: false,
+                // Enhanced E-commerce Configuration
+                allow_google_signals: true,
+                allow_ad_personalization_signals: true,
+                // Debug mode (set to false in production)
+                debug_mode: ${process.env.NODE_ENV === 'development'},
               });
             `}
           </Script>
@@ -38,7 +54,7 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
       )}
 
       {/* Google Tag Manager */}
-      {seo.googleTagManagerId && (
+      {isValidString(seo.googleTagManagerId) && (
         <>
           <Script id="google-tag-manager" strategy="afterInteractive">
             {`
@@ -54,7 +70,7 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
       )}
 
       {/* Facebook Pixel */}
-      {seo.facebookPixelId && (
+      {isValidString(seo.facebookPixelId) && (
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -72,7 +88,7 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
       )}
 
       {/* Hotjar */}
-      {seo.hotjarId && (
+      {isValidNumber(seo.hotjarId) && (
         <Script id="hotjar" strategy="afterInteractive">
           {`
             (function(h,o,t,j,a,r){
@@ -88,7 +104,7 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
       )}
 
       {/* Microsoft Clarity */}
-      {seo.clarityId && (
+      {isValidString(seo.clarityId) && (
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
@@ -101,7 +117,7 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
       )}
 
       {/* Facebook Pixel noscript fallback */}
-      {seo.facebookPixelId && (
+      {isValidString(seo.facebookPixelId) && (
         <noscript>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

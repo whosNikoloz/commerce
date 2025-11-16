@@ -12,6 +12,7 @@ import { SearchIcon } from "../icons";
 
 import { searchProducts } from "@/app/api/services/productService";
 import { useSearchHistory } from "@/app/context/useSearchHistory";
+import { useGA4 } from "@/hooks/useGA4";
 
 // (Optional) tiny hook using matchMedia
 const MOBILE_BREAKPOINT = 768;
@@ -53,6 +54,7 @@ const Search = ({
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const debounceRef = useRef<number | null>(null);
+  const { trackSearchQuery } = useGA4();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -109,6 +111,10 @@ const Search = ({
     try {
       setIsLoading(true);
       setError(null);
+
+      // Track search query in GA4
+      trackSearchQuery(trimmed);
+
       const resp = await searchProducts(trimmed, "name", "asc", 1, pageSize);
       const items = (resp as PagedList<ProductResponseModel>).items ?? [];
 

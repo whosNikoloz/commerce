@@ -10,6 +10,9 @@ import { getProductRestsByIds } from "../api/services/productService";
 
 import { getCachedMerchantType } from "./tenantContext";
 
+import { trackAddToCart, trackRemoveFromCart, cartItemToGA4Item, calculateItemsValue } from "@/lib/analytics/ga4";
+
+
 export type CartItem = {
   discount: any;
   originalPrice?: ReactNode;
@@ -90,15 +93,37 @@ const creator: StateCreator<CartState> = (set, get) => ({
 
       toast.success(`${item.name} დაემატა კალათაში`);
 
+      // Track add to cart event in GA4
+      const gaItem = cartItemToGA4Item(item);
+      const value = calculateItemsValue([gaItem]);
+
+      trackAddToCart({
+        items: [gaItem],
+        value,
+      });
+
       return { cart: newCart };
     });
   },
 
   removeFromCart: (id) =>
     set((state) => {
+      // Find the item being removed for tracking
+      const removedItem = state.cart.find((item) => item.id === String(id));
       const newCart = state.cart.filter((item) => item.id !== String(id));
 
       toast.success("საქონელი წაიშალა კალათიდან");
+
+      // Track remove from cart event in GA4
+      if (removedItem) {
+        const gaItem = cartItemToGA4Item(removedItem);
+        const value = calculateItemsValue([gaItem]);
+
+        trackRemoveFromCart({
+          items: [gaItem],
+          value,
+        });
+      }
 
       return { cart: newCart };
     }),

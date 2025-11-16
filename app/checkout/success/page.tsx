@@ -5,10 +5,18 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 
+import { useGA4 } from '@/hooks/useGA4';
+import { useCartStore } from '@/app/context/cartContext';
+
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { trackPurchaseComplete } = useGA4();
+  const cart = useCartStore((s) => s.cart);
+  const subtotal = useCartStore((s) => s.getSubtotal());
+  const clearCart = useCartStore((s) => s.clearCart);
   const [orderInfo, setOrderInfo] = useState<{ orderId: string; paymentId?: string } | null>(null);
+  const [purchaseTracked, setPurchaseTracked] = useState(false);
 
   useEffect(() => {
     const paymentId = searchParams.get('paymentId');
@@ -23,12 +31,37 @@ function PaymentSuccessContent() {
         paymentId: paymentId || undefined,
       });
 
+      // Track purchase event (only once)
+      if (!purchaseTracked && cart && cart.length > 0) {
+        const shipping = subtotal > 50 ? 0 : 9.99;
+        const tax = subtotal * 0.08;
+        const total = subtotal + shipping + tax;
+
+        trackPurchaseComplete(
+          finalOrderId,
+          cart,
+          total,
+          {
+            tax,
+            shipping,
+            affiliation: 'Online Store',
+          }
+        );
+
+        setPurchaseTracked(true);
+
+        // Clear cart after successful purchase
+        setTimeout(() => {
+          clearCart();
+        }, 1000);
+      }
+
       // Clear stored order ID
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('lastOrderId');
       }
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, cart, subtotal, trackPurchaseComplete, clearCart, purchaseTracked]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">

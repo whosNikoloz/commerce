@@ -28,6 +28,7 @@ export const NavbarTemplate1 = () => {
   const site = config?.siteConfig;
   const cartVariant = config?.ui?.cartVariant ?? "dropdown";
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   // All hooks must be called unconditionally before any early returns
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,6 +47,11 @@ export const NavbarTemplate1 = () => {
 
   // Get current language from pathname - if /en exists, use en, otherwise default to ka
   const lng = pathname.startsWith("/en") ? "en" : "ka";
+
+  // Track when component is mounted (client-side only)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // scroll state
   useEffect(() => {
@@ -92,7 +98,11 @@ export const NavbarTemplate1 = () => {
   if (isLoading || !site) {
     return null;
   }
-  const logoSrc = (resolvedTheme === "dark" ? site.logoDark : site.logoLight) || site.logo || "/logo.svg";
+
+  // Use default logo during SSR, then switch to theme-specific logo after mount
+  const logoSrc = mounted
+    ? (resolvedTheme === "dark" ? site.logoDark : site.logoLight) || site.logo || "/logo.svg"
+    : site.logo || "/logo.svg";
 
   return (
     <>

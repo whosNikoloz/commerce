@@ -18,6 +18,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 import { useFlyToCart } from "@/hooks/use-fly-to-cart";
 import { locales, defaultLocale } from "@/i18n.config";
+import { useGA4 } from "@/hooks/useGA4";
 
 type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
 
@@ -48,6 +49,21 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const [notFound, setNotFound] = useState(false);
   const imageReviewRef = useRef<ImageReviewHandle>(null);
   const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
+  const { trackProductView } = useGA4();
+
+  // Track product view when product changes
+  useEffect(() => {
+    if (product && product.id) {
+      trackProductView({
+        id: product.id,
+        name: product.name || '',
+        price: product.price,
+        discountPrice: product.discountPrice,
+        brand: product.brand,
+        category: product.category,
+      });
+    }
+  }, [product?.id, trackProductView]);
 
   const handleFacetChange = async (facetName: string, facetValue: string, targetFacetValueId?: string) => {
 

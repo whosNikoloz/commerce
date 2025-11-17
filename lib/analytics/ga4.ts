@@ -71,7 +71,9 @@ export const trackEvent = (
   params?: GA4EventParams
 ): void => {
   if (!isGALoaded()) {
+    // eslint-disable-next-line no-console
     console.warn('GA4 not loaded. Event not tracked:', eventName);
+
     return;
   }
 
@@ -435,6 +437,7 @@ export const calculateItemsValue = (items: GA4Item[]): number => {
     const itemPrice = item.price || 0;
     const itemQuantity = item.quantity || 1;
     const itemDiscount = item.discount || 0;
+
     return total + (itemPrice - itemDiscount) * itemQuantity;
   }, 0);
 };

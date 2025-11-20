@@ -18,7 +18,7 @@ export default function AdminPage() {
   const isMobile = useIsMobile();
 
   const currentLang = lang === "ka" ? "ka" : "en";
-  const next = searchParams.get("next"); // <- read ?next=/en/admin/products
+  const next = searchParams.get("next");
 
   useEffect(() => {
     let cancelled = false;

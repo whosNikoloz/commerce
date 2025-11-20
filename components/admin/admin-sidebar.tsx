@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { IconArrowLeft, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconBook, IconLetterB } from "@tabler/icons-react";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
-import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon, Layers, Store, Palette } from "lucide-react";
+import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon, Layers, Store, Palette, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { ProfileIcon } from "../icons";
 
@@ -17,6 +18,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
   const { config } = useTenant();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const router = useRouter();
   const pathname = usePathname();                 
@@ -201,6 +203,27 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                   Site Config
                 </span>
               </a>
+
+              <button
+                aria-label="Toggle theme"
+                className={cn("flex items-center justify-start gap-2 group/sidebar py-2" , "text-indigo-600 dark:text-indigo-400")}
+                type="button"
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              >
+                <span className="shrink-0 flex items-center justify-center w-5 h-5 relative">
+                  <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                </span>
+                <span
+                  className={cn(
+                    "text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block transition-all duration-150",
+                    "group-hover/sidebar:translate-x-1",
+                    open ? "opacity-100" : "opacity-0 w-0 overflow-hidden absolute pointer-events-none"
+                  )}
+                >
+                  {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}
+                </span>
+              </button>
             </div>
           </div>
 

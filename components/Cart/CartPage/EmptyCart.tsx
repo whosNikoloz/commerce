@@ -11,7 +11,7 @@ const translations: Record<string, string> = {
   "cart.empty": "Your cart is empty",
   "cart.emptyDescription": "Start adding items to your cart to see them here",
   "cart.startShopping": "Start Shopping",
-  "cart.freeShippingOver": "Free shipping on orders over $50",
+  "cart.freeShippingOver": "Free shipping on orders over ₾50",
   "cart.secureCheckout": "Secure checkout process",
   "cart.fastDelivery": "Fast delivery available",
 };

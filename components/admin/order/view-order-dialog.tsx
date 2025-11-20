@@ -543,26 +543,36 @@ export default function OrderDetailsModal({
                     <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
                       <h3 className="font-bold text-lg mb-3">Tracking History</h3>
                       <div className="space-y-2">
-                        {normalizedDetail.trackingSteps.map((t, i) => (
-                          <div key={i} className="flex gap-3 items-start">
-                            <div
-                              className={`w-2 h-2 mt-1 rounded-full ${
-                                t.completed ? "bg-emerald-500" : "bg-slate-400"
-                              }`}
-                            />
-                            <div>
-                              <div className="font-medium text-sm">{t.status}</div>
-                              {t.description && (
-                                <div className="text-xs text-slate-500">
-                                  {t.description}
+                        {normalizedDetail.trackingSteps.map((t, i) => {
+                          // Convert numeric status to readable label
+                          const statusValue = typeof t.status === 'string' && !isNaN(Number(t.status))
+                            ? Number(t.status) as OrderStatus
+                            : t.status;
+                          const readableStatus = typeof statusValue === 'number'
+                            ? OrderStatus[statusValue]
+                            : String(statusValue);
+
+                          return (
+                            <div key={i} className="flex gap-3 items-start">
+                              <div
+                                className={`w-2 h-2 mt-1 rounded-full ${
+                                  t.completed ? "bg-emerald-500" : "bg-slate-400"
+                                }`}
+                              />
+                              <div>
+                                <div className="font-medium text-sm">{readableStatus}</div>
+                                {t.description && (
+                                  <div className="text-xs text-slate-500">
+                                    {t.description}
+                                  </div>
+                                )}
+                                <div className="text-xs text-slate-400">
+                                  {formatDateTimeLocal(t.date)}
                                 </div>
-                              )}
-                              <div className="text-xs text-slate-400">
-                                {formatDateTimeLocal(t.date)}
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

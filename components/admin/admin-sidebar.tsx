@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { IconArrowLeft, IconUserBolt, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconBook } from "@tabler/icons-react";
+import { IconArrowLeft, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconBook, IconLetterB } from "@tabler/icons-react";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
-import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon } from "lucide-react";
+import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon, Layers, Store, Palette } from "lucide-react";
 
 import { ProfileIcon } from "../icons";
 
@@ -34,21 +34,114 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   }, [pathname]); // whenever the route changes
 
   const allLinks = [
-    { label: "Dashboard",  href: `/${currentLang}/admin`,            icon: <IconHome className="h-5 w-5 text-slate-600 dark:text-slate-400" /> },
-    { label: "Brands",     href: `/${currentLang}/admin/brands`,     icon: <IconUserBolt className="h-5 w-5 text-purple-600 dark:text-purple-400" /> },
-    { label: "Products",   href: `/${currentLang}/admin/products`,   icon: <IconBox className="h-5 w-5 text-cyan-600 dark:text-cyan-400" /> },
-    { label: "Faqs",       href: `/${currentLang}/admin/faqs`,       icon: <FileQuestionIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> },
-    { label: "Categories", href: `/${currentLang}/admin/categories`, icon: <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
-    { label: "Facets", href: `/${currentLang}/admin/facets`, icon: <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" /> },
-    ...(isFinaMerchant ? [{ label: "Sync",       href: `/${currentLang}/admin/sync`,       icon: <IconFileDownloadFilled className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> }] : []),
-    { label: "Payments",    href: `/${currentLang}/admin/payments`,  icon: <CreditCard className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
-    { label: "Orders",    href: `/${currentLang}/admin/orders`,  icon: <Package className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
-    { label: "Customers",    href: `/${currentLang}/admin/customers`,  icon: <ProfileIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
-    { label: "Shippings",    href: `/${currentLang}/admin/shipping`,  icon: <TruckIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
-    { label: "Analytics",    href: `/${currentLang}/admin/analytics`,  icon: <Database className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    {
+      label: "Dashboard",
+      href: `/${currentLang}/admin`,
+      icon: (
+        <IconHome className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
 
-    //{ label: "Tenants",    href: `/${currentLang}/admin/tenants`,    icon: <IconColorFilter className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> },
+    {
+      label: "Orders",
+      href: `/${currentLang}/admin/orders`,
+      icon: (
+        <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Products",
+      href: `/${currentLang}/admin/products`,
+      icon: (
+        <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Customers",
+      href: `/${currentLang}/admin/customers`,
+      icon: (
+        <ProfileIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+
+    {
+      label: "Product Groups",
+      href: `/${currentLang}/admin/product-groups`,
+      icon: (
+        <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Categories",
+      href: `/${currentLang}/admin/categories`,
+      icon: (
+        <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Facets",
+      href: `/${currentLang}/admin/facets`,
+      icon: (
+        <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Brands",
+      href: `/${currentLang}/admin/brands`,
+      icon: (
+        <IconLetterB className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+
+    {
+      label: "Payments",
+      href: `/${currentLang}/admin/payments`,
+      icon: (
+        <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Shippings",
+      href: `/${currentLang}/admin/shipping`,
+      icon: (
+        <TruckIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Stores",
+      href: `/${currentLang}/admin/stores`,
+      icon: (
+        <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    ...(isFinaMerchant
+      ? [
+          {
+            label: "Sync",
+            href: `/${currentLang}/admin/sync`,
+            icon: (
+              <IconFileDownloadFilled className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            ),
+          },
+        ]
+      : []),
+
+    {
+      label: "Analytics",
+      href: `/${currentLang}/admin/analytics`,
+      icon: (
+        <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
+    {
+      label: "Faqs",
+      href: `/${currentLang}/admin/faqs`,
+      icon: (
+        <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
+    },
   ];
+
 
   const links = allLinks;
 
@@ -91,6 +184,23 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                   onClick={() => isMobile && setOpen(false)}
                 />
               ))}
+              <a
+                className={cn("flex items-center justify-start gap-2 group/sidebar py-2" , "text-indigo-600 dark:text-indigo-400")}
+                href={"https://tenant-admin-panel.vercel.app/"}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span className="shrink-0 flex items-center justify-center w-5 h-5"><Palette /></span>
+                <span
+                  className={cn(
+                    "text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block transition-all duration-150",
+                    "group-hover/sidebar:translate-x-1",
+                    open ? "opacity-100" : "opacity-0 w-0 overflow-hidden absolute pointer-events-none"
+                  )}
+                >
+                  Site Config
+                </span>
+              </a>
             </div>
           </div>
 

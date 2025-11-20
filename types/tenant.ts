@@ -384,8 +384,9 @@ export type NavbarVariant = 1 | 2;
 export type CartVariant = "dropdown" | "drawer";
 
 export type UIConfig = {
-  navbarVariant?: NavbarVariant;
-  cartVariant?: CartVariant;     
+  navbarVariant?: NavbarVariant; // Choose navbar template (1 or 2)
+  cartVariant?: CartVariant; // Cart display style: "dropdown" or "drawer"
+  enableFlyToCart?: boolean; // Enable/disable fly-to-cart animation when adding items to cart (default: true)
 };
 
 

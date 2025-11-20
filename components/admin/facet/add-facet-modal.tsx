@@ -3,10 +3,20 @@
 import type { CategoryModel } from "@/types/category";
 import type { FacetValueModel } from "@/types/facet";
 
-
 import { useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/modal";
+import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { Switch } from "@heroui/switch";
 
 import FacetValuesEditor from "./facet-values-editor";
 import DisplayTypePicker from "./display-type-picker";
@@ -14,40 +24,33 @@ import { DisplayTypePreview } from "./displaytype-preview";
 
 import { FacetValueNode, hasChildren } from "@/types/facet-ui";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter,
-  DialogHeader, DialogTitle, DialogTrigger
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createFacet, type CreateFacetRequest } from "@/app/api/services/facetService";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { GoBackButton } from "@/components/go-back-button";
 
 export default function AddFacetModal({
   categories,
   disabled,
-  presetCategoryId,           // ← current category from FacetsTable
+  presetCategoryId,
   onCreated,
 }: {
   categories: CategoryModel[];
   disabled?: boolean;
-  presetCategoryId?: string;  // ← when present, we hide category picker
+  presetCategoryId?: string;
   onCreated?: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
-  const [displayType, setDisplayType] = useState("1"); // default: Checkbox List
+  const [displayType, setDisplayType] = useState("1");
   const [isCustom, setIsCustom] = useState(true);
 
-  // Keep local selectedCategories ONLY for the “no preset” case
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     presetCategoryId ? [presetCategoryId] : []
   );
 
-  // If preset changes while modal is open, sync it
   useEffect(() => {
     if (presetCategoryId) setSelectedCategories([presetCategoryId]);
   }, [presetCategoryId]);
@@ -55,7 +58,6 @@ export default function AddFacetModal({
   const [values, setValues] = useState<FacetValueModel[]>([]);
 
   const effectiveCategoryIds = useMemo<string[]>(() => {
-    // If parent passes presetCategoryId, force-use it and ignore local selector
     if (presetCategoryId) return [presetCategoryId];
 
     return selectedCategories;
@@ -74,6 +76,26 @@ export default function AddFacetModal({
 
   const canSubmit = name.trim().length > 0 && effectiveCategoryIds.length > 0;
 
+  const resetForm = () => {
+    setName("");
+    setDisplayType("1");
+    setIsCustom(true);
+    setValues([]);
+    if (!presetCategoryId) setSelectedCategories([]);
+  };
+
+  const handleOpen = () => {
+    if (!disabled) {
+      resetForm();
+      onOpen();
+    }
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) {
@@ -87,11 +109,7 @@ export default function AddFacetModal({
       console.log("Creating facet with payload:", JSON.stringify(payload, null, 2));
       await createFacet(payload);
       toast.success("Facet created");
-      setOpen(false);
-      setName("");
-      setValues([]);
-      // reset local selector only if we're in the manual-category mode
-      if (!presetCategoryId) setSelectedCategories([]);
+      handleClose();
       onCreated?.();
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -103,76 +121,152 @@ export default function AddFacetModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!disabled) setOpen(v); }}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white" disabled={disabled}>
-          <Plus className="h-4 w-4" /> Add Facet
-        </Button>
-      </DialogTrigger>
+    <>
+      <Button
+        className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+        disabled={disabled}
+        onClick={handleOpen}
+      >
+        <Plus className="h-4 w-4" /> Add Facet
+      </Button>
 
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add Facet</DialogTitle>
-          <DialogDescription>Create a new attribute (e.g., Size, Resolution)</DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="fname">Name *</Label>
-              <Input id="fname" placeholder="Size" value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-3 grid gap-2">
-                <Label>Display Type</Label>
-                <DisplayTypePicker value={displayType} onChange={setDisplayType} />
-                <div className="mt-3 rounded-lg border p-4 bg-muted/30">
-                  <div className="text-xs font-semibold mb-2">Preview</div>
-                  <DisplayTypePreview displayType={displayType} values={values} />
-                </div>
-              </div>
-
-              {/* Custom toggle */}
-              <div className="grid gap-2">
-                <Label>Custom</Label>
-                <div className="h-10 rounded-md border flex items-center px-3">
-                  <Switch checked={isCustom} onCheckedChange={setIsCustom} />
-                </div>
-              </div>
-
-              {/* Category picker (only if no preset) */}
-              {!presetCategoryId && (
-                <div className="grid gap-2">
-                  <Label>Categories *</Label>
-                  <Select
-                    value={selectedCategories[0] ?? ""}
-                    onValueChange={(v) => setSelectedCategories([v])}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                    <SelectContent>
-                      {categories.map(c => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
+      <Modal
+        classNames={{
+          backdrop: "bg-black/60 backdrop-blur-sm",
+          base: "w-screen rounded-none bg-background dark:bg-slate-950 flex flex-col rounded-2xl",
+        }}
+        hideCloseButton={isMobile}
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size={isMobile ? "full" : "3xl"}
+        onClose={handleClose}
+      >
+        <ModalContent className="h-full">
+          {() => (
+            <form className="flex h-full flex-col" onSubmit={handleSubmit}>
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
+                  <GoBackButton onClick={handleClose} />
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Add Facet
+                    </span>
+                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                      Create a new attribute (e.g., Size, Resolution)
+                    </span>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                  <div className="flex flex-col min-w-0">
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      Add Facet
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Create a new attribute (e.g., Size, Resolution)
+                    </p>
+                  </div>
+                </ModalHeader>
               )}
-            </div>
 
-            <div className="grid gap-2">
-              <Label>Facet Values</Label>
-              <FacetValuesEditor values={values} onChange={setValues} />
-            </div>
-          </div>
+              <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3 space-y-4">
+                {/* Name */}
+                <Input
+                  required
+                  label="Name"
+                  labelPlacement="outside"
+                  placeholder="Size"
+                  value={name}
+                  variant="bordered"
+                  onChange={(e) => setName(e.target.value)}
+                />
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button disabled={loading || !canSubmit} type="submit">
-              {loading ? "Creating..." : "Create"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+                {/* Display Type */}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Display Type
+                  </div>
+                  <DisplayTypePicker value={displayType} onChange={setDisplayType} />
+                  <div className="mt-3 rounded-lg border p-4 bg-muted/30">
+                    <div className="text-xs font-semibold mb-2">Preview</div>
+                    <DisplayTypePreview displayType={displayType} values={values} />
+                  </div>
+                </div>
+
+                {/* Custom Toggle */}
+                <div className="flex items-center justify-between p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                      Custom
+                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      Mark as custom facet
+                    </p>
+                  </div>
+                  <Switch
+                    isSelected={isCustom}
+                    onValueChange={setIsCustom}
+                  />
+                </div>
+
+                {/* Category Picker (only if no preset) */}
+                {!presetCategoryId && (
+                  <Select
+                    isRequired
+                    label="Category"
+                    labelPlacement="outside"
+                    placeholder="Select category"
+                    selectedKeys={selectedCategories[0] ? [selectedCategories[0]] : []}
+                    variant="bordered"
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+
+                      setSelectedCategories(selected ? [selected] : []);
+                    }}
+                  >
+                    {categories.map(c => (
+                      <SelectItem key={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+
+                {/* Facet Values */}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Facet Values
+                  </div>
+                  <FacetValuesEditor values={values} onChange={setValues} />
+                </div>
+              </ModalBody>
+
+              <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
+                <div className="flex w-full items-center justify-end gap-2">
+                  <Button
+                    disabled={loading}
+                    size={isMobile ? "sm" : "default"}
+                    type="button"
+                    variant="outline"
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold"
+                    disabled={loading || !canSubmit}
+                    size={isMobile ? "sm" : "default"}
+                    type="submit"
+                  >
+                    {loading ? "Creating..." : "Create"}
+                  </Button>
+                </div>
+              </ModalFooter>
+            </form>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 

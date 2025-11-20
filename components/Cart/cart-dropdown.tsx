@@ -157,7 +157,7 @@ export default function CartDropdown() {
                               <span className="text-base leading-none">🗑️</span>
                             </button>
 
-                            {/* qty pill (keeps your brand orange as-is) */}
+                            {/* qty pill (keeps your brand blue as-is) */}
                             <div className="inline-flex items-center h-8 rounded-full bg-brand-primary text-white shadow-sm">
                               <button
                                 aria-label="Decrease quantity"

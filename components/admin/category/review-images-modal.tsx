@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { deleteImage, uploadCategoryImages } from "@/app/api/services/categoryService";
+import { GoBackButton } from "@/components/go-back-button";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -250,24 +251,33 @@ export default function ReviewImagesModal({
         <ModalContent>
           {() => (
             <>
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-2xl" />
 
-              <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
-                      Manage Category Images
-                    </h2>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                      Upload up to {maxFiles} images • Max {maxSizeMB}MB each
-                    </p>
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-2 px-4 pt-6 pb-4 z-50 relative">
+                  <GoBackButton onClick={handleCloseModal} />
+                  <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                  </Badge>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-2 pb-4 pt-8 relative">
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col">
+                      <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                        Manage Category Images
+                      </h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                        Upload up to {maxFiles} images • Max {maxSizeMB}MB each
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                  {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
-                </Badge>
-              </ModalHeader>
+                  <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                  </Badge>
+                </ModalHeader>
+              )}
 
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 <div className="grid gap-4">

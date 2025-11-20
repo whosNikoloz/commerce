@@ -91,7 +91,7 @@ const initialShippingMethods: ShippingMethod[] = [
   {
     id: "4",
     name: "Free Shipping",
-    description: "Free delivery for orders over $50",
+    description: "Free delivery for orders over ₾50",
     baseRate: 0,
     deliveryTime: "7-10 business days",
     zones: ["Domestic"],
@@ -427,7 +427,7 @@ export function ShippingTable() {
                     Minimum order value for free shipping
                   </p>
                 </div>
-                <Input className="w-24" placeholder="$50" />
+                <Input className="w-24" placeholder="₾50" />
               </div>
               <div className="flex items-center justify-between">
                 <div>

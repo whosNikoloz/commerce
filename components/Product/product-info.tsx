@@ -167,7 +167,7 @@ export function ProductInfo({
               ) : stock <= 3 ? (
                 <Badge className="bg-amber-600 text-white">ბოლო {stock} ც</Badge>
               ) : stock <= 10 ? (
-                <Badge className="bg-orange-600 text-white">დარჩა {stock} ც</Badge>
+                <Badge className="bg-blue-600 text-white">დარჩა {stock} ც</Badge>
               ) : (
                 <Badge className="bg-emerald-600 text-white">მარაგშია ({stock} ც)</Badge>
               )}

@@ -12,7 +12,7 @@ import { useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
 
 const formatPrice = (price: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(price);
+  new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
 
 const PROMO_CODES = {
   SAVE10: { discount: 0.1, label: "10% OFF" },
@@ -203,7 +203,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
           <div className="pt-4 space-y-2">
             <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <Truck className="h-3 w-3" />
-              <span>Free shipping on orders over $50</span>
+              <span>Free shipping on orders over ₾50</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <RotateCcw className="h-3 w-3" />

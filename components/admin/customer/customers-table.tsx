@@ -11,6 +11,8 @@ import {
   ModalHeader,
 } from "@heroui/modal";
 
+import { useIsMobile } from "@/hooks/use-mobile";
+import { GoBackButton } from "@/components/go-back-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -113,6 +115,7 @@ function getOrderStatusVariant(
 }
 
 export function CustomersTable() {
+  const isMobile = useIsMobile();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -423,25 +426,44 @@ export function CustomersTable() {
       {/* Customer Details Modal */}
       <Modal
         classNames={{
-          backdrop: "bg-black/60 backdrop-blur-lg",
-          base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl",
+          backdrop: "bg-black/60 backdrop-blur-sm",
+          base: "w-screen rounded-none bg-background dark:bg-slate-950 flex flex-col rounded-2xl",
         }}
+        hideCloseButton={isMobile}
         isOpen={isDialogOpen}
-        placement="center"
-        size="3xl"
+        scrollBehavior="inside"
+        size={isMobile ? "full" : "3xl"}
         onClose={() => setIsDialogOpen(false)}
       >
-        <ModalContent>
+        <ModalContent className="h-full">
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold">Customer Details - {selectedCustomer?.name}</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Complete customer information and order history
-                </p>
-              </ModalHeader>
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
+                  <GoBackButton onClick={() => setIsDialogOpen(false)} />
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                      {selectedCustomer?.name}
+                    </span>
+                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                      Customer information and order history
+                    </span>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                  <div className="flex flex-col min-w-0">
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      Customer Details - {selectedCustomer?.name}
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Complete customer information and order history
+                    </p>
+                  </div>
+                </ModalHeader>
+              )}
 
-              <ModalBody className="overflow-y-auto max-h-[70vh] px-5 py-4">
+              <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3">
                 {selectedCustomer && (
                   <Tabs className="w-full" defaultValue="profile">
                     <TabsList className="grid w-full grid-cols-3 mb-4">
@@ -559,8 +581,12 @@ export function CustomersTable() {
                 )}
               </ModalBody>
 
-              <ModalFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
+                <Button
+                  size={isMobile ? "sm" : "default"}
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
                   Close
                 </Button>
               </ModalFooter>
@@ -572,25 +598,44 @@ export function CustomersTable() {
       {/* Order Detail Modal */}
       <Modal
         classNames={{
-          backdrop: "bg-black/60 backdrop-blur-lg",
-          base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl",
+          backdrop: "bg-black/60 backdrop-blur-sm",
+          base: "w-screen rounded-none bg-background dark:bg-slate-950 flex flex-col rounded-2xl",
         }}
+        hideCloseButton={isMobile}
         isOpen={isOrderDialogOpen}
-        placement="center"
-        size="4xl"
+        scrollBehavior="inside"
+        size={isMobile ? "full" : "4xl"}
         onClose={() => setIsOrderDialogOpen(false)}
       >
-        <ModalContent>
+        <ModalContent className="h-full">
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold">Order Details</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Complete order information and items
-                </p>
-              </ModalHeader>
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
+                  <GoBackButton onClick={() => setIsOrderDialogOpen(false)} />
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Order Details
+                    </span>
+                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                      Complete order information and items
+                    </span>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                  <div className="flex flex-col min-w-0">
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      Order Details
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Complete order information and items
+                    </p>
+                  </div>
+                </ModalHeader>
+              )}
 
-              <ModalBody className="overflow-y-auto max-h-[70vh] px-5 py-4">
+              <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3">
             {isLoadingOrderDetail ? (
               <div className="flex items-center justify-center py-12">
                 <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
@@ -725,8 +770,12 @@ export function CustomersTable() {
             )}
               </ModalBody>
 
-              <ModalFooter>
-                <Button variant="outline" onClick={() => setIsOrderDialogOpen(false)}>
+              <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
+                <Button
+                  size={isMobile ? "sm" : "default"}
+                  variant="outline"
+                  onClick={() => setIsOrderDialogOpen(false)}
+                >
                   Close
                 </Button>
               </ModalFooter>
@@ -738,25 +787,44 @@ export function CustomersTable() {
       {/* Edit Customer Modal */}
       <Modal
         classNames={{
-          backdrop: "bg-black/60 backdrop-blur-lg",
-          base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl",
+          backdrop: "bg-black/60 backdrop-blur-sm",
+          base: "w-screen rounded-none bg-background dark:bg-slate-950 flex flex-col rounded-2xl",
         }}
+        hideCloseButton={isMobile}
         isOpen={isEditDialogOpen}
-        placement="center"
-        size="2xl"
+        scrollBehavior="inside"
+        size={isMobile ? "full" : "2xl"}
         onClose={() => setIsEditDialogOpen(false)}
       >
-        <ModalContent>
+        <ModalContent className="h-full">
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold">Edit Customer</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Update customer information
-                </p>
-              </ModalHeader>
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
+                  <GoBackButton onClick={() => setIsEditDialogOpen(false)} />
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Edit Customer
+                    </span>
+                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                      Update customer information
+                    </span>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                  <div className="flex flex-col min-w-0">
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      Edit Customer
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Update customer information
+                    </p>
+                  </div>
+                </ModalHeader>
+              )}
 
-              <ModalBody className="px-6 py-4">
+              <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
@@ -819,19 +887,23 @@ export function CustomersTable() {
                 </div>
               </ModalBody>
 
-              <ModalFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  disabled={isUpdating}
-                  onClick={handleUpdateCustomer}
-                >
-                  {isUpdating ? "Saving..." : "Save Changes"}
-                </Button>
+              <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
+                <div className="flex w-full items-center justify-end gap-2">
+                  <Button
+                    size={isMobile ? "sm" : "default"}
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={isUpdating}
+                    size={isMobile ? "sm" : "default"}
+                    onClick={handleUpdateCustomer}
+                  >
+                    {isUpdating ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
               </ModalFooter>
             </>
           )}

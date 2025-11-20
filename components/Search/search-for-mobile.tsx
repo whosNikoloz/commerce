@@ -203,7 +203,7 @@ export default function SearchForMobile({
       return <Smartphone className="h-12 w-12 text-green-500" />;
     }
     if (name.includes('laptop') || name.includes('computer')) {
-      return <Laptop className="h-12 w-12 text-orange-500" />;
+      return <Laptop className="h-12 w-12 text-blue-500" />;
     }
     if (name.includes('home') || name.includes('furniture')) {
       return <Home className="h-12 w-12 text-red-500" />;

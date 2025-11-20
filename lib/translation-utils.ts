@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n.config";
    ========================= */
 
 const CURRENCY_FORMATTERS: Record<Locale, Intl.NumberFormat> = {
-  en: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }),
+  en: new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }),
   ka: new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }),
 };
 

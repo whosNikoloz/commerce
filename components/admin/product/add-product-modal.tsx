@@ -5,34 +5,31 @@ import type { CategoryModel } from "@/types/category";
 import type { BrandModel } from "@/types/brand";
 import type { ProductFacetValueModel } from "@/types/facet";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/modal";
+import { Input, Textarea } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
 
 import { FacetSelector } from "./facet-selector";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { StockStatus, Condition } from "@/types/enums";
-import { createProduct, getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productService";
+import {
+  createProduct,
+  getAllProductGroups,
+  type ProductGroupModel,
+} from "@/app/api/services/productService";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { GoBackButton } from "@/components/go-back-button";
 
 interface AddProductModalProps {
   categories: CategoryModel[];
@@ -40,66 +37,113 @@ interface AddProductModalProps {
   onProductAdded?: () => void;
 }
 
+type FormState = {
+  name: string;
+  price: string;
+  discountPrice: string;
+  description: string;
+  categoryId: string;
+  brandId: string;
+  productGroupId: string;
+  status: string;
+  condition: string;
+};
+
+const initialFormState: FormState = {
+  name: "",
+  price: "",
+  discountPrice: "",
+  description: "",
+  categoryId: "",
+  brandId: "",
+  productGroupId: "",
+  status: StockStatus.InStock.toString(),
+  condition: Condition.New.toString(),
+};
+
 export default function AddProductModal({
   categories,
   brands,
   onProductAdded,
 }: AddProductModalProps) {
-  const [open, setOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const isMobile = useIsMobile();
+
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormState>(initialFormState);
+
+  const [selectedFacetValues, setSelectedFacetValues] =
+    useState<ProductFacetValueModel[]>([]);
+
   const [productGroups, setProductGroups] = useState<ProductGroupModel[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    discountPrice: "",
-    description: "",
-    categoryId: "",
-    brandId: "",
-    productGroupId: "",
-    status: StockStatus.InStock.toString(),
-    condition: Condition.New.toString(),
-  });
+  // Normalize product groups for HeroUI `items`
+  const productGroupOptions = useMemo(
+    () => [
+      { id: "none", label: "None (standalone product)" },
+      ...productGroups.map((pg) => ({
+        id: pg.id,
+        label: `${pg.name} (ID: ${pg.id})`,
+      })),
+    ],
+    [productGroups]
+  );
 
-  const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>([]);
-
-  // Fetch product groups when category or brand changes
-  const fetchProductGroups = async () => {
-    if (!formData.categoryId && !formData.brandId) return;
-
-    setLoadingGroups(true);
-    try {
-      const groups = await getAllProductGroups(
-        formData.categoryId || undefined,
-        formData.brandId || undefined
-      );
-
-      // eslint-disable-next-line no-console
-      //console.log('🔍 Fetched product groups:', groups);
-      // eslint-disable-next-line no-console
-      //console.log('🔍 First group structure:', groups[0]);
-      setProductGroups(groups);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to fetch product groups:", error);
-      toast.error("Failed to load product groups");
-    } finally {
-      setLoadingGroups(false);
-    }
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setSelectedFacetValues([]);
+    setProductGroups([]);
   };
 
-  // Fetch groups when category or brand changes
-  useState(() => {
-    if (open && (formData.categoryId || formData.brandId)) {
-      fetchProductGroups();
-    }
-  });
+  const handleOpen = () => {
+    resetForm();
+    onOpen();
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  // Load product groups when category or brand changes
+  useEffect(() => {
+    const fetchGroups = async () => {
+      if (!formData.categoryId && !formData.brandId) {
+        setProductGroups([]);
+
+        return;
+      }
+
+      setLoadingGroups(true);
+      try {
+        const groups = await getAllProductGroups(
+          formData.categoryId || undefined,
+          formData.brandId || undefined
+        );
+
+        setProductGroups(groups);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to fetch product groups:", error);
+        toast.error("Failed to load product groups");
+      } finally {
+        setLoadingGroups(false);
+      }
+    };
+
+    fetchGroups();
+  }, [formData.categoryId, formData.brandId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.price || !formData.categoryId || !formData.brandId) {
+    if (
+      !formData.name.trim() ||
+      !formData.price ||
+      !formData.categoryId ||
+      !formData.brandId
+    ) {
       toast.error("Please fill in all required fields");
 
       return;
@@ -109,10 +153,12 @@ export default function AddProductModal({
 
     try {
       const productData: ProductRequestModel = {
-        id: crypto.randomUUID(), // Generate new ID
-        name: formData.name,
+        id: crypto.randomUUID(),
+        name: formData.name.trim(),
         price: parseFloat(formData.price),
-        discountPrice: formData.discountPrice ? parseFloat(formData.discountPrice) : undefined,
+        discountPrice: formData.discountPrice
+          ? parseFloat(formData.discountPrice)
+          : undefined,
         description: formData.description,
         categoryId: formData.categoryId,
         brandId: formData.brandId,
@@ -124,28 +170,16 @@ export default function AddProductModal({
         isNewArrival: true,
         images: [],
         productFacetValues: selectedFacetValues,
-        productGroupId: formData.productGroupId || undefined,
+        productGroupId:
+          formData.productGroupId && formData.productGroupId !== "none"
+            ? formData.productGroupId
+            : undefined,
       };
 
       await createProduct(productData);
       toast.success("Product created successfully");
 
-      // Reset form
-      setFormData({
-        name: "",
-        price: "",
-        discountPrice: "",
-        description: "",
-        categoryId: "",
-        brandId: "",
-        productGroupId: "",
-        status: StockStatus.InStock.toString(),
-        condition: Condition.New.toString(),
-      });
-      setSelectedFacetValues([]);
-      setProductGroups([]);
-
-      setOpen(false);
+      handleClose();
       onProductAdded?.();
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -157,248 +191,405 @@ export default function AddProductModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-          size="sm"
-        >
-          <Plus className="h-4 w-4" />
-          Add Product
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Add New Product
-          </DialogTitle>
-          <DialogDescription className="text-slate-600 dark:text-slate-400">
-            Create a new product for your store
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="name">
-                Product Name *
-              </Label>
-              <Input
-                required
-                className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                id="name"
-                placeholder="e.g., iPhone 15 Pro"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
+    <>
+      {/* Trigger button */}
+      <Button
+        className="gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:translate-y-[1px] hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-blue-500/35"
+        size="sm"
+        onClick={handleOpen}
+      >
+        <Plus className="h-4 w-4" />
+        Add Product
+      </Button>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="price">
-                  Price (₾) *
-                </Label>
-                <Input
-                  required
-                  className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                  id="price"
-                  min="0"
-                  placeholder="0.00"
-                  step="0.01"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="discountPrice">
-                  Discount Price (₾)
-                </Label>
-                <Input
-                  className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                  id="discountPrice"
-                  min="0"
-                  placeholder="0.00"
-                  step="0.01"
-                  type="number"
-                  value={formData.discountPrice}
-                  onChange={(e) => setFormData({ ...formData, discountPrice: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="description">
-                Description
-              </Label>
-              <Textarea
-                className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 min-h-[100px]"
-                id="description"
-                placeholder="Product description..."
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="category">
-                  Category *
-                </Label>
-                <Select
-                  required
-                  value={formData.categoryId}
-                  onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
-                >
-                  <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid gap-2">
-                <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="brand">
-                  Brand *
-                </Label>
-                <Select
-                  required
-                  value={formData.brandId}
-                  onValueChange={(value) => {
-                    setFormData({ ...formData, brandId: value });
-                    fetchProductGroups();
-                  }}
-                >
-                  <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-                    {brands.map((brand) => (
-                      <SelectItem key={brand.id} value={brand.id}>
-                        {brand.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Product Group Selector */}
-            <div className="grid gap-2">
-              <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="productGroup">
-                Product Group (Variants)
-                <span className="text-xs font-normal text-slate-500 ml-2">
-                  Optional - Connect products that are variants of each other
-                </span>
-              </Label>
-              <Select
-                disabled={loadingGroups || (!formData.categoryId && !formData.brandId)}
-                value={formData.productGroupId || undefined}
-                onValueChange={(value) => {
-                  // eslint-disable-next-line no-console
-                  console.log('✅ Selected productGroupId:', value);
-                  setFormData({ ...formData, productGroupId: value === "none" ? "" : value });
-                }}
-              >
-                <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                  <SelectValue placeholder={loadingGroups ? "Loading groups..." : "Select product group (optional)"} />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-                  <SelectItem value="none">None (standalone product)</SelectItem>
-                  {productGroups.map((group) => {
-                    // eslint-disable-next-line no-console
-                    //console.log('🔍 Rendering group:', { id: group.id, name: group.name, fullObject: group });
-
-                    return (
-                      <SelectItem key={group.id} value={group.id}>
-                        {group.name} (ID: {group.id})
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-              {!formData.categoryId && !formData.brandId && (
-                <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Select a category or brand first to see available product groups
-                </p>
+      <Modal
+        classNames={{
+          backdrop: "bg-black/60 backdrop-blur-sm",
+          base:
+            " w-screen rounded-none bg-background dark:bg-slate-950 flex flex-col rounded-2xl",
+        }}
+        hideCloseButton={isMobile}
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size={isMobile ? "full" : "4xl"}
+        onClose={handleClose}
+      >
+        <ModalContent className="h-full">
+          {() => (
+            <form
+              className="flex h-full flex-col"
+              onSubmit={handleSubmit}
+            >
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
+                  <GoBackButton onClick={handleClose} />
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Add New Product
+                    </span>
+                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                      Create a product with pricing, stock and attributes.
+                    </span>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                  <div className="flex flex-col min-w-0">
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      Add New Product
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Manage your product inventory, pricing and attributes.
+                    </p>
+                  </div>
+                </ModalHeader>
               )}
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="status">
-                  Stock Status *
-                </Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value })}
-                >
-                  <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-                    <SelectItem value={StockStatus.InStock.toString()}>In Stock</SelectItem>
-                    <SelectItem value={StockStatus.OutOfStock.toString()}>Out of Stock</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* BODY (scrolls on BOTH mobile + desktop) */}
+              <ModalBody
+                className="
+                  flex-1 overflow-y-auto
+                  px-4 md:px-6
+                  pt-2 pb-3
+                  space-y-4 md:space-y-5
+                "
+              >
+                <section className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-10">
+                      Basic Information
+                    </h3>
+                  </div>
 
-              <div className="grid gap-2">
-                <Label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="condition">
-                  Condition *
-                </Label>
-                <Select
-                  value={formData.condition}
-                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
-                >
-                  <SelectTrigger className="border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800">
-                    <SelectItem value={Condition.New.toString()}>New</SelectItem>
-                    <SelectItem value={Condition.Used.toString()}>Used</SelectItem>
-                    <SelectItem value={Condition.LikeNew.toString()}>Like New</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                  <Input
+                    required
+                    classNames={{
+                      inputWrapper:
+                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                    }}
+                    label="Product Name"
+                    labelPlacement="outside"
+                    placeholder="e.g., iPhone 15 Pro"
+                    value={formData.name}
+                    variant="bordered"
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                  />
 
-            {/* Facet Selector */}
-            <div className="grid gap-2 pt-2">
-              <FacetSelector
-                categoryId={formData.categoryId}
-                selectedFacetValues={selectedFacetValues}
-                onChange={setSelectedFacetValues}
-              />
-            </div>
-          </div>
+                  <Textarea
+                    classNames={{
+                      inputWrapper:
+                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                    }}
+                    label="Description"
+                    labelPlacement="outside"
+                    minRows={3}
+                    placeholder="Product description..."
+                    value={formData.description}
+                    variant="bordered"
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                  />
+                </section>
 
-          <DialogFooter>
-            <Button
-              className="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-300 dark:hover:bg-slate-600"
-              disabled={loading}
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold"
-              disabled={loading}
-              type="submit"
-            >
-              {loading ? "Creating..." : "Create Product"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+                {/* Pricing */}
+                <section className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      Pricing
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Set the regular and discounted selling price.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <Input
+                      required
+                      classNames={{
+                        inputWrapper:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      label="Price (₾)"
+                      labelPlacement="outside"
+                      min="0"
+                      placeholder="0.00"
+                      step="0.01"
+                      type="number"
+                      value={formData.price}
+                      variant="bordered"
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          price: e.target.value,
+                        }))
+                      }
+                    />
+
+                    <Input
+                      classNames={{
+                        inputWrapper:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      label="Discount Price (₾)"
+                      labelPlacement="outside"
+                      min="0"
+                      placeholder="0.00"
+                      step="0.01"
+                      type="number"
+                      value={formData.discountPrice}
+                      variant="bordered"
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          discountPrice: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </section>
+
+                {/* Classification */}
+                <section className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      Classification
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Organize this product by category, brand and variant group.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <Select
+                      isRequired
+                      classNames={{
+                        trigger:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      label="Category"
+                      labelPlacement="outside"
+                      placeholder="Select category"
+                      selectedKeys={
+                        formData.categoryId ? [formData.categoryId] : []
+                      }
+                      variant="bordered"
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          categoryId: selected || "",
+                          productGroupId: "",
+                        }));
+                      }}
+                    >
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id}>{cat.name}</SelectItem>
+                      ))}
+                    </Select>
+
+                    <Select
+                      isRequired
+                      classNames={{
+                        trigger:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      label="Brand"
+                      labelPlacement="outside"
+                      placeholder="Select brand"
+                      selectedKeys={
+                        formData.brandId ? [formData.brandId] : []
+                      }
+                      variant="bordered"
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          brandId: selected || "",
+                          productGroupId: "",
+                        }));
+                      }}
+                    >
+                      {brands.map((brand) => (
+                        <SelectItem key={brand.id}>{brand.name}</SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+
+                  <Select
+                    classNames={{
+                      trigger:
+                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                    }}
+                    description={
+                      !formData.categoryId && !formData.brandId
+                        ? "Select a category or brand first to see available product groups."
+                        : "Optional – connect products that are variants of each other."
+                    }
+                    isDisabled={
+                      loadingGroups ||
+                      (!formData.categoryId && !formData.brandId)
+                    }
+                    items={productGroupOptions}
+                    label="Product Group (Variants)"
+                    labelPlacement="outside"
+                    placeholder={
+                      loadingGroups
+                        ? "Loading groups..."
+                        : "Select product group (optional)"
+                    }
+                    selectedKeys={
+                      formData.productGroupId
+                        ? [formData.productGroupId]
+                        : []
+                    }
+                    variant="bordered"
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+
+                      setFormData((prev) => ({
+                        ...prev,
+                        productGroupId: selected || "none",
+                      }));
+                    }}
+                  >
+                    {(item) => (
+                      <SelectItem key={item.id}>{item.label}</SelectItem>
+                    )}
+                  </Select>
+                </section>
+
+                {/* Inventory */}
+                <section className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      Inventory & Condition
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Control how this product appears in stock and condition filters.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <Select
+                      classNames={{
+                        trigger:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      label="Stock Status"
+                      labelPlacement="outside"
+                      selectedKeys={[formData.status]}
+                      variant="bordered"
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          status: selected,
+                        }));
+                      }}
+                    >
+                      <SelectItem key={StockStatus.InStock.toString()}>
+                        In Stock
+                      </SelectItem>
+                      <SelectItem key={StockStatus.OutOfStock.toString()}>
+                        Out of Stock
+                      </SelectItem>
+                    </Select>
+
+                    <Select
+                      classNames={{
+                        trigger:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      label="Condition"
+                      labelPlacement="outside"
+                      selectedKeys={[formData.condition]}
+                      variant="bordered"
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          condition: selected,
+                        }));
+                      }}
+                    >
+                      <SelectItem key={Condition.New.toString()}>
+                        New
+                      </SelectItem>
+                      <SelectItem key={Condition.Used.toString()}>
+                        Used
+                      </SelectItem>
+                      <SelectItem key={Condition.LikeNew.toString()}>
+                        Like New
+                      </SelectItem>
+                    </Select>
+                  </div>
+                </section>
+
+                {/* Facets */}
+                <section className="space-y-3 pb-1">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      Attributes & Filters
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Attach facet values (size, color, material, etc.) so customers can filter.
+                    </p>
+                  </div>
+
+                  <FacetSelector
+                    categoryId={formData.categoryId}
+                    selectedFacetValues={selectedFacetValues}
+                    onChange={setSelectedFacetValues}
+                  />
+                </section>
+              </ModalBody>
+
+              {/* FOOTER (fixed) */}
+              <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
+                <div className="flex w-full items-center justify-between gap-3">
+                  <p className="hidden text-xs text-slate-500 dark:text-slate-400 md:block">
+                    You can edit all details later from the product page.
+                  </p>
+
+                  <div className="ml-auto flex items-center gap-2">
+                    <Button
+                      className="rounded-lg border-slate-200 bg-white text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                      disabled={loading}
+                      size={isMobile ? "sm" : "default"}
+                      type="button"
+                      variant="outline"
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-700"
+                      disabled={loading}
+                      size={isMobile ? "sm" : "default"}
+                      type="submit"
+                    >
+                      {loading ? "Creating..." : "Create Product"}
+                    </Button>
+                  </div>
+                </div>
+              </ModalFooter>
+            </form>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

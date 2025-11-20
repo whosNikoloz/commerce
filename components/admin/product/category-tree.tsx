@@ -136,14 +136,14 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     }}
                   >
                     {isExpanded ? (
-                      <ChevronDown className={`h-3.5 w-3.5 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`} />
+                      <ChevronDown className={`h-3.5 w-3.5 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
                     ) : (
-                      <ChevronRight className={`h-3.5 w-3.5 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`} />
+                      <ChevronRight className={`h-3.5 w-3.5 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
                     )}
                   </button>
                 ) : (
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-orange-500" : "bg-slate-400 dark:bg-slate-600"}`} />
+                    <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-blue-500" : "bg-slate-400 dark:bg-slate-600"}`} />
                   </div>
                 )}
 
@@ -152,16 +152,16 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                   {hasChildCategories ? (
                     isExpanded ? (
                       <FolderOpen
-                        className={`h-4 w-4 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`}
+                        className={`h-4 w-4 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
                       />
                     ) : (
                       <Folder
-                        className={`h-4 w-4 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`}
+                        className={`h-4 w-4 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
                       />
                     )
                   ) : (
                     <Tag
-                      className={`h-4 w-4 ${isSelected ? "text-orange-600 dark:text-orange-400" : "text-slate-500 dark:text-slate-400"}`}
+                      className={`h-4 w-4 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
                     />
                   )}
                 </div>
@@ -171,9 +171,9 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                   className={[
                     "flex-1 text-sm font-semibold truncate",
                     isSelected
-                      ? "text-orange-900 dark:text-orange-300"
+                      ? "text-blue-900 dark:text-blue-300"
                       : "text-slate-900 dark:text-slate-100",
-                    isHighlighted && !isSelected ? "underline decoration-orange-500/50" : "",
+                    isHighlighted && !isSelected ? "underline decoration-blue-500/50" : "",
                   ].join(" ")}
                   title={cat.name}
                 >
@@ -186,7 +186,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                     className={[
                       "text-xs px-2 py-0.5 h-5 font-bold",
                       isSelected
-                        ? "bg-orange-200 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300"
+                        ? "bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
                         : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
                     ].join(" ")}
                     variant="secondary"
@@ -212,7 +212,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
   const rootCategories = categories.filter((c) => c.parentId === null);
 
   return (
-    <Card className="lg:sticky lg:top-4 bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+    <Card className=" lg:sticky lg:top-4 bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
       <CardHeader className="pb-3 relative">
         <div className="flex items-center justify-between gap-2">
@@ -234,7 +234,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
           {selectedCategory !== null && (
             <Button
               aria-label="Clear selection"
-              className="h-7 w-7 p-0 text-slate-500 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors"
+              className="h-7 w-7 p-0 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
               size="sm"
               variant="ghost"
               onClick={clearSelection}
@@ -246,10 +246,10 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500 dark:text-orange-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 dark:text-blue-400 h-4 w-4" />
           <Input
             aria-label="Search categories"
-            className="pl-9 h-9 text-sm bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-orange-500 dark:focus:border-orange-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
+            className="pl-9 h-9 text-sm bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

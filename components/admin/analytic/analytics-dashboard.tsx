@@ -140,7 +140,7 @@ export function AnalyticsDashboard() {
   const metrics = [
     {
       label: 'Total Revenue',
-      value: '$46,900',
+      value: '₾46,900',
       change: '+12.5%',
       icon: DollarSign,
       trend: 'up',
@@ -164,7 +164,7 @@ export function AnalyticsDashboard() {
     },
     {
       label: 'Avg Order Value',
-      value: '$24.85',
+      value: '₾24.85',
       change: '-1.2%',
       icon: TrendingUp,
       trend: 'down',

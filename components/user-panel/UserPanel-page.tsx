@@ -662,43 +662,53 @@ export default function UserPanel() {
                             </h4>
                             {detail.trackingSteps.length ? (
                               <div className="space-y-4 bg-background border rounded-lg p-4">
-                                {detail.trackingSteps.map((step: TrackingStep, i: number) => (
-                                  <div key={i} className="flex items-start gap-4">
-                                    <div className="flex flex-col items-center">
-                                      <div
-                                        className={cx(
-                                          "h-5 w-5 rounded-full transition-colors",
-                                          step.completed ? "bg-primary" : "bg-muted",
-                                        )}
-                                      >
-                                        {step.completed && <CheckCircle2 className="h-5 w-5 text-primary-foreground" />}
-                                      </div>
-                                      {i < detail.trackingSteps.length - 1 && (
+                                {detail.trackingSteps.map((step: TrackingStep, i: number) => {
+                                  // Convert numeric status to readable label
+                                  const statusValue = typeof step.status === 'string' && !isNaN(Number(step.status))
+                                    ? Number(step.status) as OrderStatus
+                                    : step.status;
+                                  const readableStatus = typeof statusValue === 'number'
+                                    ? OrderStatus[statusValue]
+                                    : String(statusValue);
+
+                                  return (
+                                    <div key={i} className="flex items-start gap-4">
+                                      <div className="flex flex-col items-center">
                                         <div
-                                          className={cx("w-0.5 h-12 mt-1", step.completed ? "bg-primary" : "bg-muted")}
-                                        />
-                                      )}
-                                    </div>
-                                    <div className="flex-1 pb-2">
-                                      <div className="flex items-center justify-between flex-wrap gap-2">
-                                        <p
                                           className={cx(
-                                            "font-medium text-sm",
-                                            !step.completed && "text-muted-foreground",
+                                            "h-5 w-5 rounded-full transition-colors",
+                                            step.completed ? "bg-primary" : "bg-muted",
                                           )}
                                         >
-                                          {step.status}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                          {new Date(step.date).toLocaleString()}
-                                        </p>
+                                          {step.completed && <CheckCircle2 className="h-5 w-5 text-primary-foreground" />}
+                                        </div>
+                                        {i < detail.trackingSteps.length - 1 && (
+                                          <div
+                                            className={cx("w-0.5 h-12 mt-1", step.completed ? "bg-primary" : "bg-muted")}
+                                          />
+                                        )}
                                       </div>
-                                      {step.description && (
-                                        <p className="text-xs text-muted-foreground mt-1">{step.description}</p>
-                                      )}
+                                      <div className="flex-1 pb-2">
+                                        <div className="flex items-center justify-between flex-wrap gap-2">
+                                          <p
+                                            className={cx(
+                                              "font-medium text-sm",
+                                              !step.completed && "text-muted-foreground",
+                                            )}
+                                          >
+                                            {readableStatus}
+                                          </p>
+                                          <p className="text-xs text-muted-foreground">
+                                            {new Date(step.date).toLocaleString()}
+                                          </p>
+                                        </div>
+                                        {step.description && (
+                                          <p className="text-xs text-muted-foreground mt-1">{step.description}</p>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             ) : (
                               <p className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">

@@ -59,7 +59,7 @@ function RowDraggable({
     <TableRow
       ref={setNodeRef}
       className={[
-        "hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-orange-50/50 dark:hover:from-blue-950/20 dark:hover:to-orange-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50",
+        "hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-50/50 dark:hover:from-blue-950/20 dark:hover:to-blue-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50",
         dragging || isDragging ? "opacity-70 ring-2 ring-amber-400/50 dark:ring-amber-600/50 shadow-lg" : "",
       ].join(" ")}
       style={style}
@@ -315,7 +315,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   return (
     <>
       <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-lg" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-lg" />
         <CardHeader className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60 relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex flex-1 items-center gap-3">
@@ -535,9 +535,9 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
                   >
                     {/* Card Header */}
-                    <div className="bg-gradient-to-r from-blue-50 to-orange-50 dark:from-blue-950/30 dark:to-orange-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-orange-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
                           <span className="text-white font-bold text-sm">#{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")}</span>
                         </div>
                         <div className="flex-1 min-w-0">

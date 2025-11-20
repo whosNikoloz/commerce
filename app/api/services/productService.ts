@@ -178,11 +178,12 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
 
 // Product Groups API
 export interface ProductGroupModel {
+  brandId?: string;
+  categoryId?: string;
+  productIds: string[];
   id: string;
   name: string;
-  categoryId?: string;
-  brandId?: string;
-  productIds?: string[];
+  productCount : number;
 }
 
 export async function getAllProductGroups(
@@ -198,6 +199,30 @@ export async function getAllProductGroups(
   const url = queryString ? `${API_BASE}/groups?${queryString}` : `${API_BASE}/groups`;
 
   return apiFetch<ProductGroupModel[]>(url);
+}
+
+export interface CreateProductGroupModel {
+  id: string;
+  name: string;
+  categoryId?: string;
+  brandId?: string;
+  productIds: string[];
+}
+
+export async function createProductGroup(group: Omit<CreateProductGroupModel, "id">): Promise<string> {
+  return apiFetch<string>(`${API_BASE}/groups`, {
+    method: "POST",
+    body: JSON.stringify(group),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function updateProductGroup(group: ProductGroupModel): Promise<string> {
+  return apiFetch<string>(`${API_BASE}/groups/${group.id}`, {
+    method: "PUT",
+    body: JSON.stringify(group),
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 export async function getProductVariants(productId: string): Promise<ProductResponseModel[]> {

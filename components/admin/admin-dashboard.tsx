@@ -1,14 +1,20 @@
-import { Package, ShoppingCart, Users, DollarSign, TrendingUp, ArrowUpRight, Eye, BarChart3, Plus } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Package, ShoppingCart, Users, DollarSign, TrendingUp, ArrowUpRight, Eye, BarChart3, Plus, FolderTree } from "lucide-react";
 import Link from "next/link";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useTenant } from "@/app/context/tenantContext";
+import { getAllOrders } from "@/app/api/services/orderService";
+import { OrderSummary, OrderStatus } from "@/types/orderTypes";
 
 const stats = [
   {
     titleKey: "admin.revenue",
-    value: "$45,231.89",
+    value: "₾45,231.89",
     trend: "+20.1%",
     icon: DollarSign,
     color: "text-emerald-600 dark:text-emerald-400",
@@ -52,8 +58,72 @@ const translations: Record<string, string> = {
   "admin.recentOrders": "Recent Orders",
 };
 
+function getStatusBadgeClass(status: OrderStatus): string {
+  switch (status) {
+    case OrderStatus.Delivered:
+    case OrderStatus.Paid:
+      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-800';
+    case OrderStatus.Processing:
+    case OrderStatus.Shipped:
+      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800';
+    case OrderStatus.Pending:
+      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400 ring-1 ring-yellow-200 dark:ring-yellow-800';
+    case OrderStatus.Cancelled:
+    case OrderStatus.Refunded:
+      return 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-800';
+    default:
+      return 'bg-slate-100 text-slate-700 dark:bg-slate-900/40 dark:text-slate-400 ring-1 ring-slate-200 dark:ring-slate-800';
+  }
+}
+
+function getStatusLabel(status: OrderStatus): string {
+  return typeof status === 'number' ? OrderStatus[status] : String(status);
+}
+
+function formatCurrency(amount: number, currency: string = 'GEL'): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency}`;
+  }
+}
+
+function formatDate(dateString: string): string {
+  try {
+    return new Date(dateString).toLocaleDateString();
+  } catch {
+    return dateString;
+  }
+}
+
 export default function AdminDashboard() {
   const t = (key: string, fallback?: string) => translations[key] || fallback || key;
+  const { config } = useTenant();
+  const isFinaMerchant = config?.merchantType === "FINA";
+
+  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoadingOrders(true);
+        const result = await getAllOrders(1, 4); // Get first page with 4 orders
+
+        setOrders(result.data);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch orders:', error);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   return (
     <div className="space-y-8 w-full">
@@ -131,65 +201,57 @@ export default function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent className="relative">
-            <div className="space-y-3">
-              {[
-                {
-                  id: "#1234",
-                  name: "John Doe",
-                  product: "Wireless Headphones",
-                  price: "$299.99",
-                  status: "completed",
-                  avatar: "JD",
-                },
-                {
-                  id: "#1235",
-                  name: "Jane Smith",
-                  product: "Smart Watch",
-                  price: "$149.99",
-                  status: "processing",
-                  avatar: "JS",
-                },
-                {
-                  id: "#1236",
-                  name: "Bob Johnson",
-                  product: "Coffee Maker",
-                  price: "$79.99",
-                  status: "shipped",
-                  avatar: "BJ",
-                },
-              ].map((order) => (
-                <div key={order.id} className="flex items-center p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 hover:from-slate-100 hover:to-slate-50 dark:hover:from-slate-800/70 dark:hover:to-slate-800/50 transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md cursor-pointer group">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ring-2 ring-white dark:ring-slate-800">
-                    <span className="text-sm font-bold text-white">
-                      {order.avatar}
-                    </span>
-                  </div>
-                  <div className="ml-4 flex-1">
-                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                      Order {order.id}
-                    </p>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
-                      {order.name} • {order.product}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1.5">
-                    <span className="font-bold text-slate-900 dark:text-slate-100 text-base">{order.price}</span>
-                    <Badge
-                      className={`text-xs font-bold px-3 py-1 ${
-                        order.status === 'completed'
-                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-800'
-                          : order.status === 'processing'
-                          ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400 ring-1 ring-yellow-200 dark:ring-yellow-800'
-                          : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800'
-                      }`}
-                      variant="secondary"
+            {loadingOrders ? (
+              <div className="py-12 text-center text-slate-500 dark:text-slate-400">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3" />
+                <p className="text-sm font-medium">Loading orders...</p>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="py-12 text-center text-slate-500 dark:text-slate-400">
+                <ShoppingCart className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p className="text-sm font-medium">No orders yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {orders.map((order) => {
+                  const orderNumber = order.id.slice(0, 8);
+                  const initials = orderNumber.slice(0, 2).toUpperCase();
+
+                  return (
+                    <Link
+                      key={order.id}
+                      className="flex items-center p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 hover:from-slate-100 hover:to-slate-50 dark:hover:from-slate-800/70 dark:hover:to-slate-800/50 transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md cursor-pointer group"
+                      href={`/admin/orders`}
                     >
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ring-2 ring-white dark:ring-slate-800">
+                        <span className="text-sm font-bold text-white">
+                          {initials}
+                        </span>
+                      </div>
+                      <div className="ml-4 flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                          Order #{orderNumber}
+                        </p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
+                          {formatDate(order.date)} • {order.items} {order.items === 1 ? 'item' : 'items'}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1.5 ml-2">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-base whitespace-nowrap">
+                          {formatCurrency(order.total)}
+                        </span>
+                        <Badge
+                          className={`text-xs font-bold px-3 py-1 ${getStatusBadgeClass(order.status)}`}
+                          variant="secondary"
+                        >
+                          {getStatusLabel(order.status)}
+                        </Badge>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -208,26 +270,73 @@ export default function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 relative">
+            {/* Add New Product - Disabled for FINA */}
             <Button
-              className="w-full justify-start h-auto p-4 border-2 border-emerald-200 dark:border-emerald-800/50 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/20 hover:from-emerald-100 hover:to-emerald-50 dark:hover:from-emerald-900/40 dark:hover:to-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300 group shadow-sm hover:shadow-lg backdrop-blur-sm"
+              asChild={!isFinaMerchant}
+              className="w-full justify-start h-auto p-4 border-2 border-emerald-200 dark:border-emerald-800/50 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/20 hover:from-emerald-100 hover:to-emerald-50 dark:hover:from-emerald-900/40 dark:hover:to-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300 group shadow-sm hover:shadow-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm"
+              disabled={isFinaMerchant}
               variant="outline"
             >
-              <div className="flex items-center w-full">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-600 group-hover:to-emerald-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-emerald-200 dark:ring-emerald-800/50">
-                  <Package className="h-5 w-5 text-white" />
+              {isFinaMerchant ? (
+                <div className="flex items-center w-full">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 transition-all duration-300 shadow-md ring-2 ring-emerald-200 dark:ring-emerald-800/50 opacity-50">
+                    <Package className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="ml-4 text-left">
+                    <div className="font-bold text-base">{t('admin.addProduct', 'Add New Product')}</div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Not available for FINA merchants</div>
+                  </div>
                 </div>
-                <div className="ml-4 text-left">
-                  <div className="font-bold text-base">{t('admin.addProduct', 'Add New Product')}</div>
-                  <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Create and manage inventory</div>
-                </div>
-              </div>
+              ) : (
+                <Link className="flex items-center w-full" href="/admin/products">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-600 group-hover:to-emerald-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-emerald-200 dark:ring-emerald-800/50">
+                    <Package className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="ml-4 text-left">
+                    <div className="font-bold text-base">{t('admin.addProduct', 'Add New Product')}</div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Create and manage inventory</div>
+                  </div>
+                </Link>
+              )}
             </Button>
 
+            {/* Add Category - Disabled for FINA */}
             <Button
+              asChild={!isFinaMerchant}
+              className="w-full justify-start h-auto p-4 border-2 border-cyan-200 dark:border-cyan-800/50 bg-gradient-to-br from-cyan-50 to-cyan-100/50 dark:from-cyan-900/30 dark:to-cyan-900/20 hover:from-cyan-100 hover:to-cyan-50 dark:hover:from-cyan-900/40 dark:hover:to-cyan-900/30 text-cyan-700 dark:text-cyan-400 hover:border-cyan-300 dark:hover:border-cyan-700 transition-all duration-300 group shadow-sm hover:shadow-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm"
+              disabled={isFinaMerchant}
+              variant="outline"
+            >
+              {isFinaMerchant ? (
+                <div className="flex items-center w-full">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 transition-all duration-300 shadow-md ring-2 ring-cyan-200 dark:ring-cyan-800/50 opacity-50">
+                    <FolderTree className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="ml-4 text-left">
+                    <div className="font-bold text-base">Add Category</div>
+                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">Not available for FINA merchants</div>
+                  </div>
+                </div>
+              ) : (
+                <Link className="flex items-center w-full" href="/admin/categories">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 group-hover:from-cyan-600 group-hover:to-cyan-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-cyan-200 dark:ring-cyan-800/50">
+                    <FolderTree className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="ml-4 text-left">
+                    <div className="font-bold text-base">Add Category</div>
+                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">Organize your catalog</div>
+                  </div>
+                </Link>
+              )}
+            </Button>
+
+            {/* Process Orders - Always Available */}
+            <Button
+              asChild
               className="w-full justify-start h-auto p-4 border-2 border-blue-200 dark:border-blue-800/50 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/30 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-50 dark:hover:from-blue-900/40 dark:hover:to-blue-900/30 text-blue-700 dark:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 group shadow-sm hover:shadow-lg backdrop-blur-sm"
               variant="outline"
             >
-              <div className="flex items-center w-full">
+              <Link className="flex items-center w-full" href="/admin/orders">
                 <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-blue-200 dark:ring-blue-800/50">
                   <ShoppingCart className="h-5 w-5 text-white" />
                 </div>
@@ -235,22 +344,24 @@ export default function AdminDashboard() {
                   <div className="font-bold text-base">Process Orders</div>
                   <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-0.5">Manage pending orders</div>
                 </div>
-              </div>
+              </Link>
             </Button>
 
+            {/* View Customers - Always Available */}
             <Button
+              asChild
               className="w-full justify-start h-auto p-4 border-2 border-purple-200 dark:border-purple-800/50 bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/30 dark:to-purple-900/20 hover:from-purple-100 hover:to-purple-50 dark:hover:from-purple-900/40 dark:hover:to-purple-900/30 text-purple-700 dark:text-purple-400 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300 group shadow-sm hover:shadow-lg backdrop-blur-sm"
               variant="outline"
             >
-              <div className="flex items-center w-full">
+              <Link className="flex items-center w-full" href="/admin/customers">
                 <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-purple-200 dark:ring-purple-800/50">
-                  <BarChart3 className="h-5 w-5 text-white" />
+                  <Users className="h-5 w-5 text-white" />
                 </div>
                 <div className="ml-4 text-left">
-                  <div className="font-bold text-base">{t('admin.analytics', 'View Analytics')}</div>
-                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-0.5">Track performance metrics</div>
+                  <div className="font-bold text-base">View Customers</div>
+                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-0.5">Manage customer relationships</div>
                 </div>
-              </div>
+              </Link>
             </Button>
           </CardContent>
         </Card>

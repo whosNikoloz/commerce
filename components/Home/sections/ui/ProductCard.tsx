@@ -272,7 +272,7 @@ export function ProductCard({
       {/* CONTENT */}
       <CardFooter className={cn("relative pointer-events-none flex flex-col items-start gap-2.5 flex-1", footerPadding)}>
         <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
-          <meta content="USD" itemProp="priceCurrency" />
+          <meta content="GEL" itemProp="priceCurrency" />
           <meta content={displayPrice.toString()} itemProp="price" />
           <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
           <span className={cn(priceSize, "font-bold text-zinc-900 dark:text-zinc-100")}>{formatPrice(displayPrice)}</span>

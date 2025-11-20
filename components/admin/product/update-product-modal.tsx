@@ -157,55 +157,53 @@ export default function UpdateProductModal({
 
       <Modal
         classNames={{
-          backdrop: "bg-slate-900/80 backdrop-blur-xl",
-          base:
-            "rounded-t-2xl md:rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-800 shadow-2xl",
-          wrapper: "z-[999]",
-          closeButton: "z-50",
+          backdrop: "bg-black/60 backdrop-blur-lg",
+          base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl",
         }}
         hideCloseButton={isMobile}
         isOpen={isOpen}
-        motionProps={{
-          variants: {
-            enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
-            center: {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 },
-            },
-            exit: {
-              y: 40,
-              opacity: 0,
-              scale: 0.96,
-              transition: { duration: 0.18, ease: "easeIn" },
-            },
-          },
-          initial: "enter",
-          animate: "center",
-          exit: "exit",
-        }}
-        placement={isMobile ? "top" : "center"}
-        size={isMobile ? "full" : "5xl"}
+        placement="center"
+        scrollBehavior="inside"
+        size={isMobile ? "full" : "4xl"}
         onClose={onClose}
       >
         <ModalContent>
           {() => (
             <>
-              {/* დეკორატიული overlay Add/Update FAQ სტილში */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-2xl" />
 
-              <ModalHeader className={isMobile ? "flex flex-col gap-2 px-4 pt-6 mx-4 z-50" : "flex flex-col gap-3 pb-3 pt-6 relative"}>
-                {isMobile && (
+              {isMobile ? (
+                <ModalHeader className="flex flex-col gap-2 px-4 pt-6 pb-0 z-50 relative">
                   <div className="flex items-center gap-2">
                     <GoBackButton onClick={onClose} />
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                      განახლება
-                    </h2>
                   </div>
-                )}
 
-                {!isMobile && (
+                  {/* Tabs for Mobile */}
+                  <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700">
+                    <button
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                        activeTab === "settings"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                      }`}
+                      onClick={() => setActiveTab("settings")}
+                    >
+                      ⚙️ Settings
+                    </button>
+                    <button
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                        activeTab === "description"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                      }`}
+                      onClick={() => setActiveTab("description")}
+                    >
+                      📝 Description
+                    </button>
+                  </div>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex flex-col gap-3 pb-3 pt-8 relative">
                   <div className="flex items-center justify-between px-6">
                     <div className="flex flex-col">
                       <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
@@ -216,32 +214,32 @@ export default function UpdateProductModal({
                       </p>
                     </div>
                   </div>
-                )}
 
-                {/* Tabs - Both Mobile and Desktop */}
-                <div className={`flex gap-1 border-b border-slate-200 dark:border-slate-700 ${isMobile ? "" : "px-6"}`}>
-                  <button
-                    className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
-                      activeTab === "settings"
-                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                    }`}
-                    onClick={() => setActiveTab("settings")}
-                  >
-                    ⚙️ Settings
-                  </button>
-                  <button
-                    className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
-                      activeTab === "description"
-                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                    }`}
-                    onClick={() => setActiveTab("description")}
-                  >
-                    📝 Description
-                  </button>
-                </div>
-              </ModalHeader>
+                  {/* Tabs for Desktop */}
+                  <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700 px-6">
+                    <button
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                        activeTab === "settings"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                      }`}
+                      onClick={() => setActiveTab("settings")}
+                    >
+                      ⚙️ Settings
+                    </button>
+                    <button
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                        activeTab === "description"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                      }`}
+                      onClick={() => setActiveTab("description")}
+                    >
+                      📝 Description
+                    </button>
+                  </div>
+                </ModalHeader>
+              )}
 
               <ModalBody className={`py-4 overflow-hidden ${isMobile ? "px-4" : "px-6"}`}>
                 {/* Tab Content */}
@@ -397,7 +395,7 @@ export default function UpdateProductModal({
                 )}
               </ModalBody>
 
-              <ModalFooter className="gap-3 px-6 py-5 bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 relative">
+              <ModalFooter className="gap-3 rounded-2xl px-6 py-5    relative">
                 <Button
                   className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                   disabled={loading}

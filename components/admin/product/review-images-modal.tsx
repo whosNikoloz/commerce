@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Images, Trash2, Upload, X } from "lucide-react";
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
+import { GoBackButton } from "@/components/go-back-button";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -34,7 +35,6 @@ type ReviewImagesModalProps = {
 };
 
 type SelectedImage = { id: string; file: File; url: string };
-const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
 
 export default function ReviewImagesModal({
   productId,
@@ -49,22 +49,32 @@ export default function ReviewImagesModal({
   const dropRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
+  const normalizedExisting = useMemo<ExistingImage[]>(() => {
+    if (Array.isArray(existing)) return existing;
+
+    return [];
+  }, [existing]);
+
   const [serverImages, setServerImages] = useState<(ExistingImage & { toDelete?: boolean })[]>(() =>
-    (existing ?? []).map((i) => ({ ...i, toDelete: false })),
+    normalizedExisting.map((i) => ({ ...i, toDelete: false })),
   );
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [fileToCrop, setFileToCrop] = useState<File | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [processingCrop, setProcessingCrop] = useState(false);
+
 
   useEffect(() => {
     if (!isOpen) return;
-    setServerImages((existing ?? []).map((i) => ({ ...i, toDelete: false })));
+    setServerImages(normalizedExisting.map((i) => ({ ...i, toDelete: false })));
     setImages((prev) => {
       prev.forEach((p) => URL.revokeObjectURL(p.url));
 
       return [];
     });
-  }, [isOpen, existing]);
+  }, [isOpen, normalizedExisting]);
 
   useEffect(() => {
     return () => {
@@ -81,24 +91,50 @@ export default function ReviewImagesModal({
   const addFiles = useCallback(
     (files: File[]) => {
       if (!files?.length) return;
+      if (remainingSlots <= 0) return;
+
       const imgsOnly = files.filter((f) => f.type.startsWith("image/"));
       const sizeLimit = maxSizeMB * 1024 * 1024;
       const withinSize = imgsOnly.filter((f) => f.size <= sizeLimit);
 
-      const existingKeys = new Set(images.map((i) => fileKey(i.file)));
-      const dedup = withinSize.filter((f) => !existingKeys.has(fileKey(f)));
-      const toAdd = dedup.slice(0, remainingSlots);
-
-      const newItems = toAdd.map((file) => ({
-        id: crypto.randomUUID(),
-        file,
-        url: URL.createObjectURL(file),
-      }));
-
-      if (newItems.length > 0) setImages((prev) => [...prev, ...newItems]);
+      if (withinSize.length > 0) {
+        // Open cropper with first valid file
+        setFileToCrop(withinSize[0]);
+        setShowCropper(true);
+      }
     },
-    [images, maxSizeMB, remainingSlots],
+    [remainingSlots, maxSizeMB],
   );
+
+  // const handleImageCropped = useCallback(
+  //   async (croppedDataUrl: string | null) => {
+  //     if (!croppedDataUrl || !fileToCrop) {
+  //       setShowCropper(false);
+  //       setFileToCrop(null);
+
+  //       return;
+  //     }
+
+  //     setProcessingCrop(true);
+  //     try {
+  //       const croppedFile = await dataUrlToFile(croppedDataUrl, fileToCrop.name);
+  //       const newItem: SelectedImage = {
+  //         id: crypto.randomUUID(),
+  //         file: croppedFile,
+  //         url: croppedDataUrl,
+  //       };
+
+  //       setImages((prev) => [...prev, newItem]);
+  //     } catch (err) {
+  //       console.error("Failed to process cropped image:", err);
+  //     } finally {
+  //       setProcessingCrop(false);
+  //       setShowCropper(false);
+  //       setFileToCrop(null);
+  //     }
+  //   },
+  //   [dataUrlToFile, fileToCrop],
+  // );
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -250,25 +286,34 @@ export default function ReviewImagesModal({
         <ModalContent>
           {() => (
             <>
-              {/* დეკორატიული gradient overlay — AddFaqModal-ის სტილში */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none rounded-2xl" />
+              {/* ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ gradient overlay ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â AddFaqModal-ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-2xl" />
 
-              <ModalHeader className="flex items-center justify-between gap-2 pb-2 pt-8 relative">
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
-                      Manage Product Images
-                    </h2>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                      Upload up to {maxFiles} images • Max {maxSizeMB}MB each
-                    </p>
+              {isMobile ? (
+                <ModalHeader className="flex items-center gap-2 px-4 pt-6 pb-4 z-50 relative">
+                  <GoBackButton onClick={handleCloseModal} />
+                  <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                  </Badge>
+                </ModalHeader>
+              ) : (
+                <ModalHeader className="flex items-center justify-between gap-2 pb-4 pt-8 relative">
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col">
+                      <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                        Manage Product Images
+                      </h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                        Upload up to {maxFiles} images ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ Max {maxSizeMB}MB each
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                  {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
-                </Badge>
-              </ModalHeader>
+                  <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                  </Badge>
+                </ModalHeader>
+              )}
 
               <ModalBody className="px-6 py-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 <div className="grid gap-4">
@@ -302,7 +347,10 @@ export default function ReviewImagesModal({
                           Drag & drop images here
                         </p>
                         <p className="text-xs text-slate-600 dark:text-slate-400">
-                          or click to browse • you can also paste images
+                          or click to browse - you can also paste images
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {remainingSlots} slots left - Max {maxSizeMB}MB each
                         </p>
                       </div>
                       <Input
@@ -317,6 +365,40 @@ export default function ReviewImagesModal({
                     </div>
                   </div>
 
+                  {/* Image Cropper */}
+                  {showCropper && fileToCrop && (
+                    <div className="relative rounded-lg border-2 border-blue-500 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 p-4">
+                      {processingCrop && (
+                        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-900/40 backdrop-blur-sm text-white text-sm font-semibold">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Preparing cropped image...
+                          </div>
+                        </div>
+                      )}
+                      <div className="mb-3">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                          Crop & Resize Image
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Adjust your image to ensure consistent display everywhere
+                        </p>
+                      </div>
+                      <Button
+                        className="w-full mt-4"
+                        disabled={processingCrop}
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowCropper(false);
+                          setFileToCrop(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+
                   {serverImages.length > 0 || images.length > 0 ? (
                     <ScrollArea className="max-h-[360px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -324,15 +406,16 @@ export default function ReviewImagesModal({
                         {serverImages.map((img) => (
                           <figure
                             key={img.key}
-                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800"
                           >
-                            <Image
-                              alt="Existing product image"
-                              className="h-36 w-full object-cover"
-                              height={200}
-                              src={img.url}
-                              width={200}
-                            />
+                            <div className="relative w-full aspect-square">
+                              <Image
+                                fill
+                                alt="Existing product image"
+                                className="object-cover"
+                                src={img.url}
+                              />
+                            </div>
                             <div className="absolute left-2 top-2">
                               <Badge
                                 className={cn(
@@ -375,13 +458,14 @@ export default function ReviewImagesModal({
                             key={img.id}
                             className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           >
-                            <Image
-                              alt="Product image pending upload"
-                              className="h-36 w-full object-cover"
-                              height={200}
-                              src={img.url || "/placeholder.png"}
-                              width={200}
-                            />
+                            <div className="relative w-full aspect-square">
+                              <Image
+                                fill
+                                alt="Product image pending upload"
+                                className="object-cover"
+                                src={img.url || "/placeholder.png"}
+                              />
+                            </div>
                             <div className="absolute left-2 top-2">
                               <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                                 New

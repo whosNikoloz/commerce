@@ -381,7 +381,7 @@ export function PaymentsTable() {
                           </Badge>
                         </div>
                         <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                          {method.transactionFee}% + $0.30
+                          {method.transactionFee}% + ₾0.30
                         </span>
                       </div>
                     </CardContent>
@@ -422,7 +422,7 @@ export function PaymentsTable() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-slate-900 dark:text-slate-100">
-                        {method.transactionFee}% + $0.30
+                        {method.transactionFee}% + ₾0.30
                       </TableCell>
                       <TableCell className="max-w-xs">
                         <p className="truncate text-sm text-muted-foreground text-slate-500 dark:text-slate-400">

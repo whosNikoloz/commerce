@@ -56,6 +56,12 @@ export function CartIconBouncer({
     <motion.div
       animate={controls}
       initial="idle"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transformOrigin: "center center",
+      }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       variants={cartVariants}
       whileHover={hover ? { scale: 1.04 } : undefined}
@@ -71,9 +77,13 @@ export function AnimatedCount({ value, animKey }: { value: number; animKey: numb
   return (
     <motion.span
       key={animKey}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 0.6, opacity: 0, y: -4 }} // only runs if you wrap with <AnimatePresence>
-      initial={{ scale: 0.4, opacity: 0, y: -4 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.7, opacity: 0 }} // only runs if you wrap with <AnimatePresence>
+      initial={{ scale: 0.6, opacity: 0 }}
+      style={{
+        display: "inline-block",
+        transformOrigin: "center center",
+      }}
       transition={{ type: "spring", stiffness: 560, damping: 20 }}
     >
       {value}

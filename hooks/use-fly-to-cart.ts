@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 
 import { useCartUI } from "@/app/context/cart-ui";
+import { useTenant } from "@/app/context/tenantContext";
 
 type Options = {
   durationMs?: number;
@@ -12,8 +13,18 @@ type Options = {
 
 export function useFlyToCart(options?: Options) {
   const { cartIconRef, bumpCartBadge } = useCartUI();
+  const { config } = useTenant();
 
   const flyToCart = useCallback(async (imgEl: HTMLImageElement | null) => {
+    // Check if fly-to-cart is enabled in tenant config (default: true)
+    const isEnabled = config?.ui?.enableFlyToCart ?? true;
+
+    if (!isEnabled) {
+      // Just bump the badge without animation
+      bumpCartBadge();
+      return;
+    }
+
     if (!imgEl || !cartIconRef.current) return;
 
     const duration = options?.durationMs ?? 650;
@@ -39,7 +50,7 @@ export function useFlyToCart(options?: Options) {
     clone.style.margin = "0";
     clone.style.padding = "0";
     clone.style.objectFit = "cover";
-    clone.style.borderRadius = "8px";
+    clone.style.borderRadius = "50%";
     clone.style.willChange = "transform, opacity";
     clone.style.transformOrigin = "center center";
     document.body.appendChild(clone);
@@ -115,7 +126,7 @@ export function useFlyToCart(options?: Options) {
 
       requestAnimationFrame(step);
     });
-  }, [cartIconRef, bumpCartBadge, options]);
+  }, [cartIconRef, bumpCartBadge, options, config]);
 
   return { flyToCart };
 }

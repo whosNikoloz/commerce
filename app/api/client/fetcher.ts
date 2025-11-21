@@ -17,7 +17,7 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
   const method = (options.method ?? "GET").toUpperCase();
 
   const needsAuth = ["POST", "PUT", "PATCH", "DELETE"].includes(method) ||
-                    options.requireAuth === true;
+    options.requireAuth === true;
 
   const headers = new Headers(options.headers as Record<string, string> | undefined);
 
@@ -54,35 +54,35 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
     }
   }
 
-  // if (!headers.has("X-Client-Domain")) {
-  //   if (isServer) {
-  //     try {
-  //       const { headers: nextHeaders } = await import("next/headers");
-  //       const h = await nextHeaders();
-
-  //       headers.set("X-Client-Domain", "ecom.resorter360.ge");
-  //     } catch {
-  //       headers.set("X-Client-Domain", "unknown");
-  //     }
-  //   } else {
-  //     headers.set("X-Client-Domain", "ecom.resorter360.ge");
-  //   }
-  // }
   if (!headers.has("X-Client-Domain")) {
     if (isServer) {
       try {
         const { headers: nextHeaders } = await import("next/headers");
         const h = await nextHeaders();
-        const host = h.get("x-forwarded-host") ?? h.get("host");
 
-        headers.set("X-Client-Domain", host ?? "unknown");
+        headers.set("X-Client-Domain", "ecom.resorter360.ge");
       } catch {
         headers.set("X-Client-Domain", "unknown");
       }
     } else {
-      headers.set("X-Client-Domain", window.location.hostname);
+      headers.set("X-Client-Domain", "ecom.resorter360.ge");
     }
   }
+  // if (!headers.has("X-Client-Domain")) {
+  //   if (isServer) {
+  //     try {
+  //       const { headers: nextHeaders } = await import("next/headers");
+  //       const h = await nextHeaders();
+  //       const host = h.get("x-forwarded-host") ?? h.get("host");
+
+  //       headers.set("X-Client-Domain", host ?? "unknown");
+  //     } catch {
+  //       headers.set("X-Client-Domain", "unknown");
+  //     }
+  //   } else {
+  //     headers.set("X-Client-Domain", window.location.hostname);
+  //   }
+  // }
 
 
   const fetchOptions: RequestInit = {

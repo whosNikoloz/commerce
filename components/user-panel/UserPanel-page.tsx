@@ -148,22 +148,22 @@ export default function UserPanel() {
   useEffect(() => {
     let mounted = true
 
-    ;(async () => {
-      try {
-        setLoadingOrders(true)
-        setErrorOrders(null)
-        const res = await getMyOrders(paged.page, paged.pageSize)
+      ; (async () => {
+        try {
+          setLoadingOrders(true)
+          setErrorOrders(null)
+          const res = await getMyOrders(paged.page, paged.pageSize)
 
-        if (!mounted) return
-        setPaged((p) => ({ ...p, total: res.total }))
-        setOrders(res.data)
-      } catch (e: any) {
-        if (!mounted) return
-        setErrorOrders(e?.message ?? "Failed to load orders")
-      } finally {
-        mounted && setLoadingOrders(false)
-      }
-    })()
+          if (!mounted) return
+          setPaged((p) => ({ ...p, total: res.total }))
+          setOrders(res.data)
+        } catch (e: any) {
+          if (!mounted) return
+          setErrorOrders(e?.message ?? "Failed to load orders")
+        } finally {
+          mounted && setLoadingOrders(false)
+        }
+      })()
 
     return () => {
       mounted = false
@@ -174,21 +174,21 @@ export default function UserPanel() {
   useEffect(() => {
     let mounted = true
 
-    ;(async () => {
-      try {
-        setLoadingWishlist(true)
-        setErrorWishlist(null)
-        const items = await getWishlist()
+      ; (async () => {
+        try {
+          setLoadingWishlist(true)
+          setErrorWishlist(null)
+          const items = await getWishlist()
 
-        if (!mounted) return
-        setWishlist(items)
-      } catch (e: any) {
-        if (!mounted) return
-        setErrorWishlist(e?.message ?? "Failed to load wishlist")
-      } finally {
-        mounted && setLoadingWishlist(false)
-      }
-    })()
+          if (!mounted) return
+          setWishlist(items)
+        } catch (e: any) {
+          if (!mounted) return
+          setErrorWishlist(e?.message ?? "Failed to load wishlist")
+        } finally {
+          mounted && setLoadingWishlist(false)
+        }
+      })()
 
     return () => {
       mounted = false
@@ -211,10 +211,22 @@ export default function UserPanel() {
         const detail = await getOrderById(orderId)
 
         setOrders((prev) => prev.map((o) => (o.id === orderId ? detail : o)))
+
+        return true
+      } catch (err: any) {
+        // Surface the error to the user instead of swallowing the click
+        setNotifications((p) => ({
+          ...p,
+          [orderId]: `Failed to load order details: ${String(err?.message || err)}`,
+        }))
+
+        return false
       } finally {
         setOrderActions((a) => ({ ...a, [`load-${orderId}`]: false }))
       }
     }
+
+    return true
   }
 
   const handleTrackPackage = async (orderId: string, trackingNumber?: string | null) => {

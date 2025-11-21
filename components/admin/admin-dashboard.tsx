@@ -128,7 +128,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8 w-full">
       {/* Stat Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, _index) => {
           const Icon = stat.icon;
 
@@ -169,9 +169,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Activity & Quick Actions */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
         {/* Recent Orders */}
-        <Card className="col-span-4 border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl hover:shadow-2xl transition-all duration-500">
+        <Card className="col-span-1 lg:col-span-4 border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl hover:shadow-2xl transition-all duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none rounded-lg" />
           <CardHeader className="pb-4 relative">
             <div className="flex items-center justify-between">
@@ -220,23 +220,26 @@ export default function AdminDashboard() {
                   return (
                     <Link
                       key={order.id}
-                      className="flex items-center p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 hover:from-slate-100 hover:to-slate-50 dark:hover:from-slate-800/70 dark:hover:to-slate-800/50 transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md cursor-pointer group"
+                      className="flex flex-col sm:flex-row sm:items-center p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 hover:from-slate-100 hover:to-slate-50 dark:hover:from-slate-800/70 dark:hover:to-slate-800/50 transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md cursor-pointer group gap-4 sm:gap-0"
                       href={`/admin/orders`}
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ring-2 ring-white dark:ring-slate-800">
-                        <span className="text-sm font-bold text-white">
-                          {initials}
-                        </span>
+                      <div className="flex items-center w-full sm:w-auto">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ring-2 ring-white dark:ring-slate-800 shrink-0">
+                          <span className="text-sm font-bold text-white">
+                            {initials}
+                          </span>
+                        </div>
+                        <div className="ml-4 flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                            Order #{orderNumber}
+                          </p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
+                            {formatDate(order.date)} • {order.items} {order.items === 1 ? 'item' : 'items'}
+                          </p>
+                        </div>
                       </div>
-                      <div className="ml-4 flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
-                          Order #{orderNumber}
-                        </p>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
-                          {formatDate(order.date)} • {order.items} {order.items === 1 ? 'item' : 'items'}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 ml-2">
+
+                      <div className="flex items-center justify-between sm:flex-col sm:items-end gap-1.5 sm:ml-auto w-full sm:w-auto pl-16 sm:pl-0">
                         <span className="font-bold text-slate-900 dark:text-slate-100 text-base whitespace-nowrap">
                           {formatCurrency(order.total)}
                         </span>
@@ -256,7 +259,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="col-span-3 border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl hover:shadow-2xl transition-all duration-500">
+        <Card className="col-span-1 lg:col-span-3 border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl hover:shadow-2xl transition-all duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5 pointer-events-none rounded-lg" />
           <CardHeader className="pb-4 relative">
             <CardTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-3 text-xl font-bold">
@@ -279,22 +282,22 @@ export default function AdminDashboard() {
             >
               {isFinaMerchant ? (
                 <div className="flex items-center w-full">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 transition-all duration-300 shadow-md ring-2 ring-emerald-200 dark:ring-emerald-800/50 opacity-50">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 transition-all duration-300 shadow-md ring-2 ring-emerald-200 dark:ring-emerald-800/50 opacity-50 shrink-0">
                     <Package className="h-5 w-5 text-white" />
                   </div>
-                  <div className="ml-4 text-left">
-                    <div className="font-bold text-base">{t('admin.addProduct', 'Add New Product')}</div>
-                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Not available for FINA merchants</div>
+                  <div className="ml-4 text-left flex-1 min-w-0">
+                    <div className="font-bold text-base truncate">{t('admin.addProduct', 'Add New Product')}</div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 truncate">Not available for FINA merchants</div>
                   </div>
                 </div>
               ) : (
                 <Link className="flex items-center w-full" href="/admin/products">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-600 group-hover:to-emerald-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-emerald-200 dark:ring-emerald-800/50">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-600 group-hover:to-emerald-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-emerald-200 dark:ring-emerald-800/50 shrink-0">
                     <Package className="h-5 w-5 text-white" />
                   </div>
-                  <div className="ml-4 text-left">
-                    <div className="font-bold text-base">{t('admin.addProduct', 'Add New Product')}</div>
-                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Create and manage inventory</div>
+                  <div className="ml-4 text-left flex-1 min-w-0">
+                    <div className="font-bold text-base truncate">{t('admin.addProduct', 'Add New Product')}</div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 truncate">Create and manage inventory</div>
                   </div>
                 </Link>
               )}
@@ -309,22 +312,22 @@ export default function AdminDashboard() {
             >
               {isFinaMerchant ? (
                 <div className="flex items-center w-full">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 transition-all duration-300 shadow-md ring-2 ring-cyan-200 dark:ring-cyan-800/50 opacity-50">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 transition-all duration-300 shadow-md ring-2 ring-cyan-200 dark:ring-cyan-800/50 opacity-50 shrink-0">
                     <FolderTree className="h-5 w-5 text-white" />
                   </div>
-                  <div className="ml-4 text-left">
-                    <div className="font-bold text-base">Add Category</div>
-                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">Not available for FINA merchants</div>
+                  <div className="ml-4 text-left flex-1 min-w-0">
+                    <div className="font-bold text-base truncate">Add Category</div>
+                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5 truncate">Not available for FINA merchants</div>
                   </div>
                 </div>
               ) : (
                 <Link className="flex items-center w-full" href="/admin/categories">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 group-hover:from-cyan-600 group-hover:to-cyan-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-cyan-200 dark:ring-cyan-800/50">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 group-hover:from-cyan-600 group-hover:to-cyan-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-cyan-200 dark:ring-cyan-800/50 shrink-0">
                     <FolderTree className="h-5 w-5 text-white" />
                   </div>
-                  <div className="ml-4 text-left">
-                    <div className="font-bold text-base">Add Category</div>
-                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">Organize your catalog</div>
+                  <div className="ml-4 text-left flex-1 min-w-0">
+                    <div className="font-bold text-base truncate">Add Category</div>
+                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5 truncate">Organize your catalog</div>
                   </div>
                 </Link>
               )}
@@ -337,12 +340,12 @@ export default function AdminDashboard() {
               variant="outline"
             >
               <Link className="flex items-center w-full" href="/admin/orders">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-blue-200 dark:ring-blue-800/50">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-blue-200 dark:ring-blue-800/50 shrink-0">
                   <ShoppingCart className="h-5 w-5 text-white" />
                 </div>
-                <div className="ml-4 text-left">
-                  <div className="font-bold text-base">Process Orders</div>
-                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-0.5">Manage pending orders</div>
+                <div className="ml-4 text-left flex-1 min-w-0">
+                  <div className="font-bold text-base truncate">Process Orders</div>
+                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-0.5 truncate">Manage pending orders</div>
                 </div>
               </Link>
             </Button>
@@ -354,12 +357,12 @@ export default function AdminDashboard() {
               variant="outline"
             >
               <Link className="flex items-center w-full" href="/admin/customers">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-purple-200 dark:ring-purple-800/50">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:scale-110 ring-2 ring-purple-200 dark:ring-purple-800/50 shrink-0">
                   <Users className="h-5 w-5 text-white" />
                 </div>
-                <div className="ml-4 text-left">
-                  <div className="font-bold text-base">View Customers</div>
-                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-0.5">Manage customer relationships</div>
+                <div className="ml-4 text-left flex-1 min-w-0">
+                  <div className="font-bold text-base truncate">View Customers</div>
+                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-0.5 truncate">Manage customer relationships</div>
                 </div>
               </Link>
             </Button>

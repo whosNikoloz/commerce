@@ -17,6 +17,7 @@ import ClientUADataFix from "@/components/ClientUADataFix";
 import { generateFontClassNames } from "@/lib/loadTenantFonts";
 import FloatingCompareButton from "@/components/compare/FloatingCompareButton";
 import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
+import SmoothScroll from "@/components/SmoothScroll";
 
 function normalizeHost(host?: string) {
   return (host ?? "").toLowerCase().replace(/:.*$/, "").replace(",", ".");
@@ -174,21 +175,23 @@ export default async function RootLayout({
           </noscript>
         )}
 
-        <Providers
-          initialTenant={tenant}
-          themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
-        >
-          <FontAwesomeLoader />
-          {/* <WebVitals /> */}
-          <LayoutWrapper>
-            <ClientUADataFix />
-            <main className="" id="main-content">
-              {children}
-            </main>
-            <BackToTopShadcn threshold={320} />
-            <FloatingCompareButton />
-          </LayoutWrapper>
-        </Providers>
+        <SmoothScroll enabled={tenant.ui?.enableSmoothScrolling}>
+          <Providers
+            initialTenant={tenant}
+            themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
+          >
+            <FontAwesomeLoader />
+            {/* <WebVitals /> */}
+            <LayoutWrapper>
+              <ClientUADataFix />
+              <main className="" id="main-content">
+                {children}
+              </main>
+              <BackToTopShadcn threshold={320} />
+              <FloatingCompareButton />
+            </LayoutWrapper>
+          </Providers>
+        </SmoothScroll>
       </body>
     </html>
   );

@@ -42,7 +42,7 @@ type OpeningHour = { dayOfWeek: string; opens: string; closes: string };
 function groupOpeningHours(rows?: OpeningHour[]) {
   if (!rows?.length) return [] as { label: string; hours: string }[];
 
-  const order = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const byOrder = [...rows].sort((a, b) => order.indexOf(a.dayOfWeek) - order.indexOf(b.dayOfWeek));
 
   const out: { days: string[]; hours: string }[] = [];
@@ -55,7 +55,7 @@ function groupOpeningHours(rows?: OpeningHour[]) {
     else out.push({ days: [r.dayOfWeek], hours });
   }
   const short = (ds: string[]) =>
-    ds.length > 2 ? `${ds[0].slice(0,3)}–${ds[ds.length-1].slice(0,3)}` : ds.map(d => d.slice(0,3)).join(", ");
+    ds.length > 2 ? `${ds[0].slice(0, 3)}–${ds[ds.length - 1].slice(0, 3)}` : ds.map(d => d.slice(0, 3)).join(", ");
 
   return out.map(g => ({ label: short(g.days), hours: g.hours }));
 }

@@ -203,29 +203,29 @@ export type InfoPagesConfig = {
 
 export type DynamicPageSectionInstance =
   | {
-      type: "ProductRail";
-      enabled: boolean;
-      order: number;
-      data: ProductRailData;
-    }
+    type: "ProductRail";
+    enabled: boolean;
+    order: number;
+    data: ProductRailData;
+  }
   | {
-      type: "CommercialBanner";
-      enabled: boolean;
-      order: number;
-      data: CommercialBannerData;
-    }
+    type: "CommercialBanner";
+    enabled: boolean;
+    order: number;
+    data: CommercialBannerData;
+  }
   | {
-      type: "CustomHTML";
-      enabled: boolean;
-      order: number;
-      data: CustomHTMLData;
-    };
+    type: "CustomHTML";
+    enabled: boolean;
+    order: number;
+    data: CustomHTMLData;
+  };
 
 export type DynamicPageMetadata = {
   title: LocalizedText;
   description: LocalizedText;
   ogImage?: string;
-  index?: boolean; 
+  index?: boolean;
 };
 
 export type DynamicPageConfig = {
@@ -384,32 +384,33 @@ export type NavbarVariant = 1 | 2;
 export type CartVariant = "dropdown" | "drawer";
 
 export type UIConfig = {
-  navbarVariant?: NavbarVariant; // Choose navbar template (1 or 2)
-  cartVariant?: CartVariant; // Cart display style: "dropdown" or "drawer"
-  enableFlyToCart?: boolean; // Enable/disable fly-to-cart animation when adding items to cart (default: true)
+  navbarVariant?: NavbarVariant;
+  cartVariant?: CartVariant;
+  enableFlyToCart?: boolean;
+  enableSmoothScrolling?: boolean;
 };
 
 
 export type TenantConfig =
   | {
-      templateId: 1;
-      themeColor: string;
-      theme: ThemeVars;
-      homepage: Template1Homepage;
-      infoPages?: InfoPagesConfig;
-      dynamicPages?: DynamicPagesConfig;
-      merchantType?: MerchantType;
-      siteConfig: SiteConfig;
-      ui?: UIConfig;
-    }
+    templateId: 1;
+    themeColor: string;
+    theme: ThemeVars;
+    homepage: Template1Homepage;
+    infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
+    merchantType?: MerchantType;
+    siteConfig: SiteConfig;
+    ui?: UIConfig;
+  }
   | {
-      templateId: 2;
-      themeColor: string;
-      theme: ThemeVars;
-      homepage: Template2Homepage;
-      infoPages?: InfoPagesConfig;
-      dynamicPages?: DynamicPagesConfig;
-      merchantType?: MerchantType;
-      siteConfig: SiteConfig;
-      ui?: UIConfig;
-    };
+    templateId: 2;
+    themeColor: string;
+    theme: ThemeVars;
+    homepage: Template2Homepage;
+    infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
+    merchantType?: MerchantType;
+    siteConfig: SiteConfig;
+    ui?: UIConfig;
+  };

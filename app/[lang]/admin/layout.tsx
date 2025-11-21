@@ -27,6 +27,8 @@ export async function generateMetadata({
   });
 }
 
+import { ThemeToggle } from "@/components/admin/theme-toggle";
+
 export default function AdminLayout({
   children,
 }: {
@@ -44,9 +46,13 @@ export default function AdminLayout({
                         border-slate-200/60 dark:border-slate-800/60
                         shadow-xl
                         overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent"
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
           <div className="relative z-10">
+            <div className="absolute top-0 right-0 z-50">
+              <ThemeToggle />
+            </div>
             {children}
           </div>
         </div>

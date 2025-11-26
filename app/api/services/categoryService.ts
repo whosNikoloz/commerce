@@ -32,7 +32,7 @@ export async function createCategory(data: CategoryModel): Promise<string> {
 
 export async function deleteCategory(id: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-category-by-${id}`, {
-    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
+    method: "PUT", requireAuth: true , failIfUnauthenticated : true 
   });
 }
 

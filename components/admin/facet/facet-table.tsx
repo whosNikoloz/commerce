@@ -14,6 +14,16 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { getAllFacets, deleteFacet } from "@/app/api/services/facetService";
 
 const AddFacetModal = dynamic(() => import("./add-facet-modal"), { ssr: false });
@@ -43,6 +53,8 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
   const [typeFilter, setTypeFilter] = useState<"all" | "custom" | "system">("all");
 
   const [isPending, startTransition] = useTransition();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [facetToDelete, setFacetToDelete] = useState<FacetModel | null>(null);
 
   useEffect(() => {
     if (!selectedCategoryId) { setFacets([]);
@@ -74,15 +86,20 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
       .sort((a,b) => sortBy === "name" ? (a.name ?? "").localeCompare(b.name ?? "") : (a.displayType ?? 0) - (b.displayType ?? 0));
   }, [facets, dSearch, typeFilter, sortBy]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!facetToDelete) return;
+
     try {
-      await deleteFacet(id);
-      setFacets(prev => prev.filter(f => f.id !== id));
+      await deleteFacet(facetToDelete.id);
+      setFacets(prev => prev.filter(f => f.id !== facetToDelete.id));
       toast.success("ფასეტი წაიშალა");
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       toast.error("წაშლა ვერ მოხერხდა");
+    } finally {
+      setDeleteDialogOpen(false);
+      setFacetToDelete(null);
     }
   };
 
@@ -209,7 +226,14 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                                 facet={f}
                                 onUpdated={(model) => setFacets(prev => prev.map(x => x.id === model.id ? model : x))}
                               />
-                              <Button size="sm" variant="destructive" onClick={() => handleDelete(f.id)}>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => {
+                                  setFacetToDelete(f);
+                                  setDeleteDialogOpen(true);
+                                }}
+                              >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
@@ -224,6 +248,39 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-slate-100">
+              Delete Facet?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
+              {facetToDelete ? (
+                <>
+                  Are you sure you want to delete{" "}
+                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                    {facetToDelete.name}
+                  </span>
+                  ? This action cannot be undone and will permanently delete the facet.
+                </>
+              ) : (
+                "This action cannot be undone."
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDelete}
+            >
+              Delete Facet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

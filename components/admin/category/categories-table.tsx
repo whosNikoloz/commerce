@@ -22,6 +22,16 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   updateCategory,
   deleteCategory,
   getAllCategories,
@@ -40,6 +50,8 @@ export function CategoriesTable({ initialCategories }: Props) {
 
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoryModel | null>(null);
 
   useEffect(() => {
     setCategories(initialCategories ?? []);
@@ -62,16 +74,20 @@ export function CategoriesTable({ initialCategories }: Props) {
     );
   };
 
-  const handleDeleteCategory = async (categoryId: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+
     try {
-      await deleteCategory(categoryId);
-      setCategories((prev) => prev.filter((c) => c.id !== categoryId));
+      await deleteCategory(categoryToDelete.id);
+      setCategories((prev) => prev.filter((c) => c.id !== categoryToDelete.id));
       toast.success("Category deleted successfully");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to delete category", err);
       toast.error("Failed to delete category");
+    } finally {
+      setDeleteDialogOpen(false);
+      setCategoryToDelete(null);
     }
   };
 
@@ -290,7 +306,10 @@ export function CategoriesTable({ initialCategories }: Props) {
                               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleDeleteCategory(category.id)}
+                              onClick={() => {
+                                setCategoryToDelete(category);
+                                setDeleteDialogOpen(true);
+                              }}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -459,7 +478,10 @@ export function CategoriesTable({ initialCategories }: Props) {
                         className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleDeleteCategory(category.id)}
+                        onClick={() => {
+                          setCategoryToDelete(category);
+                          setDeleteDialogOpen(true);
+                        }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete Category
@@ -482,6 +504,39 @@ export function CategoriesTable({ initialCategories }: Props) {
           )}
         </div>
       </CardContent>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-slate-100">
+              Delete Category?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
+              {categoryToDelete ? (
+                <>
+                  Are you sure you want to delete{" "}
+                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                    {categoryToDelete.name}
+                  </span>
+                  ? This action cannot be undone and will permanently delete the category.
+                </>
+              ) : (
+                "This action cannot be undone."
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDeleteCategory}
+            >
+              Delete Category
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

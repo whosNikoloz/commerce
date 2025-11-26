@@ -47,6 +47,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   deleteProductById,
   getProductsByCategory,
   updateProduct,
@@ -93,6 +103,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<ProductRequestModel | null>(null);
 
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [sortBy, setSortBy] = useState<SortOption>("name");
@@ -164,15 +176,20 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     };
   }, [selectedCategoryId]);
 
-  const handleDeleteProduct = async (productId: string) => {
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return;
+
     try {
-      await deleteProductById(productId);
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
+      await deleteProductById(productToDelete.id);
+      setProducts((prev) => prev.filter((p) => p.id !== productToDelete.id));
       toast.success("პროდუქტი წარმატებით წაიშალა");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to delete product", err);
       toast.error("პროდუქტის წაშლა ვერ მოხერხდა");
+    } finally {
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
     }
   };
 
@@ -723,7 +740,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                 <Button
                                   size="sm"
                                   variant="destructive"
-                                  onClick={() => handleDeleteProduct(product.id)}
+                                  onClick={() => {
+                                    setProductToDelete(product);
+                                    setDeleteDialogOpen(true);
+                                  }}
                                 >
                                   Delete
                                 </Button>
@@ -740,6 +760,39 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
           </Card>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-slate-100">
+              Delete Product?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
+              {productToDelete ? (
+                <>
+                  Are you sure you want to delete{" "}
+                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                    {productToDelete.name}
+                  </span>
+                  ? This action cannot be undone and will permanently delete the product.
+                </>
+              ) : (
+                "This action cannot be undone."
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDeleteProduct}
+            >
+              Delete Product
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

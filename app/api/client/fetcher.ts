@@ -60,12 +60,12 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
   //       const { headers: nextHeaders } = await import("next/headers");
   //       const h = await nextHeaders();
 
-  //       headers.set("X-Client-Domain", "ecom.resorter360.ge");
+  //       headers.set("X-Client-Domain", "new.toptools.ge");
   //     } catch {
   //       headers.set("X-Client-Domain", "unknown");
   //     }
   //   } else {
-  //     headers.set("X-Client-Domain", "ecom.resorter360.ge");
+  //     headers.set("X-Client-Domain", "new.toptools.ge");
   //   }
   // }
   if (!headers.has("X-Client-Domain")) {

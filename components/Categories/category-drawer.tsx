@@ -6,6 +6,7 @@ import { useMemo, useRef, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, ChevronRightIcon, ArrowLeftIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@heroui/button";
 
 import { getAllCategories } from "@/app/api/services/categoryService";
@@ -42,6 +43,7 @@ export default function CategoryDrawer() {
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   // Track current parent category (null = showing root categories)
   const [currentParentId, setCurrentParentId] = useState<string | null>(null);
@@ -73,6 +75,10 @@ export default function CategoryDrawer() {
 
   const getChildren = (id?: string | null) =>
     (id ? childrenMap[normalizeId(id)] : childrenMap[ROOT_KEY]) ?? [];
+
+  const handleImageError = (categoryId: string) => {
+    setImageErrors(prev => new Set(prev).add(categoryId));
+  };
 
   // Get categories to display based on current navigation level
   const currentCategories = currentParentId
@@ -106,31 +112,45 @@ export default function CategoryDrawer() {
     const id = normalizeId(node.id);
     const kids = getChildren(id);
     const hasChildren = kids.length > 0;
+    const imageUrl = node.images && node.images.length > 0 ? node.images[0] : "/placeholder.svg";
+    const hasError = imageErrors.has(id);
 
     return (
       <li key={id} className="select-none">
         <div
-          className={`group flex items-center justify-between rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-all px-4`}
+          className={`group flex items-center gap-2 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-all px-2 sm:px-4 min-w-0`}
         >
           <Link
-            className="flex-1 py-3 pr-2 text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate"
+            className="flex-1 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 min-w-0"
             href={`/category/${id}`}
             onClick={closeDrawer}
           >
-            {node.name ?? "Category"}
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+              <Image
+                fill
+                alt={node.name || "Category"}
+                className="object-cover"
+                sizes="40px"
+                src={hasError ? "/placeholder.svg" : imageUrl}
+                onError={() => handleImageError(id)}
+              />
+            </div>
+            <span className="text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate min-w-0">
+              {node.name ?? "Category"}
+            </span>
           </Link>
 
           {hasChildren ? (
             <button
               aria-label="View subcategories"
-              className="p-2 mr-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0"
               type="button"
               onClick={() => navigateToCategory(id)}
             >
-              <ChevronRightIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+              <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-300" />
             </button>
           ) : (
-            <span className="px-2 text-xs text-gray-400 dark:text-gray-500">—</span>
+            <span className="px-1 sm:px-2 text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">—</span>
           )}
         </div>
       </li>
@@ -176,35 +196,35 @@ export default function CategoryDrawer() {
           >
             <Dialog.Panel className="fixed left-0 top-0 h-full w-[420px] max-w-[92vw] bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl rounded-r-2xl overflow-hidden flex flex-col">
               {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-2 p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                   {currentParent ? (
                     <button
                       aria-label="Go back"
-                      className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                      className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0"
                       type="button"
                       onClick={goBack}
                     >
-                      <ArrowLeftIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                      <ArrowLeftIcon className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300" />
                     </button>
                   ) : (
-                    <Squares2X2Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                    <Squares2X2Icon className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                   )}
-                  <h2 className="text-xl font-extrabold text-gray-900 dark:text-white truncate">
+                  <h2 className="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white truncate min-w-0">
                     {currentParent ? currentParent.name : "Categories"}
                   </h2>
                 </div>
                 <button
                   aria-label="Close"
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0"
                   onClick={closeDrawer}
                 >
-                  <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                  <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300" />
                 </button>
               </div>
 
               {/* Body */}
-              <div className="flex-1 overflow-y-auto p-5">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5">
                 {loading && (
                   <div className="space-y-2">
                     {Array.from({ length: 8 }).map((_, i) => (
@@ -241,7 +261,7 @@ export default function CategoryDrawer() {
               </div>
 
               {/* Footer */}
-              <div className="p-5 border-t border-gray-200 dark:border-gray-700">
+              <div className="p-3 sm:p-5 border-t border-gray-200 dark:border-gray-700">
                 <Button fullWidth as={Link} color="primary" href="/category" onPress={closeDrawer}>
                   View all categories
                 </Button>

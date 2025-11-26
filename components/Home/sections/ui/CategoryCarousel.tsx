@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import Splide from "@splidejs/splide"
 import "@splidejs/splide/css"
+import { Squares2X2Icon } from "@heroicons/react/24/outline"
 
 // eslint-disable-next-line import/order
 import type { CategoryCarouselData, Locale } from "@/types/tenant"
@@ -121,13 +122,11 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
           {/* Static "All Categories" Card */}
           {data.showAllCard && (
             <Link href={data.allCategoriesHref || "/categories"}>
-              <div className="w-24 sm:w-32 md:w-40 lg:w-48 h-32 sm:h-36 md:h-40 lg:h-48 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <div className="w-full h-full flex flex-col items-center justify-center p-2 md:p-3">
-                  <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-primary-foreground text-center">
+              <div className="w-24 sm:w-32 md:w-40 lg:w-20 h-32 sm:h-36 md:h-40 lg:h-48 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-black dark:bg-gray-950 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-black dark:hover:bg-gray-900">
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                  <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
+                  <p className="text-xs sm:text-sm md:text-base font-semibold text-white text-center px-2">
                     {t(data.allCardText || { ka: "ყველა", en: "All" }, locale)}
-                  </div>
-                  <p className="text-[10px] sm:text-xs md:text-sm text-primary-foreground/80 mt-1 md:mt-2 text-center px-1">
-                    {t(data.allCardSubtext || { ka: "ყველა კატეგორია", en: "All Categories" }, locale)}
                   </p>
                 </div>
               </div>
@@ -152,13 +151,13 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                             <Image
                               fill
                               alt={category.name || "Category"}
-                              className="object-cover transition-transform duration-300 group-hover:scale-105"
+                              className="object-contain transition-transform duration-300 group-hover:scale-105"
                               sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, (max-width: 1024px) 160px, 192px"
                               src={hasError ? "/placeholder.svg" : imageUrl}
                               onError={() => handleImageError(category.id)}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                            <div className="absolute bottom-0 left-0 right-0 p-1.5 sm:p-2 md:p-3 transform translate-y-2 transition-transform duration-300 group-hover:translate-y-0">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-100 md:opacity-0 transition-opacity duration-300 md:group-hover:opacity-100" />
+                            <div className="md:opacity-0   md:group-hover:opacity-100 absolute bottom-0 left-0 right-0 p-1.5 sm:p-2 md:p-3 transform translate-y-0 md:translate-y-2 transition-transform duration-300 md:group-hover:translate-y-0">
                               <p className="text-white text-[10px] sm:text-xs md:text-sm font-semibold text-center leading-tight">
                                 {category.name}
                               </p>

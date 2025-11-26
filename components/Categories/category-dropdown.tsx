@@ -4,6 +4,7 @@ import type { CategoryModel } from "@/types/category";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { useDisclosure } from "@heroui/modal";
@@ -17,6 +18,7 @@ export default function CategoryDropdown() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   // Hover state
   const [hoveredTop, setHoveredTop] = useState<string | null>(null);
@@ -98,6 +100,10 @@ export default function CategoryDropdown() {
 
   const hasChildren = (id: string) => (childrenMap[id]?.length ?? 0) > 0;
 
+  const handleImageError = (categoryId: string) => {
+    setImageErrors(prev => new Set(prev).add(categoryId));
+  };
+
   // Lists for each column driven purely by hover state
   const midList = hoveredTop ? getChildren(hoveredTop) : [];
   const rightList = hoveredMid ? getChildren(hoveredMid) : [];
@@ -152,33 +158,48 @@ export default function CategoryDropdown() {
                 {/* Column 1: Parents */}
                 <div className="w-[300px] max-h-[60vh] overflow-y-auto border-r border-gray-200 dark:border-gray-800">
                   <div className="p-2">
-                    {topLevel.map((c) => (
-                      <div
-                        key={c.id}
-                        onMouseEnter={() => {
-                          setHoveredTop(c.id);
-                          setHoveredMid(null); // reset mid when changing parent
-                        }}
-                      >
-                        <Link
-                          className={`flex items-center justify-between p-3 rounded-lg transition-colors
-                            ${
-                              hoveredTop === c.id
-                                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                                : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                            }`}
-                          href={`/category/${c.id}`}
-                          onClick={() => {
-                            onClose();
-                            setHoveredTop(null);
-                            setHoveredMid(null);
+                    {topLevel.map((c) => {
+                      const imageUrl = c.images && c.images.length > 0 ? c.images[0] : "/placeholder.svg";
+                      const hasError = imageErrors.has(c.id);
+
+                      return (
+                        <div
+                          key={c.id}
+                          onMouseEnter={() => {
+                            setHoveredTop(c.id);
+                            setHoveredMid(null); // reset mid when changing parent
                           }}
                         >
-                          <span className="text-sm font-medium truncate">{c.name ?? "Unnamed"}</span>
-                          {hasChildren(c.id) && <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />}
-                        </Link>
-                      </div>
-                    ))}
+                          <Link
+                            className={`flex items-center gap-3 p-3 rounded-lg transition-colors
+                              ${
+                                hoveredTop === c.id
+                                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                              }`}
+                            href={`/category/${c.id}`}
+                            onClick={() => {
+                              onClose();
+                              setHoveredTop(null);
+                              setHoveredMid(null);
+                            }}
+                          >
+                            <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                              <Image
+                                fill
+                                alt={c.name || "Category"}
+                                className="object-cover"
+                                sizes="40px"
+                                src={hasError ? "/placeholder.svg" : imageUrl}
+                                onError={() => handleImageError(c.id)}
+                              />
+                            </div>
+                            <span className="text-sm font-medium truncate flex-1">{c.name ?? "Unnamed"}</span>
+                            {hasChildren(c.id) && <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />}
+                          </Link>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -186,27 +207,42 @@ export default function CategoryDropdown() {
                 {hoveredTop && midList.length > 0 && (
                   <div className="w-[300px] max-h-[60vh] overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40">
                     <div className="p-2">
-                      {midList.map((child) => (
-                        <div key={child.id} onMouseEnter={() => setHoveredMid(child.id)}>
-                          <Link
-                            className={`flex items-center justify-between p-3 rounded-lg transition-colors
-                              ${
-                                hoveredMid === child.id
-                                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                              }`}
-                            href={`/category/${child.id}`}
-                            onClick={() => {
-                              onClose();
-                              setHoveredTop(null);
-                              setHoveredMid(null);
-                            }}
-                          >
-                            <span className="text-sm font-medium truncate">{child.name ?? "Subcategory"}</span>
-                            {hasChildren(child.id) && <ChevronRightIcon className="h-4 w-4" />}
-                          </Link>
-                        </div>
-                      ))}
+                      {midList.map((child) => {
+                        const imageUrl = child.images && child.images.length > 0 ? child.images[0] : "/placeholder.svg";
+                        const hasError = imageErrors.has(child.id);
+
+                        return (
+                          <div key={child.id} onMouseEnter={() => setHoveredMid(child.id)}>
+                            <Link
+                              className={`flex items-center gap-3 p-3 rounded-lg transition-colors
+                                ${
+                                  hoveredMid === child.id
+                                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                }`}
+                              href={`/category/${child.id}`}
+                              onClick={() => {
+                                onClose();
+                                setHoveredTop(null);
+                                setHoveredMid(null);
+                              }}
+                            >
+                              <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                <Image
+                                  fill
+                                  alt={child.name || "Category"}
+                                  className="object-cover"
+                                  sizes="40px"
+                                  src={hasError ? "/placeholder.svg" : imageUrl}
+                                  onError={() => handleImageError(child.id)}
+                                />
+                              </div>
+                              <span className="text-sm font-medium truncate flex-1">{child.name ?? "Subcategory"}</span>
+                              {hasChildren(child.id) && <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />}
+                            </Link>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -215,23 +251,38 @@ export default function CategoryDropdown() {
                 {hoveredMid && rightList.length > 0 && (
                   <div className="w-[300px] max-h-[60vh] overflow-y-auto bg-gray-50 dark:bg-gray-800/50">
                     <div className="p-2">
-                      {rightList.map((g) => (
-                        <Link
-                          key={g.id}
-                          className="flex items-center justify-between gap-2 p-3 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-colors group"
-                          href={`/category/${g.id}`}
-                          onClick={() => {
-                            onClose();
-                            setHoveredTop(null);
-                            setHoveredMid(null);
-                          }}
-                        >
-                          <span className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                            {g.name ?? "Category"}
-                          </span>
-                          {hasChildren(g.id) && <ChevronRightIcon className="h-4 w-4 opacity-70" />}
-                        </Link>
-                      ))}
+                      {rightList.map((g) => {
+                        const imageUrl = g.images && g.images.length > 0 ? g.images[0] : "/placeholder.svg";
+                        const hasError = imageErrors.has(g.id);
+
+                        return (
+                          <Link
+                            key={g.id}
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-colors group"
+                            href={`/category/${g.id}`}
+                            onClick={() => {
+                              onClose();
+                              setHoveredTop(null);
+                              setHoveredMid(null);
+                            }}
+                          >
+                            <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                              <Image
+                                fill
+                                alt={g.name || "Category"}
+                                className="object-cover"
+                                sizes="40px"
+                                src={hasError ? "/placeholder.svg" : imageUrl}
+                                onError={() => handleImageError(g.id)}
+                              />
+                            </div>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white truncate flex-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                              {g.name ?? "Category"}
+                            </span>
+                            {hasChildren(g.id) && <ChevronRightIcon className="h-4 w-4 opacity-70 flex-shrink-0" />}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

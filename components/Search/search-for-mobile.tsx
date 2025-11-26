@@ -11,7 +11,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@headlessui/react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Shirt, Watch, Smartphone, Laptop, Home, Package } from "lucide-react";
 
 import { SearchIcon } from "../icons";
 import { GoBackButton } from "../go-back-button";
@@ -189,32 +188,6 @@ export default function SearchForMobile({
     handleClose();
   };
 
-  const getCategoryIcon = (categoryName: string) => {
-    const name = categoryName.toLowerCase();
-
-    // Map category names to icons
-    if (name.includes('cloth') || name.includes('fashion') || name.includes('apparel')) {
-      return <Shirt className="h-12 w-12 text-blue-500" />;
-    }
-    if (name.includes('watch') || name.includes('time')) {
-      return <Watch className="h-12 w-12 text-purple-500" />;
-    }
-    if (name.includes('phone') || name.includes('mobile')) {
-      return <Smartphone className="h-12 w-12 text-green-500" />;
-    }
-    if (name.includes('laptop') || name.includes('computer')) {
-      return <Laptop className="h-12 w-12 text-blue-500" />;
-    }
-    if (name.includes('home') || name.includes('furniture')) {
-      return <Home className="h-12 w-12 text-red-500" />;
-    }
-    if (name.includes('bag') || name.includes('accessory')) {
-      return <ShoppingBag className="h-12 w-12 text-pink-500" />;
-    }
-
-    // Default icon
-    return <Package className="h-12 w-12 text-gray-500" />;
-  };
 
   return (
     <>
@@ -381,8 +354,20 @@ export default function SearchForMobile({
                               onClick={() => goToResultsPage(category.name ?? "")}
                             >
                               <CardBody className="flex flex-col items-center justify-center p-3">
-                                <div className="mb-2">
-                                  {getCategoryIcon(category.name ?? "")}
+                                <div className="relative h-16 w-16 mb-2">
+                                  {category.images && category.images.length > 0 ? (
+                                    <Image
+                                      fill
+                                      alt={category.name ?? "Category"}
+                                      className="object-cover rounded-md"
+                                      sizes="64px"
+                                      src={category.images[0]}
+                                    />
+                                  ) : (
+                                    <div className="h-full w-full rounded-md flex items-center justify-center bg-gray-100 text-gray-400">
+                                      <SearchIcon className="h-8 w-8" />
+                                    </div>
+                                  )}
                                 </div>
                                 <span className="text-xs font-medium text-center line-clamp-2 break-words w-full">
                                   {category.name}

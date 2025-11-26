@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { compressImage } from "@/lib/image-compression";
 
 interface ImageCropperProps {
   aspectRatio?: number; // e.g., 1 for square, 16/9 for landscape, 3/4 for portrait
@@ -187,13 +188,44 @@ export function ImageCropper({
     return dataUrl;
   }, [preview, zoom, position, aspectRatio, maxWidth, maxHeight]);
 
+  const dataUrlToFile = async (dataUrl: string, filename: string): Promise<File> => {
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+
+    return new File([blob], filename, { type: blob.type });
+  };
+
   const handleCropComplete = async () => {
     const croppedUrl = await getCroppedImage();
 
     if (croppedUrl) {
-      onImageCropped(croppedUrl);
-      setIsCropping(false);
-      toast.success("Image cropped successfully");
+      try {
+        // Convert dataURL to File
+        const croppedFile = await dataUrlToFile(croppedUrl, selectedFile?.name || "cropped-image.jpg");
+
+        // Compress the cropped image
+        const compressedFile = await compressImage(croppedFile, {
+          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          quality: 0.85,
+        });
+
+        // Convert back to dataURL for onImageCropped callback
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          onImageCropped(reader.result as string);
+          setIsCropping(false);
+          toast.success("Image cropped and compressed successfully");
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (err) {
+        console.error("Failed to compress cropped image:", err);
+        // Fallback to uncompressed if compression fails
+        onImageCropped(croppedUrl);
+        setIsCropping(false);
+        toast.success("Image cropped successfully");
+      }
     }
   };
 

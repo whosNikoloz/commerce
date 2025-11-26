@@ -111,8 +111,8 @@ export function ProductCard({
   const minTitleHeight = isCompact ? "min-h-[1.75rem]" : "min-h-[2.5rem]";
   const discountBadge = isCompact ? "text-[9px] px-1.5 py-[2px]" : "text-xs px-2.5 py-1";
   const imgSizes = isCompact
-    ? "(max-width:640px) 45vw, (max-width:1024px) 24vw, 12vw"
-    : "(max-width:640px) 90vw, (max-width:1024px) 40vw, 20vw";
+    ? "(max-width:640px) 45vw, (max-width:1024px) 45vw, 45vw,"
+    : "(max-width:640px) 90vw, (max-width:1024px) 45vw,, 45vw,";
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -211,7 +211,7 @@ export function ProductCard({
               className="object-cover"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
-              quality={priority ? 85 : 72}
+              //quality={priority ? 85 : 72}
               sizes={imgSizes}
               src={imageUrl}
             />

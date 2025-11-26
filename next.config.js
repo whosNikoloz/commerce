@@ -18,6 +18,7 @@ const nextConfig = {
       { protocol: "https", hostname: "picsum.photos", pathname: "/**" },
       { protocol: "https", hostname: "media.veli.store", pathname: "/**" },
       { protocol: "https", hostname: "extra.ge", pathname: "/**" },
+      { protocol: "https", hostname: "toptools.ge", pathname: "/**" },
       {
         protocol: "https",
         hostname: "finasyncecomm.s3.eu-central-1.amazonaws.com",
@@ -128,7 +129,7 @@ const nextConfig = {
               // Dev often needs 'unsafe-inline' and 'unsafe-eval' (source maps/HMR)
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
-              "img-src 'self' data: blob: https://*.amazonaws.com https://media.veli.store https://picsum.photos https://placehold.co https://extra.ge",
+              "img-src 'self' data: blob: https://*.amazonaws.com https://media.veli.store https://picsum.photos https://placehold.co https://extra.ge https://toptools.ge",
               "font-src 'self' data: https://cdnjs.cloudflare.com",
               `connect-src ${connectSrcParts.join(" ")}`,
               // Helpful for dev tools and HMR

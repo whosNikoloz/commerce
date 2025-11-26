@@ -6,11 +6,25 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number, currency: string = "GEL"): string {
-  return new Intl.NumberFormat("ka-GE", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-  }).format(price);
+  // Use a deterministic formatter to avoid hydration mismatches
+  // Format: "GEL 2,799.00" or "2,799.00 ₾"
+  const formatted = price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  // Use currency symbol based on currency code
+  const currencySymbols: Record<string, string> = {
+    "GEL": "₾",
+    "USD": "$",
+    "EUR": "€",
+  };
+
+  const symbol = currencySymbols[currency] || currency;
+
+  // Georgian currency (₾) goes after, others before
+  if (currency === "GEL") {
+    return `${formatted} ${symbol}`;
+  }
+
+  return `${symbol}${formatted}`;
 }
 
 /**

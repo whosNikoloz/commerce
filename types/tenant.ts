@@ -72,21 +72,43 @@ export type CustomHTMLData = {
   containerClass?: string;
 };
 
+export type CategoryCarouselData = {
+  title?: LocalizedText;
+  subtitle?: LocalizedText;
+  showHeader?: boolean;
+  showAllCard?: boolean;
+  allCardText?: LocalizedText;
+  allCardSubtext?: LocalizedText;
+  allCategoriesHref?: string;
+  categoryIds?: string[]; // If provided, show only these categories
+  limit?: number; // Maximum number of categories to display
+  slidesPerView?: number; // Number of slides visible at once
+  showArrows?: boolean;
+  showPagination?: boolean;
+  autoplay?: boolean;
+  autoplayInterval?: number; // in milliseconds
+  cardHeight?: string; // Tailwind class like "h-48", "h-56", etc.
+  cardWidth?: string; // Tailwind class like "w-32", "w-40", etc.
+};
+
 
 export type CommonSectionType =
   | "CommercialBanner"
   | "ProductRail"
-  | "CustomHTML";
+  | "CustomHTML"
+  | "CategoryCarousel";
 
 export type CommonSectionInstance =
   | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
-  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData };
+  | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData }
+  | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData };
 
 export const COMMON_ALLOWED = [
   "CommercialBanner",
   "ProductRail",
   "CustomHTML",
+  "CategoryCarousel",
 ] as const;
 
 export type HeroData = {
@@ -219,6 +241,12 @@ export type DynamicPageSectionInstance =
     enabled: boolean;
     order: number;
     data: CustomHTMLData;
+  }
+  | {
+    type: "CategoryCarousel";
+    enabled: boolean;
+    order: number;
+    data: CategoryCarouselData;
   };
 
 export type DynamicPageMetadata = {

@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { deleteImage, uploadBrandImages } from "@/app/api/services/brandService";
 import { GoBackButton } from "@/components/go-back-button";
+import { compressImages } from "@/lib/image-compression";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -80,25 +81,36 @@ export default function ReviewImagesModal({
   );
 
   const addFiles = useCallback(
-    (files: File[]) => {
+    async (files: File[]) => {
       if (!files?.length) return;
       const imgsOnly = files.filter((f) => f.type.startsWith("image/"));
-      const sizeLimit = maxSizeMB * 1024 * 1024;
-      const withinSize = imgsOnly.filter((f) => f.size <= sizeLimit);
 
       const existingKeys = new Set(images.map((i) => fileKey(i.file)));
-      const dedup = withinSize.filter((f) => !existingKeys.has(fileKey(f)));
+      const dedup = imgsOnly.filter((f) => !existingKeys.has(fileKey(f)));
       const toAdd = dedup.slice(0, remainingSlots);
 
-      const newItems = toAdd.map((file) => ({
-        id: crypto.randomUUID(),
-        file,
-        url: URL.createObjectURL(file),
-      }));
+      if (toAdd.length === 0) return;
 
-      if (newItems.length > 0) setImages((prev) => [...prev, ...newItems]);
+      // Compress images before adding
+      try {
+        const compressed = await compressImages(toAdd, {
+          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          quality: 0.85,
+        });
+
+        const newItems = compressed.map((file) => ({
+          id: crypto.randomUUID(),
+          file,
+          url: URL.createObjectURL(file),
+        }));
+
+        if (newItems.length > 0) setImages((prev) => [...prev, ...newItems]);
+      } catch (err) {
+        console.error("Failed to compress images:", err);
+      }
     },
-    [images, maxSizeMB, remainingSlots],
+    [images, remainingSlots],
   );
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

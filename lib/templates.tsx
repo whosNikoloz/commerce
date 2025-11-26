@@ -61,8 +61,27 @@ const ProductRailDataSchema = z.object({
   sortBy: z.enum(["featured", "newest", "price-low", "price-high", "rating", "name"]).optional(),
 });
 
+const CategoryCarouselDataSchema = z.object({
+  title: LocalizedTextSchema.optional(),
+  subtitle: LocalizedTextSchema.optional(),
+  showHeader: z.boolean().optional(),
+  showAllCard: z.boolean().optional(),
+  allCardText: LocalizedTextSchema.optional(),
+  allCardSubtext: LocalizedTextSchema.optional(),
+  allCategoriesHref: z.string().optional(),
+  categoryIds: z.array(z.string()).optional(),
+  limit: z.number().optional(),
+  slidesPerView: z.number().optional(),
+  showArrows: z.boolean().optional(),
+  showPagination: z.boolean().optional(),
+  autoplay: z.boolean().optional(),
+  autoplayInterval: z.number().optional(),
+  cardHeight: z.string().optional(),
+  cardWidth: z.string().optional(),
+});
+
 /* ================= COMMON SECTIONS (single source of truth) ================= */
-export const COMMON_ALLOWED_SECTIONS = ["CommercialBanner", "ProductRail", "CustomHTML"] as const;
+export const COMMON_ALLOWED_SECTIONS = ["CommercialBanner", "ProductRail", "CustomHTML", "CategoryCarousel"] as const;
 export type CommonSectionType = (typeof COMMON_ALLOWED_SECTIONS)[number];
 
 const CommonSectionVariants = [
@@ -83,6 +102,12 @@ const CommonSectionVariants = [
     enabled: z.boolean(),
     order: z.number(),
     data: CustomHTMLDataSchema,
+  }),
+  z.object({
+    type: z.literal("CategoryCarousel"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: CategoryCarouselDataSchema,
   }),
 ] as const;
 
@@ -189,6 +214,7 @@ export type TemplateDefinition<TSectionType extends string = string, _TSectionIn
 const ProductRail = lazy(() => import("@/components/Home/sections/ui/ProductRail"));
 const CommercialBanner = lazy(() => import("@/components/Home/sections/ui/CommercialBanner"));
 const CustomHTML = lazy(() => import("@/components/Home/sections/ui/CustomHTML"));
+const CategoryCarousel = lazy(() => import("@/components/Home/sections/ui/CategoryCarouselWrapper"));
 
 const Hero = lazy(() => import("@/components/Home/sections/template1/Hero/Hero"));
 const HeroBrand = lazy(() => import("@/components/Home/sections/template2/HeroBrand"));
@@ -197,6 +223,7 @@ const commonRegistry: Record<CommonSectionType, SectionComponent> = {
   CommercialBanner,
   ProductRail,
   CustomHTML,
+  CategoryCarousel,
 };
 
 export const TEMPLATE_1_ALLOWED_SECTIONS = (["Hero", ...COMMON_ALLOWED_SECTIONS] as const) satisfies readonly Template1SectionType[];

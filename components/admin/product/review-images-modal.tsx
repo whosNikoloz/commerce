@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
 import { GoBackButton } from "@/components/go-back-button";
+import { compressImages } from "@/lib/image-compression";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -61,9 +62,6 @@ export default function ReviewImagesModal({
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [fileToCrop, setFileToCrop] = useState<File | null>(null);
-  const [showCropper, setShowCropper] = useState(false);
-  const [processingCrop, setProcessingCrop] = useState(false);
 
 
   useEffect(() => {
@@ -89,52 +87,36 @@ export default function ReviewImagesModal({
   );
 
   const addFiles = useCallback(
-    (files: File[]) => {
+    async (files: File[]) => {
       if (!files?.length) return;
       if (remainingSlots <= 0) return;
 
       const imgsOnly = files.filter((f) => f.type.startsWith("image/"));
-      const sizeLimit = maxSizeMB * 1024 * 1024;
-      const withinSize = imgsOnly.filter((f) => f.size <= sizeLimit);
+      const toAdd = imgsOnly.slice(0, remainingSlots);
 
-      if (withinSize.length > 0) {
-        // Open cropper with first valid file
-        setFileToCrop(withinSize[0]);
-        setShowCropper(true);
+      if (toAdd.length === 0) return;
+
+      // Compress images before adding
+      try {
+        const compressed = await compressImages(toAdd, {
+          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          quality: 0.85,
+        });
+
+        const newImages: SelectedImage[] = compressed.map((file) => ({
+          id: crypto.randomUUID(),
+          file,
+          url: URL.createObjectURL(file),
+        }));
+
+        setImages((prev) => [...prev, ...newImages]);
+      } catch (err) {
+        console.error("Failed to compress images:", err);
       }
     },
-    [remainingSlots, maxSizeMB],
+    [remainingSlots],
   );
-
-  // const handleImageCropped = useCallback(
-  //   async (croppedDataUrl: string | null) => {
-  //     if (!croppedDataUrl || !fileToCrop) {
-  //       setShowCropper(false);
-  //       setFileToCrop(null);
-
-  //       return;
-  //     }
-
-  //     setProcessingCrop(true);
-  //     try {
-  //       const croppedFile = await dataUrlToFile(croppedDataUrl, fileToCrop.name);
-  //       const newItem: SelectedImage = {
-  //         id: crypto.randomUUID(),
-  //         file: croppedFile,
-  //         url: croppedDataUrl,
-  //       };
-
-  //       setImages((prev) => [...prev, newItem]);
-  //     } catch (err) {
-  //       console.error("Failed to process cropped image:", err);
-  //     } finally {
-  //       setProcessingCrop(false);
-  //       setShowCropper(false);
-  //       setFileToCrop(null);
-  //     }
-  //   },
-  //   [dataUrlToFile, fileToCrop],
-  // );
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -304,7 +286,7 @@ export default function ReviewImagesModal({
                         Manage Product Images
                       </h2>
                       <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                        Upload up to {maxFiles} images ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ Max {maxSizeMB}MB each
+                        Upload up to {maxFiles} images  Max {maxSizeMB}MB each
                       </p>
                     </div>
                   </div>
@@ -364,40 +346,6 @@ export default function ReviewImagesModal({
                       />
                     </div>
                   </div>
-
-                  {/* Image Cropper */}
-                  {showCropper && fileToCrop && (
-                    <div className="relative rounded-lg border-2 border-blue-500 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 p-4">
-                      {processingCrop && (
-                        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-900/40 backdrop-blur-sm text-white text-sm font-semibold">
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Preparing cropped image...
-                          </div>
-                        </div>
-                      )}
-                      <div className="mb-3">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                          Crop & Resize Image
-                        </h3>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Adjust your image to ensure consistent display everywhere
-                        </p>
-                      </div>
-                      <Button
-                        className="w-full mt-4"
-                        disabled={processingCrop}
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          setShowCropper(false);
-                          setFileToCrop(null);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  )}
 
                   {serverImages.length > 0 || images.length > 0 ? (
                     <ScrollArea className="max-h-[360px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">

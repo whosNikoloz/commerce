@@ -47,7 +47,7 @@ export async function deleteBrand(id: string): Promise<string> {
 
 
 export async function deleteImage(id: string, key: string): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
+  return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-brand-${id}`, {
     method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }

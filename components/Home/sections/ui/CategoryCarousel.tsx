@@ -122,7 +122,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
           {/* Static "All Categories" Card */}
           {data.showAllCard && (
             <Link href={data.allCategoriesHref || "/categories"}>
-              <div className="w-24 sm:w-32 md:w-40 lg:w-20 h-32 sm:h-36 md:h-40 lg:h-48 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-black dark:bg-gray-950 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-black dark:hover:bg-gray-900">
+              <div className="w-24 sm:w-32 md:w-40 lg:w-48 h-32 sm:h-36 md:h-40 lg:h-48 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="w-full h-full flex flex-col items-center justify-center gap-2">
                   <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
                   <p className="text-xs sm:text-sm md:text-base font-semibold text-white text-center px-2">

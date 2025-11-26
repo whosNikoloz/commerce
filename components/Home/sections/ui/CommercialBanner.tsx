@@ -39,7 +39,7 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
           fill
           alt={t(banner.alt, locale)}
           className="object-cover w-full h-full transition-transform duration-700 "
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw"
           src={desktopImageUrl}
           onError={() => setDesktopError(true)}
         />

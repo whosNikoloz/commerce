@@ -147,7 +147,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
 
                     return (
                       <li key={category.id} className="splide__slide">
-                        <Link href={`/categories/${category.id}`}>
+                        <Link href={`/category/${category.id}`}>
                           <div className="group relative w-24 sm:w-32 md:w-40 lg:w-48 h-32 sm:h-36 md:h-40 lg:h-48 cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                             <Image
                               fill

@@ -40,10 +40,18 @@ export function useAdminAuth() {
 
     const redirectToLogin = () => {
       // Extract locale from pathname (e.g., /en/admin -> en, /ka/admin -> ka)
-      const locale = pathname.split("/")[1] || "ka";
-      const loginPath = `/${locale}/admin`;
-      const nextParam = pathname !== loginPath ? `?next=${encodeURIComponent(pathname)}` : "";
+      const segments = pathname.split("/");
+      const possibleLocale = segments[1];
+      const locale = ["en", "ka"].includes(possibleLocale) ? possibleLocale : "ka";
 
+      const loginPath = `/${locale}/admin`;
+
+      // Prevent infinite redirect loop if already on the login page
+      if (pathname === loginPath) {
+        return;
+      }
+
+      const nextParam = pathname !== loginPath ? `?next=${encodeURIComponent(pathname)}` : "";
       router.push(`${loginPath}${nextParam}`);
     };
 

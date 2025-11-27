@@ -121,11 +121,11 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
         <div className="w-full flex flex-row items-center gap-2 md:gap-3 overflow-visible">
           {/* Static "All Categories" Card */}
           {data.showAllCard && (
-            <Link href={data.allCategoriesHref || "/categories"}>
-              <div className="w-24 sm:w-32 md:w-40 lg:w-48 h-32 sm:h-36 md:h-40 lg:h-48 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+            <Link href={data.allCategoriesHref || "/categories"} className="w-24 sm:w-28 md:w-36 lg:w-40 flex-shrink-0">
+              <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 cursor-pointer overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
                   <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
-                  <p className="text-xs sm:text-sm md:text-base font-semibold text-white text-center px-2">
+                  <p className="text-[10px] sm:text-xs md:text-sm font-semibold text-white text-center">
                     {t(data.allCardText || { ka: "ყველა", en: "All" }, locale)}
                   </p>
                 </div>
@@ -141,24 +141,29 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                   {displayCategories.map((category) => {
                     const imageUrl = category.images && category.images.length > 0
                       ? category.images[0]
-                      : "/placeholder.svg"
+                      : "/placeholder.png"
                     const hasError = imageErrors.has(category.id)
 
                     return (
-                      <li key={category.id} className="splide__slide">
-                        <Link href={`/category/${category.id}`}>
-                          <div className="group relative w-24 sm:w-32 md:w-40 lg:w-48 h-32 sm:h-36 md:h-40 lg:h-48 cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                      <li key={category.id} className="splide__slide h-32 sm:h-40 md:h-48 lg:h-56">
+                        <Link href={`/category/${category.id}`} className="block h-full">
+                          <div className="group relative h-full w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-gray-100 to-gray-200">
+                            {/* Image */}
                             <Image
                               fill
                               alt={category.name || "Category"}
                               className="object-contain transition-transform duration-300 group-hover:scale-105"
-                              sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, (max-width: 1024px) 160px, 192px"
+                              sizes="(max-width: 640px) 128px, (max-width: 768px) 160px, (max-width: 1024px) 192px, 224px"
                               src={hasError ? "/placeholder.svg" : imageUrl}
                               onError={() => handleImageError(category.id)}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-100 md:opacity-0 transition-opacity duration-300 md:group-hover:opacity-100" />
-                            <div className="md:opacity-0   md:group-hover:opacity-100 absolute bottom-0 left-0 right-0 p-1.5 sm:p-2 md:p-3 transform translate-y-0 md:translate-y-2 transition-transform duration-300 md:group-hover:translate-y-0">
-                              <p className="text-white text-[10px] sm:text-xs md:text-sm font-semibold text-center leading-tight">
+
+                            {/* Overlay with gradient - appears on hover */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                            {/* Text Label - appears on hover */}
+                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 opacity-0 transform translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                              <p className="text-white text-xs sm:text-sm md:text-base font-semibold text-center leading-tight drop-shadow-lg">
                                 {category.name}
                               </p>
                             </div>

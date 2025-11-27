@@ -2,34 +2,42 @@
 
 import type { CategoryModel } from "@/types/category";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
-import { useDisclosure } from "@heroui/modal";
-import { Squares2X2Icon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { usePathname } from "next/navigation";
+import { ChevronRight, X, Boxes } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { createPortal } from "react-dom";
+import { Squares2X2Icon } from "@heroicons/react/24/outline";
 
 import { getAllCategories } from "@/app/api/services/categoryService";
+import { cn } from "@/lib/utils";
+import { useTenant } from "@/app/context/tenantContext";
 
 type ChildrenMap = Record<string, CategoryModel[]>;
 
+function PortalWrapper({ children }: { children: React.ReactNode }) {
+  if (typeof document === "undefined") return null;
+
+  return createPortal(children, document.body);
+}
+
 export default function CategoryDropdown() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(false);
-  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // Hover state
-  const [hoveredTop, setHoveredTop] = useState<string | null>(null);
-  const [hoveredMid, setHoveredMid] = useState<string | null>(null);
+  const hasLoadedRef = React.useRef(false);
+  const pathname = usePathname();
+  const { config } = useTenant();
+  const localeCode = pathname.startsWith("/en") ? "en" : "ka";
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const hasLoadedRef = useRef(false);
-
-  // Fetch once on first open
+  // Fetch categories once on mount
   useEffect(() => {
-    if (!isOpen || hasLoadedRef.current) return;
+    if (hasLoadedRef.current) return;
+
     (async () => {
       try {
         setLoading(true);
@@ -38,274 +46,319 @@ export default function CategoryDropdown() {
         setCategories(Array.isArray(data) ? data : []);
         hasLoadedRef.current = true;
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.error("Failed to load categories", e);
       } finally {
         setLoading(false);
       }
     })();
+  }, []);
+
+  // Scroll lock – prevent page scrolling when dropdown is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Lock both html and body to prevent any scrolling
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyWidth = document.body.style.width;
+    const scrollY = window.scrollY;
+
+    // Completely prevent scrolling
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    return () => {
+      // Restore original state
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.position = originalBodyPosition;
+      document.body.style.top = "";
+      document.body.style.width = originalBodyWidth;
+      window.scrollTo(0, scrollY);
+    };
   }, [isOpen]);
 
-  // Close on outside click
+  // Close on route change
   useEffect(() => {
-    const onDocClick = (e: MouseEvent) => {
-      if (dropdownRef.current && e.target instanceof Node && !dropdownRef.current.contains(e.target)) {
-        onClose();
-        setHoveredTop(null);
-        setHoveredMid(null);
-      }
-    };
+    setIsOpen(false);
+  }, [pathname]);
 
-    if (isOpen) document.addEventListener("mousedown", onDocClick);
-
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [isOpen, onClose]);
-
-  // Close on Escape
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        setHoveredTop(null);
-        setHoveredMid(null);
-      }
-    };
-
-    if (isOpen) document.addEventListener("keydown", onKey);
-
-    return () => document.removeEventListener("keydown", onKey);
-  }, [isOpen, onClose]);
-
-  const handleToggle = () => (isOpen ? onClose() : onOpen());
-
-  // ---------- Build tree via parentId (no Map) ----------
+  // Build tree (parent/children)
   const { topLevel, childrenMap } = useMemo(() => {
     const ROOT = "__root__";
     const m: ChildrenMap = {};
 
     categories.forEach((c) => {
-      const key = c.parentId && c.parentId.trim().length > 0 ? c.parentId.trim() : ROOT;
+      const key =
+        c.parentId && c.parentId.trim().length > 0
+          ? c.parentId.trim()
+          : ROOT;
 
       if (!m[key]) m[key] = [];
       m[key].push(c);
     });
 
-    Object.keys(m).forEach((k) => m[k].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+    Object.keys(m).forEach((k) =>
+      m[k].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+    );
 
     return { topLevel: m[ROOT] ?? [], childrenMap: m };
   }, [categories]);
 
-  const getChildren = (parentId?: string | null) =>
-    (parentId ? childrenMap[parentId] : undefined) ?? [];
+  // Parents into rows
+  const categoryRows = useMemo(() => {
+    const rows: CategoryModel[][] = [];
+    const COLUMNS = 4; // ცოტა ნაკლები, რომ ჰორიზონტალური ბარათები სუნთქავდეს
 
-  const hasChildren = (id: string) => (childrenMap[id]?.length ?? 0) > 0;
+    for (let i = 0; i < topLevel.length; i += COLUMNS) {
+      rows.push(topLevel.slice(i, i + COLUMNS));
+    }
 
-  const handleImageError = (categoryId: string) => {
-    setImageErrors(prev => new Set(prev).add(categoryId));
+    return rows;
+  }, [topLevel]);
+
+  const toggleCategory = (id: string) => {
+    setActiveCategory((prev) => (prev === id ? null : id));
   };
 
-  // Lists for each column driven purely by hover state
-  const midList = hoveredTop ? getChildren(hoveredTop) : [];
-  const rightList = hoveredMid ? getChildren(hoveredMid) : [];
+  const activeCategoryData = activeCategory
+    ? categories.find((c) => c.id === activeCategory)
+    : null;
+  const activeSubcategories = activeCategory
+    ? childrenMap[activeCategory] || []
+    : [];
 
-  // Dynamically size the card: 1/2/3 columns
-  const colCount = 1 + (hoveredTop && midList.length > 0 ? 1 : 0) + (hoveredMid && rightList.length > 0 ? 1 : 0);
-  const baseColWidth = 300; // px
-  const cardWidth = Math.min(1000, colCount * baseColWidth + (colCount - 1) * 1); // add slight room for borders
+  const getCategoryHref = (id: string) => `/${localeCode}/category/${id}`;
+
+  // Parent card – ჰორიზონტალური: ტექსტი მარცხნივ, სურათი მარჯვნივ
+  const renderParentCard = (cat: CategoryModel, isActive: boolean) => (
+    <div className="flex items-center justify-between w-full gap-3">
+      {/* Text side (left) */}
+      <div className="flex flex-col items-start text-left flex-1">
+        <span
+          className={cn(
+            "text-sm md:text-base font-semibold leading-tight line-clamp-2",
+            isActive ? "text-primary" : "text-foreground"
+          )}
+        >
+          {cat.name}
+        </span>
+        <span className="mt-1 text-[11px] md:text-xs text-muted-foreground flex items-center gap-1">
+          {isActive ? (
+            <>
+              Viewing subcategories
+              <ChevronRight className="w-3 h-3" />
+            </>
+          ) : (
+            "Browse products"
+          )}
+        </span>
+      </div>
+
+      {/* Image side (right) */}
+      <div className="flex items-center gap-2">
+        <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-xl overflow-hidden bg-white dark:bg-neutral-800 border border-border/60 flex items-center justify-center">
+          {cat.images && cat.images[0] ? (
+            <Image
+              fill
+              alt={cat.name || "Category"}
+              className="object-cover"
+              src={cat.images[0]}
+            />
+          ) : (
+            <Boxes className="w-6 h-6 text-muted-foreground/60" />
+          )}
+        </div>
+        <ChevronRight
+          className={cn(
+            "w-4 h-4 text-muted-foreground transition-transform duration-300",
+            isActive ? "rotate-90 text-primary" : "group-hover:translate-x-1"
+          )}
+        />
+      </div>
+    </div>
+  );
 
   return (
-    <div ref={dropdownRef} className="relative">
-      <Button
-        isIconOnly
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-        className="relative rounded-full bg-transparent"
-        variant="light"
-        onPress={handleToggle}
+    <div className="">
+      {/* Trigger Button */}
+      <button
+        className={cn(
+          "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm relative z-[10001]",
+          isOpen
+            ? ""
+            : ""
+        )}
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <Squares2X2Icon className="h-6 w-6" />
-      </Button>
+        {isOpen ? <></> : <Squares2X2Icon className="w-5 h-5" />}
+      </button>
 
-      <div
-        className={`absolute left-0 top-14 transform transition-all duration-300 ease-out z-50
-        ${isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-3 pointer-events-none"}`}
-        style={{ width: cardWidth }}
-      >
-        <Card className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl bg-white dark:bg-gray-900">
-          {/* Header */}
-          <CardHeader className="pb-4 pt-6 px-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-            <div className="flex items-center justify-between w-full">
-              <h1 className="text-lg font-bold text-text-light dark:text-text-lightdark">Categories</h1>
-              <span className="text-xs px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-text-subtle dark:text-text-subtledark">
-                {loading ? "Loading…" : `${categories.length} total`}
-              </span>
-            </div>
-          </CardHeader>
+      {/* FULLSCREEN overlay via portal */}
+      <AnimatePresence>
+        {isOpen && (
+          <PortalWrapper>
+            <>
+              {/* Backdrop */}
+              <motion.div
+                animate={{ opacity: 1 }}
+                className="fixed inset-0 bg-black/50 z-[10000] backdrop-blur-sm"
+                exit={{ opacity: 0 }}
+                initial={{ opacity: 0 }}
+                onClick={() => setIsOpen(false)}
+              />
 
-          {/* Body */}
-          <CardBody className="px-0 py-0">
-            {loading ? (
-              <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-              </div>
-            ) : topLevel.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                <Squares2X2Icon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No top-level categories</p>
-              </div>
-            ) : (
-              <div className="flex">
-                {/* Column 1: Parents */}
-                <div className="w-[300px] max-h-[60vh] overflow-y-auto border-r border-gray-200 dark:border-gray-800">
-                  <div className="p-2">
-                    {topLevel.map((c) => {
-                      const imageUrl = c.images && c.images.length > 0 ? c.images[0] : "/placeholder.svg";
-                      const hasError = imageErrors.has(c.id);
+              {/* Main panel – with inside scrolling only */}
+              <motion.div
+                animate={{ opacity: 1, y: 0 }}
+                className="fixed inset-0 z-[10000] flex items-start justify-center pt-28 md:pt-32 pb-4 px-2 md:px-6 pointer-events-none"
+                exit={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                {/* Card container – scrolls inside only */}
+                <div className="relative w-full max-w-6xl rounded-3xl bg-white dark:bg-neutral-900 shadow-[0_24px_80px_rgba(0,0,0,0.4)] border border-primary/40 backdrop-blur-xl overflow-hidden max-h-full flex flex-col pointer-events-auto">
+                  {/* Header row */}
+                  <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 via-neutral-50/70 to-transparent dark:from-primary/10 dark:via-neutral-900/80">
+                    <h2 className="text-base md:text-lg font-semibold" >ყველა კატეგორია</h2>
+                    <button
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
 
-                      return (
-                        <div
-                          key={c.id}
-                          onMouseEnter={() => {
-                            setHoveredTop(c.id);
-                            setHoveredMid(null); // reset mid when changing parent
-                          }}
-                        >
-                          <Link
-                            className={`flex items-center gap-3 p-3 rounded-lg transition-colors
-                              ${
-                                hoveredTop === c.id
-                                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                              }`}
-                            href={`/category/${c.id}`}
-                            onClick={() => {
-                              onClose();
-                              setHoveredTop(null);
-                              setHoveredMid(null);
-                            }}
-                          >
-                            <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                              <Image
-                                fill
-                                alt={c.name || "Category"}
-                                className="object-cover"
-                                sizes="40px"
-                                src={hasError ? "/placeholder.svg" : imageUrl}
-                                onError={() => handleImageError(c.id)}
-                              />
+                  {/* Body – scrolls INSIDE card only (like veli.store) */}
+                  <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 py-4 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+                    {loading ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                        Loading categories...
+                      </div>
+                    ) : topLevel.length === 0 ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                        No categories found.
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-8">
+                        {categoryRows.map((row, rowIndex) => {
+                          const isRowActive = row.some(
+                            (cat) => cat.id === activeCategory
+                          );
+
+                          return (
+                            <div key={rowIndex} className="flex flex-col gap-2">
+                              {/* Parent category cards */}
+                              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+                                {row.map((cat) => {
+                                  const hasChildren =
+                                    (childrenMap[cat.id]?.length || 0) > 0;
+                                  const isActive = activeCategory === cat.id;
+
+                                  // No subcategories → direct link card
+                                  if (!hasChildren) {
+                                    return (
+                                      <Link
+                                        key={cat.id}
+                                        className={cn(
+                                          "group flex items-stretch p-3 rounded-2xl transition-all border text-left",
+                                          "bg-neutral-50 dark:bg-neutral-900/80 border-border/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-primary/60 hover:shadow-md"
+                                        )}
+                                        href={getCategoryHref(cat.id)}
+                                        onClick={() => setIsOpen(false)}
+                                      >
+                                        {renderParentCard(cat, false)}
+                                      </Link>
+                                    );
+                                  }
+
+                                  // Has subcategories → toggle dropdown
+                                  return (
+                                    <button
+                                      key={cat.id}
+                                      className={cn(
+                                        "group flex items-stretch p-3 rounded-2xl transition-all border text-left",
+                                        isActive
+                                          ? "bg-primary/5 border-primary shadow-md shadow-primary/30"
+                                          : "bg-neutral-50 dark:bg-neutral-900/80 border-border/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-primary/60 hover:shadow-md"
+                                      )}
+                                      onClick={() => toggleCategory(cat.id)}
+                                    >
+                                      {renderParentCard(cat, isActive)}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Subcategories panel just under that row */}
+                              <AnimatePresence>
+                                {isRowActive &&
+                                  activeCategoryData &&
+                                  activeSubcategories.length > 0 && (
+                                    <motion.div
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      className="overflow-hidden w-full"
+                                      exit={{ height: 0, opacity: 0 }}
+                                      initial={{ height: 0, opacity: 0 }}
+                                      transition={{
+                                        duration: 0.28,
+                                        ease: "easeInOut",
+                                      }}
+                                    >
+                                      <div className="mt-2 mb-6 rounded-2xl border border-border bg-neutral-50/90 dark:bg-neutral-900/80 p-3 md:p-4">
+                                        {/* Smaller subcategory rows */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                                          {activeSubcategories.map((sub) => (
+                                            <Link
+                                              key={sub.id}
+                                              className="group flex items-center justify-between gap-3 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all border border-border/50 hover:border-primary/50"
+                                              href={getCategoryHref(sub.id)}
+                                              onClick={() => setIsOpen(false)}
+                                            >
+                                              {/* Left: smaller name */}
+                                              <span className="text-xs md:text-sm font-medium text-muted-foreground group-hover:text-foreground text-left line-clamp-2">
+                                                {sub.name}
+                                              </span>
+
+                                              {/* Right: small icon (sub style) */}
+                                              <div className="flex items-center gap-1">
+                                                <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-border/50 flex items-center justify-center overflow-hidden">
+                                                  {sub.images && sub.images[0] ? (
+                                                    <Image
+                                                      fill
+                                                      alt={sub.name || "Category"}
+                                                      className="object-cover"
+                                                      src={sub.images[0]}
+                                                    />
+                                                  ) : (
+                                                    <Boxes className="w-4 h-4 text-muted-foreground/70" />
+                                                  )}
+                                                </div>
+                                                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0" />
+                                              </div>
+                                            </Link>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                              </AnimatePresence>
                             </div>
-                            <span className="text-sm font-medium truncate flex-1">{c.name ?? "Unnamed"}</span>
-                            {hasChildren(c.id) && <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />}
-                          </Link>
-                        </div>
-                      );
-                    })}
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Column 2: Children of hovered parent (only if exists) */}
-                {hoveredTop && midList.length > 0 && (
-                  <div className="w-[300px] max-h-[60vh] overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40">
-                    <div className="p-2">
-                      {midList.map((child) => {
-                        const imageUrl = child.images && child.images.length > 0 ? child.images[0] : "/placeholder.svg";
-                        const hasError = imageErrors.has(child.id);
-
-                        return (
-                          <div key={child.id} onMouseEnter={() => setHoveredMid(child.id)}>
-                            <Link
-                              className={`flex items-center gap-3 p-3 rounded-lg transition-colors
-                                ${
-                                  hoveredMid === child.id
-                                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                                }`}
-                              href={`/category/${child.id}`}
-                              onClick={() => {
-                                onClose();
-                                setHoveredTop(null);
-                                setHoveredMid(null);
-                              }}
-                            >
-                              <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                <Image
-                                  fill
-                                  alt={child.name || "Category"}
-                                  className="object-cover"
-                                  sizes="40px"
-                                  src={hasError ? "/placeholder.svg" : imageUrl}
-                                  onError={() => handleImageError(child.id)}
-                                />
-                              </div>
-                              <span className="text-sm font-medium truncate flex-1">{child.name ?? "Subcategory"}</span>
-                              {hasChildren(child.id) && <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />}
-                            </Link>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Column 3: Grandchildren of hovered child (only if exists) */}
-                {hoveredMid && rightList.length > 0 && (
-                  <div className="w-[300px] max-h-[60vh] overflow-y-auto bg-gray-50 dark:bg-gray-800/50">
-                    <div className="p-2">
-                      {rightList.map((g) => {
-                        const imageUrl = g.images && g.images.length > 0 ? g.images[0] : "/placeholder.svg";
-                        const hasError = imageErrors.has(g.id);
-
-                        return (
-                          <Link
-                            key={g.id}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-colors group"
-                            href={`/category/${g.id}`}
-                            onClick={() => {
-                              onClose();
-                              setHoveredTop(null);
-                              setHoveredMid(null);
-                            }}
-                          >
-                            <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                              <Image
-                                fill
-                                alt={g.name || "Category"}
-                                className="object-cover"
-                                sizes="40px"
-                                src={hasError ? "/placeholder.svg" : imageUrl}
-                                onError={() => handleImageError(g.id)}
-                              />
-                            </div>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white truncate flex-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                              {g.name ?? "Category"}
-                            </span>
-                            {hasChildren(g.id) && <ChevronRightIcon className="h-4 w-4 opacity-70 flex-shrink-0" />}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </CardBody>
-
-          {/* Footer */}
-          <CardFooter className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-            <div className="w-full flex gap-3">
-              <Button
-                as={Link}
-                className="flex-1 h-11 rounded-xl font-semibold border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 text-text-light dark:text-text-lightdark hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
-                href="/category"
-                variant="bordered"
-                onPress={onClose}
-              >
-                View all
-              </Button>
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
+              </motion.div>
+            </>
+          </PortalWrapper>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

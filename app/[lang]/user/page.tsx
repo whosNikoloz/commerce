@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/i18n.config";
 
 import UserPanel from "@/components/user-panel/UserPanel-page";
 import { i18nPageMetadataAsync } from "@/lib/seo";
-import { Locale } from "@/i18n.config";
+import { getDictionary } from "@/lib/dictionaries";
 
 export async function generateMetadata({
   params,
@@ -10,13 +11,13 @@ export async function generateMetadata({
   params: Promise<{ lang: Locale }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  const isKa = lang === "ka";
+
+  const dict = await getDictionary(lang);
+  const t = dict.userPanel.meta;
 
   return i18nPageMetadataAsync({
-    title: isKa ? "ჩემი ანგარიში" : "My Account",
-    description: isKa
-      ? "მართე შენი პროფილი, შეკვეთები და პარამეტრები."
-      : "Manage your profile, orders, and preferences.",
+    title: t.title,
+    description: t.description,
     lang,
     path: "/user",
     index: false,

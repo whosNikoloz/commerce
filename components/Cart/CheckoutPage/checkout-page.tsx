@@ -16,11 +16,14 @@ import { apiPost } from "@/app/api/payment/helpers";
 import { useUser } from "@/app/context/userContext";
 import { createOrder } from "@/app/api/services/orderService";
 import { useGA4 } from "@/hooks/useGA4";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function CheckoutPage() {
+  const dictionary = useDictionary();
   const { user } = useUser();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
@@ -29,6 +32,10 @@ export default function CheckoutPage() {
 
   const [provider, setProvider] = useState<PaymentProvider>("bog");
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const shipping = subtotal > 50 ? 0 : 9.99;
   const tax = subtotal * 0.08;
@@ -55,11 +62,58 @@ export default function CheckoutPage() {
     }
   }, [cart.length, trackCheckoutBegin]);
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="animate-pulse space-y-8">
+            {/* Header Skeleton */}
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 bg-gray-200 dark:bg-gray-800 rounded" />
+              <div className="space-y-2">
+                <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-32" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-48" />
+              </div>
+            </div>
+
+            {/* Content Grid Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Payment Form Skeleton */}
+              <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+                <div className="space-y-4">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
+                  <div className="space-y-3">
+                    <div className="h-20 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-20 bg-gray-200 dark:bg-gray-800 rounded" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Summary Skeleton */}
+              <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+                <div className="space-y-4">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                  </div>
+                  <div className="h-12 bg-gray-200 dark:bg-gray-800 rounded mt-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (cartLen === 0) return null;
 
   const handleSubmit = async () => {
     if (!user?.id) {
-      setError("User not logged in");
+      setError(dictionary.checkout.errors.userNotLoggedIn);
 
       return;
     }
@@ -79,7 +133,7 @@ export default function CheckoutPage() {
         shippingCity: "Tbilisi",
         shippingCountry: "Georgia",
         currency: "GEL",
-      } , user.id);
+      }, user.id);
 
       const orderId = orderResponse.id;
 
@@ -113,10 +167,10 @@ export default function CheckoutPage() {
           }
         );
       } else {
-        throw new Error("Invalid payment provider");
+        throw new Error(dictionary.checkout.errors.invalidProvider);
       }
 
-      if (!data?.redirectUrl) throw new Error("redirectUrl missing");
+      if (!data?.redirectUrl) throw new Error(dictionary.checkout.errors.redirectUrlMissing);
 
       if (typeof window !== "undefined") {
         sessionStorage.setItem("lastOrderId", orderId);
@@ -124,7 +178,7 @@ export default function CheckoutPage() {
 
       window.location.href = data.redirectUrl;
     } catch (e: any) {
-      setError(e?.message ?? "Failed to start payment.");
+      setError(e?.message ?? dictionary.checkout.errors.paymentFailed);
       setIsProcessing(false);
     }
   };
@@ -147,9 +201,9 @@ export default function CheckoutPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
-              Checkout
+              {dictionary.checkout.title}
             </h1>
-            <p className="text-text-subtle dark:text-text-subtledark">Complete your purchase</p>
+            <p className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.completePurchase}</p>
           </div>
         </div>
 
@@ -164,7 +218,7 @@ export default function CheckoutPage() {
           <OrderSummary
             isProcessing={isProcessing}
             submitButtonLabel={
-              isProcessing ? "Redirecting..." : `Pay Securely • ₾${total.toFixed(2)}`
+              isProcessing ? dictionary.checkout.redirecting : `${dictionary.checkout.paySecurely} • ₾${total.toFixed(2)}`
             }
             totalOverride={total}
             onSubmit={handleSubmit}

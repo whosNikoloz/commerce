@@ -8,25 +8,14 @@ import { InputLoadingBtn } from "./input-loading-button";
 
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { registerCustomer, sendVerificationCode } from "@/app/api/services/authService";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface RegisterProps {
-  regData: {
-    title: string;
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    button: string;
-    or: string;
-    facebookAuth: string;
-    googleAuth: string;
-    switchMode: string;
-  };
-  lng: string;
   onSwitchMode: (mode: string) => void;
 }
 
-export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterProps) {
+export default function RegisterModal({ onSwitchMode }: RegisterProps) {
+  const dictionary = useDictionary();
   const regRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -61,32 +50,26 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
   // Password validation function
   const validatePassword = (password: string): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
-    const kaErrors: string[] = [];
 
     if (password.length < 6) {
-      errors.push("At least 6 characters");
-      kaErrors.push("მინიმუმ 6 სიმბოლო");
+      errors.push(dictionary.auth.register.passwordRequirements.minChars);
     }
     if (!/[0-9]/.test(password)) {
-      errors.push("At least one digit (0-9)");
-      kaErrors.push("მინიმუმ ერთი ციფრი (0-9)");
+      errors.push(dictionary.auth.register.passwordRequirements.digit);
     }
     if (!/[a-z]/.test(password)) {
-      errors.push("At least one lowercase letter (a-z)");
-      kaErrors.push("მინიმუმ ერთი პატარა ასო (a-z)");
+      errors.push(dictionary.auth.register.passwordRequirements.lower);
     }
     if (!/[A-Z]/.test(password)) {
-      errors.push("At least one uppercase letter (A-Z)");
-      kaErrors.push("მინიმუმ ერთი დიდი ასო (A-Z)");
+      errors.push(dictionary.auth.register.passwordRequirements.upper);
     }
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-      errors.push("At least one special character (!@#$%...)");
-      kaErrors.push("მინიმუმ ერთი სპეციალური სიმბოლო (!@#$%...)");
+      errors.push(dictionary.auth.register.passwordRequirements.special);
     }
 
     return {
       isValid: errors.length === 0,
-      errors: lng === "ka" ? kaErrors : errors
+      errors: errors
     };
   };
 
@@ -97,12 +80,12 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
     const { email } = registrationState;
 
     if (!email) {
-      setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
+      setRegEmailError(dictionary.auth.register.fillEmail);
 
       return;
     }
     if (!isValidEmail(email)) {
-      setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      setRegEmailError(dictionary.auth.register.invalidEmail);
 
       return;
     }
@@ -130,22 +113,22 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
 
     // Basic client-side validation
     if (!username) {
-      setRegUserNameError(lng === "ka" ? "შეავსე სახელი ველი" : "Please fill in the UserName field");
+      setRegUserNameError(dictionary.auth.register.fillUsername);
 
       return;
     }
     if (!email) {
-      setRegEmailError(lng === "ka" ? "შეავსე ელ-ფოსტა ველი" : "Please fill in the Email field");
+      setRegEmailError(dictionary.auth.register.fillEmail);
 
       return;
     }
     if (!isValidEmail(email)) {
-      setRegEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      setRegEmailError(dictionary.auth.register.invalidEmail);
 
       return;
     }
     if (!password) {
-      setRegError(lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field");
+      setRegError(dictionary.auth.register.fillPassword);
 
       return;
     }
@@ -159,27 +142,25 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
       return;
     }
     if (!confirmPassword) {
-      setConfirmPasswordError(
-        lng === "ka" ? "შეავსე პაროლის დადასტურების ველი" : "Please fill in the ConfirmPassword field"
-      );
+      setConfirmPasswordError(dictionary.auth.register.fillConfirmPassword);
 
       return;
     }
     if (password !== confirmPassword) {
-      setConfirmPasswordError(lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match");
+      setConfirmPasswordError(dictionary.auth.register.passwordsDoNotMatch);
 
       return;
     }
 
     // Ensure code has been requested before allowing registration
     if (!codeRequested) {
-      setRegError(lng === "ka" ? "გთხოვთ ჯერ გამოითხოვოთ კოდი" : "Please request verification code first");
+      setRegError(dictionary.auth.register.requestCodeFirst);
 
       return;
     }
 
     if (!verifyCode) {
-      setRegError(lng === "ka" ? "შეიყვანეთ დადასტურების კოდი" : "Please enter verification code");
+      setRegError(dictionary.auth.register.enterCode);
 
       return;
     }
@@ -198,7 +179,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
 
       onSwitchMode("login");
     } catch (e: any) {
-      setRegError(typeof e?.message === "string" ? e.message : "Registration failed");
+      setRegError(typeof e?.message === "string" ? e.message : dictionary.auth.register.registrationFailed);
     } finally {
       setIsLoading(false);
     }
@@ -210,7 +191,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
     if (!confirmPassword) return;
     setConfirmPasswordError(
       password !== confirmPassword
-        ? lng === "ka" ? "პაროლი არ ემთხვევა" : "Passwords do not match"
+        ? dictionary.auth.register.passwordsDoNotMatch
         : ""
     );
   };
@@ -268,7 +249,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
         }
         errorMessage={regUserNameError}
         isInvalid={regUserNameError !== ""}
-        label={regData.username}
+        label={dictionary.auth.register.username}
         startContent={<i className="fas fa-user text-blue-500 dark:text-blue-400" />}
         type="text"
         value={registrationState.username}
@@ -295,7 +276,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
           }}
           errorMessage={regRegPasswordError}
           isInvalid={regRegPasswordError !== ""}
-          label={regData.password}
+          label={dictionary.auth.register.password}
           startContent={<i className="fas fa-lock text-blue-500 dark:text-blue-400" />}
           type="password"
           value={registrationState.password}
@@ -315,31 +296,31 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
               <div className="flex items-center gap-1">
                 <i className={`fas fa-xs ${registrationState.password.length >= 6 ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
                 <span className={registrationState.password.length >= 6 ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
-                  {lng === "ka" ? "6+ სიმბოლო" : "6+ chars"}
+                  {dictionary.auth.register.passwordRequirements.minChars}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <i className={`fas fa-xs ${/[0-9]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
                 <span className={/[0-9]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
-                  {lng === "ka" ? "ციფრი" : "Digit"}
+                  {dictionary.auth.register.passwordRequirements.digit}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <i className={`fas fa-xs ${/[a-z]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
                 <span className={/[a-z]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
-                  {lng === "ka" ? "პატარა" : "Lower"}
+                  {dictionary.auth.register.passwordRequirements.lower}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <i className={`fas fa-xs ${/[A-Z]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
                 <span className={/[A-Z]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
-                  {lng === "ka" ? "დიდი" : "Upper"}
+                  {dictionary.auth.register.passwordRequirements.upper}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <i className={`fas fa-xs ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(registrationState.password) ? "fa-check text-green-600 dark:text-green-400" : "fa-times text-gray-400"}`} />
                 <span className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(registrationState.password) ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"}>
-                  {lng === "ka" ? "სპეც." : "Special"}
+                  {dictionary.auth.register.passwordRequirements.special}
                 </span>
               </div>
             </div>
@@ -360,7 +341,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
         }}
         errorMessage={confirmPasswordError}
         isInvalid={confirmPasswordError !== ""}
-        label={regData.confirmPassword}
+        label={dictionary.auth.register.confirmPassword}
         startContent={<i className="fas fa-lock text-blue-500 dark:text-blue-400" />}
         type="password"
         value={registrationState.confirmPassword}
@@ -393,7 +374,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
         }
         errorMessage={regEmailError}
         isInvalid={regEmailError !== ""}
-        label={regData.email}
+        label={dictionary.auth.register.email}
         startContent={<i className="fas fa-envelope text-blue-500 dark:text-blue-400" />}
         type="email"
         value={registrationState.email}
@@ -412,7 +393,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
           <div className="flex items-center gap-2 px-2">
             <i className="fas fa-check-circle text-green-600 dark:text-green-400 text-sm" />
             <p className="text-xs font-semibold text-green-800 dark:text-green-200">
-              {lng === "ka" ? "კოდი გაიგზავნა თქვენს მეილზე!" : "Verification code sent to your email!"}
+              {dictionary.auth.register.codeSent}
             </p>
           </div>
         )}
@@ -428,7 +409,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
               ],
               label: ["font-semibold text-gray-700 dark:text-gray-200"],
             }}
-            label={lng === "ka" ? "დადასტურების კოდი" : "Verification Code"}
+            label={dictionary.auth.register.verificationCode}
             placeholder="000000"
             startContent={<i className={`fas fa-key ${codeRequested ? "text-green-500 dark:text-green-400" : "text-blue-500 dark:text-blue-400"}`} />}
             type="tel"
@@ -462,13 +443,13 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
         onPress={handleRegistration}
       >
         {!codeRequested
-          ? regData.button // „რეგისტრაცია" (კოდის გაგზავნა)
-          : (lng === "ka" ? "დადასტურება" : "Confirm")} {/* მეორე ეტაპი */}
+          ? dictionary.auth.register.button
+          : dictionary.auth.register.confirm}
       </Button>
 
       <div className="flex items-center justify-center my-6">
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
-        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{regData.or}</span>
+        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{dictionary.auth.register.or}</span>
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
@@ -479,7 +460,7 @@ export default function RegisterModal({ regData, lng, onSwitchMode }: RegisterPr
           className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("login")}
         >
-          {regData.switchMode}
+          {dictionary.auth.register.switchMode}
         </button>
       </div>
     </div>

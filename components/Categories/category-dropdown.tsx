@@ -13,7 +13,7 @@ import { Squares2X2Icon } from "@heroicons/react/24/outline";
 
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { cn } from "@/lib/utils";
-import { useTenant } from "@/app/context/tenantContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type ChildrenMap = Record<string, CategoryModel[]>;
 
@@ -24,6 +24,7 @@ function PortalWrapper({ children }: { children: React.ReactNode }) {
 }
 
 export default function CategoryDropdown() {
+  const dictionary = useDictionary();
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,6 @@ export default function CategoryDropdown() {
 
   const hasLoadedRef = React.useRef(false);
   const pathname = usePathname();
-  const { config } = useTenant();
   const localeCode = pathname.startsWith("/en") ? "en" : "ka";
 
   // Fetch categories once on mount
@@ -224,7 +224,7 @@ export default function CategoryDropdown() {
                 <div className="relative w-full max-w-6xl rounded-3xl bg-white dark:bg-neutral-900 shadow-[0_24px_80px_rgba(0,0,0,0.4)] border border-primary/40 backdrop-blur-xl overflow-hidden max-h-full flex flex-col pointer-events-auto">
                   {/* Header row */}
                   <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 via-neutral-50/70 to-transparent dark:from-primary/10 dark:via-neutral-900/80">
-                    <h2 className="text-base md:text-lg font-semibold" >ყველა კატეგორია</h2>
+                    <h2 className="text-base md:text-lg font-semibold" >{dictionary?.categories?.allCategories || "All Categories"}</h2>
                     <button
                       className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                       onClick={() => setIsOpen(false)}

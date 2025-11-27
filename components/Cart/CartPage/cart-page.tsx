@@ -12,10 +12,12 @@ import { useCartStore } from "@/app/context/cartContext";
 import { getCachedMerchantType } from "@/app/context/tenantContext";
 import { getProductRestsByIds } from "@/app/api/services/productService";
 import { useGA4 } from "@/hooks/useGA4";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export type AvailabilityMap = Record<string, number>;
 
 export default function CartPage() {
+  const dictionary = useDictionary();
   const searchParams = useSearchParams();
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.getCount());
@@ -24,6 +26,11 @@ export default function CartPage() {
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const productIds = useMemo(
     () => Array.from(new Set((cart ?? []).map((it: any) => String(it.id)))),
@@ -130,6 +137,57 @@ export default function CartPage() {
     }
   }, [cart.length, trackCartView]);
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20">
+          {/* Header Skeleton */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 animate-pulse">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-gray-200 dark:bg-gray-800 h-14 w-14" />
+              <div className="space-y-2">
+                <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-32" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-24" />
+              </div>
+            </div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded w-40" />
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-pulse">
+            <div className="lg:col-span-2 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+                  <div className="flex gap-4">
+                    <div className="h-24 w-24 bg-gray-200 dark:bg-gray-800 rounded-lg flex-shrink-0" />
+                    <div className="flex-1 space-y-3">
+                      <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
+                      <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/4" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lg:sticky lg:top-6 h-fit">
+              <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+                <div className="space-y-4">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+                  </div>
+                  <div className="h-12 bg-gray-200 dark:bg-gray-800 rounded mt-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (cartLen === 0) return <EmptyCart />;
 
   return (
@@ -139,7 +197,7 @@ export default function CartPage() {
 
         {loading && (
           <div className="mb-4 text-sm text-text-subtle dark:text-text-subtledark">
-            მარაგების შემოწმება…
+            {dictionary.cart.checkingStock}
           </div>
         )}
 

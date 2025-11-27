@@ -1,27 +1,25 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/i18n.config";
 
 import CartPage from "@/components/Cart/CartPage/cart-page";
 import { i18nPageMetadataAsync } from "@/lib/seo";
-import { Locale } from "@/i18n.config";
+import { getDictionary } from "@/lib/dictionaries";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: Locale }>;
-}): Promise<Metadata> {
-  const { lang } = await params;
-  const isKa = lang === "ka";
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+
+  const dict = await getDictionary(lang);
 
   return i18nPageMetadataAsync({
-    title: isKa ? "კალათა" : "Cart",
-    description: isKa
-      ? "ნახე კალათის შიგთავსი და გააგრძელე შეკვეთა."
-      : "Review your cart and proceed to checkout.",
+    title: dict.cart.page.title,
+    description: dict.cart.page.description,
     lang,
     path: "/cart",
     images: ["/og/cart-og.jpg"],
-    // Cart/Checkout pages should not be indexed
-    index: false,
+    index: false,  // Cart should NOT be indexed
   });
 }
 

@@ -1,12 +1,46 @@
-import { PaymentsTable } from "@/components/admin/payments-table";
+import type { Metadata } from "next";
+import type { Locale } from "@/i18n.config";
 
-export default function PaymentsPage() {
+import { PaymentsTable } from "@/components/admin/payments-table";
+import { getDictionary } from "@/lib/dictionaries";
+import { i18nPageMetadataAsync } from "@/lib/seo";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+
+  const dict = await getDictionary(lang);
+
+  return i18nPageMetadataAsync({
+    title: dict.pages.admin.payments.title,
+    description: dict.pages.admin.payments.description,
+    lang,
+    path: "/admin/payments",
+    index: false,
+  });
+}
+
+export default async function PaymentsPage(
+  { params }: { params: Promise<{ lang: Locale }> }
+) {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+  const dict = await getDictionary(lang);
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Payments</h1>
-        <p className="text-muted-foreground">Monitor transactions and configure payment methods</p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {dict.pages.admin.payments.heading}
+        </h1>
+
+        <p className="text-muted-foreground">
+          {dict.pages.admin.payments.subtitle}
+        </p>
       </div>
+
       <PaymentsTable />
     </div>
   );

@@ -16,10 +16,12 @@ import HeaderCartButton from "./header-cart-button";
 
 import { useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 const fmt = new Intl.NumberFormat("ka-GE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function CartDropdown() {
+  const dictionary = useDictionary();
   const { user } = useUser();
   const router = useRouter();
 
@@ -68,7 +70,7 @@ export default function CartDropdown() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _handleCheckout = () => {
     if (!user) {
-      toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
+      toast.error(dictionary.cart.loginRequiredToast);
 
       return;
     }
@@ -88,9 +90,9 @@ export default function CartDropdown() {
           {/* header (compact) */}
           <CardHeader className="pb-2 pt-3 px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between w-full">
-              <h1 className="text-sm font-semibold text-text-light dark:text-text-lightdark">Shopping Cart</h1>
+              <h1 className="text-sm font-semibold text-text-light dark:text-text-lightdark">{dictionary.cart.shoppingCart}</h1>
               <ShadCnBadge className="bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-lightdark border border-gray-200 dark:border-gray-700 text-[11px]">
-                {mounted ? totalQuantity : 0} items
+                {mounted ? totalQuantity : 0} {dictionary.cart.items}
               </ShadCnBadge>
             </div>
           </CardHeader>
@@ -98,8 +100,8 @@ export default function CartDropdown() {
           {cartLen === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 px-4 bg-white dark:bg-gray-900">
               <ShoppingCartIcon className="h-12 w-12 text-gray-300 dark:text-gray-700 mb-2" />
-              <p className="text-sm font-medium text-text-light dark:text-text-lightdark">კალათა ცარიელია</p>
-              <p className="text-xs mt-1 text-text-subtle dark:text-text-subtledark">დაამატეთ პროდუქტები შესყიდვისთვის</p>
+              <p className="text-sm font-medium text-text-light dark:text-text-lightdark">{dictionary.cart.empty}</p>
+              <p className="text-xs mt-1 text-text-subtle dark:text-text-subtledark">{dictionary.cart.emptyDescriptionShort}</p>
             </div>
           ) : (
             <>
@@ -204,7 +206,7 @@ export default function CartDropdown() {
                       href="/cart"
                       onPress={onClose}
                     >
-                      <span className="text-sm">ნახვა</span>
+                      <span className="text-sm">{dictionary.cart.view}</span>
                       {/* <ShadCnBadge className="ml-2 bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-lightdark border border-gray-300 dark:border-gray-600 text-[11px]">
                         {mounted ? totalQuantity : 0}
                       </ShadCnBadge> */}
@@ -213,7 +215,7 @@ export default function CartDropdown() {
                       className="flex-1 h-10 rounded-lg font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md hover:shadow-lg"
                       onPress={handleCheckout}
                     >
-                      <span className="text-sm">ყიდვა</span>
+                      <span className="text-sm">{dictionary.cart.buy}</span>
                     </Button> */}
                   </div>
                 </div>

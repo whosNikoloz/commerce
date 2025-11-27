@@ -24,6 +24,7 @@ import {
 import { getAllBrands } from "@/app/api/services/brandService";
 import { searchProductsByFilter } from "@/app/api/services/productService";
 import { buildFacetValueToFacetIdMap } from "@/lib/urlState";
+import { getDictionary } from "@/lib/dictionaries";
 
 export const revalidate = 300; // 5 minutes
 
@@ -68,7 +69,6 @@ function buildFilter(
 
   const facetValueIds = Array.isArray(sp.facet) ? sp.facet : sp.facet ? [sp.facet] : [];
 
-  // Build lookup map to find facetId for each facetValueId
   const facetValueToFacetId = buildFacetValueToFacetIdMap(facets);
 
   return {
@@ -100,14 +100,17 @@ export async function generateMetadata({
   params: Promise<Params>;
   searchParams: Promise<Search>;
 }): Promise<Metadata> {
-  const { lang, slug = [] } = await params;
+  const resolvedParams = await params;
+  const { lang, slug = [] } = resolvedParams;
   const sp = await searchParams;
+  const dict = await getDictionary(lang);
+  const t = dict.category; // ← შენს dictionary-ში category სექცია უნდა გქონდეს
 
   const categoryId = slug[0];
   const query = (sp.q ?? "").trim();
 
-  let title = "Category";
-  let description = "Browse categories";
+  let title = t.meta?.defaultTitle ?? "Category";
+  let description = t.meta?.defaultDescription ?? "Browse categories.";
   let images: string[] | undefined;
   let index = true;
 
@@ -117,10 +120,27 @@ export async function generateMetadata({
     const category = await getCategoryById(categoryId).catch(() => null);
 
     if (category) {
-      title = query ? `${category.name} — Search: "${query}"` : (category.name ?? "Category");
-      description = query
-        ? `Products in ${category.name} matching "${query}".`
-        : (category.description ?? `Shop ${category.name} products.`);
+      if (query) {
+        // Search inside category
+        title =
+          t.search?.inCategoryTitle
+            ?.replace("{{category}}", category.name ?? "")
+            .replace("{{query}}", query) ??
+          `${category.name} — ${query}`;
+
+        description =
+          t.search?.inCategoryDescription
+            ?.replace("{{category}}", category.name ?? "")
+            .replace("{{query}}", query) ??
+          `Products in ${category.name} matching "${query}".`;
+      } else {
+        // Pure category page
+        title = category.name ?? t.meta?.defaultTitle ?? "Category";
+        description =
+          category.description ??
+          t.meta?.categoryDescription?.replace("{{category}}", category.name ?? "") ??
+          `Shop ${category.name} products.`;
+      }
 
       // Try to get the first product image for better social sharing
       const facets = ((category as any)?.facets as FacetModel[]) ?? [];
@@ -132,7 +152,6 @@ export async function generateMetadata({
         sortBy: "featured",
       }).catch(() => ({ items: [] }));
 
-      // Priority: first product image > category image > site ogImage > site logo
       if (firstProduct?.items?.[0]) {
         const p = firstProduct.items[0] as any;
         const productImage =
@@ -147,29 +166,33 @@ export async function generateMetadata({
         }
       }
 
-      // Fallback to category image if no product image
       if (!images && (category as any)?.image) {
         images = [(category as any).image as string];
       }
 
-      // Final fallback to site ogImage or logo
       if (!images) {
         images = [site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo];
       }
 
       index = !query; // don't index search views
     } else {
-      title = "Category not found";
-      description = `The category ${categoryId} could not be found or was removed.`;
+      title = t.meta?.notFoundTitle ?? "Category not found";
+      description =
+        t.meta?.notFoundDescription ??
+        `The category ${categoryId} could not be found or was removed.`;
       index = false;
     }
   } else if (query) {
-    title = query; // "Search results for ..." if you prefer
-    description = `Browse products matching "${query}".`;
+    // Search-only (no category)
+    title =
+      t.search?.title?.replace("{{query}}", query) ??
+      `Search: ${query}`;
+    description =
+      t.search?.description?.replace("{{query}}", query) ??
+      `Browse products matching "${query}".`;
     index = false;
   }
 
-  // Ensure images always has a fallback
   if (!images) {
     images = [site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo];
   }
@@ -180,8 +203,8 @@ export async function generateMetadata({
     title,
     description,
     lang,
-    path, // canonical/alternates built from this path (no query)
-    images, // will be absolutized against the active site's base URL
+    path,
+    images,
     index,
   });
 }
@@ -194,13 +217,15 @@ export default async function CategoryIndex({
   params: Promise<Params>;
   searchParams: Promise<Search>;
 }) {
-  const { lang, slug = [] } = await params;
+  const resolvedParams = await params;
+  const { lang, slug = [] } = resolvedParams;
   const sp = await searchParams;
+  const dict = await getDictionary(lang);
+  const t = dict.category;
 
   const q = (sp.q ?? "").trim();
   const categoryId = slug[0] ?? null;
 
-  // Resolve site once (for OG fallback + absolute URLs)
   const site = await getActiveSite();
 
   // --- Search-only landing (no category) ---
@@ -209,9 +234,14 @@ export default async function CategoryIndex({
     const { canonical: catalog } = await buildI18nUrls("/category", lang, site);
 
     const crumbsJsonLd = buildBreadcrumbJsonLd([
-      { name: "Home", url: home },
-      { name: "Catalog", url: catalog },
-      { name: q ? `Search: ${q}` : "Search", url: catalog },
+      { name: t.breadcrumbs?.home ?? "Home", url: home },
+      { name: t.breadcrumbs?.catalog ?? "Catalog", url: catalog },
+      {
+        name: q
+          ? (t.breadcrumbs?.searchWithQuery ?? "Search").replace("{{query}}", q)
+          : t.breadcrumbs?.search ?? "Search",
+        url: catalog,
+      },
     ]);
 
     return (
@@ -232,13 +262,14 @@ export default async function CategoryIndex({
     getAllBrands(),
   ]);
 
-  // Normalize to parent with subcategories
   let parent: any | null = null;
 
   if (rawTree) {
     if (Array.isArray(rawTree)) {
       const root =
-        rawTree.find((c) => c.id === categoryId) ?? rawTree.find((c) => c.parentId == null) ?? null;
+        rawTree.find((c) => c.id === categoryId) ??
+        rawTree.find((c) => c.parentId == null) ??
+        null;
 
       parent = root
         ? { ...root, subcategories: rawTree.filter((c) => c.parentId === root.id) }
@@ -252,7 +283,6 @@ export default async function CategoryIndex({
     notFound();
   }
 
-  // Server-render first page of products (SEO + speed)
   const facets = (parent.facets as FacetModel[]) ?? [];
   const { filter, page, sortBy } = buildFilter(parent.id, sp, facets);
   const pageSize = 12;
@@ -264,40 +294,39 @@ export default async function CategoryIndex({
     sortBy,
   }).catch(() => ({ items: [], totalCount: 0 }));
 
-  // JSON-LD (localized URLs)
   const { canonical: home } = await buildI18nUrls("/", lang, site);
   const { canonical: catalog } = await buildI18nUrls("/category", lang, site);
   const { canonical: current } = await buildI18nUrls(`/category/${slug.join("/")}`, lang, site);
 
   const crumbsJsonLd = buildBreadcrumbJsonLd([
-    { name: "Home", url: home },
-    { name: "Catalog", url: catalog },
-    { name: parent.name ?? "Category", url: current },
+    { name: t.breadcrumbs?.home ?? "Home", url: home },
+    { name: t.breadcrumbs?.catalog ?? "Catalog", url: catalog },
+    { name: parent.name ?? (t.meta?.defaultTitle ?? "Category"), url: current },
   ]);
 
   const listJsonLd =
     (initial.items?.length ?? 0) > 0
       ? buildItemListJsonLd(
-          await Promise.all(
-            (initial.items ?? []).map(async (p: any) => {
-              const img =
-                typeof p.image === "string"
-                  ? p.image
-                  : Array.isArray(p.images) && p.images.length > 0
-                    ? p.images[0]
-                    : site.ogImage; // ← per-host fallback
+        await Promise.all(
+          (initial.items ?? []).map(async (p: any) => {
+            const img =
+              typeof p.image === "string"
+                ? p.image
+                : Array.isArray(p.images) && p.images.length > 0
+                  ? p.images[0]
+                  : site.ogImage;
 
-              const { canonical: url } = await buildI18nUrls(`/product/${p.id}`, lang, site);
-              const absoluteImages = await toAbsoluteImages(site, [img]);
+            const { canonical: url } = await buildI18nUrls(`/product/${p.id}`, lang, site);
+            const absoluteImages = await toAbsoluteImages(site, [img]);
 
-              return {
-                name: p.name,
-                url,
-                image: absoluteImages[0], // absolutize with active site
-              };
-            }),
-          ),
-        )
+            return {
+              name: p.name,
+              url,
+              image: absoluteImages[0],
+            };
+          }),
+        ),
+      )
       : undefined;
 
   return (
@@ -315,7 +344,6 @@ export default async function CategoryIndex({
         />
       )}
 
-      {/* Hydrate your existing client CategoryPage with initial server data */}
       <CategoryPage
         __initialBrands={brands}
         __initialCategory={parent}

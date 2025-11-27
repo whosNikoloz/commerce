@@ -5,32 +5,40 @@ import { Suspense } from "react";
 
 import { StoresTable } from "@/components/admin/store/stores-table";
 import { i18nPageMetadataAsync } from "@/lib/seo";
+import { getDictionary } from "@/lib/dictionaries";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: Locale }>;
-}): Promise<Metadata> {
-  const { lang } = await params;
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+
+  const dict = await getDictionary(lang);
 
   return i18nPageMetadataAsync({
-    title: "Admin • Stores",
-    description: "Manage all stores and transfer products between locations.",
+    title: dict.pages.admin.stores.title,
+    description: dict.pages.admin.stores.description,
     lang,
     path: "/admin/stores",
     index: false, // exclude admin from search engines
   });
 }
 
-export default async function StoresPage() {
+export default async function StoresPage(
+  { params }: { params: Promise<{ lang: Locale }> }
+) {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+  const dict = await getDictionary(lang);
+
   return (
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-cyan-900 dark:from-slate-100 dark:via-blue-100 dark:to-cyan-100 bg-clip-text text-transparent">
-          Stores
+          {dict.pages.admin.stores.heading}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
-          Manage store locations and transfer products between them
+          {dict.pages.admin.stores.subtitle}
         </p>
       </div>
 
@@ -42,7 +50,10 @@ export default async function StoresPage() {
               <div className="h-10 w-full bg-gray-300/30 dark:bg-gray-700/30 rounded" />
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-32 bg-gray-300/20 dark:bg-gray-700/20 rounded" />
+                  <div
+                    key={i}
+                    className="h-32 bg-gray-300/20 dark:bg-gray-700/20 rounded"
+                  />
                 ))}
               </div>
             </div>

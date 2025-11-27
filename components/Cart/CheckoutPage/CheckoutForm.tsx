@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import { Card } from "@/components/ui/card";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export type Provider = "bog" | "tbc";
 
@@ -14,6 +15,7 @@ export default function CheckoutForm({
   value?: Provider;
   onChange: (p: Provider) => void;
 }) {
+  const dictionary = useDictionary();
   const [selected, setSelected] = useState<Provider>(value ?? "bog");
 
   useEffect(() => {
@@ -35,10 +37,9 @@ export default function CheckoutForm({
     return (
       <button
         className={`w-full text-left rounded-xl p-4 transition border
-          ${
-            active
-              ? "border-brand-primary ring-2 ring-brand-primary/20"
-              : "border-brand-muted dark:border-brand-muteddark hover:border-brand-primary/50"
+          ${active
+            ? "border-brand-primary ring-2 ring-brand-primary/20"
+            : "border-brand-muted dark:border-brand-muteddark hover:border-brand-primary/50"
           }`}
         type="button"
         onClick={() => setSelected(id)}
@@ -60,7 +61,7 @@ export default function CheckoutForm({
           <div className="flex flex-col">
             <span className="font-medium text-text-light dark:text-text-lightdark">{label}</span>
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
-              Secure hosted checkout
+              {dictionary.checkout.secureHostedCheckout}
             </span>
           </div>
         </div>
@@ -71,11 +72,11 @@ export default function CheckoutForm({
   return (
     <Card className="p-6 bg-card border border-border/50 shadow-lg">
       <div className="mb-4 font-semibold text-lg text-text-light dark:text-text-lightdark">
-        Choose payment provider
+        {dictionary.checkout.chooseProvider}
       </div>
       <div className="grid grid-cols-1 gap-3">
-        <Option id="bog" label="Bank of Georgia" logoSrc="/logos/bog.png" />
-        <Option id="tbc" label="TBC Bank" logoSrc="/logos/tbc.png" />
+        <Option id="bog" label={dictionary.checkout.providers.bog} logoSrc="/logos/bog.png" />
+        <Option id="tbc" label={dictionary.checkout.providers.tbc} logoSrc="/logos/tbc.png" />
       </div>
     </Card>
   );

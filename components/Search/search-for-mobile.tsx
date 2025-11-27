@@ -20,6 +20,7 @@ import { getAllCategories } from "@/app/api/services/categoryService";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useGA4 } from "@/hooks/useGA4";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
@@ -40,6 +41,7 @@ export default function SearchForMobile({
   setSearchModalOpen,
   forBottomNav = false,
 }: SearchForMobileProps) {
+  const dictionary = useDictionary();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { trackSearchQuery } = useGA4();
@@ -202,7 +204,7 @@ export default function SearchForMobile({
             if (e.key === "Enter" || e.key === " ") handleOpen();
           }}
         >
-          <SearchIcon height={19} width={19}/>        </div>
+          <SearchIcon height={19} width={19} />        </div>
       ) : (
         <button
           aria-expanded={isModalOpen}
@@ -227,7 +229,7 @@ export default function SearchForMobile({
                 focus-visible:border-transparent
                  placeholder-muted-foreground outline-none ring-0  transition-all"
             id="search-input"
-            placeholder="What are you looking for?"
+            placeholder={dictionary.search.placeholder}
             type="search"
             value={searchQuery}
             onChange={() => { }}
@@ -270,7 +272,7 @@ export default function SearchForMobile({
                     autoComplete="off"
                     className="w-full bg-transparent border-none focus:outline-none text-gray-900 dark:text-gray-100 text-[16px] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                     id="search-input"
-                    placeholder="What are you looking for?"
+                    placeholder={dictionary.search.placeholder}
                     type="search"
                     value={searchQuery}
                     onChange={handleSearchChange}
@@ -292,12 +294,12 @@ export default function SearchForMobile({
                     {historyItems.length > 0 ? (
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-gray-500">Recent searches</span>
+                          <span className="text-sm text-gray-500">{dictionary.search.recentSearches}</span>
                           <button
                             className="text-xs text-gray-500 underline hover:text-gray-700"
                             onClick={clearHistory}
                           >
-                            Clear all
+                            {dictionary.search.clearAll}
                           </button>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -327,16 +329,16 @@ export default function SearchForMobile({
                     ) : (
                       <div className="flex flex-col items-center justify-center py-6 text-gray-400">
                         <SearchIcon className="h-12 w-12 mb-3 opacity-30" />
-                        <p className="text-sm">You don’t have any search history yet</p>
+                        <p className="text-sm">{dictionary.search.noHistory}</p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Start typing to search products
+                          {dictionary.search.startTyping}
                         </p>
                       </div>
                     )}
 
                     {/* Categories grid below history */}
                     <div>
-                      <h3 className="text-sm text-gray-500 mb-3">Browse categories</h3>
+                      <h3 className="text-sm text-gray-500 mb-3">{dictionary.search.browseCategories}</h3>
                       <div className="grid grid-cols-3 gap-4 w-full">
                         {loadingCats
                           ? Array.from({ length: 6 }).map((_, i) => (
@@ -384,21 +386,21 @@ export default function SearchForMobile({
                 {hasQuery && isLoading && (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400 animate-pulse">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
-                    <p className="text-sm">Searching...</p>
+                    <p className="text-sm">{dictionary.search.searching}</p>
                   </div>
                 )}
 
                 {hasQuery && !!error && (
                   <div className="flex flex-col items-center justify-center py-6 text-red-500">
-                    <p className="text-sm">Error: {error}</p>
-                    <p className="text-xs text-gray-500 mt-1">Please try again.</p>
+                    <p className="text-sm">{dictionary.search.error}: {error}</p>
+                    <p className="text-xs text-gray-500 mt-1">{dictionary.search.tryAgain}</p>
                   </div>
                 )}
 
                 {hasQuery && !isLoading && !error && searchResults.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
-                    <p className="text-sm">No results found</p>
+                    <p className="text-sm">{dictionary.search.noResults}</p>
                   </div>
                 )}
 
@@ -435,7 +437,7 @@ export default function SearchForMobile({
                             </div>
                           )}
                           <div className="flex flex-col">
-                            <span className="text-sm line-clamp-1">{result.name}</span>
+                            <span className="text-sm line-clamp-1">{result.name ?? dictionary.search.unnamedProduct}</span>
                             <span className="text-xs text-gray-500">
                               {typeof result.price === "number" ? `₾${result.price}` : ""}
                             </span>
@@ -443,63 +445,10 @@ export default function SearchForMobile({
                         </div>
                       </motion.li>
                     ))}
-                    {/* <li className="mt-2">
-                      <button
-                        className="w-full text-center text-sm text-blue-600 underline py-2"
-                        onClick={() => goToResultsPage(searchQuery)} // ✅ saves history
-                      >
-                        See all results for “{searchQuery.trim()}”
-                      </button>
-                    </li> */}
                   </ul>
                 )}
               </ModalBody>
-
-              {/* <ModalFooter className="shrink-0">
-                <div className="md:hidden z-50 fixed bottom-0 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
-                  <div className="flex justify-around items-center py-2 space-x-3">
-                    <Link className="flex flex-col items-center" href="/en">
-                      <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                        Home 
-                      </span>
-                    </Link>
-
-                   
-                  <div className="flex flex-col items-center">
-                    <div
-                            className="flex flex-col items-center h-6"
-                            role="button"
-                            tabIndex={0}
-                            onClick={handleClose}
-                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClose()}
-                          >
-                            <SearchIcon height={19} width={19}/>       
-                          </div>
-                    <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                      Search
-                    </span>
-                  </div>
-
-                    <Cartlink />
-
-                  <div className="flex flex-col items-center">
-                                <CategoryDrawer />
-                                <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                                  Category
-                                </span>
-                              </div>
-
-                  <div className="flex flex-col items-center">
-                                <AuthModal IsMobile={true} />
-                                <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                                  Profile
-                                </span>
-                              </div>
-                  </div>
-                </div>
-              </ModalFooter> */}
-            </> 
+            </>
           )}
         </ModalContent>
       </Modal>

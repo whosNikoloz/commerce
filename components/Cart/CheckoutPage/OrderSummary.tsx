@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/app/context/cartContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface OrderSummaryProps {
   isProcessing: boolean;
@@ -24,6 +25,7 @@ export default function OrderSummary({
   totalOverride,
   onSubmit,
 }: OrderSummaryProps) {
+  const dictionary = useDictionary();
   const cart = useCartStore((s) => s.cart);
   const subtotal = useCartStore((s) => s.getSubtotal());
 
@@ -34,7 +36,7 @@ export default function OrderSummary({
   return (
     <Card className="sticky top-20 h-min bg-card border border-border/50 shadow-xl">
       <CardHeader>
-        <CardTitle className="text-text-light dark:text-text-lightdark">Order Summary</CardTitle>
+        <CardTitle className="text-text-light dark:text-text-lightdark">{dictionary.checkout.orderSummary}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">
@@ -78,22 +80,22 @@ export default function OrderSummary({
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-text-subtle dark:text-text-subtledark">Subtotal</span>
+            <span className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.subtotal}</span>
             <span className="text-text-light dark:text-text-lightdark">{`₾${subtotal.toFixed(2)}`}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-subtle dark:text-text-subtledark">Shipping</span>
+            <span className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.shipping}</span>
             <span className="text-text-light dark:text-text-lightdark">
-              {shipping === 0 ? "Free" : `₾${shipping.toFixed(2)}`}
+              {shipping === 0 ? dictionary.checkout.free : `₾${shipping.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-subtle dark:text-text-subtledark">Tax</span>
+            <span className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.tax}</span>
             <span className="text-text-light dark:text-text-lightdark">{`₾${tax.toFixed(2)}`}</span>
           </div>
           <Separator className="bg-brand-muted/60 dark:bg-brand-muteddark/50" />
           <div className="flex justify-between font-medium text-lg">
-            <span className="text-text-light dark:text-text-lightdark">Total</span>
+            <span className="text-text-light dark:text-text-lightdark">{dictionary.checkout.total}</span>
             <span className="text-text-light dark:text-text-lightdark">{`₾${total.toFixed(2)}`}</span>
           </div>
         </div>
@@ -101,15 +103,15 @@ export default function OrderSummary({
         <div className="space-y-2 pt-4">
           <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
             <Shield className="h-4 w-4" />
-            <span>Secure SSL encryption</span>
+            <span>{dictionary.checkout.secureEncryption}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
             <Truck className="h-4 w-4" />
-            <span>Free shipping on orders over ₾50</span>
+            <span>{dictionary.checkout.freeShippingOver.replace("{amount}", "₾50")}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
             <Check className="h-4 w-4" />
-            <span>30-day return policy</span>
+            <span>{dictionary.checkout.returnPolicy}</span>
           </div>
         </div>
 
@@ -119,11 +121,11 @@ export default function OrderSummary({
           size="lg"
           onClick={onSubmit}
         >
-          {isProcessing ? "Processing..." : (submitButtonLabel ?? "Review & Pay")}
+          {isProcessing ? dictionary.checkout.processing : (submitButtonLabel ?? dictionary.checkout.reviewAndPay)}
         </Button>
 
         <p className="text-xs text-text-subtle dark:text-text-subtledark text-center">
-          By placing your order, you agree to our Terms of Service and Privacy Policy.
+          {dictionary.checkout.termsAgreement}
         </p>
       </CardContent>
     </Card>

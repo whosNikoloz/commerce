@@ -22,9 +22,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { CategoryModel } from "@/types/category";
 import { useTenant } from "@/app/context/tenantContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export const NavbarTemplate1 = () => {
   const { config, isLoading } = useTenant();
+  const dictionary = useDictionary();
   const site = config?.siteConfig;
   const cartVariant = config?.ui?.cartVariant ?? "dropdown";
   const { resolvedTheme } = useTheme();
@@ -130,23 +132,10 @@ export const NavbarTemplate1 = () => {
                       src={logoSrc}
                       width={100}
                     />
-
-                    {/* <span
-                      className={cn(
-                        "font-bold text-xl whitespace-nowrap",
-                        "text-text-light dark:text-text-lightdark",
-                        "transition-all duration-300",
-                        isScrolled
-                          ? "opacity-0 translate-x-2 w-0 overflow-hidden"
-                          : "opacity-100 translate-x-0 w-auto"
-                      )}
-                    >
-                      {site.shortName}
-                    </span> */}
                   </Link>
                 </div>
                 <div className="items-center hidden md:flex">
-                   <CategoryDropdown />
+                  <CategoryDropdown />
                 </div>
 
 
@@ -194,11 +183,9 @@ export const NavbarTemplate1 = () => {
           <Link className="flex flex-col items-center" href={`/${lng}`}>
             <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
-              {lng === "en" ? "Home" : "მთავარი"}
+              {dictionary.common.home}
             </span>
           </Link>
-
-          
 
           {isMobile && (
             <div className="flex flex-col items-center">
@@ -210,7 +197,7 @@ export const NavbarTemplate1 = () => {
                 setSearchQuery={setSearchQuery}
               />
               <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                {lng === "en" ? "Search" : "ძებნა"}
+                {dictionary.common.search}
               </span>
             </div>
           )}
@@ -220,14 +207,14 @@ export const NavbarTemplate1 = () => {
           <div className="flex flex-col items-center">
             <CategoryDrawer />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
-              {lng === "en" ? "Category" : "კატეგორია"}
+              {dictionary.categories.category}
             </span>
           </div>
 
           <div className="flex flex-col items-center">
             <AuthModal IsMobile={isMobile} />
             <span className="text-xs text-text-subtle dark:text-text-subtledark">
-              {lng === "en" ? "Profile" : "პროფილი"}
+              {dictionary.common.profile}
             </span>
           </div>
 

@@ -81,6 +81,10 @@ export const viewport: Viewport = {
   ],
 };
 
+import { getDictionary } from "@/lib/dictionaries";
+
+// ... imports
+
 export default async function RootLayout({
   children,
   params,
@@ -93,6 +97,8 @@ export default async function RootLayout({
   const safeLang = (locales as readonly string[]).includes(lang)
     ? (lang as (typeof locales)[number])
     : defaultLocale;
+
+  const dictionary = await getDictionary(safeLang);
 
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
@@ -162,21 +168,11 @@ export default async function RootLayout({
           fontClassNames,
         )}
       >
-        {/* GTM noscript fallback for body */}
-        {seo.googleTagManagerId && (
-          <noscript>
-            <iframe
-              height="0"
-              src={`https://www.googletagmanager.com/ns.html?id=${seo.googleTagManagerId}`}
-              style={{ display: "none", visibility: "hidden" }}
-              title="Google Tag Manager"
-              width="0"
-            />
-          </noscript>
-        )}
+        {/* ... GTM ... */}
 
         <SmoothScroll enabled={tenant.ui?.enableSmoothScrolling}>
           <Providers
+            dictionary={dictionary}
             initialTenant={tenant}
             themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
           >

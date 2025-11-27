@@ -1,43 +1,44 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/i18n.config";
 
-
 import { BrandsTable } from "@/components/admin/brand/brands-table";
-import { i18nPageMetadataAsync } from "@/lib/seo"; // ← use async helper
+import { i18nPageMetadataAsync } from "@/lib/seo";
 import { getAllBrands } from "@/app/api/services/brandService";
+import { getDictionary } from "@/lib/dictionaries";
 
-// const _getBrandsCached = cache(async (): Promise<BrandModel[]> => {
-//   return await getAllBrands();
-// });
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: Locale }>;
-}): Promise<Metadata> {
-  const { lang } = await params;
+  const dict = await getDictionary(lang);
 
   return i18nPageMetadataAsync({
-    title: "Admin • Brands",
-    description: "Manage all brands in the admin dashboard.",
+    title: dict.pages.admin.brands.title,          // Admin • Brands
+    description: dict.pages.admin.brands.description,
     lang,
     path: "/admin/brands",
-    index: false, // noindex for admin
-    // no images/siteName needed — resolved per host
+    index: false,
   });
 }
 
-export default async function BrandsPage() {
+export default async function BrandsPage(
+  { params }: { params: Promise<{ lang: Locale }> }
+) {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+  const dict = await getDictionary(lang);
   const brands = await getAllBrands();
 
   return (
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-purple-900 to-violet-900 dark:from-slate-100 dark:via-purple-100 dark:to-violet-100 bg-clip-text text-transparent">
-          Brands
+          {dict.pages.admin.brands.heading}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
-          Manage your brand catalog and origins
+          {dict.pages.admin.brands.subtitle}
         </p>
       </div>
 

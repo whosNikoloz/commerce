@@ -4,12 +4,15 @@ import Link from "next/link";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface CartHeaderProps {
   itemCount: number;
 }
 
 export default function CartHeader({ itemCount }: CartHeaderProps) {
+  const dictionary = useDictionary();
+
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
       <div className="flex items-center gap-3">
@@ -18,10 +21,10 @@ export default function CartHeader({ itemCount }: CartHeaderProps) {
         </div>
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-lightdark">
-            Shopping Cart
+            {dictionary.cart.title}
           </h1>
           <p className="text-sm text-text-subtle dark:text-text-subtledark">
-            {itemCount} {itemCount === 1 ? "item" : "items"} in your cart
+            {itemCount} {itemCount === 1 ? dictionary.cart.item : dictionary.cart.items} {dictionary.cart.inYourCart}
           </p>
         </div>
       </div>
@@ -33,7 +36,7 @@ export default function CartHeader({ itemCount }: CartHeaderProps) {
       >
         <Link href="/">
           <ArrowLeft className="h-4 w-4" />
-          Continue Shopping
+          {dictionary.cart.continueShopping}
         </Link>
       </Button>
     </div>

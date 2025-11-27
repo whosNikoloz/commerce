@@ -121,7 +121,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
         <div className="w-full flex flex-row items-center gap-2 md:gap-3 overflow-visible">
           {/* Static "All Categories" Card */}
           {data.showAllCard && (
-            <Link href={data.allCategoriesHref || "/categories"} className="w-24 sm:w-28 md:w-36 lg:w-40 flex-shrink-0">
+            <Link className="w-24 sm:w-28 md:w-36 lg:w-40 flex-shrink-0" href={data.allCategoriesHref || "/categories"}>
               <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 cursor-pointer overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
                   <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
@@ -146,7 +146,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
 
                     return (
                       <li key={category.id} className="splide__slide h-32 sm:h-40 md:h-48 lg:h-56">
-                        <Link href={`/category/${category.id}`} className="block h-full">
+                        <Link className="block h-full" href={`/category/${category.id}`}>
                           <div className="group relative h-full w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-gray-100 to-gray-200">
                             {/* Image */}
                             <Image

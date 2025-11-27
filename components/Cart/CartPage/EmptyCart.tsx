@@ -5,19 +5,10 @@ import { ShoppingBag, ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-
-const translations: Record<string, string> = {
-  "cart.title": "Shopping Cart",
-  "cart.empty": "Your cart is empty",
-  "cart.emptyDescription": "Start adding items to your cart to see them here",
-  "cart.startShopping": "Start Shopping",
-  "cart.freeShippingOver": "Free shipping on orders over ₾50",
-  "cart.secureCheckout": "Secure checkout process",
-  "cart.fastDelivery": "Fast delivery available",
-};
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function EmptyCart() {
-  const t = (key: string) => translations[key] || key;
+  const dictionary = useDictionary();
 
   return (
     <div className="min-h-screen mt-10">
@@ -32,8 +23,11 @@ export default function EmptyCart() {
 
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold text-text-light dark:text-text-lightdark">
-                {t('cart.empty')}
+                {dictionary.cart.empty}
               </h2>
+              <p className="text-text-subtle dark:text-text-subtledark">
+                {dictionary.cart.emptyDescription}
+              </p>
             </div>
 
             <div className="space-y-4 pt-4">
@@ -43,16 +37,10 @@ export default function EmptyCart() {
                 size="lg"
               >
                 <Link href="/">
-                  {t('cart.startShopping')}
+                  {dictionary.cart.startShopping}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-
-              {/* <div className="text-sm text-text-subtle dark:text-text-subtledark space-y-1">
-                <p>✨ {t('cart.freeShippingOver')}</p>
-                <p>🔒 {t('cart.secureCheckout')}</p>
-                <p>📦 {t('cart.fastDelivery')}</p>
-              </div> */}
             </div>
           </CardContent>
         </Card>

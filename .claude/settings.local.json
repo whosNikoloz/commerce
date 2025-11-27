@@ -29,7 +29,10 @@
       "Bash(find:*)",
       "Bash(tee:*)",
       "Bash(del /f \"D:\\MyProjects\\nextjs\\commerce\\components\\OptimizedImage.tsx\" \"D:\\MyProjects\\nextjs\\commerce\\lib\\accessibility.ts\" \"D:\\MyProjects\\nextjs\\commerce\\LIGHTHOUSE_OPTIMIZATION_GUIDE.md\" \"D:\\MyProjects\\nextjs\\commerce\\ACCESSIBILITY_CHECKLIST.md\")",
-      "WebFetch(domain:veli.store)"
+      "WebFetch(domain:veli.store)",
+      "Bash(for:*)",
+      "Bash(do echo \"File: $file\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

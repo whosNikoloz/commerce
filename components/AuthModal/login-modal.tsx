@@ -9,30 +9,18 @@ import { InputLoadingBtn } from "./input-loading-button";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { useUser } from "@/app/context/userContext";
 import { loginCustomer, validateUser } from "@/app/api/services/authService";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface LoginProps {
-  loginData: {
-    title: string;
-    email: string;
-    password: string;
-    button: string;
-    forgotPassword: string;
-    or: string;
-    facebookAuth: string;
-    googleAuth: string;
-    switchMode: string;
-  };
-  lng: string;
   onSwitchMode: (mode: string) => void;
   onLoginSuccess?: () => void;
 }
 
 export default function LoginModal({
-  loginData,
-  lng,
   onSwitchMode,
   onLoginSuccess,
 }: LoginProps) {
+  const dictionary = useDictionary();
   const loginRef = useRef<HTMLInputElement>(null);
   const { login } = useUser();
 
@@ -58,19 +46,17 @@ export default function LoginModal({
 
     // basic validation
     if (!loginState.email) {
-      setLoginEmailError(lng === "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
+      setLoginEmailError(dictionary.auth.login.fillEmail);
 
       return;
     }
     if (!isValidEmail(loginState.email)) {
-      setLoginEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      setLoginEmailError(dictionary.auth.login.invalidEmail);
 
       return;
     }
     if (!loginState.password) {
-      setLoginPasswordError(
-        lng === "ka" ? "შეავსე პაროლის ველი" : "Please fill in the Password field"
-      );
+      setLoginPasswordError(dictionary.auth.login.fillPassword);
 
       return;
     }
@@ -78,12 +64,12 @@ export default function LoginModal({
     setIsLoading(true);
     try {
       const tokens = await loginCustomer(loginState.email, loginState.password);
-      
+
       login(tokens);
 
       if (onLoginSuccess) onLoginSuccess();
     } catch (e: any) {
-      setLoginError(typeof e?.message === "string" ? e.message : "Login failed");
+      setLoginError(typeof e?.message === "string" ? e.message : dictionary.auth.login.loginFailed);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +85,7 @@ export default function LoginModal({
       return;
     }
     if (!isValidEmail(loginState.email)) {
-      setLoginEmailError(lng === "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email");
+      setLoginEmailError(dictionary.auth.login.invalidEmail);
       setEmailLogHasBlurred(false);
 
       return;
@@ -117,9 +103,7 @@ export default function LoginModal({
       setLoginEmailError(
         typeof err?.message === "string"
           ? err.message
-          : lng === "ka"
-          ? "მომხმარებელი არ მოიძებნა"
-          : "Email not found"
+          : dictionary.auth.login.userNotFound
       );
       setEmailLogHasBlurred(false);
     } finally {
@@ -152,7 +136,7 @@ export default function LoginModal({
         }
         errorMessage={loginEmailError}
         isInvalid={loginEmailError !== ""}
-        label={loginData.email}
+        label={dictionary.auth.login.email}
         startContent={<i className="fas fa-envelope text-blue-500 dark:text-blue-400" />}
         type="email"
         value={loginState.email}
@@ -178,7 +162,7 @@ export default function LoginModal({
         }}
         errorMessage={loginPasswordError}
         isInvalid={loginPasswordError !== ""}
-        label={loginData.password}
+        label={dictionary.auth.login.password}
         startContent={<i className="fas fa-lock text-blue-500 dark:text-blue-400" />}
         type="password"
         value={loginState.password}
@@ -196,7 +180,7 @@ export default function LoginModal({
           className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("forgot")}
         >
-          {loginData.forgotPassword}
+          {dictionary.auth.login.forgotPassword}
         </button>
       </div>
 
@@ -213,12 +197,12 @@ export default function LoginModal({
         startContent={!isLoading && <i className="fas fa-sign-in-alt" />}
         onPress={handleLogin}
       >
-        {loginData.button}
+        {dictionary.auth.login.button}
       </Button>
 
       <div className="flex items-center justify-center my-6">
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
-        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{loginData.or}</span>
+        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{dictionary.auth.login.or}</span>
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
@@ -229,7 +213,7 @@ export default function LoginModal({
           className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("register")}
         >
-          {loginData.switchMode}
+          {dictionary.auth.login.switchMode}
         </button>
       </div>
     </div>

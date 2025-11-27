@@ -13,12 +13,14 @@ import { Toaster } from "sonner";
 import { TenantProvider } from "../context/tenantContext";
 import { UserProvider } from "../context/userContext";
 import { CartUIProvider } from "../context/cart-ui";
+import { DictionaryProvider } from "../context/dictionary-provider";
 
 export interface ProvidersProps {
   children: React.ReactNode;
   themeProps?: ThemeProviderProps;
   /** SSR-provided tenant config (from app/layout.tsx) */
   initialTenant: TenantConfig;
+  dictionary: Record<string, any>;
 }
 
 // Optional: sensible defaults for next-themes
@@ -34,7 +36,7 @@ declare module "@react-types/shared" {
   }
 }
 
-export function Providers({ children, themeProps, initialTenant }: ProvidersProps) {
+export function Providers({ children, themeProps, initialTenant, dictionary }: ProvidersProps) {
   const router = useRouter();
 
   //console.log("⚙️ [PROVIDERS] Initializing with tenant:", initialTenant.siteConfig.name);
@@ -61,9 +63,11 @@ export function Providers({ children, themeProps, initialTenant }: ProvidersProp
               }
               zIndex={1600}
             />
+            <DictionaryProvider dictionary={dictionary}>
               <CartUIProvider>
                 {children}
               </CartUIProvider>
+            </DictionaryProvider>
             <Toaster richColors position="bottom-right" />
           </NextThemesProvider>
         </TenantProvider>

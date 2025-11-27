@@ -6,17 +6,10 @@ import { Button } from "@heroui/button";
 
 import { InputLoadingBtn } from "./input-loading-button";
 
-interface ForgotPasswordProps {
-  forgotData: {
-    title: string;
-    subText: string;
-    email: string;
-    button: string;
-  };
-  lng: string;
-}
+import { useDictionary } from "@/app/context/dictionary-provider";
 
-export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordProps) {
+export default function ForgotPasswordModal() {
+  const dictionary = useDictionary();
   const forgotRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +28,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
   const handleForgotPassword = async () => {
     setIsLoading(true);
     if (forgotState.email === "") {
-      setForgotEmailError(lng == "ka" ? "შეავსე ელ-ფოსტის ველი" : "Please fill in the Email field");
+      setForgotEmailError(dictionary.auth.login.fillEmail);
       setIsLoading(false);
 
       return;
@@ -62,7 +55,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
       }
       if (!isEmailValid) {
         setForgotEmailError(
-          lng == "ka" ? "შეიყვანეთ ელ-ფოსტა სწორად" : "Please enter a valid email",
+          dictionary.auth.login.invalidEmail,
         );
         setEmailForgotHasBlurred(false);
 
@@ -86,7 +79,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
     <div className="space-y-5">
       <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
         <i className="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mt-0.5" />
-        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{forgotData.subText}</p>
+        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{dictionary.auth.forgotPassword.subText}</p>
       </div>
 
       <Input
@@ -109,7 +102,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
         }
         errorMessage={forgotEmailError}
         isInvalid={forgotEmailError !== ""}
-        label={forgotData.email}
+        label={dictionary.auth.forgotPassword.email}
         startContent={<i className="fas fa-envelope text-blue-500 dark:text-blue-400" />}
         type="email"
         value={forgotState.email}
@@ -135,7 +128,7 @@ export default function ForgotPasswordModal({ forgotData, lng }: ForgotPasswordP
         startContent={!isLoading && <i className="fas fa-paper-plane" />}
         onPress={handleForgotPassword}
       >
-        {forgotData.button}
+        {dictionary.auth.forgotPassword.button}
       </Button>
     </div>
   );

@@ -1,4 +1,3 @@
-// app/(routes)/cart/CartItems.tsx
 "use client";
 
 import Image from "next/image";
@@ -12,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/app/context/cartContext";
 import { CartItemType } from "@/types/cart";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
@@ -35,6 +35,7 @@ export default function CartItems({
   availability?: AvailabilityMap;
   loading?: boolean;
 }) {
+  const dictionary = useDictionary();
   const cart = useCartStore((s) => s.cart);
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
@@ -116,21 +117,21 @@ export default function CartItems({
                   <div className="mt-2 flex items-center gap-2">
                     {isCheckingStock ? (
                       <Badge className="text-[11px] px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 animate-pulse">
-                        მარაგის შემოწმება...
+                        {dictionary.cart.checkingStock}
                       </Badge>
                     ) : outOfStock ? (
                       <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
-                        არ არის მარაგში
+                        {dictionary.cart.outOfStock}
                       </Badge>
                     ) : (
                       <Badge className="text-[11px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                        მარაგი: {available} ც.
+                        {dictionary.cart.stock.replace("{count}", String(available))}
                       </Badge>
                     )}
                     {!isCheckingStock && quantity > available && available > 0 && (
                       <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
                         <AlertTriangle className="h-3.5 w-3.5" />
-                        მოთხოვნილი რაოდენობა აღემატება მარაგს — დავაკლამპე {available}-ზე
+                        {dictionary.cart.stockLimitExceeded.replace("{count}", String(available))}
                       </span>
                     )}
                   </div>

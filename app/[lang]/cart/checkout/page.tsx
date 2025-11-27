@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/i18n.config";
 
 import CheckoutPage from "@/components/Cart/CheckoutPage/checkout-page";
+import { getDictionary } from "@/lib/dictionaries";
 import { i18nPageMetadataAsync } from "@/lib/seo";
-import { Locale } from "@/i18n.config";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: Locale }>;
-}): Promise<Metadata> {
-  const { lang } = await params;
-  const isKa = lang === "ka";
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ka';
+
+  const dict = await getDictionary(lang);
 
   return i18nPageMetadataAsync({
-    title: isKa ? "გადახდა" : "Checkout",
-    description: isKa
-      ? "დაამოწმეთ შეკვეთა და დაასრულეთ გადახდა."
-      : "Review your order and complete checkout.",
+    title: dict.checkout.page.title,
+    description: dict.checkout.page.description,
     lang,
     path: "/checkout",
     images: ["/og/checkout-og.jpg"],

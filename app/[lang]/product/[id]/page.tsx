@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/i18n.config";
 
 import { notFound } from "next/navigation";
 import Script from "next/script";
 
 import { getProductById } from "@/app/api/services/productService";
 import {
-  i18nPageMetadataAsync, // ← async, host-aware
+  i18nPageMetadataAsync, // async, host-aware
   buildProductJsonLd,
   toAbsoluteImages,
   buildI18nUrls,
-  getActiveSite, // ← resolve current site from headers
+  getActiveSite, // resolve current site from headers
 } from "@/lib/seo";
 import ProductDetail from "@/components/Product/product-detail";
+import { getDictionary } from "@/lib/dictionaries";
 
 // Use ISR with revalidation for better performance
 export const revalidate = 60; // Revalidate every 60 seconds
 
-type DetailPageParams = { lang: string; id: string };
+type DetailPageParams = { lang: Locale; id: string };
 type DetailPageProps = { params: Promise<DetailPageParams> };
 
 function normalizeImages(imgs: unknown, fallbackOg: string): string[] {
@@ -34,31 +36,49 @@ export async function generateMetadata({
 }: {
   params: Promise<DetailPageParams>;
 }): Promise<Metadata> {
-  const { lang, id } = await params;
+  const resolvedParams = await params;
+  const { lang, id } = resolvedParams;
   const site = await getActiveSite(); // per-host
   const product = await getProductById(id).catch(() => null);
+  const dict = await getDictionary(lang);
 
   const path = `/product/${id}`;
 
+  // 404 / not found metadata — translated
   if (!product) {
+    const notFoundTitle =
+      dict.product?.notFound?.title || "Product not found";
+    const notFoundDescription =
+      dict.product?.notFound?.description ||
+      `The product ${id} could not be found or was removed.`;
+
     return i18nPageMetadataAsync({
-      title: "Product not found",
-      description: `The product ${id} could not be found or was removed.`,
+      title: notFoundTitle,
+      description: notFoundDescription,
       lang,
       path,
-      images: [site.ogImage],
+      images: [site.ogImage || site.logo],
       index: false,
     });
   }
 
-  const title = product?.name ?? "Product";
+  // Normal product metadata
+  const title = product.name ?? "Product";
+
   // Create a meaningful meta description
-  const description = product?.description
+  const description = product.description
     ? product.description.length > 160
       ? product.description.slice(0, 157) + "..."
       : product.description
-    : `${product?.name ?? "Product"} - ${product.brand?.name ? `by ${product.brand.name}` : ""}${product.category?.name ? ` in ${product.category.name}` : ""}. ${product.price ? `Price: ₾${product.price}` : ""} Shop now at ${site.name}.`.trim();
-  const images = await toAbsoluteImages(site, normalizeImages(product?.images, site.ogImage));
+    : `${product.name ?? "Product"}${product.brand?.name ? ` · ${product.brand.name}` : ""
+      }${product.category?.name ? ` · ${product.category.name}` : ""
+      }${product.price ? ` · Price: ₾${product.price}` : ""
+      } · ${site.name}`.trim();
+
+  const images = await toAbsoluteImages(
+    site,
+    normalizeImages(product.images, site.ogImage || site.logo),
+  );
 
   return i18nPageMetadataAsync({
     title,
@@ -72,7 +92,8 @@ export async function generateMetadata({
 
 /* ========== Page ========== */
 export default async function ProductPage({ params }: DetailPageProps) {
-  const { lang, id } = await params;
+  const resolvedParams = await params;
+  const { lang, id } = resolvedParams;
   const site = await getActiveSite(); // per-host
   const product = await getProductById(id).catch(() => null);
 
@@ -81,11 +102,17 @@ export default async function ProductPage({ params }: DetailPageProps) {
   const path = `/product/${id}`;
   const { canonical } = await buildI18nUrls(path, lang, site); // canonical for current locale
 
-  const images = await toAbsoluteImages(site, normalizeImages(product.images, site.ogImage));
+  const images = await toAbsoluteImages(
+    site,
+    normalizeImages(product.images, site.ogImage || site.logo),
+  );
   const price = product.discountPrice ?? product.price ?? 0;
 
   const availability =
-    product.status === 1 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+    product.status === 1
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock";
+
   const itemCondition =
     product.condition === 0
       ? "https://schema.org/NewCondition"
@@ -109,9 +136,9 @@ export default async function ProductPage({ params }: DetailPageProps) {
   return (
     <>
       <Script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         id="ld-product"
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ProductDetail initialProduct={product} initialSimilar={[]} />
     </>

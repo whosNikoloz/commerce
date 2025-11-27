@@ -2,12 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/modal";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/modal";
 
 import AdminDashboard from "@/components/admin/admin-dashboard";
 import LoginModal from "@/components/admin/login-modal";
 import { GoBackButton } from "@/components/go-back-button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -16,6 +23,7 @@ export default function AdminPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isMobile = useIsMobile();
+  const dict = useDictionary();
 
   const currentLang = lang === "ka" ? "ka" : "en";
   const next = searchParams.get("next");
@@ -37,13 +45,13 @@ export default function AdminPage() {
         if (data.authorized) {
           setIsAuthorized(true);
 
-          // If we came here due to middleware redirect, go to the target immediately
-          const target = next && next.startsWith(`/${currentLang}/admin`)
-            ? next
-            : `/${currentLang}/admin`;
+          const target =
+            next && next.startsWith(`/${currentLang}/admin`)
+              ? next
+              : `/${currentLang}/admin`;
 
           router.replace(target);
-          router.refresh();  
+          router.refresh();
         } else {
           onOpen(); // show login modal
         }
@@ -54,8 +62,10 @@ export default function AdminPage() {
 
     checkAuth();
 
-    return () => void (cancelled = true);
-  }, [onOpen, router, next]);
+    return () => {
+      cancelled = true;
+    };
+  }, [onOpen, router, next, currentLang]);
 
   const handleCloseModal = () => {
     onClose();
@@ -63,10 +73,12 @@ export default function AdminPage() {
   };
 
   if (!isAuthorized) {
-    const loginData =
-      currentLang === "ka"
-        ? { title: "შესვლა", email: "ელ-ფოსტა", password: "პაროლი", button: "შესვლა" }
-        : { title: "Sign In", email: "Email", password: "Password", button: "Sign In" };
+    const loginData = {
+      title: dict.admin.login.title,
+      email: dict.admin.login.email,
+      password: dict.admin.login.password,
+      button: dict.admin.login.button,
+    };
 
     return (
       <Modal
@@ -79,9 +91,29 @@ export default function AdminPage() {
         isOpen={isOpen}
         motionProps={{
           variants: {
-            enter: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0 } },
-            center: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", stiffness: 400, damping: 32, mass: 0.8 } },
-            exit: { y: 40, opacity: 0, scale: 0.96, transition: { duration: 0.18, ease: "easeIn" } },
+            enter: {
+              y: 40,
+              opacity: 0,
+              scale: 0.96,
+              transition: { duration: 0 },
+            },
+            center: {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 400,
+                damping: 32,
+                mass: 0.8,
+              },
+            },
+            exit: {
+              y: 40,
+              opacity: 0,
+              scale: 0.96,
+              transition: { duration: 0.18, ease: "easeIn" },
+            },
           },
           initial: "enter",
           animate: "center",
@@ -115,7 +147,11 @@ export default function AdminPage() {
                     onClose();
                     const fallback = `/${currentLang}/admin`;
 
-                    router.replace(next && next.startsWith(`/${currentLang}/admin`) ? next : fallback);
+                    router.replace(
+                      next && next.startsWith(`/${currentLang}/admin`)
+                        ? next
+                        : fallback,
+                    );
                   }}
                 />
               </ModalBody>
@@ -131,10 +167,10 @@ export default function AdminPage() {
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 dark:from-slate-100 dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
-          Dashboard
+          {dict.admin.dashboard.title}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
-          Welcome back! Here&apos;s what&apos;s happening with your store today.
+          {dict.admin.dashboard.description}
         </p>
       </div>
       <AdminDashboard />

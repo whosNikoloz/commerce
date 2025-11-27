@@ -1,3 +1,5 @@
+"use client";
+
 import type { ProductResponseModel } from "@/types/product";
 import type { PagedList } from "@/types/pagination";
 
@@ -13,6 +15,7 @@ import { SearchIcon } from "../icons";
 import { searchProducts } from "@/app/api/services/productService";
 import { useSearchHistory } from "@/app/context/useSearchHistory";
 import { useGA4 } from "@/hooks/useGA4";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 // (Optional) tiny hook using matchMedia
 const MOBILE_BREAKPOINT = 768;
@@ -48,6 +51,7 @@ const Search = ({
   isModalOpen,
   setSearchModalOpen,
 }: SearchForMobileProps) => {
+  const dictionary = useDictionary();
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(isModalOpen);
   const [isLoading, setIsLoading] = useState(false);
@@ -169,7 +173,7 @@ const Search = ({
           className="w-full pl-2 py-3 bg-transparent rounded-full text-foreground placeholder-muted-foreground transition-all
                     outline-none focus:outline-none ring-0 focus:ring-0 focus:border-transparent"
           id="search-input"
-          placeholder="What are you looking for?"
+          placeholder={dictionary.search.placeholder}
           type="search"
           value={searchQuery}
           onBlur={handleSearchBlur}
@@ -207,12 +211,12 @@ const Search = ({
                 {!hasQuery && historyItems.length > 0 && (
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-500">Recent searches</span>
+                      <span className="text-sm text-gray-500">{dictionary.search.recentSearches}</span>
                       <button
                         className="text-xs text-gray-500 underline hover:text-gray-700"
                         onClick={clearHistory}
                       >
-                        Clear all
+                        {dictionary.search.clearAll}
                       </button>
                     </div>
 
@@ -247,29 +251,29 @@ const Search = ({
                 {hasQuery && isLoading && (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400 animate-pulse">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
-                    <p className="text-sm">Searching...</p>
+                    <p className="text-sm">{dictionary.search.searching}</p>
                   </div>
                 )}
 
                 {hasQuery && !!error && (
                   <div className="flex flex-col items-center justify-center py-6 text-red-500">
-                    <p className="text-sm">Error: {error}</p>
-                    <p className="text-xs text-gray-500 mt-1">Please try again.</p>
+                    <p className="text-sm">{dictionary.search.error}: {error}</p>
+                    <p className="text-xs text-gray-500 mt-1">{dictionary.search.tryAgain}</p>
                   </div>
                 )}
 
                 {hasQuery && !isLoading && !error && searchResults.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
-                    <p className="text-sm">No results found</p>
+                    <p className="text-sm">{dictionary.search.noResults}</p>
                   </div>
                 )}
 
                 {!hasQuery && historyItems.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-10 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-3 opacity-30" />
-                    <p className="text-sm">You don’t have any search history yet</p>
-                    <p className="text-xs text-gray-500 mt-1">Start typing to search products</p>
+                    <p className="text-sm">{dictionary.search.noHistory}</p>
+                    <p className="text-xs text-gray-500 mt-1">{dictionary.search.startTyping}</p>
                   </div>
                 )}
 
@@ -307,7 +311,7 @@ const Search = ({
                             </div>
                           )}
                           <div className="flex flex-col">
-                            <span className="text-sm line-clamp-1">{result.name}</span>
+                            <span className="text-sm line-clamp-1">{result.name ?? dictionary.search.unnamedProduct}</span>
                             <span className="text-xs text-gray-500">
                               {typeof result.price === "number" ? `₾${result.price}` : ""}
                             </span>

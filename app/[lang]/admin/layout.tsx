@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import type { Viewport, Metadata } from "next";
 
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
@@ -28,6 +29,7 @@ export async function generateMetadata({
 }
 
 import { ThemeToggle } from "@/components/admin/theme-toggle";
+import { LanguageToggle } from "@/components/admin/language-toggle";
 import { AdminAuthGuard } from "@/components/admin/admin-auth-guard";
 
 export default function AdminLayout({
@@ -52,7 +54,8 @@ export default function AdminLayout({
           >
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
             <div className="relative z-10">
-              <div className="absolute top-0 right-0 z-50">
+              <div className="absolute top-0 right-0 z-50 flex gap-2">
+                <LanguageToggle />
                 <ThemeToggle />
               </div>
               {children}

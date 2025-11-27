@@ -5,12 +5,15 @@ import { useRouter, useParams } from "next/navigation";
 
 import FinaSyncPanel from "@/components/admin/fina-sync-panel";
 import { useTenant } from "@/app/context/tenantContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function AdminSyncPage() {
   const { config } = useTenant();
   const router = useRouter();
   const { lang } = useParams<{ lang?: string }>();
-  const currentLang = lang || "en";
+  const currentLang = (lang as string) || "en";
+
+  const dict = useDictionary();
 
   // Redirect if not FINA merchant
   useEffect(() => {
@@ -28,10 +31,10 @@ export default function AdminSyncPage() {
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-4xl md:text-5xl h-14 font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-cyan-900 dark:from-slate-100 dark:via-blue-100 dark:to-cyan-100 bg-clip-text text-transparent">
-          Synchronization
+          {dict.pages.admin.sync.heading}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
-          Trigger sync jobs, monitor status, and view a live activity log.
+          {dict.pages.admin.sync.subtitle}
         </p>
       </div>
       <FinaSyncPanel />

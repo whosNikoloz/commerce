@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
@@ -25,6 +26,7 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ autoShowLoginPrompt = false }: CartSummaryProps) {
+  const dictionary = useDictionary();
   const { user } = useUser();
   const router = useRouter();
   const itemCount = useCartStore((s) => s.cart.length);
@@ -90,7 +92,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-text-light dark:text-text-lightdark">
-            Order Summary
+            {dictionary.cart.orderSummary}
           </CardTitle>
         </CardHeader>
 
@@ -102,16 +104,16 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
                 <LogIn className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
                 <div className="space-y-2 flex-1">
                   <p className="text-blue-900 dark:text-blue-100 font-medium">
-                    Login Required
+                    {dictionary.cart.loginRequired}
                   </p>
                   <p className="text-blue-700 dark:text-blue-300 text-xs">
-                    Please log in to continue with checkout. Click the Profile icon in the navigation.
+                    {dictionary.cart.loginRequiredMsg}
                   </p>
                   <button
                     className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                     onClick={() => setShowLoginPrompt(false)}
                   >
-                    Dismiss
+                    {dictionary.cart.dismiss}
                   </button>
                 </div>
               </div>
@@ -120,7 +122,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-text-subtle dark:text-text-subtledark">
-                Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
+                {dictionary.cart.subtotal} ({itemCount} {itemCount === 1 ? dictionary.cart.item : dictionary.cart.items})
               </span>
               <span className="font-medium text-text-light dark:text-text-lightdark">
                 {formatPrice(subtotal)}
@@ -129,16 +131,16 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
 
             {appliedPromo && (
               <div className="flex justify-between text-sm text-brand-primary dark:text-brand-primary">
-                <span>Discount ({appliedPromo})</span>
+                <span>{dictionary.cart.discount} ({appliedPromo})</span>
                 <span>-{formatPrice(promoDiscount)}</span>
               </div>
             )}
 
             <div className="flex justify-between text-sm">
-              <span className="text-text-subtle dark:text-text-subtledark">Shipping</span>
+              <span className="text-text-subtle dark:text-text-subtledark">{dictionary.cart.shipping}</span>
               <span className="font-medium text-text-light dark:text-text-lightdark">
                 {shipping === 0 ? (
-                  <span className="text-green-600 dark:text-green-400">Free</span>
+                  <span className="text-green-600 dark:text-green-400">{dictionary.cart.free}</span>
                 ) : (
                   formatPrice(shipping)
                 )}
@@ -146,7 +148,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-text-subtle dark:text-text-subtledark">Tax</span>
+              <span className="text-text-subtle dark:text-text-subtledark">{dictionary.cart.tax}</span>
               <span className="font-medium text-text-light dark:text-text-lightdark">
                 {formatPrice(tax)}
               </span>
@@ -155,7 +157,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             <Separator className="bg-brand-muted/60 dark:bg-brand-muteddark/50" />
 
             <div className="flex justify-between font-semibold text-lg">
-              <span className="text-text-light dark:text-text-lightdark">Total</span>
+              <span className="text-text-light dark:text-text-lightdark">{dictionary.cart.total}</span>
               <span className="text-text-light dark:text-text-lightdark">{formatPrice(total)}</span>
             </div>
           </div>
@@ -165,7 +167,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             <div className="p-3 rounded-lg bg-brand-primary/10 border border-brand-primary/30">
               <div className="flex items-center gap-2 text-sm text-brand-primary">
                 <Truck className="h-4 w-4" />
-                <span>Add {formatPrice(50 - subtotal)} more for free shipping!</span>
+                <span>{dictionary.cart.addMoreForFreeShipping.replace("{amount}", formatPrice(50 - subtotal))}</span>
               </div>
             </div>
           )}
@@ -179,13 +181,13 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             >
               {user ? (
                 <>
-                  Proceed to Checkout
+                  {dictionary.cart.proceedToCheckout}
                   <ArrowRight className="h-4 w-4" />
                 </>
               ) : (
                 <>
                   <LogIn className="h-4 w-4" />
-                  Login to Checkout
+                  {dictionary.cart.loginToCheckout}
                 </>
               )}
             </Button>
@@ -195,7 +197,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
               className="w-full bg-transparent border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark hover:bg-brand-muted/40 dark:hover:bg-brand-muteddark/30"
               variant="outline"
             >
-              <Link href="/">Continue Shopping</Link>
+              <Link href="/">{dictionary.cart.continueShopping}</Link>
             </Button>
           </div>
 
@@ -203,15 +205,15 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
           <div className="pt-4 space-y-2">
             <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <Truck className="h-3 w-3" />
-              <span>Free shipping on orders over ₾50</span>
+              <span>{dictionary.cart.freeShippingOver.replace("{amount}", "₾50")}</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <RotateCcw className="h-3 w-3" />
-              <span>30-day return policy</span>
+              <span>{dictionary.cart.returnPolicy}</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-text-subtle dark:text-text-subtledark">
               <Shield className="h-3 w-3" />
-              <span>Secure checkout with SSL encryption</span>
+              <span>{dictionary.cart.secureCheckout}</span>
             </div>
           </div>
         </CardContent>

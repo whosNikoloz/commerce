@@ -93,18 +93,29 @@ export async function renderInfoPage({ params, slug }: { params: Promise<{ lang:
 
   if (!pageConfig) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="flex items-center justify-center min-h-[400px] p-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-2">
-              Page Not Configured
+      <div className="container mx-auto px-4 py-20">
+        <div className="flex items-center justify-center min-h-[380px] p-8">
+          <div className="text-center space-y-4 max-w-lg mx-auto">
+            <h2 className="text-3xl font-semibold text-brand-primary dark:text-brand-primarydark">
+              Coming Soon
             </h2>
-            <p className="text-gray-600">
-              This info page has not been configured yet. Please add configuration for &quot;{slug}&quot; in your tenant settings.
+
+            <p className="text-text-subtle dark:text-text-subtledark leading-relaxed">
+              We’re preparing this page to bring you helpful information soon.
+              <br />
+              The <span className="font-medium text-text-light dark:text-text-lightdark">
+                “{slug}”
+              </span>{" "}
+              section is currently being set up.
+            </p>
+
+            <p className="text-sm text-text-subtle dark:text-text-subtledark">
+              Please check back a little later 🌿
             </p>
           </div>
         </div>
       </div>
+
     );
   }
 

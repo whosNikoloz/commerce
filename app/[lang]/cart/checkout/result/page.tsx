@@ -1,20 +1,28 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
+
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function CheckoutResultPage() {
   const sp = useSearchParams();
+
+  useParams<{ lang?: string; }>();
+  const dictionary = useDictionary();
+
   const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
 
   useEffect(() => {
     const provider = sp.get("provider"); // "bog" or "tbc"
-    // if TBC redirects with ?paymentId=..., read it; otherwise use your stored lastOrderId
     const paymentId = sp.get("paymentId");
-    const lastOrderId =
-      typeof window !== "undefined" ? sessionStorage.getItem("lastOrderId") : null;
 
-    // For BOG we’ll usually use the order id we created (shop_order_id / lastOrderId).
-    // For TBC, prefer the `paymentId` returned by TBC if present.
+    const lastOrderId =
+      typeof window !== "undefined"
+        ? sessionStorage.getItem("lastOrderId")
+        : null;
+
+    // Choose identifier based on provider
     const id = provider === "tbc" ? paymentId || lastOrderId : lastOrderId;
 
     if (!provider || !id) {
@@ -23,9 +31,10 @@ export default function CheckoutResultPage() {
       return;
     }
 
-    const endpoint = provider === "tbc"
-      ? `/api/payment/tbc/status/${encodeURIComponent(id)}`
-      : `/api/payment/bog/status/${encodeURIComponent(id)}`;
+    const endpoint =
+      provider === "tbc"
+        ? `/api/payment/tbc/status/${encodeURIComponent(id)}`
+        : `/api/payment/bog/status/${encodeURIComponent(id)}`;
 
     fetch(endpoint)
       .then((r) => r.json())
@@ -46,8 +55,13 @@ export default function CheckoutResultPage() {
       .catch(() => setStatus("failed"));
   }, [sp]);
 
-  if (status === "loading") return <div className="p-8">Checking payment…</div>;
-  if (status === "success") return <div className="p-8">✅ Payment successful. Thank you!</div>;
+  if (status === "loading") {
+    return <div className="p-8">{dictionary.checkout.status.loading}</div>;
+  }
 
-  return <div className="p-8">❌ Payment failed or cancelled. Please try again.</div>;
+  if (status === "success") {
+    return <div className="p-8">{dictionary.checkout.status.success}</div>;
+  }
+
+  return <div className="p-8">{dictionary.checkout.status.failed}</div>;
 }

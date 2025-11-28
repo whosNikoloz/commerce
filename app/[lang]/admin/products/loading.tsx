@@ -1,7 +1,9 @@
+import type { Locale } from "@/i18n.config";
+
 import React from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { getDictionary } from "@/lib/dictionaries";
-import type { Locale } from "@/i18n.config";
 
 export default async function Loading({ params }: { params: Promise<{ lang: Locale }> }) {
   const resolvedParams = await params;

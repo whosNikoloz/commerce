@@ -67,8 +67,6 @@ export default function Error({
             </p>
 
             <button
-              type="button"
-              onClick={() => reset()}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -82,6 +80,8 @@ export default function Error({
                 color: "#ffffff",
                 cursor: "pointer",
               }}
+              type="button"
+              onClick={() => reset()}
             >
               Try again
             </button>

@@ -17,6 +17,7 @@ import ClientUADataFix from "@/components/ClientUADataFix";
 import { generateFontClassNames } from "@/lib/loadTenantFonts";
 import FloatingCompareButton from "@/components/compare/FloatingCompareButton";
 import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
+// eslint-disable-next-line import/order
 import SmoothScroll from "@/components/SmoothScroll";
 
 function normalizeHost(host?: string) {

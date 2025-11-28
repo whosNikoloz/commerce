@@ -7,7 +7,7 @@ import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon, Layers, Sto
 
 import { ProfileIcon } from "../icons";
 
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { Sidebar, SidebarBody, SidebarLink, SidebarGroup } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTenant } from "@/app/context/tenantContext";
@@ -41,103 +41,120 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
         <IconHome className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       ),
     },
-
     {
-      label: "Orders",
-      href: `/${currentLang}/admin/orders`,
-      icon: (
-        <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Products",
-      href: `/${currentLang}/admin/products`,
-      icon: (
-        <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Customers",
-      href: `/${currentLang}/admin/customers`,
-      icon: (
-        <ProfileIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-
-    {
-      label: "Product Groups",
-      href: `/${currentLang}/admin/product-groups`,
-      icon: (
-        <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Categories",
-      href: `/${currentLang}/admin/categories`,
-      icon: (
-        <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Facets",
-      href: `/${currentLang}/admin/facets`,
-      icon: (
-        <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Brands",
-      href: `/${currentLang}/admin/brands`,
-      icon: (
-        <IconLetterB className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-
-    {
-      label: "Payments",
-      href: `/${currentLang}/admin/payments`,
-      icon: (
-        <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Shippings",
-      href: `/${currentLang}/admin/shipping`,
-      icon: (
-        <TruckIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Stores",
-      href: `/${currentLang}/admin/stores`,
-      icon: (
-        <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    ...(isFinaMerchant
-      ? [
+      label: "Catalog",
+      href: "#",
+      icon: <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+      items: [
         {
-          label: "Sync",
-          href: `/${currentLang}/admin/sync`,
+          label: "Products",
+          href: `/${currentLang}/admin/products`,
           icon: (
-            <IconFileDownloadFilled className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Product Groups",
+          href: `/${currentLang}/admin/product-groups`,
+          icon: (
+            <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Categories",
+          href: `/${currentLang}/admin/categories`,
+          icon: (
+            <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Facets",
+          href: `/${currentLang}/admin/facets`,
+          icon: (
+            <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Brands",
+          href: `/${currentLang}/admin/brands`,
+          icon: (
+            <IconLetterB className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
       ]
-      : []),
-
+    },
+    {
+      label: "Sales",
+      href: "#",
+      icon: <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+      items: [
+        {
+          label: "Orders",
+          href: `/${currentLang}/admin/orders`,
+          icon: (
+            <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Customers",
+          href: `/${currentLang}/admin/customers`,
+          icon: (
+            <ProfileIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Payments",
+          href: `/${currentLang}/admin/payments`,
+          icon: (
+            <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        {
+          label: "Shippings",
+          href: `/${currentLang}/admin/shipping`,
+          icon: (
+            <TruckIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+      ]
+    },
+    {
+      label: "Settings",
+      href: "#",
+      icon: <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+      items: [
+        {
+          label: "Stores",
+          href: `/${currentLang}/admin/stores`,
+          icon: (
+            <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+        ...(isFinaMerchant
+          ? [
+            {
+              label: "Sync",
+              href: `/${currentLang}/admin/sync`,
+              icon: (
+                <IconFileDownloadFilled className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              ),
+            },
+          ]
+          : []),
+        {
+          label: "Faqs",
+          href: `/${currentLang}/admin/faqs`,
+          icon: (
+            <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ),
+        },
+      ]
+    },
     {
       label: "Analytics",
       href: `/${currentLang}/admin/analytics`,
       icon: (
         <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-      ),
-    },
-    {
-      label: "Faqs",
-      href: `/${currentLang}/admin/faqs`,
-      icon: (
-        <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       ),
     },
   ];
@@ -177,12 +194,19 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
           <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {/* <Logo /> */}
             <div className="flex flex-col gap-2">
-              {links.map((link) => (
-                <SidebarLink
-                  key={link.href}
-                  link={link}
-                  onClick={() => isMobile && setOpen(false)}
-                />
+              {links.map((link, idx) => (
+                link.items ? (
+                  <SidebarGroup
+                    key={idx}
+                    link={link}
+                  />
+                ) : (
+                  <SidebarLink
+                    key={link.href}
+                    link={link}
+                    onClick={() => isMobile && setOpen(false)}
+                  />
+                )
               ))}
               <a
                 className={cn("flex items-center justify-start gap-2 group/sidebar py-2", "text-indigo-600 dark:text-indigo-400")}

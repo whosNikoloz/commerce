@@ -60,8 +60,6 @@ export default function GlobalError({
             </p>
 
             <button
-              type="button"
-              onClick={() => reset()}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -75,6 +73,8 @@ export default function GlobalError({
                 color: "#ffffff",
                 cursor: "pointer",
               }}
+              type="button"
+              onClick={() => reset()}
             >
               Try again
             </button>

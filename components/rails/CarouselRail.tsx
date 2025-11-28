@@ -22,7 +22,7 @@ export default function CarouselRail({ products, template = 1, columns: _columns
   const [isIntersecting, setIsIntersecting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const perPageDesktop = 7;
+  const perPageDesktop = 5;
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -326,7 +326,7 @@ export default function CategoryDropdown() {
 
                                               {/* Right: small icon (sub style) */}
                                               <div className="flex items-center gap-1">
-                                                <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-border/50 flex items-center justify-center overflow-hidden">
+                                                <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-border/50 flex items-center justify-center overflow-hidden">
                                                   {sub.images && sub.images[0] ? (
                                                     <Image
                                                       fill

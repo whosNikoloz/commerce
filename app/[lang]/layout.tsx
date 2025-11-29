@@ -196,6 +196,7 @@ export default async function RootLayout({
         <AnalyticsScripts seo={seo} />
       </head>
       <body
+        suppressHydrationWarning
         className={clsx(
           "min-h-screen bg-brand-surface dark:bg-brand-surfacedark font-sans antialiased ",
           fontClassNames,

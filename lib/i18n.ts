@@ -18,6 +18,7 @@ export function t(field: LocalizedText | LocalizedRich, locale: string): string 
   
   // Last resort: return first available value
   const firstKey = Object.keys(field)[0];
+
   return firstKey ? field[firstKey] : "";
 }
 

@@ -33,8 +33,8 @@ interface ProductCardProps {
 const templateStyles = {
   1: {
     card:
-      "rounded-2xl border bg-white shadow-[0_6px_24px_-8px_rgba(0,0,0,.20)] " +
-      "border-black/5 dark:bg-zinc-950 dark:border-white/10 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]",
+      "rounded-2xl border bg-white " +
+      "border-black/10 dark:bg-zinc-950 dark:border-white/10",
     imageRadius: "rounded-t-2xl",
     title: "text-[15px] font-semibold leading-snug line-clamp-2",
     cta: "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90",
@@ -42,8 +42,8 @@ const templateStyles = {
   },
   2: {
     card:
-      "rounded-xl border bg-white shadow " +
-      "border-black/10 dark:bg-zinc-950 dark:border-white/10 dark:shadow-none",
+      "rounded-xl border bg-white " +
+      "border-black/10 dark:bg-zinc-950 dark:border-white/10",
     imageRadius: "rounded-t-xl",
     title: "text-sm font-semibold leading-snug line-clamp-2",
     cta: "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-white/90",
@@ -271,12 +271,12 @@ export function ProductCard({
 
       {/* CONTENT */}
       <CardFooter className={cn("relative pointer-events-none flex flex-col items-start gap-2.5 flex-1", footerPadding)}>
-        <div itemScope className="flex items-baseline gap-2 w-full" itemProp="offers" itemType="https://schema.org/Offer">
+        <div itemScope className="flex items-baseline gap-1.5 sm:gap-2 w-full flex-wrap" itemProp="offers" itemType="https://schema.org/Offer">
           <meta content="GEL" itemProp="priceCurrency" />
           <meta content={displayPrice.toString()} itemProp="price" />
           <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
-          <span className={cn(priceSize, "font-bold text-zinc-900 dark:text-zinc-100")}>{formatPrice(displayPrice)}</span>
-          {hasDiscount && <span className={cn(oldPriceSize, "line-through", S.oldPrice)}>{formatPrice(product.price)}</span>}
+          <span className={cn(priceSize, "font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap")}>{formatPrice(displayPrice)}</span>
+          {hasDiscount && <span className={cn(oldPriceSize, "line-through whitespace-nowrap", S.oldPrice)}>{formatPrice(product.price)}</span>}
         </div>
         <div className="mt-auto w-full space-y-2.5">
           <h3

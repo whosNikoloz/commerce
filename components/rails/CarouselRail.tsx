@@ -120,13 +120,13 @@ export default function CarouselRail({ products, template = 1, columns: _columns
           gap: "0.75rem",
           pagination: false,
           arrows: true,
-          drag: "free",
-          trimSpace: true,    
-          snap: false,
-          omitEnd: true,      
+          drag: true,
+          trimSpace: true,
+          snap: true,
+          omitEnd: false,
           focus: 0,
-          perMove: 0,          
-          flickPower: 500,
+          perMove: 1,
+          flickPower: 300,
           breakpoints: {
             2000: { perPage: perPageDesktop, gap: "0.75rem" },
             1280: { perPage: 7, gap: "0.75rem" },
@@ -136,7 +136,7 @@ export default function CarouselRail({ products, template = 1, columns: _columns
             480:  { perPage: 2, gap: "0.5rem" },
           },
 
-         
+
         }}
       >
         {products.map((p) => (

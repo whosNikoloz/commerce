@@ -33,6 +33,7 @@ export async function getDictionary(
 
   // 2. Second priority: Static files (only for supported static locales)
   const staticKey = normalizedLocale as BaseLocale;
+
   if (STATIC_SUPPORTED.includes(staticKey) && staticLoaders[staticKey]) {
     try {
       return await staticLoaders[staticKey]();

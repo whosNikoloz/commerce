@@ -43,16 +43,16 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
         autoplay: data.autoplay ?? false,
         interval: data.autoplayInterval || 3000,
         pauseOnHover: true,
-        trimSpace: false,
+        trimSpace: true,
         focus: 0,
-        omitEnd: true,
+        omitEnd: false,
         breakpoints: {
           640: {
             perPage: 2.5,
             gap: "0.5rem",
             arrows: false,
             drag: true,
-            trimSpace: false,
+            trimSpace: true,
             focus: 0,
             padding: 0,
           },
@@ -61,11 +61,12 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
             gap: "0.75rem",
             arrows: false,
             drag: true,
-            trimSpace: false,
+            trimSpace: true,
           },
           1024: {
             perPage: 3,
             gap: "0.875rem",
+            trimSpace: true,
           },
         },
       })
@@ -118,25 +119,27 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
           </div>
         )}
 
-        <div className="w-full flex flex-row items-center gap-2 md:gap-3 overflow-visible">
-          {/* Static "All Categories" Card */}
+        <div className="flex items-center gap-3 md:gap-4">
+          {/* Fixed "All Categories" Card */}
           {data.showAllCard && (
-            <Link className="w-24 sm:w-28 md:w-36 lg:w-40 flex-shrink-0" href={data.allCategoriesHref || "/categories"}>
-              <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 cursor-pointer overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
-                  <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
-                  <p className="text-[10px] sm:text-xs md:text-sm font-semibold text-white text-center">
-                    {t(data.allCardText || { ka: "ყველა", en: "All" }, locale)}
-                  </p>
+            <div className="flex-shrink-0">
+              <Link className="block" href={data.allCategoriesHref || "/categories"}>
+                <div className="h-32 sm:h-40 md:h-48 lg:h-56 w-24 sm:w-28 md:w-36 lg:w-40 cursor-pointer overflow-hidden rounded-lg border border-border transition-all duration-300 hover:-translate-y-1">
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
+                    <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-foreground" />
+                    <p className="text-[10px] sm:text-xs md:text-sm font-semibold text-foreground text-center">
+                      {t(data.allCardText || { ka: "ყველა", en: "All" }, locale)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </div>
           )}
 
           {/* Splide Carousel */}
-          <div className="flex-1 min-w-0 overflow-visible">
-            <div ref={containerRef} className="splide overflow-visible">
-              <div className="splide__track overflow-visible">
+          <div className="flex-1 min-w-0">
+            <div ref={containerRef} className="splide">
+              <div className="splide__track">
                 <ul className="splide__list">
                   {displayCategories.map((category) => {
                     const imageUrl = category.images && category.images.length > 0
@@ -145,9 +148,9 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                     const hasError = imageErrors.has(category.id)
 
                     return (
-                      <li key={category.id} className="splide__slide h-32 sm:h-40 md:h-48 lg:h-56">
+                      <li key={category.id} className="splide__slide">
                         <Link className="block h-full" href={`/category/${category.id}`}>
-                          <div className="group relative h-full w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-gray-100 to-gray-200">
+                          <div className="group relative h-32 sm:h-40 md:h-48 lg:h-56 w-full cursor-pointer overflow-hidden rounded-lg border border-border transition-all duration-300 hover:-translate-y-1">
                             {/* Image */}
                             <Image
                               fill
@@ -158,12 +161,9 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                               onError={() => handleImageError(category.id)}
                             />
 
-                            {/* Overlay with gradient - appears on hover */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                            {/* Text Label - appears on hover */}
-                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 opacity-0 transform translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
-                              <p className="text-white text-xs sm:text-sm md:text-base font-semibold text-center leading-tight drop-shadow-lg">
+                            {/* Text Label - always visible at bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-background/80 backdrop-blur-sm">
+                              <p className="text-foreground text-xs sm:text-sm md:text-base font-semibold text-center leading-tight">
                                 {category.name}
                               </p>
                             </div>

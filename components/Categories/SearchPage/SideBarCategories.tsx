@@ -79,10 +79,7 @@ export default function SideBarCategories(props: ProductFiltersProps) {
           side="left"
         >
           <SheetHeader className="p-6 pb-4 border-b border-border/50">
-            <SheetTitle className="text-foreground font-bold flex items-center gap-2">
-              <span className="w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
-              კატეგორიები
-            </SheetTitle>
+            <SheetTitle className="text-foreground font-bold flex items-center gap-2" />
           </SheetHeader>
 
           <div className="px-6 pb-6 overflow-y-auto max-h-[calc(100vh-80px)]">

@@ -92,7 +92,7 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
             key={`${section.type}-${section.order}-${index}`}
             fallback={getLoadingSkeleton(section.type)}
           >
-            <div className={isPriority ? "px-4 md:px-8 lg:px-16 xl:px-20 2xl:px-32 pt-6 pb-12" : "animate-fadeIn px-4 md:px-8 lg:px-16 xl:px-20 2xl:px-32 pt-6 pb-12"}>
+            <div className={isPriority ? "mt-10 px-4 md:px-8 lg:px-16 xl:px-20 2xl:px-32" : "animate-fadeIn px-4 md:px-8 lg:px-16 xl:px-20 2xl:px-32"}>
               <Component data={section.data} locale={locale} />
             </div>
           </Suspense>

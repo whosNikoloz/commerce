@@ -3,6 +3,7 @@ import React, { useState, createContext, useContext, ComponentPropsWithoutRef, u
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX, IconChevronDown, IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
+
 import { cn } from "@/lib/utils";
 
 export interface Links {
@@ -219,11 +220,11 @@ export const SidebarGroup = ({
   return (
     <div className={cn("flex flex-col", className)} {...props}>
       <button
-        onClick={handleToggle}
         className={cn(
           "flex items-center justify-start gap-2 group/sidebar py-2 w-full text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors",
           className
         )}
+        onClick={handleToggle}
       >
         <span className="shrink-0 flex items-center justify-center w-5 h-5">
           {link.icon}
@@ -249,11 +250,11 @@ export const SidebarGroup = ({
       <AnimatePresence>
         {isExpanded && open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
             className="overflow-hidden pl-4 flex flex-col gap-1 mt-1 border-l border-neutral-200 dark:border-neutral-700 ml-2.5"
+            exit={{ height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
           >
             {link.items?.map((subLink) => (
               <SidebarLink key={subLink.href} link={subLink} />

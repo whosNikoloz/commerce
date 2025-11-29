@@ -12,9 +12,9 @@ import ProductGrid from "../ProductGrid";
 import { SkeletonProductGrid } from "../SkeletonProductGrid";
 
 import ProductHeader from "./ProductHeader";
-import ProductPagination from "./ProductPagination";
 import SideBarCategories from "./SideBarCategories";
 
+import Pagination from "@/components/ui/Pagination";
 import { searchProducts, mapSort } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { cn } from "@/lib/utils";
@@ -156,7 +156,7 @@ export default function SearchPage({ query = "" }: { query?: string }) {
               <ProductGrid products={products} viewMode={viewMode} />
             )}
 
-            <ProductPagination
+            <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}

@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Facebook, Instagram, Twitter, Youtube, Linkedin,
-  Mail, Phone, MapPin, Clock
+  Mail, Phone, MapPin, Clock, Languages
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,19 @@ export function Footer() {
   const { config, isLoading } = useTenant();
   const t = useTranslation();
   const params = useParams();
+  const pathname = usePathname();
   const lng = (params.lang as string) || "ka";
+
+  const availableLanguages = config?.siteConfig?.locales || ["ka", "en"];
+  const getLanguageName = (code: string) => {
+    const names: Record<string, string> = {
+      ka: "ქართული",
+      en: "English",
+      ru: "Русский",
+    };
+
+    return names[code] || code.toUpperCase();
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -355,10 +367,38 @@ export function Footer() {
 
         {/* BOTTOM BAR */}
         <div className="mt-8 flex flex-col gap-4 border-t border-zinc-800 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 text-sm">
             <p className="text-zinc-500">
               © {year} {site.shortName || site.name}. {labels.allRightsReserved}
             </p>
+
+            {/* Language Switcher - Mobile Friendly */}
+            {availableLanguages.length > 1 && (
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-zinc-400" />
+                <div className="flex gap-2">
+                  {availableLanguages.map((langCode) => {
+                    const newPath = pathname.replace(`/${lng}`, `/${langCode}`);
+                    const isActive = lng === langCode;
+
+                    return (
+                      <Link
+                        key={langCode}
+                        className={`px-2 py-1 rounded text-xs transition-colors ${
+                          isActive
+                            ? "bg-zinc-800 text-white font-semibold"
+                            : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                        }`}
+                        href={newPath}
+                      >
+                        {getLanguageName(langCode)}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {socials.length > 0 && (
               <div className="flex gap-4">
                 {socials.map(({ href, label, icon: Icon }) => (

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { i18nPageMetadataAsync, getActiveSite } from "@/lib/seo";
-import { Locale } from "@/i18n.config";
+import { Locale, locales } from "@/i18n.config";
 import { getTenantByHost } from "@/lib/getTenantByHost";
 import HomeRenderer from "@/components/Home/HomeRenderer";
 
@@ -46,5 +46,26 @@ export default async function HomePage({
   // Get tenant configuration dynamically from API
   const tenant = await getTenantByHost(host);
 
-  return <HomeRenderer locale={lang} tenant={tenant} />;
+  // Get original pathname to detect actual locale
+  const originalPathname = headersList.get("x-pathname") || "";
+  const availableLocales = tenant?.siteConfig?.locales || [...locales];
+  const tenantDefaultLocale = tenant?.siteConfig?.localeDefault || "ka";
+
+  // Detect if the original URL had a locale prefix
+  const pathParts = originalPathname.split("/").filter(Boolean);
+  const firstSegment = pathParts[0]?.toLowerCase();
+  const hasLocaleInPath = firstSegment && /^[a-z]{2,3}$/.test(firstSegment);
+
+  // Determine the actual locale to use
+  let actualLocale: string;
+
+  if (hasLocaleInPath && availableLocales.includes(firstSegment)) {
+    // User explicitly requested a locale in the URL
+    actualLocale = firstSegment;
+  } else {
+    // No locale in original path, use tenant's default
+    actualLocale = tenantDefaultLocale;
+  }
+
+  return <HomeRenderer locale={actualLocale as Locale} tenant={tenant} />;
 }

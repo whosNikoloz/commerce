@@ -8,7 +8,18 @@ export const isLocale = (v: string): v is Locale =>
   (locales as readonly string[]).includes(v as Locale);
 
 export const toLocale = (v: string): Locale => (isLocale(v) ? v : defaultLocale);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+/**
+ * Check if a string looks like a valid locale code
+ * Accepts 2-3 lowercase letters (e.g., "en", "ka", "de", "uz", "ru")
+ * This allows dynamic locales from tenant config to pass through middleware
+ */
+function isValidLocaleFormat(v: string): boolean {
+  // Match 2-3 lowercase letters (locale codes)
+  return /^[a-z]{2,3}$/.test(v);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _getBestLocale(req: NextRequest): Locale {
   const headers: Record<string, string> = {};
 
@@ -19,10 +30,21 @@ function _getBestLocale(req: NextRequest): Locale {
   return toLocale(matched);
 }
 
-function pathLocale(pathname: string): Locale | null {
+/**
+ * Extract locale from pathname
+ * Returns the locale string if it looks like a valid locale format
+ * This allows dynamic locales from tenant config to work
+ */
+function pathLocale(pathname: string): string | null {
   const seg = pathname.split("/")[1] || "";
 
-  return isLocale(seg) ? seg : null;
+  // Accept any valid locale format (2-3 lowercase letters)
+  // Pages will validate against tenant config
+  if (isValidLocaleFormat(seg)) {
+    return seg;
+  }
+
+  return null;
 }
 
 export function middleware(request: NextRequest) {
@@ -42,20 +64,23 @@ export function middleware(request: NextRequest) {
   const locInPath = pathLocale(pathname);
 
   if (!locInPath) {
-    // No locale in path - rewrite to default locale (ka) without redirecting
+    // No locale in path - rewrite to static default locale without redirecting
+    // The layout will detect the actual tenant default and handle redirects if needed
     const url = request.nextUrl.clone();
 
     url.pathname = `/${defaultLocale}${pathname}`;
 
-    return NextResponse.rewrite(url);
+    // Add original pathname as header for layout to use
+    const response = NextResponse.rewrite(url);
+
+    response.headers.set("x-pathname", pathname);
+
+    return response;
   }
 
-  // 4) If default locale (ka) is explicitly in URL, redirect to hide it
-  if (locInPath === defaultLocale) {
-    const pathWithoutLocale = pathname.replace(`/${defaultLocale}`, '') || '/';
-
-    return NextResponse.redirect(new URL(`${pathWithoutLocale}${search}`, request.url));
-  }
+  // 4) Locale is in path - let it pass through
+  // The layout will handle tenant-specific default locale logic and redirects
+  // This allows dynamic tenant defaults to work properly
 
   const adminToken = request.cookies.get("admin_token")?.value;
   const isAdminRoot = pathname === `/${locInPath}/admin`;
@@ -69,8 +94,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Add pathname as header for layout to use
+  const response = NextResponse.next();
 
-  return NextResponse.next();
+  response.headers.set("x-pathname", pathname);
+
+  return response;
 }
 
 export const config = {

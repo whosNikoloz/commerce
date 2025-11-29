@@ -6,24 +6,27 @@ import { useParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { getDictionary } from "@/lib/dictionaries";
+import { useTenant } from "@/app/context/tenantContext";
 
 const TranslationContext = createContext<any>({});
 
 export function TranslationProvider({ children }: { children: React.ReactNode }) {
   const params = useParams();
+  const { config: tenantConfig } = useTenant();
   const [translations, setTranslations] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const loadTranslations = async () => {
-      const dict = await getDictionary(params.lang as Locale);
+      // Use tenant config dictionaries if available, fallback to static files
+      const dict = await getDictionary(params.lang as Locale, tenantConfig);
 
       setTranslations(dict);
       setIsLoading(false);
     };
 
     loadTranslations();
-  }, [params.lang]);
+  }, [params.lang, tenantConfig]);
 
   if (isLoading) {
     return <div />;

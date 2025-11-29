@@ -40,7 +40,7 @@ export async function generateMetadata({
     || (site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo);
 
   return i18nPageMetadataAsync({
-    title: dynamicPage.metadata.title[lang],
+    title: dynamicPage.metadata.title[lang] ?? "",
     description: dynamicPage.metadata.description[lang],
     lang,
     path: `/${slug}`,

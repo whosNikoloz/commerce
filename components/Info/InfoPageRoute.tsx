@@ -119,7 +119,7 @@ export async function renderInfoPage({ params, slug }: { params: Promise<{ lang:
     );
   }
 
-  const pageTitle = pageConfig.metadata.title[lang];
+  const pageTitle = pageConfig.metadata.title[lang] ?? '';
 
   return (
     <>

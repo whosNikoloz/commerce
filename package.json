@@ -75,6 +75,7 @@
     "embla-carousel": "^8.6.0",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "flag-icons": "^7.5.0",
     "framer-motion": "^12.23.12",
     "intl-messageformat": "^10.5.0",
     "isomorphic-dompurify": "^2.30.1",

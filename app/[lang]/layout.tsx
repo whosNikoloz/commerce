@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 
 import clsx from "clsx";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { Providers } from "./providers";
 import { LayoutWrapper } from "./LayoutWrapper";
@@ -95,15 +96,46 @@ export default async function RootLayout({
 }) {
   const { lang } = await params;
 
-  const safeLang = (locales as readonly string[]).includes(lang)
-    ? (lang as (typeof locales)[number])
-    : defaultLocale;
-
-  const dictionary = await getDictionary(safeLang);
-
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
   const tenant = await getTenantByHost(host);
+  const requestHeaders = await headers();
+  const originalPathname = requestHeaders.get("x-pathname") || "";
+
+  // Get available locales from tenant config
+  const availableLocales = tenant?.siteConfig?.locales || [...locales];
+  const tenantDefaultLocale = tenant?.siteConfig?.localeDefault || defaultLocale;
+  const normalizedLang = lang.toLowerCase();
+
+  // Detect if the original URL had a locale prefix
+  const pathParts = originalPathname.split("/").filter(Boolean);
+  const firstSegment = pathParts[0]?.toLowerCase();
+  const hasLocaleInPath = firstSegment && /^[a-z]{2,3}$/.test(firstSegment);
+
+  // Determine the actual locale to use
+  let actualLocale: string;
+
+  if (hasLocaleInPath && availableLocales.includes(firstSegment)) {
+    // User explicitly requested a locale in the URL
+    actualLocale = firstSegment;
+
+    // If the requested locale is the tenant's default, redirect to hide it
+    if (actualLocale === tenantDefaultLocale) {
+      const pathWithoutLocale = originalPathname.replace(`/${actualLocale}`, "") || "/";
+      redirect(pathWithoutLocale);
+    }
+  } else {
+    // No locale in original path, use tenant's default
+    actualLocale = tenantDefaultLocale;
+  }
+
+  // Validate the actual locale
+  const safeLang = availableLocales.includes(actualLocale)
+    ? actualLocale
+    : tenantDefaultLocale;
+
+  // Use tenant config dictionaries if available, fallback to static files
+  const dictionary = await getDictionary(safeLang, tenant);
   const site = tenant.siteConfig;
   const seo = site.seo || {};
   const style = themeToStyle(tenant.theme);

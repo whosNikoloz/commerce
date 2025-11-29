@@ -10,7 +10,20 @@ import { z } from "zod";
 import { lazy } from "react";
 
 /* ================= Shared localized schema ================= */
-const LocalizedTextSchema = z.object({ ka: z.string(), en: z.string() });
+// Dynamic localized text schema - requires "en" as fallback, allows any other locale keys
+// This supports dynamic languages from tenant config (e.g., "en", "ka", "de", "uz", "ru")
+const LocalizedTextSchema = z
+  .object({
+    en: z.string(), // English is required as fallback
+  })
+  .catchall(z.string()) // Allow any other locale keys (ka, de, uz, ru, etc.)
+  .refine(
+    (data) => {
+      // Ensure at least "en" exists
+      return typeof data.en === "string";
+    },
+    { message: "English (en) translation is required" }
+  );
 
 /* ================= Common block schemas ================= */
 const CommercialBannerDataSchema = z.object({
@@ -201,7 +214,8 @@ const Template2HomepageSchema = z.object({
 });
 
 export type SectionComponent<T = any> = ComponentType<{ data: T; locale: "ka" | "en" }>;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type TemplateDefinition<TSectionType extends string = string, _TSectionInstance = any> = {

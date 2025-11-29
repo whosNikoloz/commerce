@@ -203,177 +203,101 @@ export const ShoppingCartIcon = ({ size = 24, width, height, ...props }: IconSvg
   </svg>
 );
 
-export const GeorgiaIconMono = ({ size = 24, width, height, ...props }: IconSvgProps) => (
-  <svg
-    aria-hidden="true"
-    height={size || height}
-    role="img"
-    style={{ display: "block" }}
-    viewBox="0 0 36 36"
-    width={size || width}
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    {/* Background */}
-    <rect fill="#fff" height="36" width="36" />
 
-    {/* Central Cross */}
-    <rect fill="#000" height="36" width="6" x="15" />
-    <rect fill="#000" height="6" width="36" y="15" />
-
-    {/* Small Crosses */}
-    {/* Top-left */}
-    <g fill="#000">
-      <rect height="6" width="1.5" x="6.5" y="6" />
-      <rect height="1.5" width="6" x="4" y="8.5" />
-    </g>
-
-    {/* Top-right */}
-    <g fill="#000">
-      <rect height="6" width="1.5" x="28" y="6" />
-      <rect height="1.5" width="6" x="25.5" y="8.5" />
-    </g>
-
-    {/* Bottom-left */}
-    <g fill="#000">
-      <rect height="6" width="1.5" x="6.5" y="24" />
-      <rect height="1.5" width="6" x="4" y="26.5" />
-    </g>
-
-    {/* Bottom-right */}
-    <g fill="#000">
-      <rect height="6" width="1.5" x="28" y="24" />
-      <rect height="1.5" width="6" x="25.5" y="26.5" />
-    </g>
-  </svg>
-);
-
-
-export const EnglishIconMono = ({ size = 24, width, height, ...props }: IconSvgProps) => (
-  <svg
-    aria-hidden="true"
-    height={size || height}
-    role="img"
-    style={{ display: "block" }}
-    viewBox="0 0 512 512"
-    width={size || width}
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    {/* Background */}
-    <rect fill="#fff" height="512" width="512" />
-
-    {/* Central Cross */}
-    <rect fill="#000" height="64" width="512" x="0" y="224" />
-    <rect fill="#000" height="512" width="64" x="224" y="0" />
-
-    {/* Diagonal Crosses */}
-    <polygon
-      fill="#000"
-      points="0,32 32,0 512,480 480,512"
-    />
-    <polygon
-      fill="#000"
-      points="480,0 512,32 32,512 0,480"
-    />
-  </svg>
-);
+// export const GeorgiaIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
+//   <svg
+//     aria-hidden="true"
+//     className="iconify iconify--twemoji"
+//     preserveAspectRatio="xMidYMid meet"
+//     role="img"
+//     viewBox="0 0 36 36"
+//     width={size || width}
+//     xmlns="http://www.w3.org/2000/svg"
+//     xmlnsXlink="http://www.w3.org/1999/xlink"
+//     // eslint-disable-next-line react/jsx-sort-props
+//     height={size || height}
+//     // remove global fill + prevent theme inheritance
+//     // eslint-disable-next-line react/jsx-sort-props
+//     style={{ display: "block", color: "transparent" }}
+//     {...props}
+//   >
+//     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+//     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
+//     <g id="SVGRepo_iconCarrier">
+//       <path d="M32 5H20.5v10.5H36V9a4 4 0 0 0-4-4z" fill="#EEE" />
+//       <path d="M20.5 5h-5v10.5H0v5h15.5V31h5V20.5H36v-5H20.5z" fill="#E8112D" />
+//       <path
+//         d="M28.915 9.585a13.58 13.58 0 0 1 .221-1.86a7.18 7.18 0 0 1-1.77 0c.117.615.19 1.237.221 1.86a13.58 13.58 0 0 1-1.86-.221a7.18 7.18 0 0 1 0 1.77a13.56 13.56 0 0 1 1.86-.221a13.58 13.58 0 0 1-.221 1.86a7.18 7.18 0 0 1 1.77 0a13.56 13.56 0 0 1-.221-1.86a13.58 13.58 0 0 1 1.86.221a7.18 7.18 0 0 1 0-1.77c-.616.118-1.237.191-1.86.221z"
+//         fill="#E8112D"
+//       />
+//       <path d="M15.5 5H4a4 4 0 0 0-4 4v6.5h15.5V5z" fill="#EEE" />
+//       <path
+//         d="M8.415 9.585a13.58 13.58 0 0 1 .221-1.86a7.18 7.18 0 0 1-1.77 0c.117.615.19 1.237.221 1.86a13.58 13.58 0 0 1-1.86-.221a7.18 7.18 0 0 1 0 1.77a13.56 13.56 0 0 1 1.86-.221a13.58 13.58 0 0 1-.221 1.86a7.18 7.18 0 0 1 1.77 0a13.56 13.56 0 0 1-.221-1.86a13.58 13.58 0 0 1 1.86.221a7.18 7.18 0 0 1 0-1.77c-.616.118-1.237.191-1.86.221z"
+//         fill="#E8112D"
+//       />
+//       <path d="M36 27v-6.5H20.5V31H32a4 4 0 0 0 4-4z" fill="#EEE" />
+//       <path
+//         d="M28.915 26.415c.031.623.104 1.244.221 1.86a7.18 7.18 0 0 0-1.77 0c.117-.615.19-1.237.221-1.86a13.58 13.58 0 0 0-1.86.221a7.18 7.18 0 0 0 0-1.77c.615.117 1.237.19 1.86.221a13.58 13.58 0 0 0-.221-1.86a7.18 7.18 0 0 0 1.77 0a13.56 13.56 0 0 0-.221 1.86a13.58 13.58 0 0 0 1.86-.221a7.18 7.18 0 0 0 0 1.77a13.274 13.274 0 0 0-1.86-.221z"
+//         fill="#E8112D"
+//       />
+//       <path d="M15.5 20.5H0V27a4 4 0 0 0 4 4h11.5V20.5z" fill="#EEE" />
+//       <path
+//         d="M8.415 26.415c.031.623.104 1.244.221 1.86a7.18 7.18 0 0 0-1.77 0c.117-.615.19-1.237.221-1.86a13.58 13.58 0 0 0-1.86.221a7.18 7.18 0 0 0 0-1.77c.615.117 1.237.19 1.86.221a13.58 13.58 0 0 0-.221-1.86a7.18 7.18 0 0 0 1.77 0a13.56 13.56 0 0 0-.221 1.86a13.58 13.58 0 0 0 1.86-.221a7.18 7.18 0 0 0 0 1.77a13.274 13.274 0 0 0-1.86-.221z"
+//         fill="#E8112D"
+//       />
+//     </g>
+//   </svg>
+// );
 
 
+// export const EnglishIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
+//   <svg
+//     fill="#000000"
+//     height={size || height}
+//     id="Layer_1"
+//     version="1.1"
+//     viewBox="0 0 512 512"
+//     width={size || width}
+//     xmlSpace="preserve"
+//     xmlns="http://www.w3.org/2000/svg"
+//     {...props}
+//   >
+//     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+//     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
+//     <g id="SVGRepo_iconCarrier">
+//       {" "}
+//       <path
+//         d="M473.655,88.276H38.345C17.167,88.276,0,105.443,0,126.621V385.38 c0,21.177,17.167,38.345,38.345,38.345h435.31c21.177,0,38.345-17.167,38.345-38.345V126.621 C512,105.443,494.833,88.276,473.655,88.276z"
+//         style={{ fill: "#41479B" }}
+//       />{" "}
+//       <path
+//         d="M511.469,120.282c-3.022-18.159-18.797-32.007-37.814-32.007h-9.977l-163.54,107.147V88.276h-88.276 v107.147L48.322,88.276h-9.977c-19.017,0-34.792,13.847-37.814,32.007l139.778,91.58H0v88.276h140.309L0.531,391.717 c3.022,18.159,18.797,32.007,37.814,32.007h9.977l163.54-107.147v107.147h88.276V316.577l163.54,107.147h9.977 c19.017,0,34.792-13.847,37.814-32.007l-139.778-91.58H512v-88.276H371.691L511.469,120.282z"
+//         style={{ fill: "#F5F5F5" }}
+//       />{" "}
+//       <g>
+//         {" "}
+//         <polygon
+//           points="282.483,88.276 229.517,88.276 229.517,229.517 0,229.517 0,282.483 229.517,282.483 229.517,423.724 282.483,423.724 282.483,282.483 512,282.483 512,229.517 282.483,229.517 "
+//           style={{ fill: "#FF4B55" }}
+//         />{" "}
+//         <path
+//           d="M24.793,421.252l186.583-121.114h-32.428L9.224,410.31 C13.377,415.157,18.714,418.955,24.793,421.252z"
+//           style={{ fill: "#FF4B55" }}
+//         />{" "}
+//         <path
+//           d="M346.388,300.138H313.96l180.716,117.305c5.057-3.321,9.277-7.807,12.287-13.075L346.388,300.138z"
+//           style={{ fill: "#FF4B55" }}
+//         />{" "}
+//         <path
+//           d="M4.049,109.475l157.73,102.387h32.428L15.475,95.842C10.676,99.414,6.749,104.084,4.049,109.475z"
+//           style={{ fill: "#FF4B55" }}
+//         />{" "}
+//         <path
+//           d="M332.566,211.862l170.035-110.375c-4.199-4.831-9.578-8.607-15.699-10.86L300.138,211.862H332.566z"
+//           style={{ fill: "#FF4B55" }}
+//         />{" "}
+//       </g>{" "}
+//     </g>
+//   </svg>
+// );
 
-export const GeorgiaIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
-  <svg
-    aria-hidden="true"
-    className="iconify iconify--twemoji"
-    preserveAspectRatio="xMidYMid meet"
-    role="img"
-    viewBox="0 0 36 36"
-    width={size || width}
-    xmlns="http://www.w3.org/2000/svg"
-    xmlnsXlink="http://www.w3.org/1999/xlink"
-    // eslint-disable-next-line react/jsx-sort-props
-    height={size || height}
-    // remove global fill + prevent theme inheritance
-    // eslint-disable-next-line react/jsx-sort-props
-    style={{ display: "block", color: "transparent" }}
-    {...props}
-  >
-    <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
-    <g id="SVGRepo_iconCarrier">
-      <path d="M32 5H20.5v10.5H36V9a4 4 0 0 0-4-4z" fill="#EEE" />
-      <path d="M20.5 5h-5v10.5H0v5h15.5V31h5V20.5H36v-5H20.5z" fill="#E8112D" />
-      <path
-        d="M28.915 9.585a13.58 13.58 0 0 1 .221-1.86a7.18 7.18 0 0 1-1.77 0c.117.615.19 1.237.221 1.86a13.58 13.58 0 0 1-1.86-.221a7.18 7.18 0 0 1 0 1.77a13.56 13.56 0 0 1 1.86-.221a13.58 13.58 0 0 1-.221 1.86a7.18 7.18 0 0 1 1.77 0a13.56 13.56 0 0 1-.221-1.86a13.58 13.58 0 0 1 1.86.221a7.18 7.18 0 0 1 0-1.77c-.616.118-1.237.191-1.86.221z"
-        fill="#E8112D"
-      />
-      <path d="M15.5 5H4a4 4 0 0 0-4 4v6.5h15.5V5z" fill="#EEE" />
-      <path
-        d="M8.415 9.585a13.58 13.58 0 0 1 .221-1.86a7.18 7.18 0 0 1-1.77 0c.117.615.19 1.237.221 1.86a13.58 13.58 0 0 1-1.86-.221a7.18 7.18 0 0 1 0 1.77a13.56 13.56 0 0 1 1.86-.221a13.58 13.58 0 0 1-.221 1.86a7.18 7.18 0 0 1 1.77 0a13.56 13.56 0 0 1-.221-1.86a13.58 13.58 0 0 1 1.86.221a7.18 7.18 0 0 1 0-1.77c-.616.118-1.237.191-1.86.221z"
-        fill="#E8112D"
-      />
-      <path d="M36 27v-6.5H20.5V31H32a4 4 0 0 0 4-4z" fill="#EEE" />
-      <path
-        d="M28.915 26.415c.031.623.104 1.244.221 1.86a7.18 7.18 0 0 0-1.77 0c.117-.615.19-1.237.221-1.86a13.58 13.58 0 0 0-1.86.221a7.18 7.18 0 0 0 0-1.77c.615.117 1.237.19 1.86.221a13.58 13.58 0 0 0-.221-1.86a7.18 7.18 0 0 0 1.77 0a13.56 13.56 0 0 0-.221 1.86a13.58 13.58 0 0 0 1.86-.221a7.18 7.18 0 0 0 0 1.77a13.274 13.274 0 0 0-1.86-.221z"
-        fill="#E8112D"
-      />
-      <path d="M15.5 20.5H0V27a4 4 0 0 0 4 4h11.5V20.5z" fill="#EEE" />
-      <path
-        d="M8.415 26.415c.031.623.104 1.244.221 1.86a7.18 7.18 0 0 0-1.77 0c.117-.615.19-1.237.221-1.86a13.58 13.58 0 0 0-1.86.221a7.18 7.18 0 0 0 0-1.77c.615.117 1.237.19 1.86.221a13.58 13.58 0 0 0-.221-1.86a7.18 7.18 0 0 0 1.77 0a13.56 13.56 0 0 0-.221 1.86a13.58 13.58 0 0 0 1.86-.221a7.18 7.18 0 0 0 0 1.77a13.274 13.274 0 0 0-1.86-.221z"
-        fill="#E8112D"
-      />
-    </g>
-  </svg>
-);
-
-
-export const EnglishIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
-  <svg
-    fill="#000000"
-    height={size || height}
-    id="Layer_1"
-    version="1.1"
-    viewBox="0 0 512 512"
-    width={size || width}
-    xmlSpace="preserve"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
-    <g id="SVGRepo_iconCarrier">
-      {" "}
-      <path
-        d="M473.655,88.276H38.345C17.167,88.276,0,105.443,0,126.621V385.38 c0,21.177,17.167,38.345,38.345,38.345h435.31c21.177,0,38.345-17.167,38.345-38.345V126.621 C512,105.443,494.833,88.276,473.655,88.276z"
-        style={{ fill: "#41479B" }}
-      />{" "}
-      <path
-        d="M511.469,120.282c-3.022-18.159-18.797-32.007-37.814-32.007h-9.977l-163.54,107.147V88.276h-88.276 v107.147L48.322,88.276h-9.977c-19.017,0-34.792,13.847-37.814,32.007l139.778,91.58H0v88.276h140.309L0.531,391.717 c3.022,18.159,18.797,32.007,37.814,32.007h9.977l163.54-107.147v107.147h88.276V316.577l163.54,107.147h9.977 c19.017,0,34.792-13.847,37.814-32.007l-139.778-91.58H512v-88.276H371.691L511.469,120.282z"
-        style={{ fill: "#F5F5F5" }}
-      />{" "}
-      <g>
-        {" "}
-        <polygon
-          points="282.483,88.276 229.517,88.276 229.517,229.517 0,229.517 0,282.483 229.517,282.483 229.517,423.724 282.483,423.724 282.483,282.483 512,282.483 512,229.517 282.483,229.517 "
-          style={{ fill: "#FF4B55" }}
-        />{" "}
-        <path
-          d="M24.793,421.252l186.583-121.114h-32.428L9.224,410.31 C13.377,415.157,18.714,418.955,24.793,421.252z"
-          style={{ fill: "#FF4B55" }}
-        />{" "}
-        <path
-          d="M346.388,300.138H313.96l180.716,117.305c5.057-3.321,9.277-7.807,12.287-13.075L346.388,300.138z"
-          style={{ fill: "#FF4B55" }}
-        />{" "}
-        <path
-          d="M4.049,109.475l157.73,102.387h32.428L15.475,95.842C10.676,99.414,6.749,104.084,4.049,109.475z"
-          style={{ fill: "#FF4B55" }}
-        />{" "}
-        <path
-          d="M332.566,211.862l170.035-110.375c-4.199-4.831-9.578-8.607-15.699-10.86L300.138,211.862H332.566z"
-          style={{ fill: "#FF4B55" }}
-        />{" "}
-      </g>{" "}
-    </g>
-  </svg>
-);

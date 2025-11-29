@@ -1,7 +1,8 @@
 "use client";
 
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Languages } from "lucide-react";
+import { useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,26 +11,63 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTenant } from "@/app/context/tenantContext";
+import { getLocales, getDefaultLocale } from "@/i18n.config";
+import { getLanguageName, getLanguageEmoji } from "@/lib/language-utils";
 
 export function LanguageToggle() {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useParams();
-  const currentLang = params.lang as string || 'ka';
+  const { config: tenantConfig } = useTenant();
 
-  const switchLanguage = (newLang: string) => {
-    // Replace the language in the current path
-    const segments = pathname.split('/');
+  // Get available locales and default locale from tenant config
+  const availableLocales = useMemo(() => {
+    return getLocales(tenantConfig);
+  }, [tenantConfig]);
 
-    if (segments[1] === 'en' || segments[1] === 'ka') {
-      segments[1] = newLang;
-    } else {
-      segments.splice(1, 0, newLang);
+  const defaultLocale = useMemo(() => {
+    return getDefaultLocale(tenantConfig);
+  }, [tenantConfig]);
+
+  // Detect current language from pathname
+  const currentLang = useMemo(() => {
+    if (!pathname) return defaultLocale;
+
+    // Extract locale from pathname (e.g., /en/admin or /ka/admin)
+    const segments = pathname.split("/").filter(Boolean);
+    const firstSegment = segments[0]?.toLowerCase();
+
+    // Check if first segment is a valid locale
+    if (firstSegment && availableLocales.includes(firstSegment)) {
+      return firstSegment;
     }
 
-    const newPath = segments.join('/');
+    // If no locale in path, it's the default locale
+    return defaultLocale;
+  }, [pathname, availableLocales, defaultLocale]);
 
-    router.push(newPath);
+  const switchLanguage = (newLang: string) => {
+    if (!pathname) return;
+
+    // Remove any existing locale prefix
+    const segments = pathname.split("/").filter(Boolean);
+    const firstSegment = segments[0]?.toLowerCase();
+
+    // If first segment is a locale, remove it
+    if (firstSegment && availableLocales.includes(firstSegment)) {
+      segments.shift(); // Remove the locale
+    }
+
+    // Reconstruct path
+    const pathWithoutLocale = "/" + segments.join("/");
+
+    // If switching to default locale, use path without locale prefix
+    if (newLang === defaultLocale) {
+      router.push(pathWithoutLocale);
+    } else {
+      // Add locale prefix for non-default languages
+      router.push(`/${newLang}${pathWithoutLocale}`);
+    }
   };
 
   return (
@@ -41,20 +79,16 @@ export function LanguageToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          className={currentLang === 'en' ? 'bg-accent' : ''}
-          onClick={() => switchLanguage('en')}
-        >
-          <span className="mr-2">🇬🇧</span>
-          English
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className={currentLang === 'ka' ? 'bg-accent' : ''}
-          onClick={() => switchLanguage('ka')}
-        >
-          <span className="mr-2">🇬🇪</span>
-          ქართული
-        </DropdownMenuItem>
+        {availableLocales.map((locale) => (
+          <DropdownMenuItem
+            key={locale}
+            className={currentLang === locale ? "bg-accent" : ""}
+            onClick={() => switchLanguage(locale)}
+          >
+            <span className="mr-2">{getLanguageEmoji(locale)}</span>
+            {getLanguageName(locale)}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

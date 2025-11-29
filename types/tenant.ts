@@ -1,6 +1,23 @@
 export type Locale = "ka" | "en";
-export type LocalizedText = { ka: string; en: string };
-export type LocalizedRich = { ka: string; en: string };
+
+/**
+ * Dynamic localized text that supports any locale from tenant config
+ * Keys are locale codes (e.g., "en", "ka", "de", "uz", "ru")
+ * At minimum should include "en" and "ka" for backward compatibility
+ */
+export type LocalizedText = Record<string, string> & {
+  en: string; // English is required as fallback
+  ka?: string; // Georgian is optional but commonly used
+};
+
+/**
+ * Dynamic localized rich text (same structure as LocalizedText)
+ * Supports any locale from tenant config
+ */
+export type LocalizedRich = Record<string, string> & {
+  en: string; // English is required as fallback
+  ka?: string; // Georgian is optional but commonly used
+};
 
 export type ThemeVars = {
   mode: "light" | "dark";
@@ -419,26 +436,31 @@ export type UIConfig = {
 };
 
 
+// Dictionary type - matches the structure of en.json/ka.json
+export type Dictionary = Record<string, any>;
+
 export type TenantConfig =
   | {
-    templateId: 1;
-    themeColor: string;
-    theme: ThemeVars;
-    homepage: Template1Homepage;
-    infoPages?: InfoPagesConfig;
-    dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
-    siteConfig: SiteConfig;
-    ui?: UIConfig;
-  }
+      templateId: 1;
+      themeColor: string;
+      theme: ThemeVars;
+      homepage: Template1Homepage;
+      infoPages?: InfoPagesConfig;
+      dynamicPages?: DynamicPagesConfig;
+      merchantType?: MerchantType;
+      siteConfig: SiteConfig;
+      ui?: UIConfig;
+      dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
+    }
   | {
-    templateId: 2;
-    themeColor: string;
-    theme: ThemeVars;
-    homepage: Template2Homepage;
-    infoPages?: InfoPagesConfig;
-    dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
-    siteConfig: SiteConfig;
-    ui?: UIConfig;
-  };
+      templateId: 2;
+      themeColor: string;
+      theme: ThemeVars;
+      homepage: Template2Homepage;
+      infoPages?: InfoPagesConfig;
+      dynamicPages?: DynamicPagesConfig;
+      merchantType?: MerchantType;
+      siteConfig: SiteConfig;
+      ui?: UIConfig;
+      dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
+    };

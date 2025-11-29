@@ -1,27 +1,52 @@
 import type { Locale as ConfigLocale } from "@/i18n.config";
+import type { TenantConfig, Dictionary } from "@/types/tenant";
 
-const SUPPORTED = ["en", "ka"] as const;
+// Static fallback dictionaries (only used if tenant config doesn't provide them)
+const STATIC_SUPPORTED = ["en", "ka"] as const;
 
-type BaseLocale = (typeof SUPPORTED)[number];
+type BaseLocale = (typeof STATIC_SUPPORTED)[number];
 
-function normalizeLocale(l: string): BaseLocale {
-  const base = l?.split?.("-")?.[0] ?? "en";
-
-  return (SUPPORTED as readonly string[]).includes(base as BaseLocale)
-    ? (base as BaseLocale)
-    : "en";
+function normalizeLocale(l: string): string {
+  return l?.split?.("-")?.[0] ?? "en";
 }
 
-const loaders: Record<BaseLocale, () => Promise<Record<string, any>>> = {
+// Static file loaders (fallback only)
+const staticLoaders: Record<BaseLocale, () => Promise<Dictionary>> = {
   en: () => import("@/dictionaries/en.json").then((m) => m.default),
   ka: () => import("@/dictionaries/ka.json").then((m) => m.default),
 };
 
-export async function getDictionary(locale: ConfigLocale | string) {
-  const key = normalizeLocale(String(locale));
-  const load = loaders[key];
+/**
+ * Get dictionary for a locale, prioritizing tenant config dictionaries
+ * Falls back to static files if tenant config doesn't have the locale
+ */
+export async function getDictionary(
+  locale: ConfigLocale | string,
+  tenantConfig?: TenantConfig | null
+): Promise<Dictionary> {
+  const normalizedLocale = normalizeLocale(String(locale)).toLowerCase();
 
-  if (typeof load !== "function") return loaders.en();
+  // 1. First priority: Check tenant config dictionaries
+  if (tenantConfig?.dictionaries?.[normalizedLocale]) {
+    return tenantConfig.dictionaries[normalizedLocale];
+  }
 
-  return load();
+  // 2. Second priority: Static files (only for supported static locales)
+  const staticKey = normalizedLocale as BaseLocale;
+  if (STATIC_SUPPORTED.includes(staticKey) && staticLoaders[staticKey]) {
+    try {
+      return await staticLoaders[staticKey]();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`⚠️ Failed to load static dictionary for ${staticKey}:`, error);
+    }
+  }
+
+  // 3. Final fallback: English (from tenant config or static)
+  if (tenantConfig?.dictionaries?.["en"]) {
+    return tenantConfig.dictionaries["en"];
+  }
+
+  // Last resort: static English
+  return staticLoaders.en();
 }

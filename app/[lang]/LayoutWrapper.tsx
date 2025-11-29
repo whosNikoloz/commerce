@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Navbar } from "@/components/Navbar/navbar";
 import { Footer } from "@/components/footer";
@@ -12,15 +13,25 @@ interface LayoutWrapperProps {
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
-  const isAdminPage = pathname?.includes("/admin");
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // More robust admin page check
+  const isAdminPage = pathname?.includes("/admin") ?? false;
+
+  // Prevent hydration mismatch by not rendering Navbar until mounted
+  const shouldShowNavbar = mounted && !isAdminPage;
+  const shouldShowFooter = mounted && !isAdminPage;
 
   return (
     <div className={`${isAdminPage ? "" : "relative flex flex-col  min-h-screen"}`}>
       <GA4PageTracker />
-      {!isAdminPage && <Navbar />}
+      {shouldShowNavbar && <Navbar />}
       <main className={`${isAdminPage ? "" : "   "}`}>{children}</main>
-      {!isAdminPage && <Footer />}
+      {shouldShowFooter && <Footer />}
     </div>
   );
 }

@@ -284,7 +284,7 @@ export default function ImageModal({
 
         {description && isMobile && (
           <div className="px-6 py-3 border-b bg-background border-border">
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="font-primary text-muted-foreground text-sm leading-relaxed">
               {description}
             </p>
           </div>

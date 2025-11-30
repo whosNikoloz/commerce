@@ -80,7 +80,7 @@ function NotificationArea({
             <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
               <Bell className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <span className="text-sm font-medium text-emerald-900 dark:text-emerald-100">{message}</span>
+            <span className="font-primary text-sm font-medium text-emerald-900 dark:text-emerald-100">{message}</span>
           </div>
           <Button
             aria-label="Dismiss notification"
@@ -113,8 +113,8 @@ function EmptyState({
       <div className="mx-auto mb-4 h-16 w-16 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
         {icon}
       </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      {desc && <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">{desc}</p>}
+      <h3 className="font-heading text-xl font-semibold mb-2">{title}</h3>
+      {desc && <p className="font-primary text-sm text-muted-foreground mb-4 max-w-md mx-auto">{desc}</p>}
       {cta && <div className="mt-6">{cta}</div>}
     </div>
   )
@@ -339,7 +339,7 @@ export default function UserPanel() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{paged.total}</div>
-          <p className="text-xs text-muted-foreground mt-1">All time purchases</p>
+          <p className="font-primary text-xs text-muted-foreground mt-1">All time purchases</p>
         </CardContent>
       </Card>
 
@@ -350,7 +350,7 @@ export default function UserPanel() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{fmtMoney(totalSpent)}</div>
-          <p className="text-xs text-muted-foreground mt-1">Lifetime spending</p>
+          <p className="font-primary text-xs text-muted-foreground mt-1">Lifetime spending</p>
         </CardContent>
       </Card>
 
@@ -361,7 +361,7 @@ export default function UserPanel() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{wishlist.length}</div>
-          <p className="text-xs text-muted-foreground mt-1">Saved for later</p>
+          <p className="font-primary text-xs text-muted-foreground mt-1">Saved for later</p>
         </CardContent>
       </Card>
 
@@ -372,7 +372,7 @@ export default function UserPanel() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-muted-foreground">—</div>
-          <p className="text-xs text-muted-foreground mt-1">Coming soon</p>
+          <p className="font-primary text-xs text-muted-foreground mt-1">Coming soon</p>
         </CardContent>
       </Card>
     </div>
@@ -395,7 +395,7 @@ export default function UserPanel() {
           <CardContent>
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-muted-foreground">Loading your orders...</p>
+              <p className="font-primary text-sm text-muted-foreground">Loading your orders...</p>
             </div>
           </CardContent>
         </Card>
@@ -409,7 +409,7 @@ export default function UserPanel() {
             <CardDescription>Your latest purchases</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-destructive">{errorOrders}</p>
+            <p className="font-primary text-sm text-destructive">{errorOrders}</p>
           </CardContent>
         </Card>
       )
@@ -442,8 +442,8 @@ export default function UserPanel() {
                     <Package className="h-5 w-5 text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-sm truncate">{order.id}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="font-primary font-semibold text-sm truncate">{order.id}</p>
+                    <p className="font-primary text-xs text-muted-foreground">
                       {new Date(order.date).toLocaleDateString()} • {order.items} items
                     </p>
                   </div>
@@ -456,10 +456,10 @@ export default function UserPanel() {
                   >
                     {getStatusName(order.status)}
                   </Badge>
-                  <p className="font-semibold text-sm">{fmtMoney((order as OrderDetail).total ?? 0)}</p>
+                  <p className="font-primary font-semibold text-sm">{fmtMoney((order as OrderDetail).total ?? 0)}</p>
                   <Button size="sm" variant="outline" onClick={() => onView(order.id)}>
                     <Eye className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">View</span>
+                    <span className="font-primary hidden sm:inline">View</span>
                   </Button>
                 </div>
               </div>
@@ -481,7 +481,7 @@ export default function UserPanel() {
           <CardContent>
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-muted-foreground">Loading your orders...</p>
+              <p className="font-primary text-sm text-muted-foreground">Loading your orders...</p>
             </div>
           </CardContent>
         </Card>
@@ -494,7 +494,7 @@ export default function UserPanel() {
             <CardTitle>Order History</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-destructive">{errorOrders}</p>
+            <p className="font-primary text-sm text-destructive">{errorOrders}</p>
           </CardContent>
         </Card>
       )
@@ -525,7 +525,7 @@ export default function UserPanel() {
             >
               Prev
             </Button>
-            <span className="text-sm text-muted-foreground whitespace-nowrap px-3">
+            <span className="font-primary text-sm text-muted-foreground whitespace-nowrap px-3">
               {paged.page} / {Math.max(1, Math.ceil(paged.total / paged.pageSize))}
             </span>
             <Button
@@ -575,11 +575,11 @@ export default function UserPanel() {
                             <Package className="h-6 w-6 text-primary" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-semibold truncate">{order.id}</p>
-                            <p className="text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString()}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="font-primary font-semibold truncate">{order.id}</p>
+                            <p className="font-primary text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString()}</p>
+                            <p className="font-primary text-sm text-muted-foreground">
                               {order.items} items •{" "}
-                              <span className="font-medium">{fmtMoney((order as OrderDetail).total ?? 0)}</span>
+                              <span className="font-primary font-medium">{fmtMoney((order as OrderDetail).total ?? 0)}</span>
                             </p>
                           </div>
                         </div>
@@ -611,7 +611,7 @@ export default function UserPanel() {
 
                           {/* Items */}
                           <div>
-                            <h4 className="font-semibold mb-3 flex items-center gap-2">
+                            <h4 className="font-heading font-semibold mb-3 flex items-center gap-2">
                               <ShoppingCart className="h-4 w-4" />
                               Order Items
                             </h4>
@@ -625,12 +625,12 @@ export default function UserPanel() {
                                     src={item.image || "/placeholder.png"}
                                   />
                                   <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-sm truncate">{item.name}</p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="font-primary font-medium text-sm truncate">{item.name}</p>
+                                    <p className="font-primary text-xs text-muted-foreground">
                                       Qty: {item.quantity}
                                     </p>
                                   </div>
-                                  <p className="font-semibold text-sm">{fmtMoney(item.price)}</p>
+                                  <p className="font-primary font-semibold text-sm">{fmtMoney(item.price)}</p>
                                 </div>
                               ))}
                             </div>
@@ -638,28 +638,28 @@ export default function UserPanel() {
 
                           {/* Shipping */}
                           <div>
-                            <h4 className="font-semibold mb-3 flex items-center gap-2">
+                            <h4 className="font-heading font-semibold mb-3 flex items-center gap-2">
                               <Truck className="h-4 w-4" />
                               Shipping Information
                             </h4>
                             <div className="bg-background border rounded-lg p-4 space-y-3">
                               <div className="flex items-start gap-2">
                                 <MapPinIcon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                <span className="text-sm">{detail.shippingAddress}</span>
+                                <span className="font-primary text-sm">{detail.shippingAddress}</span>
                               </div>
                               {!!detail.trackingNumber && (
                                 <div className="flex items-center gap-2">
                                   <Package className="h-4 w-4 text-muted-foreground shrink-0" />
-                                  <span className="text-sm">
-                                    Tracking: <span className="font-mono font-medium">{detail.trackingNumber}</span>
+                                  <span className="font-primary text-sm">
+                                    Tracking: <span className="font-primary font-mono font-medium">{detail.trackingNumber}</span>
                                   </span>
                                 </div>
                               )}
                               {!!detail.estimatedDelivery && (
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                                  <span className="text-sm">
-                                    Expected: <span className="font-medium">{detail.estimatedDelivery}</span>
+                                  <span className="font-primary text-sm">
+                                    Expected: <span className="font-primary font-medium">{detail.estimatedDelivery}</span>
                                   </span>
                                 </div>
                               )}
@@ -668,7 +668,7 @@ export default function UserPanel() {
 
                           {/* Tracking */}
                           <div>
-                            <h4 className="font-semibold mb-3 flex items-center gap-2">
+                            <h4 className="font-heading font-semibold mb-3 flex items-center gap-2">
                               <MapPinIcon className="h-4 w-4" />
                               Order Tracking
                             </h4>
@@ -710,12 +710,12 @@ export default function UserPanel() {
                                           >
                                             {readableStatus}
                                           </p>
-                                          <p className="text-xs text-muted-foreground">
+                                          <p className="font-primary text-xs text-muted-foreground">
                                             {new Date(step.date).toLocaleString()}
                                           </p>
                                         </div>
                                         {step.description && (
-                                          <p className="text-xs text-muted-foreground mt-1">{step.description}</p>
+                                          <p className="font-primary text-xs text-muted-foreground mt-1">{step.description}</p>
                                         )}
                                       </div>
                                     </div>
@@ -723,7 +723,7 @@ export default function UserPanel() {
                                 })}
                               </div>
                             ) : (
-                              <p className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
+                              <p className="font-primary text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
                                 No tracking updates yet.
                               </p>
                             )}
@@ -766,7 +766,7 @@ export default function UserPanel() {
                               Loading details…
                             </div>
                           ) : (
-                            <p className="py-3">Click to load order details</p>
+                            <p className="font-primary py-3">Click to load order details</p>
                           )}
                         </div>
                       )}
@@ -792,7 +792,7 @@ export default function UserPanel() {
           <CardContent>
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-muted-foreground">Loading your wishlist...</p>
+              <p className="font-primary text-sm text-muted-foreground">Loading your wishlist...</p>
             </div>
           </CardContent>
         </Card>
@@ -805,7 +805,7 @@ export default function UserPanel() {
             <CardTitle>My Wishlist</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-destructive">{errorWishlist}</p>
+            <p className="font-primary text-sm text-destructive">{errorWishlist}</p>
           </CardContent>
         </Card>
       )
@@ -841,8 +841,8 @@ export default function UserPanel() {
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="font-semibold text-sm truncate">{item.name}</h3>
-                    <p className="text-lg font-bold mt-1">{fmtMoney(item.price)}</p>
+                    <h3 className="font-heading font-semibold text-sm truncate">{item.name}</h3>
+                    <p className="font-primary text-lg font-bold mt-1">{fmtMoney(item.price)}</p>
                   </div>
                   <div className="flex gap-2">
                     <Button className="flex-1" size="sm">
@@ -932,7 +932,7 @@ export default function UserPanel() {
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img alt="Visa" className="h-6 w-auto" src="/visa.svg" />
-              <p className="font-medium">**** **** **** 1234</p>
+              <p className="font-primary font-medium">**** **** **** 1234</p>
               <Badge variant="secondary">Primary</Badge>
             </div>
             <div className="flex gap-2">
@@ -949,7 +949,7 @@ export default function UserPanel() {
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img alt="Mastercard" className="h-6 w-auto" src="/mastercard.svg" />
-              <p className="font-medium">**** **** **** 5678</p>
+              <p className="font-primary font-medium">**** **** **** 5678</p>
             </div>
             <div className="flex gap-2">
               <Button size="sm" variant="outline">
@@ -982,10 +982,10 @@ export default function UserPanel() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-center text-muted-foreground">
+            <p className="font-primary text-center text-muted-foreground">
               You need to be logged in to view your orders, wishlist, and account settings.
             </p>
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="font-primary text-center text-sm text-muted-foreground">
               Click the profile icon in the navigation to log in.
             </p>
           </CardContent>
@@ -1005,8 +1005,8 @@ export default function UserPanel() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold">Welcome back, {user?.userName || "User"}!</h1>
-            <p className="text-sm text-muted-foreground">Manage your orders and account settings</p>
+            <h1 className="font-heading text-2xl font-bold">Welcome back, {user?.userName || "User"}!</h1>
+            <p className="font-primary text-sm text-muted-foreground">Manage your orders and account settings</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -1055,29 +1055,29 @@ export default function UserPanel() {
                     <div className="flex items-start gap-3">
                       <Shield className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
-                        <p className="font-medium">Password changed successfully</p>
-                        <span className="text-xs text-muted-foreground">1 hour ago</span>
+                        <p className="font-primary font-medium">Password changed successfully</p>
+                        <span className="font-primary text-xs text-muted-foreground">1 hour ago</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Package className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
-                        <p className="font-medium">Order #12345 shipped</p>
-                        <span className="text-xs text-muted-foreground">3 hours ago</span>
+                        <p className="font-primary font-medium">Order #12345 shipped</p>
+                        <span className="font-primary text-xs text-muted-foreground">3 hours ago</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Heart className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
-                        <p className="font-medium">Item added to wishlist</p>
-                        <span className="text-xs text-muted-foreground">5 hours ago</span>
+                        <p className="font-primary font-medium">Item added to wishlist</p>
+                        <span className="font-primary text-xs text-muted-foreground">5 hours ago</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Bell className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
-                        <p className="font-medium">New notification received</p>
-                        <span className="text-xs text-muted-foreground">Yesterday</span>
+                        <p className="font-primary font-medium">New notification received</p>
+                        <span className="font-primary text-xs text-muted-foreground">Yesterday</span>
                       </div>
                     </div>
                   </div>

@@ -127,7 +127,7 @@ export function ProductInfo({
 
             {hasDiscount && (
               <div className="mt-1 flex items-center gap-2">
-                <span className="text-sm text-muted-foreground line-through">
+                <span className="font-primary text-sm text-muted-foreground line-through">
                   {formatPrice(originalPrice!, currency)}
                 </span>
                 <Badge className="h-6 px-2.5 text-[11px] font-bold leading-none bg-red-600 text-white">
@@ -208,10 +208,10 @@ export function ProductInfo({
         {/* Delivery hint (desktop only) */}
         {freeShipping && (
           <div className="hidden md:flex items-center gap-3 mt-4 rounded-lg border px-4 py-3 text-sm bg-muted/40">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
+            <span className="font-primary inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
               <Truck className="h-4 w-4" />
             </span>
-            <span className="text-foreground font-medium">
+            <span className="font-primary text-foreground font-medium">
               {dict?.common?.freeShipping || "სწრაფი მიწოდება მთელ საქართველოში TEST"}
             </span>
           </div>

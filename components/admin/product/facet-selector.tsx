@@ -125,7 +125,7 @@ export function FacetSelector({
   if (!categoryId) {
     return (
       <div className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-        <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
+        <p className="font-primary text-sm text-slate-600 dark:text-slate-400 text-center">
           Please select a category first to see available facets
         </p>
       </div>
@@ -135,7 +135,7 @@ export function FacetSelector({
   if (loading) {
     return (
       <div className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-        <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
+        <p className="font-primary text-sm text-slate-600 dark:text-slate-400 text-center">
           Loading facets...
         </p>
       </div>
@@ -145,7 +145,7 @@ export function FacetSelector({
   if (facets.length === 0) {
     return (
       <div className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-        <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
+        <p className="font-primary text-sm text-slate-600 dark:text-slate-400 text-center">
           No facets available for this category
         </p>
       </div>
@@ -179,12 +179,12 @@ export function FacetSelector({
                       ) : (
                         <ChevronRight className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                       )}
-                      <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">
+                      <span className="font-primary font-medium text-slate-900 dark:text-slate-100 text-sm">
                         {facet.name}
                       </span>
                     </div>
                     {hasSelection && (
-                      <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded">
+                      <span className="font-primary text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded">
                         1
                       </span>
                     )}
@@ -193,7 +193,7 @@ export function FacetSelector({
 
                 <CollapsibleContent className="mt-1 space-y-0.5 pl-5">
                   {facetValues.length === 0 ? (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 py-2">
+                    <p className="font-primary text-sm text-slate-500 dark:text-slate-400 py-2">
                       No values available
                     </p>
                   ) : (
@@ -228,7 +228,7 @@ export function FacetSelector({
         </div>
       </ScrollArea>
       {selectedFacetValues.length > 0 && (
-        <p className="text-xs text-slate-600 dark:text-slate-400 pt-1">
+        <p className="font-primary text-xs text-slate-600 dark:text-slate-400 pt-1">
           {selectedFacetValues.length} attribute{selectedFacetValues.length !== 1 ? 's' : ''} selected
         </p>
       )}

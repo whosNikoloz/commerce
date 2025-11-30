@@ -92,7 +92,7 @@ export default function ProductGroupFilters({
       <CardContent className="pt-0 relative flex-1 flex flex-col overflow-hidden space-y-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="font-heading text-sm font-bold text-slate-900 dark:text-slate-100">
                 Brands
               </h3>
               <Badge
@@ -118,7 +118,7 @@ export default function ProductGroupFilters({
           {brands.length === 0 ? (
             <div className="text-center py-6">
               <Tag className="h-10 w-10 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-slate-600 dark:text-slate-400 text-xs font-medium">
+              <p className="font-primary text-slate-600 dark:text-slate-400 text-xs font-medium">
                 No brands found
               </p>
             </div>
@@ -144,7 +144,7 @@ export default function ProductGroupFilters({
                 >
                   <div className="flex items-center gap-2">
                     <Tag className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                    <span className="font-semibold">All Brands</span>
+                    <span className="font-primary font-semibold">All Brands</span>
                     <Badge
                       className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                       variant="secondary"
@@ -161,7 +161,7 @@ export default function ProductGroupFilters({
                   >
                     <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                      <span className="font-semibold truncate">
+                      <span className="font-primary font-semibold truncate">
                         {brand.name || "Unnamed Brand"}
                       </span>
                       {brand.origin && (
@@ -181,7 +181,7 @@ export default function ProductGroupFilters({
           <div className="flex-1 flex flex-col overflow-hidden h-min">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                <h3 className="font-heading text-sm font-bold text-slate-900 dark:text-slate-100">
                   Categories
                 </h3>
                 <Badge

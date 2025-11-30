@@ -280,12 +280,12 @@ export default function OrderDetailsModal({
             <ModalHeader className="flex justify-between items-center ">
               <div className="flex items-center gap-2 ">
                 {isMobile && <GoBackButton onClick={onClose} />}
-                <h2 className="text-xl font-bold">Order Details</h2>
+                <h2 className="font-heading text-xl font-bold">Order Details</h2>
               </div>
               {normalizedDetail && (
                 <Badge className={getStatusColor(normalizedDetail.status)}>
                   {getStatusIcon(normalizedDetail.status)}
-                  <span className="ml-1">{statusLabel(normalizedDetail.status)}</span>
+                  <span className="font-primary ml-1">{statusLabel(normalizedDetail.status)}</span>
                 </Badge>
               )}
             </ModalHeader>
@@ -304,7 +304,7 @@ export default function OrderDetailsModal({
                 <div className="space-y-5">
                   {/* --------- ORDER INFO --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-bold text-lg mb-2">Order Information</h3>
+                    <h3 className="font-heading font-bold text-lg mb-2">Order Information</h3>
                     <div className="grid grid-cols-2 gap-y-2 text-sm">
                       <div>Date: {formatDateTimeLocal(normalizedDetail.date)}</div>
                       <div>
@@ -325,7 +325,7 @@ export default function OrderDetailsModal({
 
                   {/* --------- CUSTOMER --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-bold text-lg mb-2">Customer</h3>
+                    <h3 className="font-heading font-bold text-lg mb-2">Customer</h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
                       <div>
@@ -341,8 +341,7 @@ export default function OrderDetailsModal({
                       <div>
                         <div className="text-slate-500">Email</div>
                         {normalizedDetail?.user?.email ? (
-                          <a
-                            className="font-medium text-blue-600 hover:underline"
+                          <a className="font-primary font-medium text-blue-600 hover:underline"
                             href={`mailto:${normalizedDetail.user.email}`}
                           >
                             {normalizedDetail.user.email}
@@ -355,8 +354,7 @@ export default function OrderDetailsModal({
                       <div>
                         <div className="text-slate-500">Phone</div>
                         {normalizedDetail?.user?.phoneNumber ? (
-                          <a
-                            className="font-medium text-blue-600 hover:underline"
+                          <a className="font-primary font-medium text-blue-600 hover:underline"
                             href={`tel:${normalizedDetail.user.phoneNumber}`}
                           >
                             {normalizedDetail.user.phoneNumber}
@@ -378,9 +376,9 @@ export default function OrderDetailsModal({
 
                   {/* --------- QUICK UPDATE --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-bold text-lg mb-3">Quick Update</h3>
+                    <h3 className="font-heading font-bold text-lg mb-3">Quick Update</h3>
 
-                    <label className="text-xs" htmlFor={statusId}>
+                    <label className="font-primary text-xs" htmlFor={statusId}>
                       Status
                     </label>
                     <select
@@ -401,7 +399,7 @@ export default function OrderDetailsModal({
                       ))}
                     </select>
 
-                    <label className="text-xs" htmlFor={trackingId}>
+                    <label className="font-primary text-xs" htmlFor={trackingId}>
                       Tracking Number
                     </label>
                     <input
@@ -416,7 +414,7 @@ export default function OrderDetailsModal({
                       }
                     />
 
-                    <label className="text-xs" htmlFor={etdId}>
+                    <label className="font-primary text-xs" htmlFor={etdId}>
                       Estimated Delivery
                     </label>
                     <input
@@ -432,7 +430,7 @@ export default function OrderDetailsModal({
                       }
                     />
 
-                    <label className="text-xs" htmlFor={descId}>
+                    <label className="font-primary text-xs" htmlFor={descId}>
                       Description
                     </label>
                     <textarea
@@ -503,7 +501,7 @@ export default function OrderDetailsModal({
 
                   {/* --------- PRODUCTS --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-bold text-lg mb-3">Products</h3>
+                    <h3 className="font-heading font-bold text-lg mb-3">Products</h3>
                     {normalizedDetail.orderItems.map((it) => (
                       <div
                         key={it.id}
@@ -541,7 +539,7 @@ export default function OrderDetailsModal({
                   {/* --------- TRACKING HISTORY --------- */}
                   {normalizedDetail.trackingSteps?.length > 0 && (
                     <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                      <h3 className="font-bold text-lg mb-3">Tracking History</h3>
+                      <h3 className="font-heading font-bold text-lg mb-3">Tracking History</h3>
                       <div className="space-y-2">
                         {normalizedDetail.trackingSteps.map((t, i) => {
                           // Convert numeric status to readable label
@@ -579,18 +577,18 @@ export default function OrderDetailsModal({
 
                   {/* --------- SHIPPING --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-bold text-lg mb-3">Shipping</h3>
-                    <p className="text-sm whitespace-pre-wrap mb-2">
+                    <h3 className="font-heading font-bold text-lg mb-3">Shipping</h3>
+                    <p className="font-primary text-sm whitespace-pre-wrap mb-2">
                       {normalizedDetail.shippingAddress}
                     </p>
                     {normalizedDetail.trackingNumber && (
-                      <p className="text-sm">
+                      <p className="font-primary text-sm">
                         <strong>Tracking:</strong>{" "}
                         {normalizedDetail.trackingNumber}
                       </p>
                     )}
                     {normalizedDetail.estimatedDelivery && (
-                      <p className="text-sm">
+                      <p className="font-primary text-sm">
                         <strong>Estimated Delivery:</strong>{" "}
                         {formatDateLocal(normalizedDetail.estimatedDelivery)}
                       </p>

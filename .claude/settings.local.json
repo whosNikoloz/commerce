@@ -32,7 +32,8 @@
       "WebFetch(domain:veli.store)",
       "Bash(for:*)",
       "Bash(do echo \"File: $file\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(del \"D:\\MyProjects\\nextjs\\commerce\\components\\Home\\sections\\ui\\ProductCardHoverExample.tsx\")"
     ],
     "deny": [],
     "ask": []

@@ -6,10 +6,10 @@ export default function CategoryNotFound() {
   return (
     <div className="flex min-h-[45vh] items-center justify-center mt-20">
       <div className="text-center space-y-4">
-        <h2 className="text-2xl font-semibold text-text-light dark:text-text-lightdark">
+        <h2 className="font-heading text-2xl font-semibold text-text-light dark:text-text-lightdark">
           Category not found
         </h2>
-        <p className="text-text-subtle dark:text-text-subtledark">
+        <p className="font-primary text-text-subtle dark:text-text-subtledark">
           The category you&apos;re looking for doesn&apos;t exist or was removed.
         </p>
 

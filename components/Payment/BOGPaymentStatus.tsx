@@ -122,7 +122,7 @@ export default function BOGPaymentStatus({
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="font-primary text-sm text-red-600">{error}</p>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export default function BOGPaymentStatus({
     return (
       <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-4">
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-        <span className="ml-2 text-sm text-gray-600">Loading payment status...</span>
+        <span className="font-primary ml-2 text-sm text-gray-600">Loading payment status...</span>
       </div>
     );
   }
@@ -143,7 +143,7 @@ export default function BOGPaymentStatus({
   return (
     <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">BOG Payment Status</h3>
+        <h3 className="font-heading text-lg font-semibold text-gray-900">BOG Payment Status</h3>
         <div className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium ${getStatusColor(paymentDetails.status)}`}>
           {getStatusIcon(paymentDetails.status)}
           {paymentDetails.status}
@@ -152,19 +152,19 @@ export default function BOGPaymentStatus({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <p className="text-sm text-gray-500">Order ID</p>
-          <p className="mt-1 font-mono text-sm text-gray-900">{paymentDetails.order_id}</p>
+          <p className="font-primary text-sm text-gray-500">Order ID</p>
+          <p className="font-primary mt-1 font-mono text-sm text-gray-900">{paymentDetails.order_id}</p>
         </div>
 
         <div>
-          <p className="text-sm text-gray-500">Intent</p>
-          <p className="mt-1 text-sm text-gray-900">{paymentDetails.intent}</p>
+          <p className="font-primary text-sm text-gray-500">Intent</p>
+          <p className="font-primary mt-1 text-sm text-gray-900">{paymentDetails.intent}</p>
         </div>
 
         {paymentDetails.purchase_units && paymentDetails.purchase_units.length > 0 && (
           <div>
-            <p className="text-sm text-gray-500">Amount</p>
-            <p className="mt-1 text-sm text-gray-900">
+            <p className="font-primary text-sm text-gray-500">Amount</p>
+            <p className="font-primary mt-1 text-sm text-gray-900">
               {paymentDetails.purchase_units[0].amount.value} {paymentDetails.purchase_units[0].amount.currency_code}
             </p>
           </div>
@@ -173,7 +173,7 @@ export default function BOGPaymentStatus({
 
       {(paymentDetails.links || paymentDetails._links) && (
         <div className="border-t border-gray-200 pt-4">
-          <p className="mb-2 text-sm font-medium text-gray-700">Available Actions</p>
+          <p className="font-primary mb-2 text-sm font-medium text-gray-700">Available Actions</p>
           <div className="flex flex-wrap gap-2">
             {(paymentDetails.links || paymentDetails._links || []).map((link, index) => (
               <span

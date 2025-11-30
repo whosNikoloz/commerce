@@ -15,9 +15,9 @@ export default function ProductNotFound() {
   return (
     <div className="flex min-h-[45vh] items-center justify-center bg-brand-surface dark:bg-brand-surfacedark">
       <div className="text-center space-y-4 text-text-light dark:text-text-lightdark">
-        <h2 className="text-2xl font-semibold">{t.title}</h2>
+        <h2 className="font-heading text-2xl font-semibold">{t.title}</h2>
 
-        <p className="text-text-subtle dark:text-text-subtledark">
+        <p className="font-primary text-text-subtle dark:text-text-subtledark">
           {t.description}
         </p>
 

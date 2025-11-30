@@ -68,6 +68,7 @@ export function ProductCard({
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const addToCart = useCartStore((s) => s.smartAddToCart);
   const { addToCompare, removeFromCompare, isInCompare } = useCompareStore();
   const inCompare = mounted ? isInCompare(product.id) : false;
@@ -84,7 +85,9 @@ export function ProductCard({
     }
   }, [user, product.id]);
 
-  const imageUrl = resolveImageUrl(product.images?.[0]);
+  const images = product.images || [];
+  const hasMultipleImages = images.length > 1;
+  const imageUrl = resolveImageUrl(images[currentImageIndex]);
   const isInStock = product.status === StockStatus.InStock;
   const hasDiscount = !!product.discountPrice && product.discountPrice < product.price;
   const displayPrice = hasDiscount ? product.discountPrice! : product.price;
@@ -205,12 +208,34 @@ export function ProductCard({
       {/* IMAGE */}
       <CardContent className="p-0 relative pointer-events-none"> {/* prevent blocking clicks to link */}
         <div className="relative">
-          <AspectRatio className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)} ratio={1}>
+          <AspectRatio
+            className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)}
+            ratio={1}
+            onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
+          >
+            {hasMultipleImages && (
+              <div className="absolute inset-0 z-10 flex pointer-events-auto">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    aria-label={`View image ${index + 1} of ${images.length}`}
+                    className="flex-1 cursor-pointer"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentImageIndex(index);
+                    }}
+                    onMouseEnter={() => setCurrentImageIndex(index)}
+                  />
+                ))}
+              </div>
+            )}
             <Image
               ref={imgRef as any}
               fill
               alt={product.name || "Product image"}
-              className="object-cover"
+              className="object-cover transition-opacity duration-300"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
               //quality={priority ? 85 : 72}
@@ -218,6 +243,23 @@ export function ProductCard({
               src={imageUrl}
             />
           </AspectRatio>
+
+          {/* Image Carousel Indicators */}
+          {hasMultipleImages && (
+            <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5 pointer-events-none z-20">
+              {images.map((_, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "h-1.5 rounded-full transition-all duration-300",
+                    currentImageIndex === index
+                      ? "w-6 bg-white shadow-md"
+                      : "w-1.5 bg-white/60"
+                  )}
+                />
+              ))}
+            </div>
+          )}
 
           {discountPercent > 0 && (
             <div className="absolute left-3 top-3 pointer-events-none">
@@ -243,7 +285,7 @@ export function ProductCard({
                   onClick={handleCompareToggle}
                 >
                   <ArrowLeftRight className={cn(iconDimension)} />
-                  <span className="sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
+                  <span className="font-primary sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
                 </Button>
               )}
               <Button
@@ -264,7 +306,7 @@ export function ProductCard({
                 }}
               >
                 <Heart className={cn(iconDimension, inWishlist && "fill-current")} />
-                <span className="sr-only">{inWishlist ? "Remove from wishlist" : "Add to wishlist"}</span>
+                <span className="font-primary sr-only">{inWishlist ? "Remove from wishlist" : "Add to wishlist"}</span>
               </Button>
             </div>
           )}
@@ -277,15 +319,15 @@ export function ProductCard({
           <meta content="GEL" itemProp="priceCurrency" />
           <meta content={displayPrice.toString()} itemProp="price" />
           <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
-          <span className={cn(priceSize, "font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap")}>{formatPrice(displayPrice)}</span>
-          {hasDiscount && <span className={cn(oldPriceSize, "line-through whitespace-nowrap", S.oldPrice)}>{formatPrice(product.price)}</span>}
+          <span className={cn(priceSize, "font-primary font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap")}>{formatPrice(displayPrice)}</span>
+          {hasDiscount && <span className={cn(oldPriceSize, "font-primary line-through whitespace-nowrap", S.oldPrice)}>{formatPrice(product.price)}</span>}
         </div>
         <div className="mt-auto w-full space-y-2.5">
           <h3
             className={cn(
               S.title,
               titleSize,
-              "text-zinc-900 dark:text-zinc-100 w-full",
+              "font-heading text-zinc-900 dark:text-zinc-100 w-full",
               minTitleHeight,
               "line-clamp-2"
             )}
@@ -296,7 +338,7 @@ export function ProductCard({
 
           {conditionLabel && product.condition !== Condition.New && (
             <span
-              className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300 line-clamp-2"
+              className="font-primary text-[11px] px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300 line-clamp-2"
             >
               {conditionLabel}
             </span>
@@ -317,14 +359,14 @@ export function ProductCard({
                 {addingToCart ? (
                   <>
                     <Loader2 className={cn(iconDimension, "animate-spin")} />
-                    <span className="hidden sm:inline">Checking...</span>
-                    <span className="sm:hidden">Wait...</span>
+                    <span className="font-primary hidden sm:inline">Checking...</span>
+                    <span className="font-primary sm:hidden">Wait...</span>
                   </>
                 ) : (
                   <>
                     <ShoppingCart className={cn(iconDimension)} />
-                    <span className="hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
-                    <span className="sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
+                    <span className="font-primary hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
+                    <span className="font-primary sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
                   </>
                 )}
               </Button>
@@ -365,14 +407,14 @@ export function ProductCard({
               {addingToCart ? (
                 <>
                   <Loader2 className={cn(iconDimension, "animate-spin")} />
-                  <span className="hidden sm:inline">Checking...</span>
-                  <span className="sm:hidden">Wait...</span>
+                  <span className="font-primary hidden sm:inline">Checking...</span>
+                  <span className="font-primary sm:hidden">Wait...</span>
                 </>
               ) : (
                 <>
                   <ShoppingCart className={cn(iconDimension)} />
-                  <span className="hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
-                  <span className="sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
+                  <span className="font-primary hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
+                  <span className="font-primary sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
                 </>
               )}
             </Button>

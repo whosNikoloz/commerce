@@ -176,8 +176,7 @@ export default function LoginModal({
       />
 
       <div className="flex px-1 justify-end -mt-1">
-        <button
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
+        <button className="font-primary text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("forgot")}
         >
           {dictionary.auth.login.forgotPassword}
@@ -202,15 +201,14 @@ export default function LoginModal({
 
       <div className="flex items-center justify-center my-6">
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
-        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{dictionary.auth.login.or}</span>
+        <span className="font-primary mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{dictionary.auth.login.or}</span>
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
       <OAuthButtons variant="flat" onSuccess={onLoginSuccess} />
 
       <div className="text-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
+        <button className="font-primary text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("register")}
         >
           {dictionary.auth.login.switchMode}

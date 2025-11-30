@@ -257,7 +257,7 @@ export function PaymentsTable() {
             <div className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
               ${totalRevenue.toFixed(2)}
             </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
+            <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
               <TrendingUp className="inline h-2 w-2 sm:h-3 sm:w-3 mr-1" />
               +12% from last month
             </p>
@@ -274,7 +274,7 @@ export function PaymentsTable() {
             <div className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
               ${totalFees.toFixed(2)}
             </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
+            <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
               <TrendingDown className="inline h-2 w-2 sm:h-3 sm:w-3 mr-1" />
               -2% from last month
             </p>
@@ -291,7 +291,7 @@ export function PaymentsTable() {
             <div className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
               {transactions.filter((t) => t.status === "completed").length}
             </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
+            <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
               {(
                 (transactions.filter((t) => t.status === "completed").length /
                   transactions.length) *
@@ -312,7 +312,7 @@ export function PaymentsTable() {
             <div className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
               {transactions.filter((t) => t.status === "failed").length}
             </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
+            <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
               {(
                 (transactions.filter((t) => t.status === "failed").length / transactions.length) *
                 100
@@ -354,10 +354,10 @@ export function PaymentsTable() {
                         <div className="flex items-center space-x-3 flex-1">
                           {getMethodIcon(method.type)}
                           <div className="min-w-0 flex-1">
-                            <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+                            <p className="font-primary font-semibold text-slate-900 dark:text-slate-100 text-sm">
                               {method.name}
                             </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            <p className="font-primary text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                               {method.description}
                             </p>
                           </div>
@@ -380,7 +380,7 @@ export function PaymentsTable() {
                             {method.status}
                           </Badge>
                         </div>
-                        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                        <span className="font-primary text-xs text-slate-600 dark:text-slate-400 font-medium">
                           {method.transactionFee}% + ₾0.30
                         </span>
                       </div>
@@ -411,7 +411,7 @@ export function PaymentsTable() {
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           {getMethodIcon(method.type)}
-                          <span className="font-medium text-slate-900 dark:text-slate-100">
+                          <span className="font-primary font-medium text-slate-900 dark:text-slate-100">
                             {method.name}
                           </span>
                         </div>
@@ -425,7 +425,7 @@ export function PaymentsTable() {
                         {method.transactionFee}% + ₾0.30
                       </TableCell>
                       <TableCell className="max-w-xs">
-                        <p className="truncate text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
+                        <p className="font-primary truncate text-sm text-muted-foreground text-slate-500 dark:text-slate-400">
                           {method.description}
                         </p>
                       </TableCell>
@@ -542,11 +542,11 @@ export function PaymentsTable() {
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <h2 className="font-heading text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <Settings className="h-5 w-5 md:h-6 md:w-6 text-blue-600 dark:text-blue-400" />
                   Merchant Gateway Configuration
                 </h2>
-                <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <p className="font-primary text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
                   Configure and manage payment gateway integrations for BOG and TBC banks
                 </p>
               </div>
@@ -582,8 +582,8 @@ export function PaymentsTable() {
                     </div>
                     <div className="min-w-0">
                       <CardTitle className="text-lg sm:text-xl text-slate-900 dark:text-slate-100 flex flex-wrap items-center gap-2">
-                        <span className="truncate">Bank of Georgia</span>
-                        <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded flex-shrink-0">
+                        <span className="font-primary truncate">Bank of Georgia</span>
+                        <span className="font-primary text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded flex-shrink-0">
                           BOG
                         </span>
                       </CardTitle>
@@ -756,8 +756,8 @@ export function PaymentsTable() {
                     </div>
                     <div className="min-w-0">
                       <CardTitle className="text-lg sm:text-xl text-slate-900 dark:text-slate-100 flex flex-wrap items-center gap-2">
-                        <span className="truncate">TBC Bank</span>
-                        <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded flex-shrink-0">
+                        <span className="font-primary truncate">TBC Bank</span>
+                        <span className="font-primary text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded flex-shrink-0">
                           TBC
                         </span>
                       </CardTitle>
@@ -916,10 +916,10 @@ export function PaymentsTable() {
                       <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
+                      <h3 className="font-heading font-semibold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
                         Save Configuration Changes
                       </h3>
-                      <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                      <p className="font-primary text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                         Apply merchant gateway settings to your platform
                       </p>
                     </div>
@@ -936,8 +936,8 @@ export function PaymentsTable() {
                       onClick={saveMerchantConfig}
                     >
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      <span className="hidden sm:inline">Save Configuration</span>
-                      <span className="sm:hidden">Save</span>
+                      <span className="font-primary hidden sm:inline">Save Configuration</span>
+                      <span className="font-primary sm:hidden">Save</span>
                     </Button>
                   </div>
                 </div>

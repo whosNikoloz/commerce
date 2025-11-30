@@ -75,7 +75,7 @@ export function LanguageToggle() {
       <DropdownMenuTrigger asChild>
         <Button size="icon" variant="ghost">
           <Languages className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">Switch language</span>
+          <span className="font-primary sr-only">Switch language</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -85,7 +85,7 @@ export function LanguageToggle() {
             className={currentLang === locale ? "bg-accent" : ""}
             onClick={() => switchLanguage(locale)}
           >
-            <span className="mr-2">{getLanguageEmoji(locale)}</span>
+            <span className="font-primary mr-2">{getLanguageEmoji(locale)}</span>
             {getLanguageName(locale)}
           </DropdownMenuItem>
         ))}

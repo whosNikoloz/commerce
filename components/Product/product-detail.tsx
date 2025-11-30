@@ -365,7 +365,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   return (
     <div className="container mx-auto text-text-light dark:text-text-lightdark relative">
-      <h1 className="text-3xl font-bold mb-2 md:block hidden p-4">
+      <h1 className="font-heading text-3xl font-bold mb-2 md:block hidden p-4">
         {product.name ?? "პროდუქტი"}
       </h1>
 
@@ -374,7 +374,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           <ImageReview ref={imageReviewRef} images={galleryImages} productName={product.name ?? ""} />
         </div>
 
-        <h1 className="text-3xl md:hidden block font-bold order-2 lg:order-2">
+        <h1 className="font-heading text-3xl md:hidden block font-bold order-2 lg:order-2">
           {product.name}
         </h1>
 
@@ -418,8 +418,8 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
       {specs.map((g, i) => (
         <div key={i} className="my-12 relative">
-          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-            <span className="w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
+          <h2 className="font-heading text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+            <span className="font-primary w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
             Specifications
           </h2>
           <Specifications

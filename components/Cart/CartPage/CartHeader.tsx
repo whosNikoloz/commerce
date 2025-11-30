@@ -20,10 +20,10 @@ export default function CartHeader({ itemCount }: CartHeaderProps) {
           <ShoppingCart className="h-6 w-6 text-brand-primary" />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-lightdark">
+          <h1 className="font-heading text-2xl md:text-3xl font-bold text-text-light dark:text-text-lightdark">
             {dictionary.cart.title}
           </h1>
-          <p className="text-sm text-text-subtle dark:text-text-subtledark">
+          <p className="font-primary text-sm text-text-subtle dark:text-text-subtledark">
             {itemCount} {itemCount === 1 ? dictionary.cart.item : dictionary.cart.items} {dictionary.cart.inYourCart}
           </p>
         </div>

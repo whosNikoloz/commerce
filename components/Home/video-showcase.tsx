@@ -89,10 +89,10 @@ export function VideoShowcase() {
     <section className="py-20 bg-brand-surface dark:bg-brand-surfacedark">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="mb-6 text-4xl md:text-5xl font-bold text-text-light dark:text-text-lightdark">
+          <h2 className="font-heading mb-6 text-4xl md:text-5xl font-bold text-text-light dark:text-text-lightdark">
             Behind the Brand
           </h2>
-          <p className="mx-auto max-w-2xl text-xl text-text-subtle dark:text-text-subtledark">
+          <p className="font-primary mx-auto max-w-2xl text-xl text-text-subtle dark:text-text-subtledark">
             Discover the craftsmanship and passion that goes into every product
           </p>
         </div>
@@ -124,7 +124,7 @@ export function VideoShowcase() {
             type="button"
             onClick={togglePlayPause}
           >
-            <span className="rounded-full bg-brand-surface/20 dark:bg-brand-surfacedark/20 p-4 backdrop-blur-md transition hover:bg-brand-surface/30 dark:hover:bg-brand-surfacedark/30">
+            <span className="font-primary rounded-full bg-brand-surface/20 dark:bg-brand-surfacedark/20 p-4 backdrop-blur-md transition hover:bg-brand-surface/30 dark:hover:bg-brand-surfacedark/30">
               {isPlaying ? (
                 <Pause className="h-10 w-10 text-text-light dark:text-text-lightdark" />
               ) : (

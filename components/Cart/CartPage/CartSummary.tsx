@@ -103,14 +103,13 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
               <div className="flex items-start gap-2 text-sm">
                 <LogIn className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
                 <div className="space-y-2 flex-1">
-                  <p className="text-blue-900 dark:text-blue-100 font-medium">
+                  <p className="font-primary text-blue-900 dark:text-blue-100 font-medium">
                     {dictionary.cart.loginRequired}
                   </p>
-                  <p className="text-blue-700 dark:text-blue-300 text-xs">
+                  <p className="font-primary text-blue-700 dark:text-blue-300 text-xs">
                     {dictionary.cart.loginRequiredMsg}
                   </p>
-                  <button
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  <button className="font-primary text-xs text-blue-600 dark:text-blue-400 hover:underline"
                     onClick={() => setShowLoginPrompt(false)}
                   >
                     {dictionary.cart.dismiss}
@@ -121,10 +120,10 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
           )}
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-text-subtle dark:text-text-subtledark">
+              <span className="font-primary text-text-subtle dark:text-text-subtledark">
                 {dictionary.cart.subtotal} ({itemCount} {itemCount === 1 ? dictionary.cart.item : dictionary.cart.items})
               </span>
-              <span className="font-medium text-text-light dark:text-text-lightdark">
+              <span className="font-primary font-medium text-text-light dark:text-text-lightdark">
                 {formatPrice(subtotal)}
               </span>
             </div>
@@ -137,10 +136,10 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             )}
 
             <div className="flex justify-between text-sm">
-              <span className="text-text-subtle dark:text-text-subtledark">{dictionary.cart.shipping}</span>
-              <span className="font-medium text-text-light dark:text-text-lightdark">
+              <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.cart.shipping}</span>
+              <span className="font-primary font-medium text-text-light dark:text-text-lightdark">
                 {shipping === 0 ? (
-                  <span className="text-green-600 dark:text-green-400">{dictionary.cart.free}</span>
+                  <span className="font-primary text-green-600 dark:text-green-400">{dictionary.cart.free}</span>
                 ) : (
                   formatPrice(shipping)
                 )}
@@ -148,8 +147,8 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-text-subtle dark:text-text-subtledark">{dictionary.cart.tax}</span>
-              <span className="font-medium text-text-light dark:text-text-lightdark">
+              <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.cart.tax}</span>
+              <span className="font-primary font-medium text-text-light dark:text-text-lightdark">
                 {formatPrice(tax)}
               </span>
             </div>
@@ -157,8 +156,8 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
             <Separator className="bg-brand-muted/60 dark:bg-brand-muteddark/50" />
 
             <div className="flex justify-between font-semibold text-lg">
-              <span className="text-text-light dark:text-text-lightdark">{dictionary.cart.total}</span>
-              <span className="text-text-light dark:text-text-lightdark">{formatPrice(total)}</span>
+              <span className="font-primary text-text-light dark:text-text-lightdark">{dictionary.cart.total}</span>
+              <span className="font-primary text-text-light dark:text-text-lightdark">{formatPrice(total)}</span>
             </div>
           </div>
 

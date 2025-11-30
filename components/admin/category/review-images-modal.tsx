@@ -276,10 +276,10 @@ export default function ReviewImagesModal({
                 <ModalHeader className="flex items-center justify-between gap-2 pb-4 pt-8 relative">
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
-                      <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                      <h2 className="font-heading text-2xl font-black text-slate-900 dark:text-slate-100">
                         Manage Category Images
                       </h2>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                      <p className="font-primary text-sm text-slate-600 dark:text-slate-400 font-medium">
                         Upload up to {maxFiles} images • Max {maxSizeMB}MB each
                       </p>
                     </div>
@@ -319,10 +319,10 @@ export default function ReviewImagesModal({
                         <Upload className="h-5 w-5 text-slate-900 dark:text-slate-100" />
                       </div>
                       <div className="space-y-1">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        <p className="font-primary text-sm font-semibold text-slate-900 dark:text-slate-100">
                           Drag & drop images here
                         </p>
-                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                        <p className="font-primary text-xs text-slate-600 dark:text-slate-400">
                           or click to browse • you can also paste images
                         </p>
                       </div>
@@ -366,8 +366,7 @@ export default function ReviewImagesModal({
                                 {img.toDelete ? "Will delete" : "Existing"}
                               </Badge>
                             </div>
-                            <button
-                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                            <button className="font-primary absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
                               title={img.toDelete ? "Undo delete" : "Delete"}
                               type="button"
                               onClick={() =>
@@ -425,7 +424,7 @@ export default function ReviewImagesModal({
                       <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                         <Images className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                       </div>
-                      <p className="text-sm text-slate-700 dark:text-slate-300">No images yet.</p>
+                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">No images yet.</p>
                     </div>
                   )}
                 </div>
@@ -452,7 +451,7 @@ export default function ReviewImagesModal({
                   onClick={handleSave}
                 >
                   {saving ? (
-                    <span className="flex items-center gap-2">
+                    <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       Saving...
                     </span>

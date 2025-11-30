@@ -209,7 +209,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           width={64}
                         />
                         {!!category.images && category.images.length > 1 && (
-                          <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                          <span className="font-primary absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
                             +{category.images.length}
                           </span>
                         )}
@@ -232,7 +232,7 @@ export function CategoriesTable({ initialCategories }: Props) {
 
                     {/* DESCRIPTION */}
                     <TableCell className="max-w-xs">
-                      <p className="truncate text-slate-600 dark:text-slate-400 font-medium">
+                      <p className="font-primary truncate text-slate-600 dark:text-slate-400 font-medium">
                         {category.description}
                       </p>
                     </TableCell>
@@ -247,7 +247,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           {parent.name}
                         </Badge>
                       ) : (
-                        <span className="text-slate-400 dark:text-slate-500 font-medium">-</span>
+                        <span className="font-primary text-slate-400 dark:text-slate-500 font-medium">-</span>
                       )}
                     </TableCell>
 
@@ -272,14 +272,14 @@ export function CategoriesTable({ initialCategories }: Props) {
                         {isActive ? (
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 ring-1 ring-emerald-200 dark:ring-emerald-800">
                             <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                            <span className="font-primary text-xs font-bold text-emerald-700 dark:text-emerald-400">
                               Active
                             </span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
                             <EyeOff className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                            <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                            <span className="font-primary text-xs font-bold text-slate-600 dark:text-slate-400">
                               Inactive
                             </span>
                           </div>
@@ -327,10 +327,10 @@ export function CategoriesTable({ initialCategories }: Props) {
                       <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                         <Tag className="h-8 w-8 text-slate-400" />
                       </div>
-                      <p className="text-slate-500 dark:text-slate-400 font-semibold">
+                      <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">
                         No categories found
                       </p>
-                      <p className="text-sm text-slate-400 dark:text-slate-500">
+                      <p className="font-primary text-sm text-slate-400 dark:text-slate-500">
                         Try adjusting your search
                       </p>
                     </div>
@@ -365,7 +365,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                     src={category.images?.[0] || "/placeholder.png"}
                   />
                   {!!category.images && category.images.length > 1 && (
-                    <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
+                    <span className="font-primary absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
                       +{category.images.length}
                     </span>
                   )}
@@ -378,10 +378,10 @@ export function CategoriesTable({ initialCategories }: Props) {
                       <Tag className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-black text-slate-900 dark:text-slate-100 text-lg truncate">
+                      <h3 className="font-heading font-black text-slate-900 dark:text-slate-100 text-lg truncate">
                         {category.name}
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
+                      <p className="font-primary text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
                         ID: {category.id}
                       </p>
                     </div>
@@ -412,7 +412,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           {parent.name}
                         </Badge>
                       ) : (
-                        <span className="text-slate-400 dark:text-slate-500 font-medium text-sm">
+                        <span className="font-primary text-slate-400 dark:text-slate-500 font-medium text-sm">
                           -
                         </span>
                       )}
@@ -435,7 +435,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                 {/* Card Footer */}
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-3 border-t border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">
+                    <span className="font-primary text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">
                       Status
                     </span>
                     <div className="flex items-center gap-3">
@@ -447,14 +447,14 @@ export function CategoriesTable({ initialCategories }: Props) {
                       {isActive ? (
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 ring-1 ring-emerald-200 dark:ring-emerald-800">
                           <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                          <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                          <span className="font-primary text-xs font-bold text-emerald-700 dark:text-emerald-400">
                             Active
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
                           <EyeOff className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                          <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                          <span className="font-primary text-xs font-bold text-slate-600 dark:text-slate-400">
                             Inactive
                           </span>
                         </div>
@@ -498,8 +498,8 @@ export function CategoriesTable({ initialCategories }: Props) {
               <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                 <Tag className="h-8 w-8 text-slate-400" />
               </div>
-              <p className="text-slate-500 dark:text-slate-400 font-semibold">No categories found</p>
-              <p className="text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
+              <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">No categories found</p>
+              <p className="font-primary text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
             </div>
           )}
         </div>
@@ -516,7 +516,7 @@ export function CategoriesTable({ initialCategories }: Props) {
               {categoryToDelete ? (
                 <>
                   Are you sure you want to delete{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                  <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {categoryToDelete.name}
                   </span>
                   ? This action cannot be undone and will permanently delete the category.

@@ -149,7 +149,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                     <GoBackButton onClick={handleCloseModal} />
                   </div>
 
-                  <h2 className="absolute left-1/2 top-6 -translate-x-1/2 text-2xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="font-heading absolute left-1/2 top-6 -translate-x-1/2 text-2xl font-bold text-gray-900 dark:text-white">
                     {authMode === "login"
                       ? dictionary.auth.login.title
                       : authMode === "register"
@@ -160,13 +160,13 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
               ) : authMode == "forgot" ? (
                 <ModalHeader className="flex items-center gap-2 px-6 pt-6 pb-4 z-50 border-b border-gray-200 dark:border-gray-700">
                   <GoBackButton onClick={() => handleAuthMode("login")} />
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white ml-2">
+                  <h2 className="font-heading text-xl font-bold text-gray-900 dark:text-white ml-2">
                     {dictionary.auth.forgotPassword.title}
                   </h2>
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-2 pt-8 pb-6 border-b border-gray-200 dark:border-gray-700">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="font-heading text-2xl font-bold text-gray-900 dark:text-white">
                     {authMode === "login"
                       ? dictionary.auth.login.title
                       : authMode === "register"
@@ -196,7 +196,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                   <div className="flex justify-around items-center py-2 gap-1">
                     <Link className="flex flex-col items-center flex-1 min-w-0" href={`/${lng}`} onClick={handleCloseModal}>
                       <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark flex-shrink-0" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                      <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
                         {dictionary.common.home}
                       </span>
                     </Link>
@@ -209,7 +209,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                         setSearchModalOpen={setSearchModalIsOpen}
                         setSearchQuery={setSearchQuery}
                       />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                      <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
                         {dictionary.common.search}
                       </span>
                     </div>
@@ -220,7 +220,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
 
                     <div className="flex flex-col items-center flex-1 min-w-0">
                       <CategoryDrawer />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                      <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
                         {dictionary.categories.category}
                       </span>
                     </div>
@@ -240,7 +240,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                       >
                         <ProfileIcon />
                       </div>
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                      <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
                         {dictionary.common.profile}
                       </span>
                     </div>

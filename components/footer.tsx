@@ -218,13 +218,13 @@ export function Footer() {
               <Image alt={site.name} className="h-9 w-auto object-contain" height={40} src={logoSrc} width={140} />
             </Link>
             {site.slogan && (
-              <p className="text-sm text-zinc-400">
+              <p className="font-primary text-sm text-zinc-400">
                 {typeof site.slogan === "string" ? site.slogan : getLocalized(site.slogan, lng)}
               </p>
             )}
           </div>
           <button
-            className="self-start rounded-full border border-zinc-800 px-3 py-1 text-xs text-zinc-300 hover:bg-zinc-900 sm:self-auto"
+            className="font-primary self-start rounded-full border border-zinc-800 px-3 py-1 text-xs text-zinc-300 hover:bg-zinc-900 sm:self-auto"
             type="button"
             onClick={toggleTheme}
           >
@@ -236,8 +236,8 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-12">
           {/* LEFT: Newsletter + contact */}
           <div className="lg:col-span-5">
-            <h2 className="mb-2 text-2xl font-bold text-white leading-tight">{labels.stayUpdated}</h2>
-            <p className="mb-4 text-sm text-zinc-400">{labels.tagline}</p>
+            <h2 className="font-heading mb-2 text-2xl font-bold text-white leading-tight">{labels.stayUpdated}</h2>
+            <p className="font-primary mb-4 text-sm text-zinc-400">{labels.tagline}</p>
 
             <form className="relative" onSubmit={handleNewsletterSubmit}>
               <Input
@@ -262,12 +262,12 @@ export function Footer() {
 
             <div className="mt-5 space-y-2 text-sm text-zinc-400">
               {phoneLocalized && (
-                <a className="inline-flex items-center gap-2 hover:text-white" href={`tel:${phoneLocalized.replace(/\s+/g, "")}`}>
+                <a className="font-primary inline-flex items-center gap-2 hover:text-white" href={`tel:${phoneLocalized.replace(/\s+/g, "")}`}>
                   <Phone className="h-4 w-4" /> {phoneLocalized}
                 </a>
               )}
               {emailAddr && (
-                <a className="ml-4 inline-flex items-center gap-2 hover:text-white" href={`mailto:${emailAddr}`}>
+                <a className="font-primary ml-4 inline-flex items-center gap-2 hover:text-white" href={`mailto:${emailAddr}`}>
                   <Mail className="h-4 w-4" /> {emailAddr}
                 </a>
               )}
@@ -277,8 +277,7 @@ export function Footer() {
                   <p>
                     {addressStr}{" "}
                     {mapsUrl && (
-                      <a
-                        className="underline decoration-dotted underline-offset-2 hover:text-white"
+                      <a className="font-primary underline decoration-dotted underline-offset-2 hover:text-white"
                         href={mapsUrl}
                         rel="noopener noreferrer"
                         target="_blank"
@@ -306,7 +305,7 @@ export function Footer() {
           {/* RIGHT: links */}
           <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
             <nav>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white">
+              <h3 className="font-heading mb-3 text-xs font-semibold uppercase tracking-wider text-white">
                 {labels.information}
               </h3>
               <ul className="space-y-2">
@@ -321,7 +320,7 @@ export function Footer() {
             </nav>
 
             <nav>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white">
+              <h3 className="font-heading mb-3 text-xs font-semibold uppercase tracking-wider text-white">
                 {labels.helpAndSupport}
               </h3>
               <ul className="space-y-2">
@@ -344,7 +343,7 @@ export function Footer() {
             </nav>
 
             <nav>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white">
+              <h3 className="font-heading mb-3 text-xs font-semibold uppercase tracking-wider text-white">
                 {labels.about}
               </h3>
               <ul className="space-y-2">
@@ -371,7 +370,7 @@ export function Footer() {
         {/* BOTTOM BAR */}
         <div className="mt-8 flex flex-col gap-4 border-t border-zinc-800 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 text-sm">
-            <p className="text-zinc-500">
+            <p className="font-primary text-zinc-500">
               © {year} {site.shortName || site.name}. {labels.allRightsReserved}
             </p>
 
@@ -420,7 +419,7 @@ export function Footer() {
           </div>
 
           {(business.legalName || business.vatNumber) && (
-            <p className="text-xs text-zinc-500">
+            <p className="font-primary text-xs text-zinc-500">
               {business.legalName && <span>{business.legalName}</span>}
               {business.legalName && business.vatNumber && " • "}
               {business.vatNumber && <span>VAT: {business.vatNumber}</span>}

@@ -260,7 +260,7 @@ export function CustomersTable() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{customerStats.total}</div>
-            <p className="text-xs text-muted-foreground">{customerStats.active} active customers</p>
+            <p className="font-primary text-xs text-muted-foreground">{customerStats.active} active customers</p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
@@ -270,7 +270,7 @@ export function CustomersTable() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${customerStats.totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">From all customers</p>
+            <p className="font-primary text-xs text-muted-foreground">From all customers</p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
@@ -280,7 +280,7 @@ export function CustomersTable() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${customerStats.avgOrderValue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Per order average</p>
+            <p className="font-primary text-xs text-muted-foreground">Per order average</p>
           </CardContent>
         </Card>
       </div>
@@ -323,7 +323,7 @@ export function CustomersTable() {
                   <TableCell className="py-8 text-center" colSpan={7}>
                     <div className="flex items-center justify-center">
                       <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-                      <span className="ml-2 text-muted-foreground">Loading customers...</span>
+                      <span className="font-primary ml-2 text-muted-foreground">Loading customers...</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -442,10 +442,10 @@ export function CustomersTable() {
                 <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
                   <GoBackButton onClick={() => setIsDialogOpen(false)} />
                   <div className="flex flex-col min-w-0">
-                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                       {selectedCustomer?.name}
                     </span>
-                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                       Customer information and order history
                     </span>
                   </div>
@@ -453,10 +453,10 @@ export function CustomersTable() {
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
-                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                       Customer Details - {selectedCustomer?.name}
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Complete customer information and order history
                     </p>
                   </div>
@@ -474,7 +474,7 @@ export function CustomersTable() {
 
                     <TabsContent className="space-y-4" value="profile">
                       <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                        <h3 className="font-bold text-lg mb-3">Customer Information</h3>
+                        <h3 className="font-heading font-bold text-lg mb-3">Customer Information</h3>
                         <div className="flex items-center space-x-4 mb-4">
                           <Avatar className="h-16 w-16 ring-2 ring-blue-500/20">
                             <AvatarImage
@@ -489,17 +489,17 @@ export function CustomersTable() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
+                            <h3 className="font-heading text-lg font-medium text-slate-900 dark:text-slate-100">
                               {selectedCustomer.name}
                             </h3>
-                            <p className="text-sm text-slate-500">{selectedCustomer.email}</p>
-                            <p className="text-sm text-slate-500">{selectedCustomer.phone}</p>
+                            <p className="font-primary text-sm text-slate-500">{selectedCustomer.email}</p>
+                            <p className="font-primary text-sm text-slate-500">{selectedCustomer.phone}</p>
                           </div>
                         </div>
                       </div>
 
                       <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                        <h3 className="font-bold text-lg mb-3">Account Stats</h3>
+                        <h3 className="font-heading font-bold text-lg mb-3">Account Stats</h3>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <div>
                             <div className="text-xs text-slate-500">Customer Since</div>
@@ -526,7 +526,7 @@ export function CustomersTable() {
                 {isLoadingOrders ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-                    <span className="ml-2 text-muted-foreground">Loading orders...</span>
+                    <span className="font-primary ml-2 text-muted-foreground">Loading orders...</span>
                   </div>
                 ) : customerOrders.length === 0 ? (
                   <div className="py-8 text-center text-muted-foreground">
@@ -534,7 +534,7 @@ export function CustomersTable() {
                   </div>
                 ) : (
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-bold text-lg mb-3">Order History</h3>
+                    <h3 className="font-heading font-bold text-lg mb-3">Order History</h3>
                     <div className="space-y-2">
                     {customerOrders.map((order) => (
                       <button
@@ -563,7 +563,7 @@ export function CustomersTable() {
                     </TabsContent>
                     <TabsContent className="space-y-4" value="address">
                       <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                        <h3 className="font-bold text-lg mb-3 flex items-center">
+                        <h3 className="font-heading font-bold text-lg mb-3 flex items-center">
                           <MapPin className="mr-2 h-5 w-5" />
                           Shipping Address
                         </h3>
@@ -614,10 +614,10 @@ export function CustomersTable() {
                 <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
                   <GoBackButton onClick={() => setIsOrderDialogOpen(false)} />
                   <div className="flex flex-col min-w-0">
-                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                       Order Details
                     </span>
-                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                       Complete order information and items
                     </span>
                   </div>
@@ -625,10 +625,10 @@ export function CustomersTable() {
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
-                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                       Order Details
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Complete order information and items
                     </p>
                   </div>
@@ -639,48 +639,48 @@ export function CustomersTable() {
             {isLoadingOrderDetail ? (
               <div className="flex items-center justify-center py-12">
                 <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-                <span className="ml-2 text-muted-foreground">Loading order details...</span>
+                <span className="font-primary ml-2 text-muted-foreground">Loading order details...</span>
               </div>
             ) : selectedOrder ? (
               <div className="space-y-6">
               {/* Order Header */}
               <div className="grid grid-cols-1 gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Order ID</p>
-                  <p className="font-medium">#{selectedOrder.id.slice(0, 8)}</p>
+                  <p className="font-primary text-sm text-muted-foreground">Order ID</p>
+                  <p className="font-primary font-medium">#{selectedOrder.id.slice(0, 8)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Date</p>
-                  <p className="font-medium">{new Date(selectedOrder.date).toLocaleDateString()}</p>
+                  <p className="font-primary text-sm text-muted-foreground">Date</p>
+                  <p className="font-primary font-medium">{new Date(selectedOrder.date).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
+                  <p className="font-primary text-sm text-muted-foreground">Status</p>
                   <Badge variant={getOrderStatusVariant(selectedOrder.status)}>
                     {getOrderStatusLabel(selectedOrder.status)}
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-lg font-bold">${selectedOrder.total.toFixed(2)} {selectedOrder.currency}</p>
+                  <p className="font-primary text-sm text-muted-foreground">Total</p>
+                  <p className="font-primary text-lg font-bold">${selectedOrder.total.toFixed(2)} {selectedOrder.currency}</p>
                 </div>
               </div>
 
               {/* Customer Information */}
               <div>
-                <h3 className="mb-2 font-semibold text-slate-900 dark:text-slate-100">Customer Information</h3>
+                <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Customer Information</h3>
                 <div className="rounded-lg border p-4">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">Name</p>
-                      <p className="font-medium">{selectedOrder.user.firstName} {selectedOrder.user.lastName}</p>
+                      <p className="font-primary text-sm text-muted-foreground">Name</p>
+                      <p className="font-primary font-medium">{selectedOrder.user.firstName} {selectedOrder.user.lastName}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Email</p>
-                      <p className="font-medium">{selectedOrder.user.email}</p>
+                      <p className="font-primary text-sm text-muted-foreground">Email</p>
+                      <p className="font-primary font-medium">{selectedOrder.user.email}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Phone</p>
-                      <p className="font-medium">{selectedOrder.user.phoneNumber || 'N/A'}</p>
+                      <p className="font-primary text-sm text-muted-foreground">Phone</p>
+                      <p className="font-primary font-medium">{selectedOrder.user.phoneNumber || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -688,20 +688,20 @@ export function CustomersTable() {
 
               {/* Shipping Information */}
               <div>
-                <h3 className="mb-2 font-semibold text-slate-900 dark:text-slate-100">Shipping Information</h3>
+                <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Shipping Information</h3>
                 <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">Address</p>
-                  <p className="font-medium">{selectedOrder.shippingAddress}</p>
+                  <p className="font-primary text-sm text-muted-foreground">Address</p>
+                  <p className="font-primary font-medium">{selectedOrder.shippingAddress}</p>
                   {selectedOrder.trackingNumber && (
                     <div className="mt-2">
-                      <p className="text-sm text-muted-foreground">Tracking Number</p>
-                      <p className="font-mono text-sm font-medium">{selectedOrder.trackingNumber}</p>
+                      <p className="font-primary text-sm text-muted-foreground">Tracking Number</p>
+                      <p className="font-primary font-mono text-sm font-medium">{selectedOrder.trackingNumber}</p>
                     </div>
                   )}
                   {selectedOrder.estimatedDelivery && (
                     <div className="mt-2">
-                      <p className="text-sm text-muted-foreground">Estimated Delivery</p>
-                      <p className="font-medium">{new Date(selectedOrder.estimatedDelivery).toLocaleDateString()}</p>
+                      <p className="font-primary text-sm text-muted-foreground">Estimated Delivery</p>
+                      <p className="font-primary font-medium">{new Date(selectedOrder.estimatedDelivery).toLocaleDateString()}</p>
                     </div>
                   )}
                 </div>
@@ -709,7 +709,7 @@ export function CustomersTable() {
 
               {/* Order Items */}
               <div>
-                <h3 className="mb-2 font-semibold text-slate-900 dark:text-slate-100">Order Items</h3>
+                <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Order Items</h3>
                 <div className="space-y-2">
                   {selectedOrder.orderItems.map((item) => (
                     <div key={item.id} className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
@@ -724,14 +724,14 @@ export function CustomersTable() {
                           />
                         )}
                         <div>
-                          <p className="font-medium text-slate-900 dark:text-slate-100">{item.name}</p>
-                          {item.sku && <p className="text-xs text-muted-foreground">SKU: {item.sku}</p>}
-                          <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                          <p className="font-primary font-medium text-slate-900 dark:text-slate-100">{item.name}</p>
+                          {item.sku && <p className="font-primary text-xs text-muted-foreground">SKU: {item.sku}</p>}
+                          <p className="font-primary text-sm text-muted-foreground">Qty: {item.quantity}</p>
                         </div>
                       </div>
                       <div className="text-right sm:text-right">
-                        <p className="font-medium">${item.price.toFixed(2)}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="font-primary font-medium">${item.price.toFixed(2)}</p>
+                        <p className="font-primary text-sm text-muted-foreground">
                           Total: ${(item.price * item.quantity).toFixed(2)}
                         </p>
                       </div>
@@ -743,17 +743,17 @@ export function CustomersTable() {
               {/* Tracking Steps */}
               {selectedOrder.trackingSteps && selectedOrder.trackingSteps.length > 0 && (
                 <div>
-                  <h3 className="mb-2 font-semibold text-slate-900 dark:text-slate-100">Tracking History</h3>
+                  <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Tracking History</h3>
                   <div className="space-y-2">
                     {selectedOrder.trackingSteps.map((step, index) => (
                       <div key={index} className="flex items-start space-x-3 rounded-lg border p-3">
                         <div className={`mt-1 h-3 w-3 rounded-full ${step.completed ? 'bg-green-500' : 'bg-gray-300'}`} />
                         <div className="flex-1">
-                          <p className="font-medium text-slate-900 dark:text-slate-100">{step.status}</p>
+                          <p className="font-primary font-medium text-slate-900 dark:text-slate-100">{step.status}</p>
                           {step.description && (
-                            <p className="text-sm text-muted-foreground">{step.description}</p>
+                            <p className="font-primary text-sm text-muted-foreground">{step.description}</p>
                           )}
-                          <p className="text-xs text-muted-foreground">
+                          <p className="font-primary text-xs text-muted-foreground">
                             {new Date(step.date).toLocaleString()}
                           </p>
                         </div>
@@ -803,10 +803,10 @@ export function CustomersTable() {
                 <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
                   <GoBackButton onClick={() => setIsEditDialogOpen(false)} />
                   <div className="flex flex-col min-w-0">
-                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                       Edit Customer
                     </span>
-                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                       Update customer information
                     </span>
                   </div>
@@ -814,10 +814,10 @@ export function CustomersTable() {
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
-                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                       Edit Customer
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Update customer information
                     </p>
                   </div>
@@ -828,7 +828,7 @@ export function CustomersTable() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-sm font-medium" htmlFor="firstName">
+                      <label className="font-primary mb-1 block text-sm font-medium" htmlFor="firstName">
                         First Name
                       </label>
                       <Input
@@ -841,7 +841,7 @@ export function CustomersTable() {
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-medium" htmlFor="lastName">
+                      <label className="font-primary mb-1 block text-sm font-medium" htmlFor="lastName">
                         Last Name
                       </label>
                       <Input
@@ -856,7 +856,7 @@ export function CustomersTable() {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium" htmlFor="email">
+                    <label className="font-primary mb-1 block text-sm font-medium" htmlFor="email">
                       Email
                     </label>
                     <Input
@@ -871,7 +871,7 @@ export function CustomersTable() {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium" htmlFor="phone">
+                    <label className="font-primary mb-1 block text-sm font-medium" htmlFor="phone">
                       Phone
                     </label>
                     <Input

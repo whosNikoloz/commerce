@@ -329,7 +329,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               src={product.images?.[0] || "/placeholder.png"}
             />
             {product.images && product.images.length > 1 && (
-              <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
+              <span className="font-primary absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
                 +{product.images.length}
               </span>
             )}
@@ -344,7 +344,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         </div>
 
         <div className="space-y-2">
-          <h3 className="font-semibold text-sm line-clamp-2 text-slate-900 dark:text-slate-100">
+          <h3 className="font-heading font-semibold text-sm line-clamp-2 text-slate-900 dark:text-slate-100">
             {product.name}
           </h3>
 
@@ -361,13 +361,13 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             <div className="font-medium">
               {product.discountPrice ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-500 dark:text-slate-400 line-through text-sm">{product.price} ₾</span>
-                  <span className="text-blue-700 dark:text-blue-400 text-sm font-bold">
+                  <span className="font-primary text-slate-500 dark:text-slate-400 line-through text-sm">{product.price} ₾</span>
+                  <span className="font-primary text-blue-700 dark:text-blue-400 text-sm font-bold">
                     {product.discountPrice} ₾
                   </span>
                 </div>
               ) : (
-                <span className="text-blue-700 dark:text-blue-400 text-sm font-bold">{product.price} ₾</span>
+                <span className="font-primary text-blue-700 dark:text-blue-400 text-sm font-bold">{product.price} ₾</span>
               )}
             </div>
 
@@ -556,10 +556,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 {!selectedCategoryId ? (
                   <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
                     <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
-                    <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                    <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
                       Select a Category
                     </h3>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+                    <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">
                       Choose a category from the sidebar (or button on mobile) to view and manage
                       products.
                     </p>
@@ -568,7 +568,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
                       <RefreshCw className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
-                      <span className="text-slate-600 dark:text-slate-400">Loading products...</span>
+                      <span className="font-primary text-slate-600 dark:text-slate-400">Loading products...</span>
                     </div>
                   </div>
                 ) : error ? (
@@ -585,10 +585,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 ) : filteredAndSortedProducts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center px-6">
                     <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
-                    <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                    <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
                       No Products Found
                     </h3>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+                    <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">
                       {debouncedSearch
                         ? "Try adjusting your search terms"
                         : "No products available in this category"}
@@ -642,7 +642,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   width={64}
                                 />
                                 {product.images && product.images.length > 1 && (
-                                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                  <span className="font-primary absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
                                     +{product.images.length}
                                   </span>
                                 )}
@@ -772,7 +772,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               {productToDelete ? (
                 <>
                   Are you sure you want to delete{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                  <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {productToDelete.name}
                   </span>
                   ? This action cannot be undone and will permanently delete the product.

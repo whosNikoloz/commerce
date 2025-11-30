@@ -106,8 +106,7 @@ export default function StoreMap({
       )}
     >
       <div className="absolute left-3 ml-10 top-3 z-[1000] flex gap-2">
-        <button
-          className="rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium shadow hover:bg-white dark:bg-slate-800/90 dark:text-slate-100"
+        <button className="font-primary rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium shadow hover:bg-white dark:bg-slate-800/90 dark:text-slate-100"
           title="ჩემი მდებარეობა"
           onClick={locateMe}
         >
@@ -143,8 +142,7 @@ export default function StoreMap({
                     ტელ: <a href={`tel:${s.phone.replace(/\s+/g, "")}`}>{s.phone}</a>
                   </div>
                   <div>გრაფიკი: {s.hours}</div>
-                  <a
-                    className="text-blue-600 underline dark:text-blue-400"
+                  <a className="font-primary text-blue-600 underline dark:text-blue-400"
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${s.lat},${s.lng}`)}`}
                     rel="noopener noreferrer"
                     target="_blank"

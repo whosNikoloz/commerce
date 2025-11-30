@@ -128,9 +128,9 @@ const nextConfig = {
               "default-src 'self'",
               // Dev often needs 'unsafe-inline' and 'unsafe-eval' (source maps/HMR)
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
-              "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
+              "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://*.amazonaws.com https://media.veli.store https://picsum.photos https://placehold.co https://extra.ge https://toptools.ge",
-              "font-src 'self' data: https://cdnjs.cloudflare.com",
+              "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
               `connect-src ${connectSrcParts.join(" ")}`,
               // Helpful for dev tools and HMR
               "worker-src 'self' blob:",

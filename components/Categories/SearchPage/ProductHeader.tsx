@@ -33,14 +33,14 @@ export default function ProductHeader({
     <header className="bg-gradient-to-r from-card/50 to-card/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-border/40 shadow-lg">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
             Search Results
           </h1>
           <p
             aria-live="polite"
             className="text-sm lg:text-base text-muted-foreground font-medium flex items-center gap-2"
           >
-            <span className="inline-block w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
+            <span className="font-primary inline-block w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
             {productCount} products found
           </p>
         </div>
@@ -53,8 +53,8 @@ export default function ProductHeader({
                 className="min-w-[120px] lg:min-w-[140px] border-2 border-border/50 hover:border-brand-primary/40 rounded-xl shadow-md hover:shadow-lg transition-all"
                 variant="outline"
               >
-                <span className="hidden sm:inline font-medium">Sort by</span>
-                <span className="sm:hidden font-medium">Sort</span>
+                <span className="font-primary hidden sm:inline font-medium">Sort by</span>
+                <span className="font-primary sm:hidden font-medium">Sort</span>
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

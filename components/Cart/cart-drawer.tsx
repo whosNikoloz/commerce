@@ -75,7 +75,7 @@ export default function CartDrawer() {
               <div className="flex items-center justify-between px-3 py-3 sm:px-4 sm:py-3.5 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-2">
                   <ShoppingCartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-300" />
-                  <h2 className="text-sm sm:text-base font-bold text-gray-800 dark:text-white">My Cart</h2>
+                  <h2 className="font-heading text-sm sm:text-base font-bold text-gray-800 dark:text-white">My Cart</h2>
                 </div>
                 <button
                   aria-label="Close cart"
@@ -89,7 +89,7 @@ export default function CartDrawer() {
               {cartLines === 0 ? (
                 <div className="flex flex-col items-center justify-center flex-1 p-4 text-center">
                   <ShoppingCartIcon className="h-12 w-12 sm:h-14 sm:w-14 text-gray-400 dark:text-gray-500" />
-                  <p className="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                  <p className="font-primary mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                     Your cart is empty.
                   </p>
                 </div>
@@ -110,10 +110,10 @@ export default function CartDrawer() {
                             width={56}
                           />
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-white truncate leading-tight">
+                            <h3 className="font-heading text-xs sm:text-sm font-semibold text-gray-800 dark:text-white truncate leading-tight">
                               {item.name}
                             </h3>
-                            <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">
+                            <p className="font-primary text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">
                               ₾{item.price.toFixed(2)}
                             </p>
                           </div>
@@ -132,7 +132,7 @@ export default function CartDrawer() {
                           >
                             <MinusIcon className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                           </button>
-                          <span className="w-5 text-center font-medium text-xs text-gray-800 dark:text-white">
+                          <span className="font-primary w-5 text-center font-medium text-xs text-gray-800 dark:text-white">
                             {item.quantity}
                           </span>
                           <button
@@ -161,8 +161,8 @@ export default function CartDrawer() {
 
                   <div className="sticky bottom-0 px-3 py-3 sm:px-4 sm:py-3.5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
                     <div className="flex justify-between items-center text-sm sm:text-base font-bold mb-2.5">
-                      <span className="text-gray-700 dark:text-gray-300">Total:</span>
-                      <span className="text-brand-primary dark:text-brand-primaryDark">
+                      <span className="font-primary text-gray-700 dark:text-gray-300">Total:</span>
+                      <span className="font-primary text-brand-primary dark:text-brand-primaryDark">
                         ₾{subtotal.toFixed(2)}
                       </span>
                     </div>
@@ -172,7 +172,7 @@ export default function CartDrawer() {
                       href="/cart"
                       onPress={closeCart}
                     >
-                      <span className="text-sm">ნახვა</span>
+                      <span className="font-primary text-sm">ნახვა</span>
                     </Button>
                   </div>
                 </div>

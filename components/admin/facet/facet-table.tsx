@@ -183,8 +183,8 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
               {!selectedCategoryId ? (
                 <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
                   <Plus className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
-                  <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">Select a Category</h3>
-                  <p className="text-slate-500 dark:text-slate-400 max-w-sm">Choose a category from the sidebar to manage facets.</p>
+                  <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">Select a Category</h3>
+                  <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">Choose a category from the sidebar to manage facets.</p>
                 </div>
               ) : loading ? (
                 <div className="flex items-center justify-center py-12 px-6">Loading facets...</div>
@@ -195,8 +195,8 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-                  <h3 className="text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">No Facets</h3>
-                  <p className="text-slate-500 dark:text-slate-400 max-w-sm">Create your first facet for this category.</p>
+                  <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">No Facets</h3>
+                  <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">Create your first facet for this category.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto relative">
@@ -260,7 +260,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
               {facetToDelete ? (
                 <>
                   Are you sure you want to delete{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                  <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {facetToDelete.name}
                   </span>
                   ? This action cannot be undone and will permanently delete the facet.

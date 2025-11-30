@@ -124,10 +124,10 @@ export default function AddCategoryModal({
                 <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
                   <GoBackButton onClick={handleClose} />
                   <div className="flex flex-col min-w-0">
-                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                       Add New Category
                     </span>
-                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                       Create a category for organizing products
                     </span>
                   </div>
@@ -135,10 +135,10 @@ export default function AddCategoryModal({
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
-                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                       Add New Category
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Create a category for organizing products
                     </p>
                   </div>

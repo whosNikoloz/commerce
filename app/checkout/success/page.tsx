@@ -73,24 +73,24 @@ function PaymentSuccessContent() {
           </div>
 
           {/* Success Message */}
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">Payment Successful!</h1>
-          <p className="mb-6 text-gray-600">
+          <h1 className="font-heading mb-2 text-3xl font-bold text-gray-900">Payment Successful!</h1>
+          <p className="font-primary mb-6 text-gray-600">
             Thank you for your purchase. Your order has been confirmed.
           </p>
 
           {/* Order Information */}
           {orderInfo && (
             <div className="mb-6 rounded-lg bg-gray-50 p-4 text-left">
-              <h2 className="mb-2 text-sm font-semibold text-gray-700">Order Details</h2>
+              <h2 className="font-heading mb-2 text-sm font-semibold text-gray-700">Order Details</h2>
               <div className="space-y-1 text-sm text-gray-600">
                 <div className="flex justify-between">
                   <span>Order ID:</span>
-                  <span className="font-mono font-medium">{orderInfo.orderId}</span>
+                  <span className="font-primary font-mono font-medium">{orderInfo.orderId}</span>
                 </div>
                 {orderInfo.paymentId && (
                   <div className="flex justify-between">
                     <span>Payment ID:</span>
-                    <span className="font-mono font-medium">{orderInfo.paymentId}</span>
+                    <span className="font-primary font-mono font-medium">{orderInfo.paymentId}</span>
                   </div>
                 )}
               </div>
@@ -99,7 +99,7 @@ function PaymentSuccessContent() {
 
           {/* Confirmation Email Notice */}
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <p className="text-sm text-blue-800">
+            <p className="font-primary text-sm text-blue-800">
               📧 A confirmation email will be sent to your email address shortly.
             </p>
           </div>

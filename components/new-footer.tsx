@@ -180,7 +180,7 @@ export default function Footer() {
       {stores.length > 0 && (
         <div className="border-b border-border bg-secondary/40 px-4 py-12 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <h2 className="mb-8 text-center text-2xl font-bold md:text-3xl">{t.visitStores}</h2>
+            <h2 className="font-heading mb-8 text-center text-2xl font-bold md:text-3xl">{t.visitStores}</h2>
 
             {/* Store Selector */}
             <div className="mb-8 flex justify-center">
@@ -230,30 +230,29 @@ export default function Footer() {
                 {/* Store Details Card */}
                 <div className={(currentStore.mapsEmbed || business.mapsEmbed) ? "" : "lg:col-span-3"}>
                   <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-                    <h3 className="mb-6 text-xl font-bold text-foreground">
+                    <h3 className="font-heading mb-6 text-xl font-bold text-foreground">
                       {getLocalizedText(currentStore.name, currentLocale)}
                     </h3>
 
                     <div className="space-y-5">
                       {/* Address */}
                       <div>
-                        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                        <p className="font-primary mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                           <MapPin className="h-4 w-4" />
                           {t.address}
                         </p>
-                        <p className="text-sm text-foreground">
+                        <p className="font-primary text-sm text-foreground">
                           {getLocalizedText(currentStore.address, currentLocale)}
                         </p>
                       </div>
 
                       {/* Phone */}
                       <div>
-                        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                        <p className="font-primary mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                           <Phone className="h-4 w-4" />
                           {t.contact}
                         </p>
-                        <a
-                          className="text-sm font-medium text-primary hover:underline transition-colors"
+                        <a className="font-primary text-sm font-medium text-primary hover:underline transition-colors"
                           href={`tel:${getLocalizedText(currentStore.phone, currentLocale)}`}
                         >
                           {getLocalizedText(currentStore.phone, currentLocale)}
@@ -262,8 +261,8 @@ export default function Footer() {
 
                       {/* Hours */}
                       <div>
-                        <p className="mb-2 text-sm font-semibold text-muted-foreground">{t.hours}</p>
-                        <p className="text-sm text-foreground">
+                        <p className="font-primary mb-2 text-sm font-semibold text-muted-foreground">{t.hours}</p>
+                        <p className="font-primary text-sm text-foreground">
                           {getLocalizedText(currentStore.hours, currentLocale)}
                         </p>
                       </div>
@@ -292,8 +291,8 @@ export default function Footer() {
                 />
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-balance">{companyName}</h3>
-                <p className="text-xs text-muted-foreground">{companyTagline}</p>
+                <h3 className="font-heading font-semibold text-lg text-balance">{companyName}</h3>
+                <p className="font-primary text-xs text-muted-foreground">{companyTagline}</p>
               </div>
             </div>
 
@@ -308,12 +307,12 @@ export default function Footer() {
                 {theme === "light" ? (
                   <>
                     <Moon className="h-4 w-4" />
-                    <span className="text-sm font-medium">Dark</span>
+                    <span className="font-primary text-sm font-medium">Dark</span>
                   </>
                 ) : (
                   <>
                     <Sun className="h-4 w-4" />
-                    <span className="text-sm font-medium">Light</span>
+                    <span className="font-primary text-sm font-medium">Light</span>
                   </>
                 )}
               </button>
@@ -327,7 +326,7 @@ export default function Footer() {
                     onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                   >
                     <Globe className="h-4 w-4" />
-                    <span className="text-sm font-medium">{languages[language]}</span>
+                    <span className="font-primary text-sm font-medium">{languages[language]}</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
@@ -360,20 +359,20 @@ export default function Footer() {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
             {/* Information Column */}
             <div>
-              <h4 className="mb-4 font-semibold text-foreground">{t.information}</h4>
+              <h4 className="font-heading mb-4 font-semibold text-foreground">{t.information}</h4>
               <ul className="space-y-3">
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/delivery`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/delivery`}>
                     {t.delivery}
                   </a>
                 </li>
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/stores`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/stores`}>
                     {t.stores}
                   </a>
                 </li>
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/about`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/about`}>
                     {t.about}
                   </a>
                 </li>
@@ -382,20 +381,20 @@ export default function Footer() {
 
             {/* Support Column */}
             <div>
-              <h4 className="mb-4 font-semibold text-foreground">{t.help}</h4>
+              <h4 className="font-heading mb-4 font-semibold text-foreground">{t.help}</h4>
               <ul className="space-y-3">
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/faq`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/faq`}>
                     {t.faq}
                   </a>
                 </li>
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/return-policy`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/return-policy`}>
                     {t.returns}
                   </a>
                 </li>
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/guarantee`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/guarantee`}>
                     {t.guarantee}
                   </a>
                 </li>
@@ -404,15 +403,15 @@ export default function Footer() {
 
             {/* Policies Column */}
             <div>
-              <h4 className="mb-4 font-semibold text-foreground">Legal</h4>
+              <h4 className="font-heading mb-4 font-semibold text-foreground">Legal</h4>
               <ul className="space-y-3">
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/privacy-policy`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/privacy-policy`}>
                     {t.privacy}
                   </a>
                 </li>
                 <li>
-                  <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/terms-and-conditions`}>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/terms-and-conditions`}>
                     {t.terms}
                   </a>
                 </li>
@@ -426,30 +425,30 @@ export default function Footer() {
       <div className="border-t border-border px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-xs text-muted-foreground">{copyrightText}</p>
+            <p className="font-primary text-xs text-muted-foreground">{copyrightText}</p>
             <div className="flex gap-6">
               {socialLinks.facebook && (
-                <a className="text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.facebook} rel="noopener noreferrer" target="_blank">
+                <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.facebook} rel="noopener noreferrer" target="_blank">
                   Facebook
                 </a>
               )}
               {socialLinks.instagram && (
-                <a className="text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.instagram} rel="noopener noreferrer" target="_blank">
+                <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.instagram} rel="noopener noreferrer" target="_blank">
                   Instagram
                 </a>
               )}
               {socialLinks.twitter && (
-                <a className="text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.twitter} rel="noopener noreferrer" target="_blank">
+                <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.twitter} rel="noopener noreferrer" target="_blank">
                   Twitter
                 </a>
               )}
               {socialLinks.youtube && (
-                <a className="text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.youtube} rel="noopener noreferrer" target="_blank">
+                <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.youtube} rel="noopener noreferrer" target="_blank">
                   YouTube
                 </a>
               )}
               {socialLinks.linkedin && (
-                <a className="text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.linkedin} rel="noopener noreferrer" target="_blank">
+                <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.linkedin} rel="noopener noreferrer" target="_blank">
                   LinkedIn
                 </a>
               )}

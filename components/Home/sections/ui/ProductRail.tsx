@@ -116,17 +116,17 @@ export default async function ProductRail({
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6 md:mb-10 gap-2">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg md:text-3xl lg:text-4xl font-bold text-foreground font-heading">
+            <h2 className="font-heading text-lg md:text-3xl lg:text-4xl font-bold text-foreground">
               {t(data.title, locale)}
             </h2>
-            {data.subtitle && <p className="hidden md:block text-muted-foreground mt-2 md:mt-3 text-sm md:text-lg">{tOpt(data.subtitle, locale)}</p>}
+            {data.subtitle && <p className="font-primary hidden md:block text-muted-foreground mt-2 md:mt-3 text-sm md:text-lg">{tOpt(data.subtitle, locale)}</p>}
           </div>
 
         {/* VIEW ALL */}
           <Button asChild className="group flex-shrink-0" size="sm" variant="ghost">
-            <Link className="flex items-center gap-1 text-sm font-semibold" href={data.viewAllHref}>
-              <span className="hidden sm:inline">View All</span>
-              <span className="sm:hidden">All</span>
+            <Link className="font-primary flex items-center gap-1 text-sm font-semibold" href={data.viewAllHref}>
+              <span className="font-primary hidden sm:inline">View All</span>
+              <span className="font-primary sm:hidden">All</span>
               <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>

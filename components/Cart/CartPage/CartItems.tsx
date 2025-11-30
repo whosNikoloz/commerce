@@ -95,7 +95,7 @@ export default function CartItems({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium leading-snug line-clamp-2 text-sm sm:text-base text-text-light dark:text-text-lightdark">
+                  <h3 className="font-heading font-medium leading-snug line-clamp-2 text-sm sm:text-base text-text-light dark:text-text-lightdark">
                     {item.name}
                   </h3>
 
@@ -129,7 +129,7 @@ export default function CartItems({
                       </Badge>
                     )}
                     {!isCheckingStock && quantity > available && available > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                      <span className="font-primary flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
                         <AlertTriangle className="h-3.5 w-3.5" />
                         {dictionary.cart.stockLimitExceeded.replace("{count}", String(available))}
                       </span>
@@ -139,12 +139,12 @@ export default function CartItems({
                   {/* mobile price */}
                   <div className="mt-2 md:hidden">
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-semibold text-text-light dark:text-text-lightdark">
+                      <span className="font-primary text-base font-semibold text-text-light dark:text-text-lightdark">
                         {formatPrice(price)}
                       </span>
                       {hasDiscount && (
                         <>
-                          <span className="text-sm text-text-subtle dark:text-text-subtledark line-through">
+                          <span className="font-primary text-sm text-text-subtle dark:text-text-subtledark line-through">
                             {formatPrice(originalPrice!)}
                           </span>
                           <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
@@ -172,7 +172,7 @@ export default function CartItems({
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="min-w-[2.75rem] text-center text-sm font-medium text-text-light dark:text-text-lightdark">
+                  <span className="font-primary min-w-[2.75rem] text-center text-sm font-medium text-text-light dark:text-text-lightdark">
                     {quantity}
                   </span>
                   <Button
@@ -199,7 +199,7 @@ export default function CartItems({
                 </div>
                 {hasDiscount && (
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-text-subtle dark:text-text-subtledark line-through">
+                    <span className="font-primary text-sm text-text-subtle dark:text-text-subtledark line-through">
                       {formatPrice(originalPrice!)}
                     </span>
                     <Badge

@@ -99,7 +99,7 @@ export default function CartDropdown() {
           {/* header (compact) */}
           <CardHeader className="pb-2 pt-3 px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between w-full">
-              <h1 className="text-sm font-semibold text-text-light dark:text-text-lightdark">{dictionary.cart.shoppingCart}</h1>
+              <h1 className="font-heading text-sm font-semibold text-text-light dark:text-text-lightdark">{dictionary.cart.shoppingCart}</h1>
               <ShadCnBadge className="bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-lightdark border border-gray-200 dark:border-gray-700 text-[11px]">
                 {mounted ? totalQuantity : 0} {dictionary.cart.items}
               </ShadCnBadge>
@@ -109,8 +109,8 @@ export default function CartDropdown() {
           {cartLen === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 px-4 bg-white dark:bg-gray-900">
               <ShoppingCartIcon className="h-12 w-12 text-gray-300 dark:text-gray-700 mb-2" />
-              <p className="text-sm font-medium text-text-light dark:text-text-lightdark">{dictionary.cart.empty}</p>
-              <p className="text-xs mt-1 text-text-subtle dark:text-text-subtledark">{dictionary.cart.emptyDescriptionShort}</p>
+              <p className="font-primary text-sm font-medium text-text-light dark:text-text-lightdark">{dictionary.cart.empty}</p>
+              <p className="font-primary text-xs mt-1 text-text-subtle dark:text-text-subtledark">{dictionary.cart.emptyDescriptionShort}</p>
             </div>
           ) : (
             <>
@@ -139,17 +139,17 @@ export default function CartDropdown() {
 
                           {/* title + price */}
                           <div className="min-w-0">
-                            <h4 className="text-[13px] font-semibold leading-tight truncate text-text-light dark:text-text-lightdark">
+                            <h4 className="font-heading text-[13px] font-semibold leading-tight truncate text-text-light dark:text-text-lightdark">
                               {item.name}
                             </h4>
 
                             <div className="mt-1.5 flex items-center gap-2">
-                              <span className="text-sm font-bold text-text-light dark:text-text-lightdark">
+                              <span className="font-primary text-sm font-bold text-text-light dark:text-text-lightdark">
                                 {fmt.format(item.price)} ₾
                               </span>
                               {item.discount > 0 && (
                                 <>
-                                  <span className="text-[11px] line-through text-text-subtle dark:text-text-subtledark">
+                                  <span className="font-primary text-[11px] line-through text-text-subtle dark:text-text-subtledark">
                                     {item.originalPrice} ₾
                                   </span>
                                 </>
@@ -165,7 +165,7 @@ export default function CartDropdown() {
                               title="Remove"
                               onClick={() => removeFromCart(item.id)}
                             >
-                              <span className="text-base leading-none">🗑️</span>
+                              <span className="font-primary text-base leading-none">🗑️</span>
                             </button>
 
                             {/* qty pill (keeps your brand blue as-is) */}
@@ -178,7 +178,7 @@ export default function CartDropdown() {
                                   updateCartItem(item.id, Math.max(1, item.quantity - 1))
                                 }
                               >
-                                <span className="text-sm font-bold">−</span>
+                                <span className="font-primary text-sm font-bold">−</span>
                               </button>
                               <div className="w-9 h-8 flex items-center justify-center text-xs font-extrabold">
                                 {item.quantity}
@@ -188,7 +188,7 @@ export default function CartDropdown() {
                                 className="h-8 w-8 rounded-r-full hover:bg-white/10"
                                 onClick={() => updateCartItem(item.id, item.quantity + 1)}
                               >
-                                <span className="text-sm font-bold">+</span>
+                                <span className="font-primary text-sm font-bold">+</span>
                               </button>
                             </div>
                           </div>
@@ -202,8 +202,8 @@ export default function CartDropdown() {
               <CardFooter className="sticky bottom-0 z-10 px-4  bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
                 <div className="w-full space-y-3">
                   <div className="flex items-center justify-between rounded-lg ">
-                    <span className="text-sm font-semibold text-text-light dark:text-text-lightdark" />
-                    <span className="text-xl font-extrabold text-text-light dark:text-text-lightdark">
+                    <span className="font-primary text-sm font-semibold text-text-light dark:text-text-lightdark" />
+                    <span className="font-primary text-xl font-extrabold text-text-light dark:text-text-lightdark">
                       {fmt.format(subtotal)} ₾
                     </span>
                   </div>
@@ -215,7 +215,7 @@ export default function CartDropdown() {
                       href="/cart"
                       onPress={onClose}
                     >
-                      <span className="text-sm">{dictionary.cart.view}</span>
+                      <span className="font-primary text-sm">{dictionary.cart.view}</span>
                       {/* <ShadCnBadge className="ml-2 bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-lightdark border border-gray-300 dark:border-gray-600 text-[11px]">
                         {mounted ? totalQuantity : 0}
                       </ShadCnBadge> */}
@@ -224,7 +224,7 @@ export default function CartDropdown() {
                       className="flex-1 h-10 rounded-lg font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md hover:shadow-lg"
                       onPress={handleCheckout}
                     >
-                      <span className="text-sm">{dictionary.cart.buy}</span>
+                      <span className="font-primary text-sm">{dictionary.cart.buy}</span>
                     </Button> */}
                   </div>
                 </div>

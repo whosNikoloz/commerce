@@ -232,7 +232,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               width={48}
             />
             {!!category.images && category.images.length > 1 && (
-              <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs px-1 py-0.5 rounded-full font-medium text-[10px]">
+              <span className="font-primary absolute -top-1 -right-1 bg-blue-600 text-white text-xs px-1 py-0.5 rounded-full font-medium text-[10px]">
                 +{category.images.length}
               </span>
             )}
@@ -271,12 +271,12 @@ export function CategoriesTreeView({ initialCategories }: Props) {
             {isActive ? (
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 ring-1 ring-emerald-200 dark:ring-emerald-800">
                 <Eye className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Active</span>
+                <span className="font-primary text-xs font-bold text-emerald-700 dark:text-emerald-400">Active</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
                 <EyeOff className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Hidden</span>
+                <span className="font-primary text-xs font-bold text-slate-600 dark:text-slate-400">Hidden</span>
               </div>
             )}
           </div>
@@ -417,8 +417,8 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                 onClick={expandAll}
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="hidden sm:inline">Expand All</span>
-                <span className="sm:hidden">Expand</span>
+                <span className="font-primary hidden sm:inline">Expand All</span>
+                <span className="font-primary sm:hidden">Expand</span>
               </Button>
               <Button
                 className="text-xs sm:text-sm font-semibold flex-1 sm:flex-none"
@@ -427,8 +427,8 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                 onClick={collapseAll}
               >
                 <Minus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="hidden sm:inline">Collapse All</span>
-                <span className="sm:hidden">Collapse</span>
+                <span className="font-primary hidden sm:inline">Collapse All</span>
+                <span className="font-primary sm:hidden">Collapse</span>
               </Button>
             </div>
 
@@ -450,16 +450,16 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           <div className="flex items-center gap-2 text-xs sm:text-sm flex-wrap">
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800">
               <Folder className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                <span className="hidden sm:inline">{rootCategories.length} root</span>
-                <span className="sm:hidden">{rootCategories.length}</span>
+              <span className="font-primary font-semibold text-slate-700 dark:text-slate-300">
+                <span className="font-primary hidden sm:inline">{rootCategories.length} root</span>
+                <span className="font-primary sm:hidden">{rootCategories.length}</span>
               </span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800">
               <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                <span className="hidden sm:inline">{categories.length} total</span>
-                <span className="sm:hidden">{categories.length}</span>
+              <span className="font-primary font-semibold text-slate-700 dark:text-slate-300">
+                <span className="font-primary hidden sm:inline">{categories.length} total</span>
+                <span className="font-primary sm:hidden">{categories.length}</span>
               </span>
             </div>
           </div>
@@ -472,10 +472,10 @@ export function CategoriesTreeView({ initialCategories }: Props) {
             <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
               <Tag className="h-6 w-6 sm:h-8 sm:w-8 text-slate-400" />
             </div>
-            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-semibold text-center">
+            <p className="font-primary text-sm sm:text-base text-slate-500 dark:text-slate-400 font-semibold text-center">
               No categories found
             </p>
-            <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500 text-center">
+            <p className="font-primary text-xs sm:text-sm text-slate-400 dark:text-slate-500 text-center">
               {searchTerm ? "Try adjusting your search" : "Add your first category to get started"}
             </p>
           </div>
@@ -497,7 +497,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               {categoryToDelete ? (
                 <>
                   Are you sure you want to delete{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                  <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {categoryToDelete.name}
                   </span>
                   ? This action cannot be undone and will permanently delete the category.

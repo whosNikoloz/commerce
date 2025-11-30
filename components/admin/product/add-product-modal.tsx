@@ -224,10 +224,10 @@ export default function AddProductModal({
                 <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
                   <GoBackButton onClick={handleClose} />
                   <div className="flex flex-col min-w-0">
-                    <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                       Add New Product
                     </span>
-                    <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                       Create a product with pricing, stock and attributes.
                     </span>
                   </div>
@@ -235,10 +235,10 @@ export default function AddProductModal({
               ) : (
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
-                    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                       Add New Product
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Manage your product inventory, pricing and attributes.
                     </p>
                   </div>
@@ -256,7 +256,7 @@ export default function AddProductModal({
               >
                 <section className="space-y-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-10">
+                    <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100 mb-10">
                       Basic Information
                     </h3>
                   </div>
@@ -303,10 +303,10 @@ export default function AddProductModal({
                 {/* Pricing */}
                 <section className="space-y-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
                       Pricing
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Set the regular and discounted selling price.
                     </p>
                   </div>
@@ -360,10 +360,10 @@ export default function AddProductModal({
                 {/* Classification */}
                 <section className="space-y-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
                       Classification
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Organize this product by category, brand and variant group.
                     </p>
                   </div>
@@ -472,10 +472,10 @@ export default function AddProductModal({
                 {/* Inventory */}
                 <section className="space-y-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
                       Inventory & Condition
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Control how this product appears in stock and condition filters.
                     </p>
                   </div>
@@ -541,10 +541,10 @@ export default function AddProductModal({
                 {/* Facets */}
                 <section className="space-y-3 pb-1">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
                       Attributes & Filters
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                       Attach facet values (size, color, material, etc.) so customers can filter.
                     </p>
                   </div>
@@ -560,7 +560,7 @@ export default function AddProductModal({
               {/* FOOTER (fixed) */}
               <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
                 <div className="flex w-full items-center justify-between gap-3">
-                  <p className="hidden text-xs text-slate-500 dark:text-slate-400 md:block">
+                  <p className="font-primary hidden text-xs text-slate-500 dark:text-slate-400 md:block">
                     You can edit all details later from the product page.
                   </p>
 

@@ -17,11 +17,11 @@ export default async function NotFound({
   return (
     <div className="container mx-auto px-4 py-16 text-center h-screen flex flex-col justify-center items-center">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-6xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+        <h1 className="font-heading text-6xl font-bold text-gray-800 dark:text-gray-200 mb-4">
           {t.code}
         </h1>
 
-        <h2 className="text-3xl font-semibold text-gray-700 dark:text-gray-300 mb-6">
+        <h2 className="font-heading text-3xl font-semibold text-gray-700 dark:text-gray-300 mb-6">
           {t.title}
         </h2>
 

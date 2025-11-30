@@ -99,7 +99,7 @@ export function Specifications({ specs = [], value, onChange, disabled = false }
                  <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] lg:grid-cols-[250px_1fr]  items-center">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-brand-primary/60" />
-                        <span className="font-semibold text-foreground text-sm sm:text-base">
+                        <span className="font-primary font-semibold text-foreground text-sm sm:text-base">
                           {spec.facetName}
                         </span>
                       </div>

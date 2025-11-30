@@ -121,6 +121,7 @@ export default async function RootLayout({
     // If the requested locale is the tenant's default, redirect to hide it
     if (actualLocale === tenantDefaultLocale) {
       const pathWithoutLocale = originalPathname.replace(`/${actualLocale}`, "") || "/";
+
       redirect(pathWithoutLocale);
     }
   } else {
@@ -147,6 +148,36 @@ export default async function RootLayout({
   // Get dynamic theme color from PWA config or tenant theme
   const themeColor = site.pwa?.themeColor || tenant.themeColor || "#000000";
 
+  // Extract font names for Google Fonts
+  const getFontNames = () => {
+    const fonts = new Set<string>();
+
+    if (tenant.theme.fonts?.primary) {
+      const fontName = tenant.theme.fonts.primary.split(',')[0].trim().replace(/['"]/g, '');
+
+      fonts.add(fontName);
+    }
+
+    if (tenant.theme.fonts?.heading) {
+      const fontName = tenant.theme.fonts.heading.split(',')[0].trim().replace(/['"]/g, '');
+
+      fonts.add(fontName);
+    }
+
+    if (tenant.theme.fonts?.secondary) {
+      const fontName = tenant.theme.fonts.secondary.split(',')[0].trim().replace(/['"]/g, '');
+
+      fonts.add(fontName);
+    }
+
+    return Array.from(fonts);
+  };
+
+  const fontNames = getFontNames();
+  const googleFontsUrl = fontNames.length > 0
+    ? `https://fonts.googleapis.com/css2?${fontNames.map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;500;600;700&`).join('')}display=swap`
+    : null;
+
   return (
     <html suppressHydrationWarning lang={safeLang} style={style}>
       <head>
@@ -156,6 +187,15 @@ export default async function RootLayout({
         <meta content={themeColor} name="msapplication-TileColor" />
         <link href={site.favicon} rel="icon" sizes="any" />
         <link href={site.favicon} rel="apple-touch-icon" />
+
+        {/* Google Fonts preconnect */}
+        <link href="https://fonts.googleapis.com" rel="preconnect" />
+        <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
+
+        {/* Load tenant fonts from Google Fonts */}
+        {googleFontsUrl && (
+          <link href={googleFontsUrl} rel="stylesheet" />
+        )}
 
         {/* Resource hints for performance */}
         <link href="https://cdnjs.cloudflare.com" rel="preconnect" />

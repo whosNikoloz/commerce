@@ -130,7 +130,7 @@ export default async function FAQPage({ params }: { params: Promise<{ lang: stri
         <NextLink className="hover:text-primary" href={`/${lang}`}>
           მთავარი
         </NextLink>
-        <span className="mx-2">/</span>
+        <span className="font-primary mx-2">/</span>
         <span aria-current="page" className="text-foreground">
           FAQ
         </span>
@@ -142,8 +142,8 @@ export default async function FAQPage({ params }: { params: Promise<{ lang: stri
             <HelpCircle className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">ხშირად დასმული კითხვები</h1>
-            <p className="mt-2 max-w-2xl text-muted-foreground">
+            <h1 className="font-heading text-3xl font-bold tracking-tight">ხშირად დასმული კითხვები</h1>
+            <p className="font-primary mt-2 max-w-2xl text-muted-foreground">
               მოკლე პასუხები მიწოდებაზე, გადახდაზე, დაბრუნებასა და გარანტიაზე.
             </p>
           </div>

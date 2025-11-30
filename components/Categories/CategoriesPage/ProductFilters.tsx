@@ -98,7 +98,7 @@ function FacetBlock({
                 id={v.id}
                 onCheckedChange={() => v.id && onFacetToggle(facet.id, v.id)}
               />
-              <label className="text-sm cursor-pointer text-text-light dark:text-text-lightdark" htmlFor={v.id}>
+              <label className="font-primary text-sm cursor-pointer text-text-light dark:text-text-lightdark" htmlFor={v.id}>
                 {v.value}
               </label>
             </div>
@@ -180,7 +180,7 @@ function FacetBlock({
 
       return (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-text-light dark:text-text-lightdark">
+          <span className="font-primary text-sm text-text-light dark:text-text-lightdark">
             {firstVal?.value ?? "Enabled"}
           </span>
           <Switch checked={checked} onCheckedChange={() => firstVal?.id && onFacetToggle(facet.id, firstVal.id)} />
@@ -211,7 +211,7 @@ function FacetBlock({
             type="date"
             onChange={(e) => onFacetDateRangeChange?.(facet.id, e.target.value || undefined, undefined)}
           />
-          <span className="text-xs text-muted-foreground">to</span>
+          <span className="font-primary text-xs text-muted-foreground">to</span>
           <Input
             className="w-40"
             disabled={disabled}
@@ -234,7 +234,7 @@ function FacetBlock({
                   id={v.id}
                   onCheckedChange={() => v.id && onFacetToggle(facet.id, v.id)}
                 />
-                <label className="cursor-pointer" htmlFor={v.id}>
+                <label className="font-primary cursor-pointer" htmlFor={v.id}>
                   {v.value}
                 </label>
               </div>
@@ -273,8 +273,8 @@ function SidebarContent({
     <div className="space-y-6">
       {/* Categories */}
       <div>
-        <h2 className="text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
-          <span className="w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
+        <h2 className="font-heading text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
+          <span className="font-primary w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
           {dict?.filters?.categories || "Categories"}
         </h2>
         <div className="space-y-1.5">
@@ -290,8 +290,8 @@ function SidebarContent({
                          hover:translate-x-1"
               href={buildSubHref(sub)}
             >
-              <span className="text-sm font-medium group-hover:font-semibold transition-all">{sub.name}</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-all">
+              <span className="font-primary text-sm font-medium group-hover:font-semibold transition-all">{sub.name}</span>
+              <span className="font-primary text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-all">
                 {(sub as any).count ?? 0}
               </span>
             </Link>
@@ -303,7 +303,7 @@ function SidebarContent({
         {/* Price */}
         <AccordionItem className="border-b border-border/50" value="price">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
-            <span className="flex items-center gap-2">
+            <span className="font-primary flex items-center gap-2">
               {dict?.filters?.priceRange || "Price Range"}
             </span>
           </AccordionTrigger>
@@ -318,8 +318,8 @@ function SidebarContent({
                 onValueChange={(v: number[]) => onPriceChange(v?.[0], v?.[1])}
               />
               <div className="flex items-center justify-between text-sm">
-                <span className="text-text-subtle dark:text-text-subtledark">₾{minPrice}</span>
-                <span className="text-text-subtle dark:text-text-subtledark">₾{maxPrice}</span>
+                <span className="font-primary text-text-subtle dark:text-text-subtledark">₾{minPrice}</span>
+                <span className="font-primary text-text-subtle dark:text-text-subtledark">₾{maxPrice}</span>
               </div>
               <div className="flex gap-2">
                 <Input
@@ -342,7 +342,7 @@ function SidebarContent({
         {/* Brands */}
         <AccordionItem className="border-b border-border/50" value="brands">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
-            <span className="flex items-center gap-2">
+            <span className="font-primary flex items-center gap-2">
               {dict?.filters?.brands || "Brands"}
             </span>
           </AccordionTrigger>
@@ -358,8 +358,7 @@ function SidebarContent({
                       id={`brand-${b.id}`}
                       onCheckedChange={() => onBrandToggle(b.id)}
                     />
-                    <label
-                      className="text-sm cursor-pointer text-text-light dark:text-text-lightdark"
+                    <label className="font-primary text-sm cursor-pointer text-text-light dark:text-text-lightdark"
                       htmlFor={`brand-${b.id}`}
                     >
                       {b.name}
@@ -374,7 +373,7 @@ function SidebarContent({
         {/* Stock */}
         <AccordionItem className="border-b border-border/50" value="stock">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
-            <span className="flex items-center gap-2">
+            <span className="font-primary flex items-center gap-2">
               {dict?.filters?.stock || "Stock"}
             </span>
           </AccordionTrigger>
@@ -411,7 +410,7 @@ function SidebarContent({
         {/* Condition */}
         <AccordionItem className="border-b border-border/50" value="condition">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
-            <span className="flex items-center gap-2">
+            <span className="font-primary flex items-center gap-2">
               {dict?.filters?.condition || "Condition"}
             </span>
           </AccordionTrigger>
@@ -431,8 +430,7 @@ function SidebarContent({
                       id={`cond-${c.v}`}
                       onCheckedChange={() => onConditionToggle(c.v)}
                     />
-                    <label
-                      className="text-sm cursor-pointer text-text-light dark:text-text-lightdark"
+                    <label className="font-primary text-sm cursor-pointer text-text-light dark:text-text-lightdark"
                       htmlFor={`cond-${c.v}`}
                     >
                       {c.label}
@@ -448,7 +446,7 @@ function SidebarContent({
         {facets.map((f) => (
           <AccordionItem key={f.id} className="border-b border-border/50" value={`facet-${f.id}`}>
             <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
-              <span className="flex items-center gap-2">
+              <span className="font-primary flex items-center gap-2">
                 {f.name}
               </span>
             </AccordionTrigger>

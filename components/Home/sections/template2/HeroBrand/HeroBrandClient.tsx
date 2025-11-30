@@ -117,20 +117,20 @@ export default function HeroBrandClient({
                               {slide.badgeText && (
                                 <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/30 rounded-full">
                                   <Sparkles className="w-4 h-4 text-white" />
-                                  <span className="text-sm tracking-widest uppercase text-white font-light">
+                                  <span className="font-primary text-sm tracking-widest uppercase text-white font-light">
                                     {slide.badgeText}
                                   </span>
                                 </div>
                               )}
 
                               {slide.titleText && (
-                                <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-white mb-6 drop-shadow-2xl">
+                                <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-white mb-6 drop-shadow-2xl">
                                   {slide.titleText}
                                 </h1>
                               )}
 
                               {(slide.descText || subheadline) && (
-                                <p className="text-lg md:text-xl text-white/95 font-light tracking-wide max-w-2xl mx-auto mb-8 drop-shadow-lg">
+                                <p className="font-primary text-lg md:text-xl text-white/95 font-light tracking-wide max-w-2xl mx-auto mb-8 drop-shadow-lg">
                                   {slide.descText || subheadline}
                                 </p>
                               )}
@@ -211,13 +211,13 @@ export default function HeroBrandClient({
                 {badge && (
                   <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/30 rounded-full">
                     <Sparkles className="w-4 h-4 text-white" />
-                    <span className="text-sm tracking-widest uppercase text-white font-light">
+                    <span className="font-primary text-sm tracking-widest uppercase text-white font-light">
                       {badge}
                     </span>
                   </div>
                 )}
 
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-6 drop-shadow-2xl">
+                <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-6 drop-shadow-2xl">
                   {headline}
                 </h1>
 
@@ -283,11 +283,11 @@ export default function HeroBrandClient({
 
               {/* Content */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 transition-transform duration-500 group-hover:translate-y-[-8px]">
-                <h3 className="text-3xl md:text-4xl font-light tracking-wide text-white mb-2 drop-shadow-lg">
+                <h3 className="font-heading text-3xl md:text-4xl font-light tracking-wide text-white mb-2 drop-shadow-lg">
                   {tile.titleText}
                 </h3>
                 {tile.subtitleText && (
-                  <p className="text-sm md:text-base tracking-widest uppercase text-white/90 font-light drop-shadow">
+                  <p className="font-primary text-sm md:text-base tracking-widest uppercase text-white/90 font-light drop-shadow">
                     {tile.subtitleText}
                   </p>
                 )}

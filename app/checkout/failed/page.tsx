@@ -32,44 +32,44 @@ function PaymentFailedContent() {
             </div>
           </div>
 
-          <h1 className="mb-2 text-center text-2xl font-bold text-gray-900">
+          <h1 className="font-heading mb-2 text-center text-2xl font-bold text-gray-900">
             Payment Failed
           </h1>
 
           {paymentInfo?.reason && (
             <div className="mb-6 rounded-lg bg-red-50 p-4">
-              <p className="text-sm text-red-800">
+              <p className="font-primary text-sm text-red-800">
                 <strong>Reason:</strong> {paymentInfo.reason}
               </p>
             </div>
           )}
 
           <div className="mb-6">
-            <p className="mb-4 text-center text-gray-600">
+            <p className="font-primary mb-4 text-center text-gray-600">
               We couldn&apos;t process your payment. This could be due to:
             </p>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start">
-                <span className="mr-2">•</span>
+                <span className="font-primary mr-2">•</span>
                 <span>Insufficient funds</span>
               </li>
               <li className="flex items-start">
-                <span className="mr-2">•</span>
+                <span className="font-primary mr-2">•</span>
                 <span>Card declined by bank</span>
               </li>
               <li className="flex items-start">
-                <span className="mr-2">•</span>
+                <span className="font-primary mr-2">•</span>
                 <span>Incorrect card details</span>
               </li>
               <li className="flex items-start">
-                <span className="mr-2">•</span>
+                <span className="font-primary mr-2">•</span>
                 <span>Payment cancelled</span>
               </li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
+            <button className="font-primary flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
               onClick={handleRetry}
             >
               <RefreshCw className="h-5 w-5" />

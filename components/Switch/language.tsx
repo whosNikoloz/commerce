@@ -166,7 +166,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
             className,
           )}
         >
-          <span className="text-sm">{getLanguageName(defaultLocale)}</span>
+          <span className="font-primary text-sm">{getLanguageName(defaultLocale)}</span>
         </div>
       );
     }
@@ -199,7 +199,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
           <div className="flex items-center gap-2">
             {iconName && <FlagIcon code={iconName} size={18} />}
             <SelectValue placeholder={getLanguageName(currentLanguage)}>
-              <span className="text-sm">{getLanguageName(currentLanguage)}</span>
+              <span className="font-primary text-sm">{getLanguageName(currentLanguage)}</span>
             </SelectValue>
           </div>
         </SelectTrigger>
@@ -249,7 +249,7 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
         {!currentIconName && toggleIconName && <FlagIcon code={toggleIconName} size={24} />}
 
         {!currentIconName && !toggleIconName && (
-          <span className="text-sm">{getLanguageName(currentLanguage)}</span>
+          <span className="font-primary text-sm">{getLanguageName(currentLanguage)}</span>
         )}
       </div>
     </Component>

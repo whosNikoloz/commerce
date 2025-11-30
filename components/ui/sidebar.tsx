@@ -145,8 +145,7 @@ export const MobileSidebar = ({ className, children, ...props }: React.Component
                 ease: "easeInOut",
               }}
             >
-              <button
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
+              <button className="font-primary absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
                 onClick={() => setOpen(!open)}
               >
                 <IconX />
@@ -175,7 +174,7 @@ export const SidebarLink = ({ link, className, ...props }: SidebarLinkProps) => 
       prefetch={false}
       {...props}
     >
-      <span className="shrink-0 flex items-center justify-center w-5 h-5">{link.icon}</span>
+      <span className="font-primary shrink-0 flex items-center justify-center w-5 h-5">{link.icon}</span>
 
       <span
         className={cn(
@@ -226,7 +225,7 @@ export const SidebarGroup = ({
         )}
         onClick={handleToggle}
       >
-        <span className="shrink-0 flex items-center justify-center w-5 h-5">
+        <span className="font-primary shrink-0 flex items-center justify-center w-5 h-5">
           {link.icon}
         </span>
 
@@ -236,7 +235,7 @@ export const SidebarGroup = ({
             open ? "opacity-100 w-auto" : "opacity-0 w-0"
           )}
         >
-          <span className="text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap">
+          <span className="font-primary text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap">
             {link.label}
           </span>
           {isExpanded ? (

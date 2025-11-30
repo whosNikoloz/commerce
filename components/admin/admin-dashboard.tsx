@@ -160,7 +160,7 @@ export default function AdminDashboard() {
                     <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
                     {stat.trend}
                   </Badge>
-                  <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">vs last month</span>
+                  <span className="font-primary text-xs text-slate-600 dark:text-slate-400 font-medium">vs last month</span>
                 </div>
               </CardContent>
             </Card>
@@ -204,12 +204,12 @@ export default function AdminDashboard() {
             {loadingOrders ? (
               <div className="py-12 text-center text-slate-500 dark:text-slate-400">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3" />
-                <p className="text-sm font-medium">Loading orders...</p>
+                <p className="font-primary text-sm font-medium">Loading orders...</p>
               </div>
             ) : orders.length === 0 ? (
               <div className="py-12 text-center text-slate-500 dark:text-slate-400">
                 <ShoppingCart className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                <p className="text-sm font-medium">No orders yet</p>
+                <p className="font-primary text-sm font-medium">No orders yet</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -225,22 +225,22 @@ export default function AdminDashboard() {
                     >
                       <div className="flex items-center w-full sm:w-auto">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 ring-2 ring-white dark:ring-slate-800 shrink-0">
-                          <span className="text-sm font-bold text-white">
+                          <span className="font-primary text-sm font-bold text-white">
                             {initials}
                           </span>
                         </div>
                         <div className="ml-4 flex-1 min-w-0">
-                          <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                          <p className="font-primary text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
                             Order #{orderNumber}
                           </p>
-                          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
+                          <p className="font-primary text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
                             {formatDate(order.date)} • {order.items} {order.items === 1 ? 'item' : 'items'}
                           </p>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between sm:flex-col sm:items-end gap-1.5 sm:ml-auto w-full sm:w-auto pl-16 sm:pl-0">
-                        <span className="font-bold text-slate-900 dark:text-slate-100 text-base whitespace-nowrap">
+                        <span className="font-primary font-bold text-slate-900 dark:text-slate-100 text-base whitespace-nowrap">
                           {formatCurrency(order.total)}
                         </span>
                         <Badge

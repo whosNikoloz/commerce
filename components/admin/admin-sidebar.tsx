@@ -214,7 +214,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <span className="shrink-0 flex items-center justify-center w-5 h-5"><Palette /></span>
+                <span className="font-primary shrink-0 flex items-center justify-center w-5 h-5"><Palette /></span>
                 <span
                   className={cn(
                     "text-neutral-700 dark:text-neutral-200 text-sm whitespace-nowrap inline-block transition-all duration-150",
@@ -266,10 +266,10 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
 //       href="#"
 //     >
 //       <div className="h-8 w-8 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center">
-//         <span className="text-white font-bold text-sm">F</span>
+//         <span className="font-primary text-white font-bold text-sm">F</span>
 //       </div>
 //       {open && (
-//         <span className="whitespace-nowrap text-slate-900 dark:text-slate-100 font-bold text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150 tracking-tight">
+//         <span className="font-primary whitespace-nowrap text-slate-900 dark:text-slate-100 font-bold text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150 tracking-tight">
 //           Demo
 //         </span>
 //       )}

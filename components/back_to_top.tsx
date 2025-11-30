@@ -78,7 +78,7 @@ export default function BackToTopShadcn({
       type="button"
       onClick={scrollToTop}
     >
-      <span className="sr-only">{ariaLabel}</span>
+      <span className="font-primary sr-only">{ariaLabel}</span>
       <ArrowUp className="h-5 w-5 md:h-6 md:w-6" />
     </Button>
   );

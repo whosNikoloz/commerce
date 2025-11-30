@@ -373,11 +373,11 @@ const ProductCard = memo(function ProductCard({
                           </span>
                         </>
                       ) : showComingSoon ? (
-                        <span className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
+                        <span className="font-primary text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
                           Coming Soon
                         </span>
                       ) : (
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">Out of Stock</span>
+                        <span className="font-primary text-[10px] sm:text-xs text-muted-foreground">Out of Stock</span>
                       )}
                     </div>
                   </div>
@@ -432,21 +432,21 @@ const ProductCard = memo(function ProductCard({
               <div className="flex flex-col justify-center flex-1 min-w-0 space-y-1.5">
                 <div className="space-y-0.5">
                   {metaLine && (
-                    <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide truncate">
+                    <p className="font-primary text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide truncate">
                       {metaLine}
                     </p>
                   )}
-                  <h3 className="text-sm sm:text-base md:text-lg font-semibold leading-tight group-hover:text-brand-primary transition-colors line-clamp-2">
+                  <h3 className="font-heading text-sm sm:text-base md:text-lg font-semibold leading-tight group-hover:text-brand-primary transition-colors line-clamp-2">
                     {product.name ?? "Unnamed Product"}
                   </h3>
                 </div>
 
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                  <span className="font-primary text-lg sm:text-xl md:text-2xl font-bold text-foreground">
                     {formatPrice(displayPrice)}
                   </span>
                   {originalPrice && (
-                    <span className="text-xs sm:text-sm text-muted-foreground/70 line-through">
+                    <span className="font-primary text-xs sm:text-sm text-muted-foreground/70 line-through">
                       {formatPrice(originalPrice)}
                     </span>
                   )}
@@ -456,16 +456,16 @@ const ProductCard = memo(function ProductCard({
                   {inStock ? (
                     <>
                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
-                      <span className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                      <span className="font-primary text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-medium">
                         In Stock
                       </span>
                     </>
                   ) : showComingSoon ? (
-                    <span className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
+                    <span className="font-primary text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">
                       Coming Soon
                     </span>
                   ) : (
-                    <span className="text-[10px] sm:text-xs text-muted-foreground">Out of Stock</span>
+                    <span className="font-primary text-[10px] sm:text-xs text-muted-foreground">Out of Stock</span>
                   )}
                 </div>
               </div>

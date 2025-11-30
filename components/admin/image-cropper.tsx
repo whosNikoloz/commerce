@@ -272,7 +272,7 @@ export function ImageCropper({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium text-slate-700 dark:text-slate-300" id={labelId}>
+      <p className="font-primary text-sm font-medium text-slate-700 dark:text-slate-300" id={labelId}>
         {label}
       </p>
 
@@ -292,10 +292,10 @@ export function ImageCropper({
                 style={{ aspectRatio }}
               >
                 <Upload className="h-12 w-12 text-slate-400 mb-4" />
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <p className="font-primary text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Click to upload image
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="font-primary text-xs text-slate-500">
                   PNG, JPG up to 5MB
                 </p>
               </div>
@@ -401,7 +401,7 @@ export function ImageCropper({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-sm">Zoom</Label>
-              <span className="text-sm text-slate-500">{(zoom * 100).toFixed(0)}%</span>
+              <span className="font-primary text-sm text-slate-500">{(zoom * 100).toFixed(0)}%</span>
             </div>
             <Slider
               max={3}
@@ -412,7 +412,7 @@ export function ImageCropper({
             />
           </div>
 
-          <p className="text-xs text-slate-500 text-center">
+          <p className="font-primary text-xs text-slate-500 text-center">
             Drag to reposition • Use slider to zoom
           </p>
 

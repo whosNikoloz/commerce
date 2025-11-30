@@ -37,10 +37,10 @@ export default function InfoPageRenderer({ pageConfig, locale }: InfoPageRendere
     return (
       <div className="flex items-center justify-center min-h-[400px] p-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">
+          <h2 className="font-heading text-2xl font-bold text-red-600 mb-2">
             No Content Available
           </h2>
-          <p className="text-gray-600">
+          <p className="font-primary text-gray-600">
             This page has no configured content sections.
           </p>
         </div>

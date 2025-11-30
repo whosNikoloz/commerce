@@ -64,8 +64,8 @@ export function AdminHeader() {
           <DropdownMenuContent forceMount align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Admin User</p>
-                <p className="text-xs leading-none text-muted-foreground">admin@example.com</p>
+                <p className="font-primary text-sm font-medium leading-none">Admin User</p>
+                <p className="font-primary text-xs leading-none text-muted-foreground">admin@example.com</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

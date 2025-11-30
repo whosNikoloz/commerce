@@ -24,8 +24,8 @@ export default function ProductPagination({
         variant="outline"
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
       >
-        <span className="text-lg sm:text-lg lg:text-xl">←</span>
-        <span className="hidden sm:inline">Prev</span>
+        <span className="font-primary text-lg sm:text-lg lg:text-xl">←</span>
+        <span className="font-primary hidden sm:inline">Prev</span>
       </Button>
 
       <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
@@ -73,8 +73,8 @@ export default function ProductPagination({
         variant="outline"
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
       >
-        <span className="hidden sm:inline">Next</span>
-        <span className="text-lg sm:text-lg lg:text-xl">→</span>
+        <span className="font-primary hidden sm:inline">Next</span>
+        <span className="font-primary text-lg sm:text-lg lg:text-xl">→</span>
       </Button>
     </div>
   );

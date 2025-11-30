@@ -247,7 +247,7 @@ export function ProductGroupsTable({
                 ) : filteredGroups.length === 0 ? (
                   <div className="text-center py-12 px-4">
                     <Package className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
+                    <p className="font-primary text-slate-600 dark:text-slate-400 text-sm font-medium">
                       No product groups found
                     </p>
                   </div>
@@ -346,10 +346,10 @@ export function ProductGroupsTable({
                           <CardContent className="p-4 space-y-3">
                             <div className="flex items-start justify-between">
                               <div>
-                                <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                                <h3 className="font-heading font-semibold text-lg text-slate-900 dark:text-slate-100">
                                   {group.name}
                                 </h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">
+                                <p className="font-primary text-sm text-slate-500 dark:text-slate-400">
                                   ID: {group.id}
                                 </p>
                               </div>

@@ -197,7 +197,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-slate-600 dark:text-slate-400 font-medium">Loading brands...</p>
+                <p className="font-primary text-slate-600 dark:text-slate-400 font-medium">Loading brands...</p>
               </div>
             </div>
           )}
@@ -253,7 +253,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                               width={64}
                             />
                             {!!brand.images && brand.images.length > 1 && (
-                              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                              <span className="font-primary absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
                                 +{brand.images.length}
                               </span>
                             )}
@@ -322,8 +322,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                             <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                               <TriangleAlert className="h-8 w-8 text-slate-400" />
                             </div>
-                            <p className="text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
-                            <p className="text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
+                            <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
+                            <p className="font-primary text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -350,7 +350,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                         src={brand.images?.[0] || "/placeholder.png"}
                       />
                       {!!brand.images && brand.images.length > 1 && (
-                        <span className="absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
+                        <span className="font-primary absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
                           +{brand.images.length}
                         </span>
                       )}
@@ -360,10 +360,10 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
                       <div className="flex items-center gap-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-black text-slate-900 dark:text-slate-100 text-lg truncate">
+                          <h3 className="font-heading font-black text-slate-900 dark:text-slate-100 text-lg truncate">
                             {brand.name}
                           </h3>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
+                          <p className="font-primary text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
                             ID: {brand.id}
                           </p>
                         </div>
@@ -430,8 +430,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                     <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                       <TriangleAlert className="h-8 w-8 text-slate-400" />
                     </div>
-                    <p className="text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
-                    <p className="text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
+                    <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
+                    <p className="font-primary text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
                   </div>
                 )}
               </div>
@@ -454,7 +454,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
               {deleteTarget ? (
                 <>
                   You are about to permanently delete{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                  <span className="font-primary font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                     {deleteTarget.name}
                   </span>
                   . This action cannot be undone.
@@ -481,7 +481,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
               onClick={() => deleteTarget && handleDeleteBrand(deleteTarget.id)}
             >
               {deleting ? (
-                <span className="flex items-center gap-2">
+                <span className="font-primary flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Deleting...
                 </span>

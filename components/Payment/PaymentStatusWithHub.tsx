@@ -35,7 +35,7 @@ export default function PaymentStatusWithHub({
       {useRealtime && (
         <div className="flex items-center gap-2 text-sm">
           <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-300'}`} />
-          <span className="text-gray-600">
+          <span className="font-primary text-gray-600">
             {isConnected ? 'Real-time updates active' : 'Connecting to real-time updates...'}
           </span>
         </div>
@@ -56,8 +56,8 @@ export default function PaymentStatusWithHub({
 
       {hubStatus && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-          <p className="text-sm font-medium text-blue-900">Latest Update</p>
-          <p className="mt-1 text-sm text-blue-700">{hubStatus.message}</p>
+          <p className="font-primary text-sm font-medium text-blue-900">Latest Update</p>
+          <p className="font-primary mt-1 text-sm text-blue-700">{hubStatus.message}</p>
         </div>
       )}
     </div>

@@ -18,8 +18,8 @@ function SidebarContent({ categorys, buildSubHref }: ProductFiltersProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
-          <span className="w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
+        <h2 className="font-heading text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
+          <span className="font-primary w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
           კატეგორიები
         </h2>
         <div className="space-y-1.5">
@@ -35,8 +35,8 @@ function SidebarContent({ categorys, buildSubHref }: ProductFiltersProps) {
                          hover:translate-x-1"
               href={buildSubHref(sub)}
             >
-              <span className="text-sm font-medium group-hover:font-semibold transition-all">{sub.name}</span>
-              {/* <span className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-all">
+              <span className="font-primary text-sm font-medium group-hover:font-semibold transition-all">{sub.name}</span>
+              {/* <span className="font-primary text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-all">
                 {sub.count ?? 0}
               </span> */}
             </Link>

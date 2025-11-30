@@ -200,10 +200,10 @@ export default function CheckoutPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
+            <h1 className="font-heading text-2xl font-bold text-text-light dark:text-text-lightdark">
               {dictionary.checkout.title}
             </h1>
-            <p className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.completePurchase}</p>
+            <p className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.completePurchase}</p>
           </div>
         </div>
 

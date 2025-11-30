@@ -17,14 +17,13 @@ export default function Error({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-brand-surface dark:bg-brand-surfacedark p-4">
       <div className="max-w-md text-center">
-        <h2 className="mb-4 text-2xl font-bold text-text-light dark:text-text-lightdark">
+        <h2 className="font-heading mb-4 text-2xl font-bold text-text-light dark:text-text-lightdark">
           Something went wrong!
         </h2>
-        <p className="mb-6 text-text-muted dark:text-text-muteddark">
+        <p className="font-primary mb-6 text-text-muted dark:text-text-muteddark">
           We apologize for the inconvenience. Please try again.
         </p>
-        <button
-          className="rounded-lg bg-brand-primary px-6 py-3 text-white font-semibold hover:bg-brand-primarydark transition-colors"
+        <button className="font-primary rounded-lg bg-brand-primary px-6 py-3 text-white font-semibold hover:bg-brand-primarydark transition-colors"
           onClick={() => reset()}
         >
           Try again

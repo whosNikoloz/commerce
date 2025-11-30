@@ -160,7 +160,7 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
         onMouseLeave={() => { setOverItemWithSubs(false); maybeScheduleClose(); }}
       >
         <div className="px-4 py-3 border-b border-border bg-neutral-100 dark:bg-neutral-800">
-          <h2 className="font-semibold text-lg text-foreground">{title}</h2>
+          <h2 className="font-heading font-semibold text-lg text-foreground">{title}</h2>
         </div>
 
         <nav className="py-2">
@@ -194,16 +194,16 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
                       className="flex items-center justify-between px-4 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
                       href={`/${locale}/category/${category.id}`}
                     >
-                      <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                      <span className="font-primary text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                         {category.name}
                       </span>
                       <div className="flex items-center gap-2">
                         {/* {hasSubs && (
-                          <span className="text-xs text-primary/70 font-medium">
+                          <span className="font-primary text-xs text-primary/70 font-medium">
                             +{subcategories!.length}
                           </span>
                         )} */}
-                        {/* <span className="text-xs text-muted-foreground/70">{productCount}</span> */}
+                        {/* <span className="font-primary text-xs text-muted-foreground/70">{productCount}</span> */}
                         {hasSubs && (
                         <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
                         )}
@@ -240,8 +240,8 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
             onMouseLeave={() => { setOverPanel(false); maybeScheduleClose(); }}
           >
             <div className="px-4 py-3 border-b border-border bg-neutral-50 dark:bg-neutral-800">
-              <h3 className="font-semibold text-sm text-foreground">{data?.category.name}</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">{subs.length} subcategories</p>
+              <h3 className="font-heading font-semibold text-sm text-foreground">{data?.category.name}</h3>
+              <p className="font-primary text-xs text-muted-foreground mt-0.5">{subs.length} subcategories</p>
             </div>
 
             {/* Close when the list itself scrolls */}
@@ -258,7 +258,7 @@ export default function HeroCategoryNav({ categories, locale, title }: HeroCateg
                       role="menuitem"
                       onClick={closeNow}
                     >
-                      <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                      <span className="font-primary text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                         {subcategory.name}
                       </span>
                       <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-foreground transition-all" />

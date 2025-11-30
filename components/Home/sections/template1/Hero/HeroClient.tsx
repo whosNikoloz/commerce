@@ -26,7 +26,7 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
   if (!data.banners || data.banners.length === 0) {
     return (
       <div className="w-full h-[400px] bg-muted rounded-xl flex items-center justify-center">
-        <p className="text-muted-foreground">No banners available</p>
+        <p className="font-primary text-muted-foreground">No banners available</p>
       </div>
     )
   }
@@ -34,7 +34,7 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
   if (!mounted) {
     return (
       <div className="w-full h-[400px] bg-muted rounded-xl flex items-center justify-center animate-pulse">
-        <p className="text-muted-foreground">Loading carousel...</p>
+        <p className="font-primary text-muted-foreground">Loading carousel...</p>
       </div>
     )
   }
@@ -87,12 +87,12 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
                   <div className="absolute inset-0 flex items-end">
                     <div className="p-8 text-white">
                       {banner.title && (
-                        <h3 className="text-3xl md:text-4xl font-bold mb-2">
+                        <h3 className="font-heading text-3xl md:text-4xl font-bold mb-2">
                           {t(banner.title, locale)}
                         </h3>
                       )}
                       {banner.description && (
-                        <p className="text-lg md:text-xl text-white/90">
+                        <p className="font-primary text-lg md:text-xl text-white/90">
                           {t(banner.description, locale)}
                         </p>
                       )}

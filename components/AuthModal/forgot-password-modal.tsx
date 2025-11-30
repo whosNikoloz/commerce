@@ -79,7 +79,7 @@ export default function ForgotPasswordModal() {
     <div className="space-y-5">
       <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
         <i className="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mt-0.5" />
-        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{dictionary.auth.forgotPassword.subText}</p>
+        <p className="font-primary text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{dictionary.auth.forgotPassword.subText}</p>
       </div>
 
       <Input

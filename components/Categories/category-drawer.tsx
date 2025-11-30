@@ -135,7 +135,7 @@ export default function CategoryDrawer() {
                 onError={() => handleImageError(id)}
               />
             </div>
-            <span className="text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate min-w-0">
+            <span className="font-primary text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate min-w-0">
               {node.name ?? "Category"}
             </span>
           </Link>
@@ -150,7 +150,7 @@ export default function CategoryDrawer() {
               <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-300" />
             </button>
           ) : (
-            <span className="px-1 sm:px-2 text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">—</span>
+            <span className="font-primary px-1 sm:px-2 text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">—</span>
           )}
         </div>
       </li>
@@ -210,7 +210,7 @@ export default function CategoryDrawer() {
                   ) : (
                     <Squares2X2Icon className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                   )}
-                  <h2 className="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white truncate min-w-0">
+                  <h2 className="font-heading text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white truncate min-w-0">
                     {currentParent ? currentParent.name : "Categories"}
                   </h2>
                 </div>
@@ -238,7 +238,7 @@ export default function CategoryDrawer() {
 
                 {error && !loading && (
                   <div className="text-center py-10">
-                    <p className="text-red-600 dark:text-red-400">{error}</p>
+                    <p className="font-primary text-red-600 dark:text-red-400">{error}</p>
                     <Button className="mt-4" color="primary" variant="flat" onPress={loadCategories}>
                       Try again
                     </Button>

@@ -64,14 +64,14 @@ export default function DisplayTypePicker({ value, onChange }: Props) {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">{title}</span>
+                  <span className="font-primary font-semibold">{title}</span>
                   {active && <Badge className="h-5" variant="secondary">Selected</Badge>}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">{desc}</div>
               </div>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="sr-only">Info</span>
+                  <span className="font-primary sr-only">Info</span>
                 </TooltipTrigger>
                 <TooltipContent>{desc}</TooltipContent>
               </Tooltip>

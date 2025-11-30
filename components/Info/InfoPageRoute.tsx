@@ -98,20 +98,20 @@ export async function renderInfoPage({ params, slug }: { params: Promise<{ lang:
       <div className="container mx-auto px-4 py-20">
         <div className="flex items-center justify-center min-h-[380px] p-8">
           <div className="text-center space-y-4 max-w-lg mx-auto">
-            <h2 className="text-3xl font-semibold text-brand-primary dark:text-brand-primarydark">
+            <h2 className="font-heading text-3xl font-semibold text-brand-primary dark:text-brand-primarydark">
               Coming Soon
             </h2>
 
-            <p className="text-text-subtle dark:text-text-subtledark leading-relaxed">
+            <p className="font-primary text-text-subtle dark:text-text-subtledark leading-relaxed">
               We’re preparing this page to bring you helpful information soon.
               <br />
-              The <span className="font-medium text-text-light dark:text-text-lightdark">
+              The <span className="font-primary font-medium text-text-light dark:text-text-lightdark">
                 “{slug}”
               </span>{" "}
               section is currently being set up.
             </p>
 
-            <p className="text-sm text-text-subtle dark:text-text-subtledark">
+            <p className="font-primary text-sm text-text-subtle dark:text-text-subtledark">
               Please check back a little later 🌿
             </p>
           </div>

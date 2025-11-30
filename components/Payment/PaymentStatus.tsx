@@ -120,7 +120,7 @@ export default function PaymentStatus({
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="font-primary text-sm text-red-600">{error}</p>
       </div>
     );
   }
@@ -129,7 +129,7 @@ export default function PaymentStatus({
     return (
       <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-4">
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-        <span className="ml-2 text-sm text-gray-600">Loading payment status...</span>
+        <span className="font-primary ml-2 text-sm text-gray-600">Loading payment status...</span>
       </div>
     );
   }
@@ -141,7 +141,7 @@ export default function PaymentStatus({
   return (
     <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Payment Status</h3>
+        <h3 className="font-heading text-lg font-semibold text-gray-900">Payment Status</h3>
         <div className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium ${getStatusColor(paymentDetails.status)}`}>
           {getStatusIcon(paymentDetails.status)}
           {paymentDetails.status}
@@ -150,43 +150,43 @@ export default function PaymentStatus({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <p className="text-sm text-gray-500">Payment ID</p>
-          <p className="mt-1 font-mono text-sm text-gray-900">{paymentDetails.paymentId}</p>
+          <p className="font-primary text-sm text-gray-500">Payment ID</p>
+          <p className="font-primary mt-1 font-mono text-sm text-gray-900">{paymentDetails.paymentId}</p>
         </div>
 
         {paymentDetails.transactionId && (
           <div>
-            <p className="text-sm text-gray-500">Transaction ID</p>
-            <p className="mt-1 font-mono text-sm text-gray-900">{paymentDetails.transactionId}</p>
+            <p className="font-primary text-sm text-gray-500">Transaction ID</p>
+            <p className="font-primary mt-1 font-mono text-sm text-gray-900">{paymentDetails.transactionId}</p>
           </div>
         )}
 
         <div>
-          <p className="text-sm text-gray-500">Amount</p>
-          <p className="mt-1 text-sm text-gray-900">
+          <p className="font-primary text-sm text-gray-500">Amount</p>
+          <p className="font-primary mt-1 text-sm text-gray-900">
             {paymentDetails.amount} {paymentDetails.currency}
           </p>
         </div>
 
         {paymentDetails.paymentMethod && (
           <div>
-            <p className="text-sm text-gray-500">Payment Method</p>
-            <p className="mt-1 text-sm text-gray-900">{paymentDetails.paymentMethod}</p>
+            <p className="font-primary text-sm text-gray-500">Payment Method</p>
+            <p className="font-primary mt-1 text-sm text-gray-900">{paymentDetails.paymentMethod}</p>
           </div>
         )}
       </div>
 
       {paymentDetails.recurringCard && (
         <div className="border-t border-gray-200 pt-4">
-          <p className="mb-2 text-sm font-medium text-gray-700">Card Information</p>
+          <p className="font-primary mb-2 text-sm font-medium text-gray-700">Card Information</p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <p className="text-sm text-gray-500">Card Number</p>
-              <p className="mt-1 font-mono text-sm text-gray-900">{paymentDetails.recurringCard.cardMask}</p>
+              <p className="font-primary text-sm text-gray-500">Card Number</p>
+              <p className="font-primary mt-1 font-mono text-sm text-gray-900">{paymentDetails.recurringCard.cardMask}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Expiry Date</p>
-              <p className="mt-1 font-mono text-sm text-gray-900">{paymentDetails.recurringCard.expiryDate}</p>
+              <p className="font-primary text-sm text-gray-500">Expiry Date</p>
+              <p className="font-primary mt-1 font-mono text-sm text-gray-900">{paymentDetails.recurringCard.expiryDate}</p>
             </div>
           </div>
         </div>
@@ -195,10 +195,10 @@ export default function PaymentStatus({
       {(paymentDetails.userMessage || paymentDetails.developerMessage) && (
         <div className="border-t border-gray-200 pt-4">
           {paymentDetails.userMessage && (
-            <p className="text-sm text-gray-700">{paymentDetails.userMessage}</p>
+            <p className="font-primary text-sm text-gray-700">{paymentDetails.userMessage}</p>
           )}
           {paymentDetails.developerMessage && (
-            <p className="mt-1 text-xs text-gray-500">{paymentDetails.developerMessage}</p>
+            <p className="font-primary mt-1 text-xs text-gray-500">{paymentDetails.developerMessage}</p>
           )}
         </div>
       )}

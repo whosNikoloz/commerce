@@ -193,8 +193,8 @@ export function AnalyticsDashboard() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
-          <p className="text-muted-foreground mt-1">Track your commerce performance</p>
+          <h1 className="font-heading text-3xl font-bold text-foreground">Analytics</h1>
+          <p className="font-primary text-muted-foreground mt-1">Track your commerce performance</p>
         </div>
 
         {/* Time Range Selector */}
@@ -223,13 +223,13 @@ export function AnalyticsDashboard() {
             <Card key={index} className="border-border bg-card">
               <CardHeader className="pb-2">
                 <CardDescription className="flex items-center justify-between">
-                  <span className="text-xs">{metric.label}</span>
+                  <span className="font-primary text-xs">{metric.label}</span>
                   <Icon className="h-4 w-4 text-muted-foreground" />
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-1">
-                  <p className="text-xl font-bold text-foreground">{metric.value}</p>
+                  <p className="font-primary text-xl font-bold text-foreground">{metric.value}</p>
                   <p
                     className={`text-xs font-medium ${
                       metric.trend === 'up' ? 'text-chart-2' : 'text-chart-3'
@@ -408,9 +408,9 @@ export function AnalyticsDashboard() {
                       className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: item.color }}
                      />
-                    <span className="text-foreground">{item.name}</span>
+                    <span className="font-primary text-foreground">{item.name}</span>
                   </div>
-                  <span className="font-semibold text-foreground">{item.value}%</span>
+                  <span className="font-primary font-semibold text-foreground">{item.value}%</span>
                 </div>
               ))}
             </div>
@@ -433,14 +433,14 @@ export function AnalyticsDashboard() {
                     <Package className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">{product.sales} sales</p>
+                    <p className="font-primary font-medium text-foreground">{product.name}</p>
+                    <p className="font-primary text-xs text-muted-foreground">{product.sales} sales</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-8">
                   <div className="text-right">
-                    <p className="font-semibold text-foreground">${product.revenue.toLocaleString()}</p>
-                    <p className="text-xs text-chart-2">⭐ {product.rating}</p>
+                    <p className="font-primary font-semibold text-foreground">${product.revenue.toLocaleString()}</p>
+                    <p className="font-primary text-xs text-chart-2">⭐ {product.rating}</p>
                   </div>
                 </div>
               </div>
@@ -464,9 +464,9 @@ export function AnalyticsDashboard() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground">{geo.region}</span>
+                      <span className="font-primary text-sm font-medium text-foreground">{geo.region}</span>
                     </div>
-                    <span className="font-semibold text-foreground">${geo.sales.toLocaleString()}</span>
+                    <span className="font-primary font-semibold text-foreground">${geo.sales.toLocaleString()}</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-muted">
                     <div
@@ -493,9 +493,9 @@ export function AnalyticsDashboard() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Smartphone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground">{device.name}</span>
+                      <span className="font-primary text-sm font-medium text-foreground">{device.name}</span>
                     </div>
-                    <span className="font-semibold text-foreground">{device.value}%</span>
+                    <span className="font-primary font-semibold text-foreground">{device.value}%</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-muted">
                     <div

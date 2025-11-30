@@ -36,10 +36,10 @@ export default function HomeRenderer({ tenant, locale }: HomeRendererProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px] p-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">
+          <h2 className="font-heading text-2xl font-bold text-red-600 mb-2">
             Configuration Error
           </h2>
-          <p className="text-gray-600">
+          <p className="font-primary text-gray-600">
             The homepage configuration is invalid. Please check the console for details.
           </p>
         </div>

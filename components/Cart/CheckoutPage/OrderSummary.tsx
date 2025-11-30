@@ -61,14 +61,14 @@ export default function OrderSummary({
                   </Badge>
                 </div>
                 <div className="flex-1 space-y-1">
-                  <h4 className="font-medium text-sm text-text-light dark:text-text-lightdark">
+                  <h4 className="font-heading font-medium text-sm text-text-light dark:text-text-lightdark">
                     {item.name}
                   </h4>
-                  <p className="text-sm text-text-subtle dark:text-text-subtledark">
+                  <p className="font-primary text-sm text-text-subtle dark:text-text-subtledark">
                     {originalPrice && originalPrice > price && (
-                      <span className="line-through text-xs mr-2">{`₾${originalPrice.toFixed(2)}`}</span>
+                      <span className="font-primary line-through text-xs mr-2">{`₾${originalPrice.toFixed(2)}`}</span>
                     )}
-                    <span className="font-medium text-text-light dark:text-text-lightdark">{`₾${price.toFixed(2)}`}</span>
+                    <span className="font-primary font-medium text-text-light dark:text-text-lightdark">{`₾${price.toFixed(2)}`}</span>
                   </p>
                 </div>
               </div>
@@ -80,23 +80,23 @@ export default function OrderSummary({
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.subtotal}</span>
-            <span className="text-text-light dark:text-text-lightdark">{`₾${subtotal.toFixed(2)}`}</span>
+            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.subtotal}</span>
+            <span className="font-primary text-text-light dark:text-text-lightdark">{`₾${subtotal.toFixed(2)}`}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.shipping}</span>
-            <span className="text-text-light dark:text-text-lightdark">
+            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.shipping}</span>
+            <span className="font-primary text-text-light dark:text-text-lightdark">
               {shipping === 0 ? dictionary.checkout.free : `₾${shipping.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-subtle dark:text-text-subtledark">{dictionary.checkout.tax}</span>
-            <span className="text-text-light dark:text-text-lightdark">{`₾${tax.toFixed(2)}`}</span>
+            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.tax}</span>
+            <span className="font-primary text-text-light dark:text-text-lightdark">{`₾${tax.toFixed(2)}`}</span>
           </div>
           <Separator className="bg-brand-muted/60 dark:bg-brand-muteddark/50" />
           <div className="flex justify-between font-medium text-lg">
-            <span className="text-text-light dark:text-text-lightdark">{dictionary.checkout.total}</span>
-            <span className="text-text-light dark:text-text-lightdark">{`₾${total.toFixed(2)}`}</span>
+            <span className="font-primary text-text-light dark:text-text-lightdark">{dictionary.checkout.total}</span>
+            <span className="font-primary text-text-light dark:text-text-lightdark">{`₾${total.toFixed(2)}`}</span>
           </div>
         </div>
 
@@ -124,7 +124,7 @@ export default function OrderSummary({
           {isProcessing ? dictionary.checkout.processing : (submitButtonLabel ?? dictionary.checkout.reviewAndPay)}
         </Button>
 
-        <p className="text-xs text-text-subtle dark:text-text-subtledark text-center">
+        <p className="font-primary text-xs text-text-subtle dark:text-text-subtledark text-center">
           {dictionary.checkout.termsAgreement}
         </p>
       </CardContent>

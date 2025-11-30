@@ -3,32 +3,39 @@
 @tailwind utilities;
 
 :root {
+  /* ===== BRAND COLORS ===== */
+  /* These are default fallbacks - will be overridden by tenant configuration */
   --brand-primary: 37 99 235;
-  /* #2563eb */
+  /* #2563eb - blue-600 */
   --brand-primary-dark: 44 109 238;
-  /* #2c6dee */
+  /* #2c6dee - slightly lighter blue for dark mode */
   --brand-surface: 241 245 249;
-  /* #f1f5f9 */
+  /* #f1f5f9 - slate-100 */
   --brand-surface-dark: 2 6 23;
-  /* #020617 */
+  /* #020617 - slate-950 */
   --brand-muted: 226 232 240;
-  /* #e2e8f0 */
+  /* #e2e8f0 - slate-200 */
   --brand-muted-dark: 16 24 41;
-  /* #101829 */
+  /* #101829 - custom dark muted */
 
+  /* ===== TEXT COLORS ===== */
+  /* Primary and secondary text colors for light and dark modes */
   --text-light: 30 41 59;
-  /* #1e293b */
+  /* #1e293b - slate-800 */
   --text-subtle: 100 116 139;
-  /* #64748b */
+  /* #64748b - slate-500 */
   --text-light-dark: 228 221 222;
-  /* #e4ddde */
+  /* #e4ddde - light text for dark mode */
   --text-subtle-dark: 106 119 138;
-  /* #6a778a */
+  /* #6a778a - subtle text for dark mode */
 
+  /* ===== FONT FAMILIES ===== */
   /* Default font variables - will be overridden by tenant configuration */
-  --font-primary: system-ui, sans-serif;
-  --font-secondary: 'Courier New', monospace;
-  --font-heading: system-ui, sans-serif;
+  /* If tenant.theme.globalFont is set, all three will use the same font */
+  /* Otherwise, tenant.theme.fonts.{primary,secondary,heading} can override individually */
+  --font-primary: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-secondary: 'Courier New', 'Consolas', monospace;
+  --font-heading: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 @keyframes bump {

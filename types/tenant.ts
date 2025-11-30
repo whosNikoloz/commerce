@@ -37,9 +37,9 @@ export type ThemeVars = {
     subtleDark: string;
   };
   fonts?: {
-    primary?: string;
-    secondary?: string;
-    heading?: string;
+    primary?: string;    // Font for body text, buttons, inputs, etc.
+    secondary?: string;  // Font for code blocks, monospace
+    heading?: string;    // Font for h1, h2, h3, h4, h5, h6
     sizes?: Record<string, string | number>;
     weights?: Record<string, string | number>;
   };

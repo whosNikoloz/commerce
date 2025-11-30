@@ -317,7 +317,7 @@ export function ShippingTable() {
                     <Badge className={getTypeColor(method.type)}>{method.type}</Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium">
+                    <span className="font-primary font-medium">
                       {method.baseRate === 0 ? "Free" : `$${method.baseRate.toFixed(2)}`}
                     </span>
                   </TableCell>
@@ -393,15 +393,15 @@ export function ShippingTable() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
-                  <h4 className="font-medium">Domestic Zone</h4>
-                  <p className="text-sm text-muted-foreground">United States</p>
+                  <h4 className="font-heading font-medium">Domestic Zone</h4>
+                  <p className="font-primary text-sm text-muted-foreground">United States</p>
                 </div>
                 <Badge>Active</Badge>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
-                  <h4 className="font-medium">International Zone</h4>
-                  <p className="text-sm text-muted-foreground">Worldwide</p>
+                  <h4 className="font-heading font-medium">International Zone</h4>
+                  <p className="font-primary text-sm text-muted-foreground">Worldwide</p>
                 </div>
                 <Badge>Active</Badge>
               </div>
@@ -422,8 +422,8 @@ export function ShippingTable() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Free shipping threshold</h4>
-                  <p className="text-sm text-muted-foreground">
+                  <h4 className="font-heading font-medium">Free shipping threshold</h4>
+                  <p className="font-primary text-sm text-muted-foreground">
                     Minimum order value for free shipping
                   </p>
                 </div>
@@ -431,15 +431,15 @@ export function ShippingTable() {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Processing time</h4>
-                  <p className="text-sm text-muted-foreground">Time to prepare orders</p>
+                  <h4 className="font-heading font-medium">Processing time</h4>
+                  <p className="font-primary text-sm text-muted-foreground">Time to prepare orders</p>
                 </div>
                 <Input className="w-32" placeholder="1-2 days" />
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Weight-based rates</h4>
-                  <p className="text-sm text-muted-foreground">Calculate shipping by weight</p>
+                  <h4 className="font-heading font-medium">Weight-based rates</h4>
+                  <p className="font-primary text-sm text-muted-foreground">Calculate shipping by weight</p>
                 </div>
                 <Switch />
               </div>

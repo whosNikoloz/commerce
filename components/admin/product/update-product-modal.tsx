@@ -206,10 +206,10 @@ export default function UpdateProductModal({
                 <ModalHeader className="flex flex-col gap-3 pb-3 pt-8 relative">
                   <div className="flex items-center justify-between px-6">
                     <div className="flex flex-col">
-                      <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+                      <h2 className="font-heading text-2xl font-black text-slate-900 dark:text-slate-100">
                         პროდუქტის აღწერის განახლება
                       </h2>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                      <p className="font-primary text-sm text-slate-600 dark:text-slate-400 font-medium">
                         განაახლე პროდუქტის ინფორმაცია და აღწერა
                       </p>
                     </div>
@@ -290,7 +290,7 @@ export default function UpdateProductModal({
                         id="is-liquidated"
                         onCheckedChange={setIsLiquidated}
                       />
-                      <span className="text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                      <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
                         <Box className="w-3 h-3 mb-0.5" />
                         ლიკვ.
                       </span>
@@ -303,7 +303,7 @@ export default function UpdateProductModal({
                         id="is-coming-soon"
                         onCheckedChange={setIsComingSoon}
                       />
-                      <span className="text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                      <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
                         <Clock3 className="w-3 h-3 mb-0.5" />
                         მალე
                       </span>
@@ -316,7 +316,7 @@ export default function UpdateProductModal({
                         id="is-new-arrival"
                         onCheckedChange={setIsNewArrival}
                       />
-                      <span className="text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                      <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
                         <Sparkles className="w-3 h-3 mb-0.5" />
                         ახალი
                       </span>
@@ -327,7 +327,7 @@ export default function UpdateProductModal({
                   <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                     <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
                       Product Group
-                      <span className="text-xs font-normal text-slate-500 ml-1">
+                      <span className="font-primary text-xs font-normal text-slate-500 ml-1">
                         (Optional)
                       </span>
                     </Label>
@@ -410,7 +410,7 @@ export default function UpdateProductModal({
                   onClick={handleSave}
                 >
                   {loading ? (
-                    <span className="flex items-center gap-2">
+                    <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       Saving...
                     </span>

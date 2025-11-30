@@ -65,8 +65,7 @@ function RowDraggable({
       style={style}
     >
       <TableCell className="w-10 align-middle">
-        <button
-          className="cursor-grab active:cursor-grabbing p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors duration-200 ring-1 ring-slate-200 dark:ring-slate-700"
+        <button className="font-primary cursor-grab active:cursor-grabbing p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors duration-200 ring-1 ring-slate-200 dark:ring-slate-700"
           {...attributes}
           {...listeners}
           aria-label="Drag handle"
@@ -414,8 +413,8 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
         </CardHeader>
 
         <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
-          {loading && <p className="p-4 text-text-subtle">იტვირთება…</p>}
-          {error && <p className="p-4 text-red-500">{error}</p>}
+          {loading && <p className="font-primary p-4 text-text-subtle">იტვირთება…</p>}
+          {error && <p className="font-primary p-4 text-red-500">{error}</p>}
 
           {!loading && !error && (
             <>
@@ -538,11 +537,11 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
-                          <span className="text-white font-bold text-sm">#{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")}</span>
+                          <span className="font-primary text-white font-bold text-sm">#{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-black text-slate-900 dark:text-slate-100 text-base leading-tight">{faq.question}</h3>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
+                          <h3 className="font-heading font-black text-slate-900 dark:text-slate-100 text-base leading-tight">{faq.question}</h3>
+                          <p className="font-primary text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
                             ID: {faq.id}
                           </p>
                         </div>
@@ -568,7 +567,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                           ) : (
                             <EyeOff className="h-4 w-4 text-slate-400" />
                           )}
-                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Active</span>
+                          <span className="font-primary text-xs font-semibold text-slate-700 dark:text-slate-300">Active</span>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -580,7 +579,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                           <Star
                             className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
                           />
-                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Featured</span>
+                          <span className="font-primary text-xs font-semibold text-slate-700 dark:text-slate-300">Featured</span>
                         </div>
                       </div>
                     </div>
@@ -613,7 +612,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
                 {filtered.length === 0 && (
                   <div className="flex flex-col items-center gap-3 py-12">
-                    <p className="text-slate-500 dark:text-slate-400 font-semibold">ჩანაწერები ვერ მოიძებნა.</p>
+                    <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">ჩანაწერები ვერ მოიძებნა.</p>
                   </div>
                 )}
               </div>
@@ -633,7 +632,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
               {deleteTarget ? (
                 <>
                   წაიშლება:{" "}
-                  <span className="font-semibold text-text-light dark:text-text-lightdark">
+                  <span className="font-primary font-semibold text-text-light dark:text-text-lightdark">
                     {deleteTarget.question}
                   </span>
                   . ქმედება შეუქცევადია.

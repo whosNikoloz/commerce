@@ -124,10 +124,10 @@ export function StoresTable() {
                 <Store className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                <h2 className="font-heading text-2xl font-bold text-slate-900 dark:text-slate-100">
                   Store Management
                 </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                <p className="font-primary text-sm text-slate-600 dark:text-slate-400 mt-1">
                   Manage stores and transfer products between locations
                 </p>
               </div>
@@ -164,7 +164,7 @@ export function StoresTable() {
       {error && (
         <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20">
           <CardContent className="pt-6">
-            <p className="text-red-600 dark:text-red-400 text-center">{error}</p>
+            <p className="font-primary text-red-600 dark:text-red-400 text-center">{error}</p>
           </CardContent>
         </Card>
       )}
@@ -175,15 +175,15 @@ export function StoresTable() {
           {loading ? (
             <div className="p-12 text-center">
               <RefreshCw className="h-8 w-8 animate-spin mx-auto text-blue-500 mb-4" />
-              <p className="text-slate-600 dark:text-slate-400">Loading stores...</p>
+              <p className="font-primary text-slate-600 dark:text-slate-400">Loading stores...</p>
             </div>
           ) : filteredStores.length === 0 ? (
             <div className="p-12 text-center">
               <Store className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-700 mb-4" />
-              <p className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">
+              <p className="font-primary text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">
                 No stores found
               </p>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="font-primary text-slate-600 dark:text-slate-400">
                 {searchTerm ? "Try adjusting your search" : "Create your first store to get started"}
               </p>
             </div>
@@ -232,7 +232,7 @@ export function StoresTable() {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic">Not specified</span>
+                          <span className="font-primary text-slate-400 italic">Not specified</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -250,7 +250,7 @@ export function StoresTable() {
                             </div>
                           )}
                           {!store.phone && !store.email && (
-                            <span className="text-slate-400 italic text-sm">Not specified</span>
+                            <span className="font-primary text-slate-400 italic text-sm">Not specified</span>
                           )}
                         </div>
                       </TableCell>
@@ -261,7 +261,7 @@ export function StoresTable() {
                             {store.manager}
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic">Not assigned</span>
+                          <span className="font-primary text-slate-400 italic">Not assigned</span>
                         )}
                       </TableCell>
                       <TableCell>

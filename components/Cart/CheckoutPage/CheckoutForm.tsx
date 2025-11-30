@@ -59,8 +59,8 @@ export default function CheckoutForm({
             width={40}
           />
           <div className="flex flex-col">
-            <span className="font-medium text-text-light dark:text-text-lightdark">{label}</span>
-            <span className="text-xs text-text-subtle dark:text-text-subtledark">
+            <span className="font-primary font-medium text-text-light dark:text-text-lightdark">{label}</span>
+            <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark">
               {dictionary.checkout.secureHostedCheckout}
             </span>
           </div>

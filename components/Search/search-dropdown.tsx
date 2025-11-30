@@ -211,9 +211,8 @@ const Search = ({
                 {!hasQuery && historyItems.length > 0 && (
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-500">{dictionary.search.recentSearches}</span>
-                      <button
-                        className="text-xs text-gray-500 underline hover:text-gray-700"
+                      <span className="font-primary text-sm text-gray-500">{dictionary.search.recentSearches}</span>
+                      <button className="font-primary text-xs text-gray-500 underline hover:text-gray-700"
                         onClick={clearHistory}
                       >
                         {dictionary.search.clearAll}
@@ -227,8 +226,7 @@ const Search = ({
                           key={term}
                           className="group flex items-center gap-2 px-3 py-1 rounded-full border text-sm hover:bg-gray-50"
                         >
-                          <button
-                            className="hover:underline"
+                          <button className="font-primary hover:underline"
                             onClick={() => selectHistoryTerm(term)}
                           >
                             {term}
@@ -251,29 +249,29 @@ const Search = ({
                 {hasQuery && isLoading && (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400 animate-pulse">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-30" />
-                    <p className="text-sm">{dictionary.search.searching}</p>
+                    <p className="font-primary text-sm">{dictionary.search.searching}</p>
                   </div>
                 )}
 
                 {hasQuery && !!error && (
                   <div className="flex flex-col items-center justify-center py-6 text-red-500">
-                    <p className="text-sm">{dictionary.search.error}: {error}</p>
-                    <p className="text-xs text-gray-500 mt-1">{dictionary.search.tryAgain}</p>
+                    <p className="font-primary text-sm">{dictionary.search.error}: {error}</p>
+                    <p className="font-primary text-xs text-gray-500 mt-1">{dictionary.search.tryAgain}</p>
                   </div>
                 )}
 
                 {hasQuery && !isLoading && !error && searchResults.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-2 opacity-20" />
-                    <p className="text-sm">{dictionary.search.noResults}</p>
+                    <p className="font-primary text-sm">{dictionary.search.noResults}</p>
                   </div>
                 )}
 
                 {!hasQuery && historyItems.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-10 text-gray-400">
                     <SearchIcon className="h-12 w-12 mb-3 opacity-30" />
-                    <p className="text-sm">{dictionary.search.noHistory}</p>
-                    <p className="text-xs text-gray-500 mt-1">{dictionary.search.startTyping}</p>
+                    <p className="font-primary text-sm">{dictionary.search.noHistory}</p>
+                    <p className="font-primary text-xs text-gray-500 mt-1">{dictionary.search.startTyping}</p>
                   </div>
                 )}
 
@@ -311,8 +309,8 @@ const Search = ({
                             </div>
                           )}
                           <div className="flex flex-col">
-                            <span className="text-sm line-clamp-1">{result.name ?? dictionary.search.unnamedProduct}</span>
-                            <span className="text-xs text-gray-500">
+                            <span className="font-primary text-sm line-clamp-1">{result.name ?? dictionary.search.unnamedProduct}</span>
+                            <span className="font-primary text-xs text-gray-500">
                               {typeof result.price === "number" ? `₾${result.price}` : ""}
                             </span>
                           </div>

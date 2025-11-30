@@ -69,7 +69,7 @@ export default function Cartlink({ showLabel = false }: CartlinkProps = {}) {
         </Button>
       </Badge>
       {showLabel && (
-        <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+        <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
           {dictionary?.cart?.title || "Cart"}
         </span>
       )}

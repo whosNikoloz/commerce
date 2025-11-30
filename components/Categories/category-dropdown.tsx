@@ -147,7 +147,7 @@ export default function CategoryDropdown() {
         >
           {cat.name}
         </span>
-        <span className="mt-1 text-[11px] md:text-xs text-muted-foreground flex items-center gap-1">
+        <span className="font-primary mt-1 text-[11px] md:text-xs text-muted-foreground flex items-center gap-1">
           {isActive ? (
             <>
               Viewing subcategories
@@ -224,9 +224,8 @@ export default function CategoryDropdown() {
                 <div className="relative w-full max-w-6xl rounded-3xl bg-white dark:bg-neutral-900 shadow-[0_24px_80px_rgba(0,0,0,0.4)] border border-primary/40 backdrop-blur-xl overflow-hidden max-h-full flex flex-col pointer-events-auto">
                   {/* Header row */}
                   <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 via-neutral-50/70 to-transparent dark:from-primary/10 dark:via-neutral-900/80">
-                    <h2 className="text-base md:text-lg font-semibold" >{dictionary?.categories?.allCategories || "All Categories"}</h2>
-                    <button
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    <h2 className="font-heading text-base md:text-lg font-semibold" >{dictionary?.categories?.allCategories || "All Categories"}</h2>
+                    <button className="font-primary inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                       onClick={() => setIsOpen(false)}
                     >
                       <X className="w-4 h-4" />
@@ -320,7 +319,7 @@ export default function CategoryDropdown() {
                                               onClick={() => setIsOpen(false)}
                                             >
                                               {/* Left: smaller name */}
-                                              <span className="text-xs md:text-sm font-medium text-muted-foreground group-hover:text-foreground text-left line-clamp-2">
+                                              <span className="font-primary text-xs md:text-sm font-medium text-muted-foreground group-hover:text-foreground text-left line-clamp-2">
                                                 {sub.name}
                                               </span>
 

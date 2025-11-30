@@ -262,7 +262,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
           {categories.length === 0 ? (
             <div className="text-center py-8">
               <Folder className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">No categories found</p>
+              <p className="font-primary text-slate-600 dark:text-slate-400 text-sm font-medium">No categories found</p>
             </div>
           ) : (
             <div className="space-y-2">

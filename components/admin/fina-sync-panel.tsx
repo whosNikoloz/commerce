@@ -249,30 +249,30 @@ export default function FinaSyncPanel() {
           </CardHeader>
           <CardContent className="space-y-3 relative">
             <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
-              <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Status</span>
+              <span className="font-primary text-sm font-semibold text-slate-600 dark:text-slate-400">Status</span>
               <span className={`text-sm font-bold ${status?.running ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
                 {status?.running ? "Running" : "Idle"}
               </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
-              <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Progress</span>
-              <span className="text-base font-bold text-slate-900 dark:text-slate-100">
+              <span className="font-primary text-sm font-semibold text-slate-600 dark:text-slate-400">Progress</span>
+              <span className="font-primary text-base font-bold text-slate-900 dark:text-slate-100">
                 {progressLabel}
               </span>
             </div>
             {status?.message && (
               <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                <p className="text-xs font-medium text-blue-700 dark:text-blue-300">{status.message}</p>
+                <p className="font-primary text-xs font-medium text-blue-700 dark:text-blue-300">{status.message}</p>
               </div>
             )}
             <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Started</span>
-                <span className="text-xs text-slate-600 dark:text-slate-300">{status?.startedAt ?? "—"}</span>
+                <span className="font-primary text-xs font-semibold text-slate-500 dark:text-slate-400">Started</span>
+                <span className="font-primary text-xs text-slate-600 dark:text-slate-300">{status?.startedAt ?? "—"}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Finished</span>
-                <span className="text-xs text-slate-600 dark:text-slate-300">{status?.finishedAt ?? "—"}</span>
+                <span className="font-primary text-xs font-semibold text-slate-500 dark:text-slate-400">Finished</span>
+                <span className="font-primary text-xs text-slate-600 dark:text-slate-300">{status?.finishedAt ?? "—"}</span>
               </div>
             </div>
           </CardContent>

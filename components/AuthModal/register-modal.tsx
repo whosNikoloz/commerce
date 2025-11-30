@@ -392,7 +392,7 @@ export default function RegisterModal({ onSwitchMode }: RegisterProps) {
         {codeRequested && (
           <div className="flex items-center gap-2 px-2">
             <i className="fas fa-check-circle text-green-600 dark:text-green-400 text-sm" />
-            <p className="text-xs font-semibold text-green-800 dark:text-green-200">
+            <p className="font-primary text-xs font-semibold text-green-800 dark:text-green-200">
               {dictionary.auth.register.codeSent}
             </p>
           </div>
@@ -449,15 +449,14 @@ export default function RegisterModal({ onSwitchMode }: RegisterProps) {
 
       <div className="flex items-center justify-center my-6">
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
-        <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{dictionary.auth.register.or}</span>
+        <span className="font-primary mx-4 text-gray-500 dark:text-gray-400 text-sm font-semibold bg-white dark:bg-slate-900 px-2">{dictionary.auth.register.or}</span>
         <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
       </div>
 
       <OAuthButtons onSuccess={() => onSwitchMode("login")} />
 
       <div className="text-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
+        <button className="font-primary text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold transition-colors hover:underline"
           onClick={() => onSwitchMode("login")}
         >
           {dictionary.auth.register.switchMode}

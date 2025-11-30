@@ -126,7 +126,7 @@ export default function CompareProductsPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-600 dark:text-slate-400">
+          <p className="font-primary text-slate-600 dark:text-slate-400">
             {t.status.loading}
           </p>
         </div>
@@ -138,10 +138,10 @@ export default function CompareProductsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="font-heading text-3xl font-bold text-slate-900 dark:text-white mb-2">
             {t.page.title}
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 mb-8">
+          <p className="font-primary text-slate-600 dark:text-slate-400 mb-8">
             {t.page.emptySubtitle}
           </p>
           <Button
@@ -161,7 +161,7 @@ export default function CompareProductsPage() {
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
+          <h1 className="font-heading text-4xl font-bold text-slate-900 dark:text-white mb-6">
             {t.page.title}
           </h1>
           <div className="flex flex-wrap gap-3">
@@ -286,8 +286,7 @@ function ProductCard({ product, onRemove, currentLang }: ProductCardProps) {
             "/placeholder.svg?height=160&width=208"
           }
         />
-        <button
-          className="absolute top-2 right-2 p-1.5 bg-white dark:bg-slate-800 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white rounded-full transition-colors shadow-md"
+        <button className="font-primary absolute top-2 right-2 p-1.5 bg-white dark:bg-slate-800 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white rounded-full transition-colors shadow-md"
           onClick={() => onRemove(product.id)}
         >
           <X className="h-4 w-4" />
@@ -305,11 +304,11 @@ function ProductCard({ product, onRemove, currentLang }: ProductCardProps) {
 
         {/* Price */}
         <div className="flex items-baseline gap-2 mb-3">
-          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+          <span className="font-primary text-lg font-bold text-blue-600 dark:text-blue-400">
             {formatPrice(product.discountPrice || product.price)}
           </span>
           {product.discountPrice && (
-            <span className="text-xs text-slate-500 dark:text-slate-400 line-through">
+            <span className="font-primary text-xs text-slate-500 dark:text-slate-400 line-through">
               {formatPrice(product.price)}
             </span>
           )}
@@ -318,18 +317,18 @@ function ProductCard({ product, onRemove, currentLang }: ProductCardProps) {
         {/* Metadata */}
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between">
-            <span className="text-slate-600 dark:text-slate-400">
+            <span className="font-primary text-slate-600 dark:text-slate-400">
               {t.labels.brandInline}
             </span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
+            <span className="font-primary font-medium text-slate-900 dark:text-slate-100">
               {product.brand?.name || "-"}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-600 dark:text-slate-400">
+            <span className="font-primary text-slate-600 dark:text-slate-400">
               {t.labels.categoryInline}
             </span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
+            <span className="font-primary font-medium text-slate-900 dark:text-slate-100">
               {product.category?.name || "-"}
             </span>
           </div>
@@ -373,7 +372,7 @@ function CompareRow({ label, values, showDifferencesOnly }: CompareRowProps) {
             {val[0] !== "-" && !areAllSame && (
               <Check className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
             )}
-            <span className="text-slate-700 dark:text-slate-300">
+            <span className="font-primary text-slate-700 dark:text-slate-300">
               {val.join(", ")}
             </span>
           </div>

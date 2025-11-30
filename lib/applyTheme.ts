@@ -33,16 +33,35 @@ export function themeToStyle(theme: ThemeVars): CustomCSSProperties {
     if (val !== undefined && val !== null && val !== "") style[key] = val;
   };
 
-  // Fonts - simplified without dynamic-fonts
   if (theme.fonts) {
     if (theme.fonts.primary) {
-      setVar("--font-primary", theme.fonts.primary);
+      // Remove quotes and add proper formatting with fallbacks
+      const cleanFont = theme.fonts.primary.replace(/['"]/g, '');
+      const fontFamily = cleanFont.includes(',')
+        ? cleanFont
+        : `'${cleanFont}', system-ui, -apple-system, sans-serif`;
+
+      setVar("--font-primary", fontFamily);
     }
-    if (theme.fonts.secondary) {
-      setVar("--font-secondary", theme.fonts.secondary);
-    }
+
     if (theme.fonts.heading) {
-      setVar("--font-heading", theme.fonts.heading);
+      // Remove quotes and add proper formatting with fallbacks
+      const cleanFont = theme.fonts.heading.replace(/['"]/g, '');
+      const fontFamily = cleanFont.includes(',')
+        ? cleanFont
+        : `'${cleanFont}', system-ui, -apple-system, sans-serif`;
+
+      setVar("--font-heading", fontFamily);
+    }
+
+    if (theme.fonts.secondary) {
+      // Remove quotes and add proper formatting with fallbacks
+      const cleanFont = theme.fonts.secondary.replace(/['"]/g, '');
+      const fontFamily = cleanFont.includes(',')
+        ? cleanFont
+        : `'${cleanFont}', monospace`;
+
+      setVar("--font-secondary", fontFamily);
     }
     if (theme.fonts.sizes) {
       Object.entries(theme.fonts.sizes).forEach(([k, v]) =>

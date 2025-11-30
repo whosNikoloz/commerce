@@ -22,10 +22,10 @@ export default function EmptyCart() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-semibold text-text-light dark:text-text-lightdark">
+              <h2 className="font-heading text-2xl font-semibold text-text-light dark:text-text-lightdark">
                 {dictionary.cart.empty}
               </h2>
-              <p className="text-text-subtle dark:text-text-subtledark">
+              <p className="font-primary text-text-subtle dark:text-text-subtledark">
                 {dictionary.cart.emptyDescription}
               </p>
             </div>

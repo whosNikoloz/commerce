@@ -102,22 +102,22 @@ export function ProductInfoBottom({
             width={48}
           />
           <div className="hidden md:flex flex-col min-w-0 gap-1">
-            <span className="text-sm font-semibold truncate text-foreground">{name}</span>
+            <span className="font-primary text-sm font-semibold truncate text-foreground">{name}</span>
             <div className="flex items-center gap-1 flex-wrap">
               {isNewArrival && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
+                <span className="font-primary inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
                   <Sparkles className="h-3 w-3" />
                   ახალი
                 </span>
               )}
               {isLiquidated && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
+                <span className="font-primary inline-flex items-center gap-0.5 text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
                   <Tag className="h-3 w-3" />
                   ლიკვიდაცია
                 </span>
               )}
               {typeof stock === "number" && stock <= 3 && stock > 0 && (
-                <span className="text-[10px] text-amber-600 dark:text-amber-400">
+                <span className="font-primary text-[10px] text-amber-600 dark:text-amber-400">
                   ბოლო {stock} ცალი
                 </span>
               )}
@@ -129,17 +129,17 @@ export function ProductInfoBottom({
         <div className="flex items-center gap-2 md:gap-3 flex-1 md:flex-initial justify-end">
           <div className="flex flex-col items-end gap-0.5">
             <div className="flex items-center gap-1.5">
-              <span className="text-base md:text-lg font-bold text-foreground whitespace-nowrap">
+              <span className="font-primary text-base md:text-lg font-bold text-foreground whitespace-nowrap">
                 {price.toFixed(2)} {currency}
               </span>
               {hasDiscount && (
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-red-500/10 text-red-700 dark:text-red-400 text-[10px] font-semibold">
+                <span className="font-primary inline-flex items-center px-1.5 py-0.5 rounded-md bg-red-500/10 text-red-700 dark:text-red-400 text-[10px] font-semibold">
                   -{computedDiscount}%
                 </span>
               )}
             </div>
             {hasDiscount && (
-              <span className="text-[10px] md:text-xs text-muted-foreground line-through whitespace-nowrap">
+              <span className="font-primary text-[10px] md:text-xs text-muted-foreground line-through whitespace-nowrap">
                 {originalPrice!.toFixed(2)} {currency}
               </span>
             )}
@@ -158,7 +158,7 @@ export function ProductInfoBottom({
             onPress={onAddToCart}
           >
             <ShoppingCart className="h-4 w-4" />
-            <span className="hidden xs:inline">
+            <span className="font-primary hidden xs:inline">
               {isComingSoon ? "მალე" : !inStock ? "ამოიწურა" : "კალათაში"}
             </span>
           </Button>

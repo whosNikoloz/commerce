@@ -132,7 +132,7 @@ export default function AdminPage() {
                 </ModalHeader>
               ) : (
                 <ModalHeader className="flex flex-col items-center gap-1 pb-4">
-                  <h2 className="text-2xl font-bold text-text-light dark:text-text-lightdark">
+                  <h2 className="font-heading text-2xl font-bold text-text-light dark:text-text-lightdark">
                     {loginData.title}
                   </h2>
                 </ModalHeader>
@@ -166,10 +166,10 @@ export default function AdminPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 dark:from-slate-100 dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
+        <h1 className="font-heading text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 dark:from-slate-100 dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
           {dict.admin.dashboard.title}
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
+        <p className="font-primary text-slate-600 dark:text-slate-400 text-lg font-medium">
           {dict.admin.dashboard.description}
         </p>
       </div>

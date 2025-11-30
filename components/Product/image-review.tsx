@@ -166,7 +166,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
       <div className="space-y-4">
         <Card className="relative rounded-lg overflow-hidden bg-white dark:bg-neutral-900 aspect-square max-h-72">
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">No images available</p>
+            <p className="font-primary text-gray-500">No images available</p>
           </div>
         </Card>
       </div>

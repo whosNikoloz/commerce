@@ -32,11 +32,11 @@ export default async function ShippingPage(
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="font-heading text-3xl font-bold tracking-tight">
           {dict.pages.admin.shipping.heading}
         </h1>
 
-        <p className="text-muted-foreground">
+        <p className="font-primary text-muted-foreground">
           {dict.pages.admin.shipping.subtitle}
         </p>
       </div>

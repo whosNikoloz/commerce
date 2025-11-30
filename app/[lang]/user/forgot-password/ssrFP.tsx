@@ -118,7 +118,7 @@
 //           QuizHub
 //         </Link>
 //         <div className="w-full p-6 bg-white rounded-lg h-auto shadow dark:border md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
-//           <h2 className="mb-1 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+//           <h2 className="font-heading mb-1 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
 //             {lang === "ka" ? "პაროლის შეცვლა" : "Change Password"}
 //           </h2>
 //           <div className="mt-4 space-y-4 lg:mt-5 md:space-y-5">
@@ -151,7 +151,7 @@
 //                     setTerms(e.target.checked);
 //                   }}
 //                 >
-//                   <span className="text-yellow-500">
+//                   <span className="font-primary text-yellow-500">
 //                     {lang === "ka" ? "დაეთანხმე  " : "Accept  "}
 //                   </span>
 //                   Terms and Conditions

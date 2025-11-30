@@ -24,8 +24,8 @@ export default function ProductPagination({
         variant="outline"
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
       >
-        <span className="hidden sm:inline">Previous</span>
-        <span className="sm:hidden">Prev</span>
+        <span className="font-primary hidden sm:inline">Previous</span>
+        <span className="font-primary sm:hidden">Prev</span>
       </Button>
 
       {[...Array(totalPages)].map((_, i) => {
@@ -71,8 +71,8 @@ export default function ProductPagination({
         variant="outline"
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
       >
-        <span className="hidden sm:inline">Next</span>
-        <span className="sm:hidden">Next</span>
+        <span className="font-primary hidden sm:inline">Next</span>
+        <span className="font-primary sm:hidden">Next</span>
       </Button>
     </div>
   );

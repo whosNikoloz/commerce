@@ -112,7 +112,7 @@ export const NavbarTemplate2 = () => {
           {/* Top Bar - Announcement/Promo Strip */}
           <div className="w-full bg-gradient-to-r from-brand-primary/10 via-brand-primary/5 to-brand-primary/10 dark:from-brand-primarydark/10 dark:via-brand-primarydark/5 dark:to-brand-primarydark/10 border-b border-brand-primary/10 dark:border-brand-primarydark/10">
             <div className="max-w-7xl mx-auto px-4 py-2">
-              <p className="text-center text-xs md:text-sm tracking-wider text-text-subtle dark:text-text-subtledark font-light">
+              <p className="font-primary text-center text-xs md:text-sm tracking-wider text-text-subtle dark:text-text-subtledark font-light">
                 {lng === "en" ? "FREE SHIPPING ON ORDERS OVER 100" : "უფასო მიწოდება 100-ზე მეტი ღირებულების შეკვეთებზე"}
               </p>
             </div>
@@ -208,21 +208,21 @@ export const NavbarTemplate2 = () => {
                   href={`/${lng}`}
                 >
                   {lng === "en" ? "New Arrivals" : "ახალი"}
-                  <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
+                  <span className="font-primary absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
                 </Link>
                 <Link
                   className="text-sm font-light tracking-widest uppercase text-text-light dark:text-text-lightdark hover:text-brand-primary dark:hover:text-brand-primarydark transition-colors duration-300 relative group"
                   href={`/${lng}`}
                 >
                   {lng === "en" ? "Collections" : "კოლექცია"}
-                  <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
+                  <span className="font-primary absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
                 </Link>
                 <Link
                   className="text-sm font-light tracking-widest uppercase text-text-light dark:text-text-lightdark hover:text-brand-primary dark:hover:text-brand-primarydark transition-colors duration-300 relative group"
                   href={`/${lng}`}
                 >
                   {lng === "en" ? "Sale" : "ფასდაკლება"}
-                  <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
+                  <span className="font-primary absolute bottom-0 left-0 w-0 h-px bg-brand-primary dark:bg-brand-primarydark group-hover:w-full transition-all duration-300" />
                 </Link>
               </div>
             </div>
@@ -253,7 +253,7 @@ export const NavbarTemplate2 = () => {
               <HomeIcon className="w-6 h-6 text-text-light dark:text-text-lightdark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300" />
               <div className="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/10 dark:group-hover:bg-brand-primarydark/10 rounded-full blur-xl transition-all duration-300" />
             </div>
-            <span className="text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
+            <span className="font-primary text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
               {lng === "en" ? "Home" : "მთავარი"}
             </span>
           </Link>
@@ -267,7 +267,7 @@ export const NavbarTemplate2 = () => {
                 setSearchModalOpen={setSearchModalIsOpen}
                 setSearchQuery={setSearchQuery}
               />
-              <span className="text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
+              <span className="font-primary text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
                 {lng === "en" ? "Search" : "ძებნა"}
               </span>
             </div>
@@ -279,14 +279,14 @@ export const NavbarTemplate2 = () => {
 
           <div className="flex flex-col items-center gap-1 min-w-[60px] group">
             <CategoryDrawer />
-            <span className="text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
+            <span className="font-primary text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
               {lng === "en" ? "Shop" : "კატეგორია"}
             </span>
           </div>
 
           <div className="flex flex-col items-center gap-1 min-w-[60px] group">
             <AuthModal IsMobile={isMobile} />
-            <span className="text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
+            <span className="font-primary text-[10px] font-light tracking-wider uppercase text-text-subtle dark:text-text-subtledark group-hover:text-brand-primary dark:group-hover:text-brand-primarydark transition-colors duration-300">
               {lng === "en" ? "Account" : "პროფილი"}
             </span>
           </div>

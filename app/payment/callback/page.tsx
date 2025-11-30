@@ -129,8 +129,8 @@ function PaymentCallbackContent() {
           {loading || status === 'checking' || status === 'pending' ? (
             <>
               <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-              <h2 className="mb-2 text-2xl font-semibold text-gray-800">Processing Payment</h2>
-              <p className="text-gray-600">{message}</p>
+              <h2 className="font-heading mb-2 text-2xl font-semibold text-gray-800">Processing Payment</h2>
+              <p className="font-primary text-gray-600">{message}</p>
             </>
           ) : status === 'success' ? (
             <>
@@ -139,9 +139,9 @@ function PaymentCallbackContent() {
                   <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
                 </svg>
               </div>
-              <h2 className="mb-2 text-2xl font-semibold text-green-800">Payment Successful!</h2>
-              <p className="text-gray-600">{message}</p>
-              <p className="mt-2 text-sm text-gray-500">Redirecting to confirmation page...</p>
+              <h2 className="font-heading mb-2 text-2xl font-semibold text-green-800">Payment Successful!</h2>
+              <p className="font-primary text-gray-600">{message}</p>
+              <p className="font-primary mt-2 text-sm text-gray-500">Redirecting to confirmation page...</p>
             </>
           ) : (
             <>
@@ -150,10 +150,9 @@ function PaymentCallbackContent() {
                   <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
                 </svg>
               </div>
-              <h2 className="mb-2 text-2xl font-semibold text-red-800">Payment Failed</h2>
-              <p className="text-gray-600">{message}</p>
-              <button
-                className="mt-6 rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
+              <h2 className="font-heading mb-2 text-2xl font-semibold text-red-800">Payment Failed</h2>
+              <p className="font-primary text-gray-600">{message}</p>
+              <button className="font-primary mt-6 rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                 onClick={() => router.push('/checkout')}
               >
                 Try Again

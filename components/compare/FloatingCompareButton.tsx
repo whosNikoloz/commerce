@@ -29,13 +29,12 @@ export default function FloatingCompareButton() {
     <div className="fixed bottom-24 right-6 z-50 animate-fadeIn">
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {/* Header - Always visible */}
-        <button
-          className="w-full px-4 py-3 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+        <button className="font-primary w-full px-4 py-3 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center gap-2">
             <ArrowLeftRight className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <span className="font-semibold text-sm">({items.length}/4)</span>
+            <span className="font-primary font-semibold text-sm">({items.length}/4)</span>
           </div>
           {isExpanded ? (
             <ChevronDown className="h-4 w-4" />
@@ -61,8 +60,7 @@ export default function FloatingCompareButton() {
                       width={64}
                     />
                   </div>
-                  <button
-                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  <button className="font-primary absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={() => removeFromCompare(item.id)}
                   >
                     <X className="h-3 w-3" />
@@ -76,7 +74,7 @@ export default function FloatingCompareButton() {
                   key={`empty-${i}`}
                   className="w-16 h-16 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center"
                 >
-                  <span className="text-zinc-400 text-xs">+</span>
+                  <span className="font-primary text-zinc-400 text-xs">+</span>
                 </div>
               ))}
             </div>

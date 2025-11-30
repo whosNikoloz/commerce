@@ -63,7 +63,7 @@ export function DisplayTypePreview({
     case FacetTypeEnum.BooleanSwitch:
       return (
         <div className="flex items-center justify-between">
-          <span className="text-sm">{first?.value || "Enabled"}</span>
+          <span className="font-primary text-sm">{first?.value || "Enabled"}</span>
           <Switch />
         </div>
       );
@@ -75,7 +75,7 @@ export function DisplayTypePreview({
       return (
         <div className="flex items-center gap-2">
           <Input className="w-44" type="date" />
-          <span className="text-xs text-muted-foreground">to</span>
+          <span className="font-primary text-xs text-muted-foreground">to</span>
           <Input className="w-44" type="date" />
         </div>
       );

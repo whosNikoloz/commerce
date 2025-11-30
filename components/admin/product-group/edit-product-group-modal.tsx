@@ -182,10 +182,10 @@ export function EditProductGroupModal({
               <ModalHeader className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
                 <GoBackButton onClick={() => onOpenChange(false)} />
                 <div className="flex flex-col min-w-0">
-                  <span className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                     {group.name}
                   </span>
-                  <span className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                  <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
                     {productsInGroup.length} products in group
                   </span>
                 </div>
@@ -198,10 +198,10 @@ export function EditProductGroupModal({
                       <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                         {group.name}
                       </h2>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
                         Edit product group
                       </p>
                     </div>
@@ -247,7 +247,7 @@ export function EditProductGroupModal({
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Package className="h-5 w-5 text-purple-600" />
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="font-heading text-lg font-semibold">
                     Products in this Group
                   </h3>
                   <Badge variant="secondary">{productsInGroup.length}</Badge>
@@ -352,17 +352,17 @@ export function EditProductGroupModal({
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium truncate">
+                              <h4 className="font-heading font-medium truncate">
                                 {product.name || "Unnamed Product"}
                               </h4>
-                              <p className="text-sm text-muted-foreground truncate">
+                              <p className="font-primary text-sm text-muted-foreground truncate">
                                 {product.id}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="font-semibold text-lg">
+                              <span className="font-primary font-semibold text-lg">
                                 {formatPrice(product.price)}
                               </span>
                               <Badge
@@ -399,7 +399,7 @@ export function EditProductGroupModal({
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-5 w-5 text-pink-600" />
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="font-heading text-lg font-semibold">
                       Other Filtered Products
                     </h3>
                     <Badge variant="secondary">
@@ -407,7 +407,7 @@ export function EditProductGroupModal({
                     </Badge>
                   </div>
 
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-primary text-sm text-muted-foreground">
                     These products match your category/brand filters but are not
                     in this group
                   </p>
@@ -505,17 +505,17 @@ export function EditProductGroupModal({
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">
+                            <h4 className="font-heading font-medium truncate">
                               {product.name || "Unnamed Product"}
                             </h4>
-                            <p className="text-sm text-muted-foreground truncate">
+                            <p className="font-primary text-sm text-muted-foreground truncate">
                               {product.id}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-lg">
+                            <span className="font-primary font-semibold text-lg">
                               {formatPrice(product.price)}
                             </span>
                             <Badge
@@ -543,7 +543,7 @@ export function EditProductGroupModal({
                   </div>
 
                   {productsNotInGroup.length > 10 && (
-                    <p className="text-sm text-muted-foreground text-center">
+                    <p className="font-primary text-sm text-muted-foreground text-center">
                       Showing first 10 of {productsNotInGroup.length} products
                     </p>
                   )}
@@ -557,7 +557,7 @@ export function EditProductGroupModal({
           <div className="flex w-full items-center justify-between gap-3">
             <div className="text-sm text-muted-foreground">
               {hasChanges && (
-                <span className="text-blue-600 dark:text-blue-400 font-medium">
+                <span className="font-primary text-blue-600 dark:text-blue-400 font-medium">
                   You have unsaved changes
                 </span>
               )}

@@ -130,7 +130,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
               </h2>
             )}
             {data.subtitle && (
-              <p className="text-muted-foreground mt-3 text-lg">{t(data.subtitle, locale)}</p>
+              <p className="font-primary text-muted-foreground mt-3 text-lg">{t(data.subtitle, locale)}</p>
             )}
           </div>
         )}
@@ -139,15 +139,14 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
           {/* Fixed "All Categories" Card */}
           {data.showAllCard && (
             <div className="flex-shrink-0">
-              <button
-                className="block"
+              <button className="font-primary block"
                 type="button"
                 onClick={handleAllCategoriesClick}
               >
                 <div className="h-32 sm:h-40 md:h-48 lg:h-56 w-24 sm:w-28 md:w-36 lg:w-40 cursor-pointer overflow-hidden rounded-lg border border-border transition-all duration-300 hover:-translate-y-1">
                   <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
                     <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-foreground" />
-                    <p className="text-[10px] sm:text-xs md:text-sm font-semibold text-foreground text-center">
+                    <p className="font-primary text-[10px] sm:text-xs md:text-sm font-semibold text-foreground text-center">
                       {t(data.allCardText || { ka: "ყველა", en: "All" }, locale)}
                     </p>
                   </div>
@@ -183,7 +182,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
 
                             {/* Text Label - always visible at bottom */}
                             <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-background/80 backdrop-blur-sm">
-                              <p className="text-foreground text-xs sm:text-sm md:text-base font-semibold text-center leading-tight">
+                              <p className="font-primary text-foreground text-xs sm:text-sm md:text-base font-semibold text-center leading-tight">
                                 {category.name}
                               </p>
                             </div>

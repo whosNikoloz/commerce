@@ -182,7 +182,7 @@ export const NavbarTemplate1 = () => {
         <div className="flex justify-around items-center py-2 gap-1">
           <Link className="flex flex-col items-center flex-1 min-w-0" href={`/${lng}`}>
             <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark flex-shrink-0" />
-            <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+            <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
               {dictionary.common.home}
             </span>
           </Link>
@@ -196,7 +196,7 @@ export const NavbarTemplate1 = () => {
                 setSearchModalOpen={setSearchModalIsOpen}
                 setSearchQuery={setSearchQuery}
               />
-              <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+              <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
                 {dictionary.common.search}
               </span>
             </div>
@@ -208,14 +208,14 @@ export const NavbarTemplate1 = () => {
 
           <div className="flex flex-col items-center flex-1 min-w-0">
             <CategoryDrawer />
-            <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+            <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
               {dictionary.categories.category}
             </span>
           </div>
 
           <div className="flex flex-col items-center flex-1 min-w-0">
             <AuthModal IsMobile={isMobile} />
-            <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+            <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
               {dictionary.common.profile}
             </span>
           </div>

@@ -74,7 +74,7 @@ export default function BrandFilter({
         {brands.length === 0 ? (
           <div className="text-center py-8">
             <Tag className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">No brands found</p>
+            <p className="font-primary text-slate-600 dark:text-slate-400 text-sm font-medium">No brands found</p>
           </div>
         ) : (
           <Select
@@ -96,7 +96,7 @@ export default function BrandFilter({
               >
                 <div className="flex items-center gap-2">
                   <Tag className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                  <span className="font-semibold">All Brands</span>
+                  <span className="font-primary font-semibold">All Brands</span>
                   <Badge
                     className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                     variant="secondary"
@@ -113,7 +113,7 @@ export default function BrandFilter({
                 >
                   <div className="flex items-center gap-2">
                     <Tag className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    <span className="font-semibold truncate">{brand.name || "Unnamed Brand"}</span>
+                    <span className="font-primary font-semibold truncate">{brand.name || "Unnamed Brand"}</span>
                     {brand.origin && (
                       <Badge
                         className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"

@@ -341,7 +341,7 @@ export function ProductCard({
                 "flex-1 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 text-white",
                 "transition-all",
                 // Hide on desktop, show on hover and always show on mobile
-                "opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                ""
               )}
               style={{ backgroundColor: themeColor }}
               disabled={!isInStock || product.isComingSoon || addingToCart}

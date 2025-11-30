@@ -23,6 +23,7 @@ import { BrandModel } from "@/types/brand";
 import { FacetModel } from "@/types/facet";
 import { FilterModel } from "@/types/filter";
 import { Condition, FacetTypeEnum, StockStatus } from "@/types/enums";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type SubcategoryItem = CategoryModel & { count?: number };
 
@@ -258,12 +259,13 @@ function SidebarContent({
   onPriceChange,
   onFacetToggle,
   onFacetRadioChange,
-  onFacetRangeChange,      
-  onFacetNumericChange,    
-  onFacetSearchChange,      
-  onFacetDateRangeChange,   
+  onFacetRangeChange,
+  onFacetNumericChange,
+  onFacetSearchChange,
+  onFacetDateRangeChange,
   buildSubHref,
 }: ProductFiltersProps) {
+  const dict = useDictionary();
   const minPrice = typeof filter.minPrice === "number" ? filter.minPrice : 0;
   const maxPrice = typeof filter.maxPrice === "number" ? filter.maxPrice : 1000;
 
@@ -273,7 +275,7 @@ function SidebarContent({
       <div>
         <h2 className="text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
           <span className="w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
-          Categories
+          {dict?.filters?.categories || "Categories"}
         </h2>
         <div className="space-y-1.5">
           {subcategories.map((sub) => (
@@ -302,7 +304,7 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="price">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              Price Range
+              {dict?.filters?.priceRange || "Price Range"}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -341,7 +343,7 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="brands">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              Brands
+              {dict?.filters?.brands || "Brands"}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -373,7 +375,7 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="stock">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              Stock
+              {dict?.filters?.stock || "Stock"}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -387,19 +389,19 @@ function SidebarContent({
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="stock-all" value="all" />
                 <Label className="text-text-light dark:text-text-lightdark" htmlFor="stock-all">
-                  All
+                  {dict?.filters?.all || "All"}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="stock-in" value={String(StockStatus.InStock)} />
                 <Label className="text-text-light dark:text-text-lightdark" htmlFor="stock-in">
-                  In stock
+                  {dict?.filters?.inStock || "In stock"}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="stock-out" value={String(StockStatus.OutOfStock)} />
                 <Label className="text-text-light dark:text-text-lightdark" htmlFor="stock-out">
-                  Out of stock
+                  {dict?.filters?.outOfStock || "Out of stock"}
                 </Label>
               </div>
             </RadioGroup>
@@ -410,15 +412,15 @@ function SidebarContent({
         <AccordionItem className="border-b border-border/50" value="condition">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">
             <span className="flex items-center gap-2">
-              Condition
+              {dict?.filters?.condition || "Condition"}
             </span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
               {[
-                { v: Condition.New, label: "New" },
-                { v: Condition.Used, label: "Used" },
-                { v: Condition.LikeNew, label: "Like new" },
+                { v: Condition.New, label: dict?.filters?.new || "New" },
+                { v: Condition.Used, label: dict?.filters?.used || "Used" },
+                { v: Condition.LikeNew, label: dict?.filters?.likeNew || "Like new" },
               ].map((c) => {
                 const active = (filter.condition ?? []).includes(c.v);
 
@@ -471,7 +473,7 @@ function SidebarContent({
         variant="outline"
         onClick={clearFilters}
       >
-        Clear all filters
+        {dict?.filters?.clearAllFilters || "Clear all filters"}
       </Button>
     </div>
   );
@@ -479,6 +481,7 @@ function SidebarContent({
 
 export default function ProductFilters(props: ProductFiltersProps) {
   const { activeFiltersCount } = props;
+  const dict = useDictionary();
 
   return (
     <>
@@ -502,7 +505,7 @@ export default function ProductFilters(props: ProductFiltersProps) {
             variant="outline"
           >
             <Filter className="h-4 w-4 mr-2" />
-            Filters
+            {dict?.filters?.filters || "Filters"}
             {activeFiltersCount > 0 && (
               <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-gradient-to-br from-brand-primary to-brand-primary/80 text-white shadow-lg">
                 {activeFiltersCount}
@@ -517,7 +520,9 @@ export default function ProductFilters(props: ProductFiltersProps) {
           side="left"
         >
           <SheetHeader className="p-6 pb-4">
-            <SheetTitle className="text-text-light dark:text-text-lightdark">Filters</SheetTitle>
+            <SheetTitle className="text-text-light dark:text-text-lightdark">
+              {dict?.filters?.filters || "Filters"}
+            </SheetTitle>
           </SheetHeader>
           <div className="px-6 pb-6 overflow-y-auto max-h-[calc(100vh-80px)]">
             <SidebarContent {...props} />

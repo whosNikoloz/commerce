@@ -60,7 +60,10 @@ function groupOpeningHours(rows?: OpeningHour[]) {
   return out.map(g => ({ label: short(g.days), hours: g.hours }));
 }
 
-function buildMapsLink(addressStr: string, geo?: { latitude?: number; longitude?: number }) {
+function buildMapsLink(addressStr: string, geo?: { latitude?: number; longitude?: number }, mapsEmbed?: string) {
+  if (mapsEmbed && mapsEmbed.startsWith("http")) {
+    return mapsEmbed;
+  }
   if (geo?.latitude != null && geo?.longitude != null) {
     return `https://maps.google.com/?q=${geo.latitude},${geo.longitude}`;
   }
@@ -150,7 +153,7 @@ export function Footer() {
   const emailAddr = business.email || "";
   const addressStr = formatAddress(business.address);
   const hoursGrouped = groupOpeningHours(business.openingHours);
-  const mapsUrl = buildMapsLink(addressStr, business.geo);
+  const mapsUrl = buildMapsLink(addressStr, business.geo, business.mapsEmbed);
 
   const socials = [
     links.facebook && { href: links.facebook, label: "Facebook", icon: Facebook },
@@ -384,11 +387,10 @@ export function Footer() {
                     return (
                       <Link
                         key={langCode}
-                        className={`px-2 py-1 rounded text-xs transition-colors ${
-                          isActive
-                            ? "bg-zinc-800 text-white font-semibold"
-                            : "text-zinc-400 hover:text-white hover:bg-zinc-900"
-                        }`}
+                        className={`px-2 py-1 rounded text-xs transition-colors ${isActive
+                          ? "bg-zinc-800 text-white font-semibold"
+                          : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                          }`}
                         href={newPath}
                       >
                         {getLanguageName(langCode)}

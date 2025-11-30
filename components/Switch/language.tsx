@@ -112,11 +112,23 @@ export const LanguageSwitch: FC<LanguageSwitchProps> = ({ className, classNames 
 
   // Function to change language
   const changeLanguage = (newLang: string) => {
-    // Remove any existing locale prefix
-    const cleanPath = pathname?.replace(/^\/([^/]+)/, "") || "";
-    const pathWithoutLocale = cleanPath || "/";
+    const segments = pathname?.split("/").filter(Boolean) || [];
+    const firstSegment = segments[0]?.toLowerCase();
 
-    // If switching to default locale, remove locale prefix
+    let pathWithoutLocale = pathname || "/";
+
+    // Only remove the first segment if it's a valid locale
+    if (firstSegment && availableLocales.includes(firstSegment)) {
+      // Remove the locale prefix
+      pathWithoutLocale = "/" + segments.slice(1).join("/");
+    }
+
+    // Ensure we have at least a slash
+    if (!pathWithoutLocale || pathWithoutLocale === "") {
+      pathWithoutLocale = "/";
+    }
+
+    // If switching to default locale, don't add prefix
     if (newLang === defaultLocale) {
       router.push(pathWithoutLocale);
     } else {

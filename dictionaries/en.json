@@ -7,7 +7,22 @@
     "success": "Success",
     "failed": "Failed",
     "back": "Back",
-    "profile": "Profile"
+    "profile": "Profile",
+    "new": "New",
+    "used": "Used",
+    "likeNew": "Like New",
+    "unknownCondition": "Unknown Condition",
+    "inStock": "In Stock",
+    "comingSoon": "Coming Soon",
+    "unknownStatus": "Unknown Status",
+    "loadError": "Failed to Load",
+    "lastStock": "Last {count} pcs",
+    "remainingStock": "{count} pcs left",
+    "soldOut": "Sold Out",
+    "addToCart": "Add to Cart",
+    "addToCartShort": "Add",
+    "liquidation": "Liquidation",
+    "freeShipping": "Fast delivery across Georgia"
   },
   "admin": {
     "dashboard": {
@@ -316,6 +331,22 @@
   "categories": {
     "category": "Categories",
     "allCategories": "All Categories"
+  },
+  "filters": {
+    "categories": "Categories",
+    "priceRange": "Price Range",
+    "brands": "Brands",
+    "stock": "Stock",
+    "condition": "Condition",
+    "clearAllFilters": "Clear all filters",
+    "filters": "Filters",
+    "all": "All",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "new": "New",
+    "used": "Used",
+    "likeNew": "Like new",
+    "to": "to"
   },
   "pages": {
     "admin": {

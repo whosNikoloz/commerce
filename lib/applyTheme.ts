@@ -20,6 +20,7 @@ export function themeToStyle(theme: ThemeVars): CustomCSSProperties {
   safeSet("--brand-surface-dark", theme.brand?.surfaceDark);
   safeSet("--brand-muted", theme.brand?.muted);
   safeSet("--brand-muted-dark", theme.brand?.mutedDark);
+  safeSet("--brand-accent", theme.brand?.accent);
 
   // text
   safeSet("--text-light", theme.text?.light);

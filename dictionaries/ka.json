@@ -7,7 +7,22 @@
     "success": "წარმატებული",
     "failed": "წარუმატებელი",
     "back": "უკან",
-    "profile": "პროფილი"
+    "profile": "პროფილი",
+    "new": "ახალი",
+    "used": "მეორადი",
+    "likeNew": "როგორც ახალი",
+    "unknownCondition": "უცნობი მდგომარეობა",
+    "inStock": "მარაგშია",
+    "comingSoon": "მალე",
+    "unknownStatus": "უცნობი სტატუსი",
+    "loadError": "ვერ ჩაიტვირთა",
+    "lastStock": "ბოლო {count} ც",
+    "remainingStock": "დარჩა {count} ც",
+    "soldOut": "ამოიწურა",
+    "addToCart": "კალათაში დამატება",
+    "addToCartShort": "დამატება",
+    "liquidation": "ლიკვიდაცია",
+    "freeShipping": "სწრაფი მიწოდება მთელ საქართველოში"
   },
   "admin": {
     "dashboard": {
@@ -316,6 +331,22 @@
   "categories": {
     "category": "კატეგორიები",
     "allCategories": "ყველა კატეგორია"
+  },
+  "filters": {
+    "categories": "კატეგორიები",
+    "priceRange": "ფასის დიაპაზონი",
+    "brands": "ბრენდები",
+    "stock": "მარაგი",
+    "condition": "მდგომარეობა",
+    "clearAllFilters": "ფილტრების გასუფთავება",
+    "filters": "ფილტრები",
+    "all": "ყველა",
+    "inStock": "მარაგშია",
+    "outOfStock": "არ არის მარაგში",
+    "new": "ახალი",
+    "used": "მეორადი",
+    "likeNew": "როგორც ახალი",
+    "to": "-დან"
   },
   "pages": {
     "admin": {

@@ -17,6 +17,8 @@ interface InfoPageRouteProps {
 
 // JSON-LD helper
 async function JsonLd({ lang, site, slug, title }: { lang: string; site: SiteConfig; slug: string; title: string }) {
+  if (site.seo?.enableBreadcrumbs === false) return null;
+
   const home = (await buildI18nUrls("/", lang, site)).canonical;
   const info = (await buildI18nUrls("/info", lang, site)).canonical;
   const page = (await buildI18nUrls(`/info/${slug}`, lang, site)).canonical;

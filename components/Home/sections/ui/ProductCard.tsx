@@ -20,10 +20,11 @@ import { useUser } from "@/app/context/userContext";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useCompareStore } from "@/app/context/compareContext";
 import { useFlyToCart } from "@/hooks/use-fly-to-cart";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface ProductCardProps {
   product: ProductResponseModel;
-  template?: 1 | 2 ;
+  template?: 1 | 2;
   className?: string;
   showActions?: boolean;
   priority?: boolean;
@@ -62,6 +63,7 @@ export function ProductCard({
   const { user } = useUser();
   const { lang } = useParams<{ lang?: string }>();
   const currentLang = lang || "en";
+  const dic = useDictionary();
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -94,10 +96,10 @@ export function ProductCard({
     product.condition === Condition.New
       ? "New"
       : product.condition === Condition.LikeNew
-      ? "Like New"
-      : product.condition === Condition.Used
-      ? "Used"
-      : "";
+        ? "Like New"
+        : product.condition === Condition.Used
+          ? "Used"
+          : "";
 
   const S = templateStyles[template];
   const isCompact = size === "compact";
@@ -321,8 +323,8 @@ export function ProductCard({
                 ) : (
                   <>
                     <ShoppingCart className={cn(iconDimension)} />
-                    <span className="hidden sm:inline">Add to cart</span>
-                    <span className="sm:hidden">Add</span>
+                    <span className="hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
+                    <span className="sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
                   </>
                 )}
               </Button>
@@ -334,7 +336,7 @@ export function ProductCard({
                   "w-11 shrink-0 rounded-full border shadow-sm",
                   "bg-white hover:bg-white border-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:border-zinc-700",
                   inWishlist &&
-                    "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
+                  "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
                 )}
                 disabled={wishlistLoading}
                 size="icon"
@@ -369,8 +371,8 @@ export function ProductCard({
               ) : (
                 <>
                   <ShoppingCart className={cn(iconDimension)} />
-                  <span className="hidden sm:inline">Add to cart</span>
-                  <span className="sm:hidden">Add</span>
+                  <span className="hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
+                  <span className="sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
                 </>
               )}
             </Button>
@@ -382,7 +384,7 @@ export function ProductCard({
 }
 
 
-export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2  }) {
+export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2 }) {
   const S = templateStyles[template];
 
   return (

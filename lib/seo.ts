@@ -53,6 +53,11 @@ const toPlain = (s: string) =>
 const clamp = (s: string, max = 160) => (s.length <= max ? s : s.slice(0, max - 1).trim() + "…");
 
 async function getBASE(siteConfig: SiteConfig): Promise<string> {
+  // If canonical base URL is configured in SEO, use it
+  if (siteConfig.seo?.canonicalBaseUrl && siteConfig.seo.canonicalBaseUrl.trim()) {
+    return siteConfig.seo.canonicalBaseUrl.replace(/\/$/, "");
+  }
+
   // If site URL is configured, use it
   if (siteConfig.url && siteConfig.url.trim()) {
     return siteConfig.url.replace(/\/$/, "");
@@ -195,6 +200,22 @@ export async function i18nPageMetadataAsync(args: I18nMetaArgs): Promise<Metadat
   // Determine if should index
   const shouldIndex = args.index && !seo.defaultNoIndex;
 
+  // Construct robots value
+  let robots: Metadata["robots"] = { index: false, follow: false, nocache: true };
+
+  if (seo.robots) {
+    // Use the string from config if available (e.g. "index, follow")
+    // We map it loosely to the Next.js Metadata structure or pass it as a string if supported,
+    // but Next.js expects an object or string.
+    // For simplicity, if it's explicitly set, we might want to trust it,
+    // but the type in tenant.ts is string.
+    // Let's parse it simply or just use it if it matches standard values.
+    // Actually, Next.js 'robots' can be a string.
+    robots = seo.robots;
+  } else if (shouldIndex) {
+    robots = { index: true, follow: true };
+  }
+
   return {
     title: args.title,
     description: desc,
@@ -202,9 +223,7 @@ export async function i18nPageMetadataAsync(args: I18nMetaArgs): Promise<Metadat
     authors: seo.author ? [{ name: seo.author }] : undefined,
     creator: seo.author,
     publisher: siteCfg.name,
-    robots: shouldIndex
-      ? { index: true, follow: true }
-      : { index: false, follow: false, nocache: true },
+    robots: robots,
     metadataBase: new URL(BASE),
     alternates: { canonical, languages: langs },
     verification: Object.keys(verification).length > 0 ? verification : undefined,

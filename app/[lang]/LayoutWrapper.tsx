@@ -4,8 +4,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Navbar } from "@/components/Navbar/navbar";
-import { Footer } from "@/components/footer";
 import GA4PageTracker from "@/components/Analytics/GA4PageTracker";
+import Footer from "@/components/new-footer";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;

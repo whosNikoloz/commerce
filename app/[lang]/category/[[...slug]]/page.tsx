@@ -244,13 +244,17 @@ export default async function CategoryIndex({
       },
     ]);
 
+    const showBreadcrumbs = site.seo?.enableBreadcrumbs !== false;
+
     return (
       <>
-        <Script
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
-          id="ld-breadcrumbs"
-          type="application/ld+json"
-        />
+        {showBreadcrumbs && (
+          <Script
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
+            id="ld-breadcrumbs"
+            type="application/ld+json"
+          />
+        )}
         <SearchPage query={q} />
       </>
     );
@@ -304,6 +308,8 @@ export default async function CategoryIndex({
     { name: parent.name ?? (t.meta?.defaultTitle ?? "Category"), url: current },
   ]);
 
+  const showBreadcrumbs = site.seo?.enableBreadcrumbs !== false;
+
   const listJsonLd =
     (initial.items?.length ?? 0) > 0
       ? buildItemListJsonLd(
@@ -331,11 +337,13 @@ export default async function CategoryIndex({
 
   return (
     <>
-      <Script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
-        id="ld-breadcrumbs"
-        type="application/ld+json"
-      />
+      {showBreadcrumbs && (
+        <Script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsJsonLd) }}
+          id="ld-breadcrumbs"
+          type="application/ld+json"
+        />
+      )}
       {listJsonLd && (
         <Script
           dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}

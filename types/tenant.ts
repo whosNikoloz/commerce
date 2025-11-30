@@ -334,6 +334,22 @@ export type SEOConfig = {
   enableSearchAction?: boolean; // Enable WebSite search action JSON-LD
 };
 
+export type StoreLocation = {
+  id: string; // Unique identifier (e.g., "us", "uk", "de")
+  name: LocalizedText; // Store name
+  address: LocalizedText; // Full address
+  phone: LocalizedText; // Phone number
+  hours: LocalizedText; // Business hours
+  email?: string; // Store-specific email
+  geo?: {
+    latitude: number;
+    longitude: number;
+  };
+  mapsEmbed?: string; // Google Maps embed URL
+  country?: string; // Country code (e.g., "US", "UK", "DE")
+  flagEmoji?: string; // Flag emoji (e.g., "🇺🇸", "🇬🇧")
+};
+
 export type BusinessInfo = {
   // Contact Information
   email?: string; // Business email
@@ -363,6 +379,14 @@ export type BusinessInfo = {
   vatNumber?: string; // Tax/VAT number
   registrationNumber?: string; // Company registration number
   legalName?: string; // Official legal name
+
+  // Footer & Multiple Store Locations
+  stores?: StoreLocation[]; // Multiple store locations for footer
+  companyName?: LocalizedText; // Company display name
+  companyTagline?: LocalizedText; // Tagline/slogan
+  logoText?: string; // Logo abbreviation (e.g., "PS")
+  copyright?: LocalizedText; // Custom copyright text
+  mapsEmbed?: string; // Main location Google Maps embed URL
 };
 
 export type PWAConfig = {

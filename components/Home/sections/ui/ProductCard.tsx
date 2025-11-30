@@ -21,40 +21,20 @@ import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { useCompareStore } from "@/app/context/compareContext";
 import { useFlyToCart } from "@/hooks/use-fly-to-cart";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { useTenant } from "@/app/context/tenantContext";
 
 interface ProductCardProps {
   product: ProductResponseModel;
-  template?: 1 | 2;
   className?: string;
   showActions?: boolean;
   priority?: boolean;
   size?: "default" | "compact";
 }
 
-const templateStyles = {
-  1: {
-    card:
-      "rounded-2xl border bg-white " +
-      "border-black/10 dark:bg-zinc-950 dark:border-white/10",
-    imageRadius: "rounded-t-2xl",
-    title: "text-[15px] font-semibold leading-snug line-clamp-2",
-    cta: "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90",
-    oldPrice: "text-muted-foreground dark:text-zinc-400",
-  },
-  2: {
-    card:
-      "rounded-xl border bg-white " +
-      "border-black/10 dark:bg-zinc-950 dark:border-white/10",
-    imageRadius: "rounded-t-xl",
-    title: "text-sm font-semibold leading-snug line-clamp-2",
-    cta: "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-white/90",
-    oldPrice: "text-neutral-400 dark:text-zinc-500",
-  },
-} as const;
+
 
 export function ProductCard({
   product,
-  template = 1,
   className,
   showActions = true,
   priority = false,
@@ -64,6 +44,8 @@ export function ProductCard({
   const { lang } = useParams<{ lang?: string }>();
   const currentLang = lang || "en";
   const dic = useDictionary();
+  const { config } = useTenant();
+  const themeColor = config?.themeColor || "#000000";
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -103,8 +85,6 @@ export function ProductCard({
         : product.condition === Condition.Used
           ? "Used"
           : "";
-
-  const S = templateStyles[template];
   const isCompact = size === "compact";
   const titleSize = isCompact ? "text-[12px] sm:text-[13px]" : undefined;
   const priceSize = isCompact ? "text-sm sm:text-base" : "text-xl";
@@ -192,7 +172,11 @@ export function ProductCard({
   return (
     <article
       itemScope
-      className={cn("group relative overflow-hidden transition-all duration-300 flex flex-col h-full", S.card, className)}
+      className={cn(
+        "group relative overflow-hidden transition-all duration-300 flex flex-col h-full",
+        "rounded-2xl border bg-white border-black/10 dark:bg-zinc-950 dark:border-white/10",
+        className
+      )}
       itemType="https://schema.org/Product"
     >
       <meta content={product.name || "Product"} itemProp="name" />
@@ -209,7 +193,7 @@ export function ProductCard({
       <CardContent className="p-0 relative pointer-events-none"> {/* prevent blocking clicks to link */}
         <div className="relative">
           <AspectRatio
-            className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)}
+            className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60 rounded-t-2xl")}
             ratio={1}
             onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
           >
@@ -262,39 +246,40 @@ export function ProductCard({
           )}
 
           {discountPercent > 0 && (
-            <div className="absolute left-3 top-3 pointer-events-none">
-              <div className={cn("rounded-full bg-red-500 text-white font-bold shadow-sm", discountBadge)}>
+            <div className="absolute left-3 top-3 pointer-events-none z-20">
+              <div
+                className={cn("rounded-full text-white font-bold shadow-lg", discountBadge)}
+                style={{ backgroundColor: themeColor }}
+              >
                 -{discountPercent}%
               </div>
             </div>
           )}
 
-          {template !== 2 && showActions && (
+          {showActions && (
             <div className="absolute right-3 top-3 flex gap-2 pointer-events-auto">
-              {template === 1 && (
-                <Button
-                  className={cn(
-                    "rounded-full shadow-md",
-                    actionIconSize,
-                    "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
-                    inCompare && "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                  )}
-                  size="icon"
-                  type="button"
-                  variant="secondary"
-                  onClick={handleCompareToggle}
-                >
-                  <ArrowLeftRight className={cn(iconDimension)} />
-                  <span className="font-primary sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
-                </Button>
-              )}
               <Button
                 className={cn(
-                  "rounded-full shadow-md",
+                  "rounded-full shadow-lg transition-all",
                   actionIconSize,
-                  "bg-white/90 hover:bg-white dark:bg-zinc-800/80 dark:hover:bg-zinc-800",
-                  inWishlist && "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                  "bg-white/95 hover:bg-white dark:bg-zinc-800/90 dark:hover:bg-zinc-800"
                 )}
+                style={inCompare ? { backgroundColor: themeColor, color: 'white' } : {}}
+                size="icon"
+                type="button"
+                variant="secondary"
+                onClick={handleCompareToggle}
+              >
+                <ArrowLeftRight className={cn(iconDimension)} />
+                <span className="font-primary sr-only">{inCompare ? "Remove from compare" : "Add to compare"}</span>
+              </Button>
+              <Button
+                className={cn(
+                  "rounded-full shadow-lg transition-all",
+                  actionIconSize,
+                  "bg-white/95 hover:bg-white dark:bg-zinc-800/90 dark:hover:bg-zinc-800"
+                )}
+                style={inWishlist ? { backgroundColor: '#ef4444', color: 'white' } : {}}
                 disabled={wishlistLoading}
                 size="icon"
                 type="button"
@@ -314,18 +299,23 @@ export function ProductCard({
       </CardContent>
 
       {/* CONTENT */}
-      <CardFooter className={cn("relative pointer-events-none flex flex-col items-start gap-2.5 flex-1", footerPadding)}>
-        <div itemScope className="flex items-baseline gap-1.5 sm:gap-2 w-full flex-wrap" itemProp="offers" itemType="https://schema.org/Offer">
+      <CardFooter className={cn("relative pointer-events-none flex flex-col items-start gap-3 flex-1", footerPadding)}>
+        <div itemScope className="flex items-baseline gap-2 w-full flex-wrap" itemProp="offers" itemType="https://schema.org/Offer">
           <meta content="GEL" itemProp="priceCurrency" />
           <meta content={displayPrice.toString()} itemProp="price" />
           <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
-          <span className={cn(priceSize, "font-primary font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap")}>{formatPrice(displayPrice)}</span>
-          {hasDiscount && <span className={cn(oldPriceSize, "font-primary line-through whitespace-nowrap", S.oldPrice)}>{formatPrice(product.price)}</span>}
+          <span
+            className={cn(priceSize, "font-primary font-extrabold whitespace-nowrap")}
+            style={{ color: themeColor }}
+          >
+            {formatPrice(displayPrice)}
+          </span>
+          {hasDiscount && <span className={cn(oldPriceSize, "font-primary line-through whitespace-nowrap opacity-60 text-muted-foreground dark:text-zinc-400")}>{formatPrice(product.price)}</span>}
         </div>
         <div className="mt-auto w-full space-y-2.5">
           <h3
             className={cn(
-              S.title,
+              "text-[15px] font-semibold leading-snug",
               titleSize,
               "font-heading text-zinc-900 dark:text-zinc-100 w-full",
               minTitleHeight,
@@ -344,58 +334,16 @@ export function ProductCard({
             </span>
           )}
 
-          {template === 2 && showActions ? (
-            <div className="w-full flex items-stretch gap-2 pointer-events-auto">
-              <Button
-                className={cn(addBtnHeight, "flex-1 rounded-xl font-medium shadow-sm flex items-center justify-center gap-2", S.cta)}
-                disabled={!isInStock || product.isComingSoon || addingToCart}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleAddToCart(product);
-                }}
-              >
-                {addingToCart ? (
-                  <>
-                    <Loader2 className={cn(iconDimension, "animate-spin")} />
-                    <span className="font-primary hidden sm:inline">Checking...</span>
-                    <span className="font-primary sm:hidden">Wait...</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className={cn(iconDimension)} />
-                    <span className="font-primary hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
-                    <span className="font-primary sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
-                  </>
-                )}
-              </Button>
-
-              <Button
-                aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                className={cn(
-                  addBtnHeight,
-                  "w-11 shrink-0 rounded-full border shadow-sm",
-                  "bg-white hover:bg-white border-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:border-zinc-700",
-                  inWishlist &&
-                  "bg-red-500 text-white hover:bg-red-600 border-red-500 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600"
-                )}
-                disabled={wishlistLoading}
-                size="icon"
-                type="button"
-                variant={inWishlist ? "default" : "outline"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleWishlistToggle(e as any);
-                }}
-              >
-                <Heart className={cn(iconDimension, inWishlist && "fill-current")} />
-              </Button>
-            </div>
-          ) : (
+          <div className="w-full flex items-stretch gap-2 pointer-events-auto">
             <Button
-              className={cn("w-full rounded-xl font-medium shadow-sm flex items-center justify-center gap-2 pointer-events-auto", addBtnHeight, S.cta)}
+              className={cn(
+                addBtnHeight,
+                "flex-1 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 text-white",
+                "transition-all",
+                // Hide on desktop, show on hover and always show on mobile
+                "opacity-100 md:opacity-0 md:group-hover:opacity-100"
+              )}
+              style={{ backgroundColor: themeColor }}
               disabled={!isInStock || product.isComingSoon || addingToCart}
               type="button"
               onClick={(e) => {
@@ -418,7 +366,7 @@ export function ProductCard({
                 </>
               )}
             </Button>
-          )}
+          </div>
         </div>
       </CardFooter>
     </article>
@@ -426,13 +374,11 @@ export function ProductCard({
 }
 
 
-export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2 }) {
-  const S = templateStyles[template];
-
+export function ProductCardSkeleton() {
   return (
-    <article className={cn("overflow-hidden", S.card)}>
+    <article className={cn("overflow-hidden rounded-2xl border bg-white border-black/10 dark:bg-zinc-950 dark:border-white/10")}>
       <CardContent className="p-4">
-        <div className={cn("relative p-2 rounded-xl shadow-inner bg-zinc-100 dark:bg-zinc-900/60", S.imageRadius)}>
+        <div className={cn("relative p-2 rounded-xl shadow-inner bg-zinc-100 dark:bg-zinc-900/60 rounded-t-2xl")}>
           <AspectRatio ratio={1}>
             <div className="h-full w-full rounded-lg animate-pulse bg-zinc-200 dark:bg-zinc-800" />
           </AspectRatio>
@@ -451,14 +397,10 @@ export function ProductCardSkeleton({ template = 1 }: { template?: 1 | 2 }) {
           <div className="h-4 w-16 rounded animate-pulse bg-zinc-200 dark:bg-zinc-800" />
         </div>
 
-        {template === 2 ? (
-          <div className="mt-1 w-full flex items-stretch gap-2">
-            <div className="h-11 flex-1 rounded-xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-11 w-11 rounded-full animate-pulse bg-zinc-200 dark:bg-zinc-800" />
-          </div>
-        ) : (
-          <div className="mt-1 h-11 w-full rounded-xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
-        )}
+        <div className="mt-1 w-full flex items-stretch gap-2">
+          <div className="h-11 flex-1 rounded-xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-11 w-11 rounded-full animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+        </div>
       </CardFooter>
     </article>
   );

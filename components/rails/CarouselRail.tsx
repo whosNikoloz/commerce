@@ -8,12 +8,11 @@ import '@splidejs/react-splide/css';
 
 type Props = {
   products: any[];
-  template?: 1 | 2 ;
   columns?: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function CarouselRail({ products, template = 1, columns: _columns = 4 }: Props) {
+export default function CarouselRail({ products, columns: _columns = 4 }: Props) {
   const splideRef = useRef<SplideCore | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_canGoPrev, setCanGoPrev] = useState(false);
@@ -77,7 +76,7 @@ export default function CarouselRail({ products, template = 1, columns: _columns
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
         {products.map((p) => (
           <div key={p.id} className="h-full">
-            <ProductCard product={p} showActions={true} size="compact" template={template} />
+            <ProductCard product={p} showActions={true} size="compact" />
           </div>
         ))}
       </div>
@@ -112,39 +111,39 @@ export default function CarouselRail({ products, template = 1, columns: _columns
       {!isIntersecting ? (
         <div className="h-80 animate-pulse bg-muted rounded-lg" />
       ) : (
-      <Splide
-        ref={splideRef as any}
-        aria-label="Products"
-        options={{
-          type: "slide",
-          gap: "0.75rem",
-          pagination: false,
-          arrows: true,
-          drag: true,
-          trimSpace: true,
-          snap: true,
-          omitEnd: false,
-          focus: 0,
-          perMove: 1,
-          flickPower: 300,
-          breakpoints: {
-            2000: { perPage: perPageDesktop, gap: "0.75rem" },
-            1280: { perPage: 7, gap: "0.75rem" },
-            1024: { perPage: 6, gap: "0.75rem" },
-            768:  { perPage: 4, gap: "0.5rem" },
-            640:  { perPage: 3, gap: "0.5rem"},
-            480:  { perPage: 2, gap: "0.5rem" },
-          },
+        <Splide
+          ref={splideRef as any}
+          aria-label="Products"
+          options={{
+            type: "slide",
+            gap: "0.75rem",
+            pagination: false,
+            arrows: true,
+            drag: true,
+            trimSpace: true,
+            snap: true,
+            omitEnd: false,
+            focus: 0,
+            perMove: 1,
+            flickPower: 300,
+            breakpoints: {
+              2000: { perPage: perPageDesktop, gap: "0.75rem" },
+              1280: { perPage: 7, gap: "0.75rem" },
+              1024: { perPage: 6, gap: "0.75rem" },
+              768: { perPage: 4, gap: "0.5rem" },
+              640: { perPage: 3, gap: "0.5rem" },
+              480: { perPage: 2, gap: "0.5rem" },
+            },
 
 
-        }}
-      >
-        {products.map((p) => (
-          <SplideSlide key={p.id}>
-            <ProductCard product={p} showActions={true} size="compact" template={template} />
-          </SplideSlide>
-        ))}
-      </Splide>
+          }}
+        >
+          {products.map((p) => (
+            <SplideSlide key={p.id}>
+              <ProductCard product={p} showActions={true} size="compact" />
+            </SplideSlide>
+          ))}
+        </Splide>
       )}
     </div>
   );

@@ -4,10 +4,9 @@ import type React from "react";
 
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, Clock3, Tag, ShoppingCart, ChevronRight, Heart } from "lucide-react";
+import { Sparkles, Clock3, Tag, ShoppingCart, Heart } from "lucide-react";
 import { Card, CardBody } from "@heroui/card";
-import { useState, memo, useEffect, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import { useState, memo, useEffect } from "react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
@@ -19,6 +18,7 @@ import { StockStatus, Condition } from "@/types/enums";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
 import { useUser } from "@/app/context/userContext";
+import { useTenant } from "@/app/context/tenantContext";
 
 interface ProductGridProps {
   products: ProductResponseModel[];
@@ -48,22 +48,21 @@ const ProductCard = memo(function ProductCard({
   product,
   viewMode,
   onAdd,
-  selectedImageIndex,
-  onSelectImage,
   size = "default",
 }: {
   product: ProductResponseModel;
   viewMode: "grid" | "list";
   onAdd: (id: string) => void;
-  selectedImageIndex: number;
-  onSelectImage: (productId: string, idx: number) => void;
   size?: "default" | "compact";
 }) {
   const { user } = useUser();
   const { lang } = useParams<{ lang?: string }>();
   const currentLang = lang || "en";
+  const { config } = useTenant();
+  const themeColor = config?.themeColor || "#000000";
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     if (user && product.id) {
@@ -72,7 +71,8 @@ const ProductCard = memo(function ProductCard({
   }, [user, product.id]);
 
   const images = product.images?.length ? product.images : ["/placeholder.png"];
-  const imgSrc = images?.[0];
+  const hasMultipleImages = images.length > 1;
+  const imageUrl = images[currentImageIndex] || images[0];
   const inStock = product.status === StockStatus.InStock;
 
   const hasDiscount =
@@ -80,8 +80,9 @@ const ProductCard = memo(function ProductCard({
   const displayPrice = hasDiscount ? product.discountPrice! : product.price;
   const originalPrice = hasDiscount ? product.price : undefined;
 
-  //const size = product.productFacetValues?.find((f) => f.facetName?.toLowerCase() === "size")?.facetValue;
-  const color = product.productFacetValues?.find((f) => f.facetName?.toLowerCase() === "color")?.facetValue;
+  const color = product.productFacetValues?.find(
+    (f) => f.facetName?.toLowerCase() === "color"
+  )?.facetValue;
   const metaLine = [product.brand?.name, color, formatCondition(product.condition)]
     .filter(Boolean)
     .join(" • ");
@@ -96,50 +97,17 @@ const ProductCard = memo(function ProductCard({
 
   const isCompact = size === "compact";
   const cardPadding = isCompact ? "p-1 sm:p-1.5 md:p-2" : "p-1 sm:p-2 md:p-3";
-  const titleSize = isCompact ? "text-[10px] sm:text-xs md:text-sm" : "text-xs sm:text-sm md:text-base lg:text-lg";
-  const priceSize = isCompact ? "text-sm sm:text-base md:text-lg" : "text-base sm:text-xl md:text-xl lg:text-2xl";
+  const titleSize = isCompact
+    ? "text-[10px] sm:text-xs md:text-sm"
+    : "text-xs sm:text-sm md:text-base lg:text-lg";
+  const priceSize = isCompact
+    ? "text-sm sm:text-base md:text-lg"
+    : "text-base sm:text-xl md:text-xl lg:text-2xl";
   const metaSize = isCompact ? "text-[9px] sm:text-[10px]" : "text-[10px] sm:text-xs";
-  const badgeSize = isCompact ? "text-[8px] sm:text-[9px] px-1.5 py-0.5" : "text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1";
+  const badgeSize = isCompact
+    ? "text-[8px] sm:text-[9px] px-1.5 py-0.5"
+    : "text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1";
   const minTitleHeight = isCompact ? "min-h-[1.5rem] sm:min-h-[2rem]" : "min-h-[2.5rem]";
-  const imageHeight = isCompact ? "h-40 sm:h-44 md:h-48" : "h-48 sm:h-56 md:h-64";
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: images.length > 1,
-    align: "center",
-    containScroll: "trimSnaps",
-  });
-
-  useEffect(() => {
-    if (emblaApi) emblaApi.scrollTo(selectedImageIndex);
-  }, [emblaApi, selectedImageIndex]);
-
-  const onEmblaSelect = useCallback(() => {
-    if (!emblaApi) return;
-    const idx = emblaApi.selectedScrollSnap();
-
-    onSelectImage(product.id, idx);
-  }, [emblaApi, onSelectImage, product.id]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.on("select", onEmblaSelect);
-
-    return () => {
-      emblaApi.off("select", onEmblaSelect);
-    };
-  }, [emblaApi, onEmblaSelect]);
-
-  const goPrev = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    emblaApi?.scrollPrev();
-  };
-
-  const goNext = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    emblaApi?.scrollNext();
-  };
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -147,12 +115,10 @@ const ProductCard = memo(function ProductCard({
 
     if (!user) {
       toast.error("Please log in to add items to your wishlist");
-
       return;
     }
     if (!product.id) {
       toast.error("Product ID is missing");
-
       return;
     }
 
@@ -174,36 +140,36 @@ const ProductCard = memo(function ProductCard({
     }
   };
 
-  const stopAll = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // @ts-ignore — native event may exist
-    e.nativeEvent?.stopImmediatePropagation?.();
-  };
-
   const ActionButtons = ({ compact = false }: { compact?: boolean }) => (
-    <div className={compact ? "flex flex-col gap-2" : "absolute top-2 right-2 flex flex-col gap-2 z-30"}>
+    <div
+      className={
+        compact
+          ? "flex flex-col gap-2"
+          : "absolute top-2 right-2 flex flex-col gap-2 z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+      }
+    >
       <Button
         aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
         className={cn(
           compact ? "h-10 w-10 sm:h-12 sm:w-12 rounded-xl" : "h-8 w-8 sm:h-9 sm:w-9 rounded-full",
-          "backdrop-blur-md shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60",
-          inWishlist ? "bg-red-500 hover:bg-red-600 text-white" : "bg-background/80 hover:bg-background"
+          "backdrop-blur-md shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60"
         )}
+        style={inWishlist ? { backgroundColor: "#ef4444", color: "white" } : {}}
         disabled={wishlistLoading}
         size="icon"
         variant="secondary"
         onClick={handleWishlistToggle}
       >
-        <Heart className={compact ? "h-5 w-5" : "h-4 w-4"} />
+        <Heart className={cn(compact ? "h-5 w-5" : "h-4 w-4", inWishlist && "fill-current")} />
       </Button>
 
       <Button
         aria-label="Add to cart"
         className={cn(
           compact ? "h-10 w-10 sm:h-12 sm:w-12 rounded-xl" : "h-8 w-8 sm:h-9 sm:w-9 rounded-full",
-          "bg-gradient-to-br from-brand-primary to-brand-primary/90 text-white shadow-lg transition-all hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60"
+          "text-white shadow-lg transition-all hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60"
         )}
+        style={{ backgroundColor: themeColor }}
         disabled={!inStock || showComingSoon}
         size="icon"
         onClick={(e) => {
@@ -218,14 +184,23 @@ const ProductCard = memo(function ProductCard({
   );
 
   return (
-    <article itemScope className={viewMode === "grid" ? "flex flex-col h-full" : ""} itemType="https://schema.org/Product">
+    <article
+      itemScope
+      className={viewMode === "grid" ? "flex flex-col h-full" : ""}
+      itemType="https://schema.org/Product"
+    >
       <meta content={product.name ?? "Product"} itemProp="name" />
-      {imgSrc && <meta content={imgSrc} itemProp="image" />}
+      {imageUrl && <meta content={imageUrl} itemProp="image" />}
 
-      <Card className={cn("group relative overflow-hidden rounded-2xl border border-border/40 bg-card shadow-lg transition-all duration-500 md:hover:-translate-y-2 md:hover:border-brand-primary/30 md:hover:shadow-2xl", viewMode === "grid" && "flex flex-col h-full")}>
+      <Card
+        className={cn(
+          "group relative overflow-hidden rounded-2xl border border-border/40 bg-card shadow-lg transition-all duration-500 md:hover:-translate-y-2 md:hover:border-brand-primary/30 md:hover:shadow-2xl",
+          viewMode === "grid" && "flex flex-col h-full"
+        )}
+      >
         {viewMode === "grid" ? (
           <>
-            {/* Clickable area only (inside Card, wrapped by Link) */}
+            {/* GRID VIEW */}
             <Link
               className="flex flex-col h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-2xl"
               href={`/${currentLang}/product/${product.id}`}
@@ -234,115 +209,131 @@ const ProductCard = memo(function ProductCard({
                 <div className="relative flex-1 flex flex-col">
                   <div
                     aria-live="polite"
-                    className={cn("relative overflow-hidden rounded-t-2xl group/image bg-gradient-to-br from-muted/30 to-muted/10", isCompact && imageHeight)}
+                    className={cn(
+                      "relative overflow-hidden rounded-t-2xl group/image bg-gradient-to-br from-muted/30 to-muted/10"
+                    )}
                   >
                     {/* Badges (left top) */}
                     <div className="absolute left-2 sm:left-3 top-2 sm:top-3 z-20 flex flex-col gap-1.5 sm:gap-2">
                       {showComingSoon && (
-                        <Badge className={cn("bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-700 text-white border-0 shadow-xl backdrop-blur-md font-semibold", badgeSize)}>
+                        <Badge
+                          className={cn(
+                            "bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-700 text-white border-0 shadow-xl backdrop-blur-md font-semibold",
+                            badgeSize
+                          )}
+                        >
                           <Clock3 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> Coming Soon
                         </Badge>
                       )}
                       {showNew && (
-                        <Badge className={cn("bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 text-white border-0 shadow-xl backdrop-blur-md font-semibold", badgeSize)}>
+                        <Badge
+                          className={cn(
+                            "bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 text-white border-0 shadow-xl backdrop-blur-md font-semibold",
+                            badgeSize
+                          )}
+                        >
                           <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> NEW
                         </Badge>
                       )}
                       {showClearance && (
-                        <Badge className={cn("bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white border-0 shadow-xl backdrop-blur-md font-bold", badgeSize)}>
+                        <Badge
+                          className={cn(
+                            "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white border-0 shadow-xl backdrop-blur-md font-bold",
+                            badgeSize
+                          )}
+                        >
                           <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> CLEARANCE
                         </Badge>
                       )}
                       {discountPct > 0 && (
-                        <Badge className={cn("bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 text-white border-0 shadow-xl backdrop-blur-md font-bold", badgeSize)}>
+                        <Badge
+                          className={cn(
+                            "text-white border-0 shadow-xl backdrop-blur-md font-bold",
+                            badgeSize
+                          )}
+                          style={{ backgroundColor: themeColor }}
+                        >
                           −{discountPct}%
                         </Badge>
                       )}
                     </div>
 
-                    {/* Carousel */}
-                    <div ref={emblaRef} className="relative rounded-t-2xl overflow-hidden">
-                      <div className="flex touch-pan-y">
-                        {images.map((src, idx) => (
-                          <div key={idx} className="flex-[0_0_100%]">
-                            <div className="relative overflow-hidden">
-                              <Image
-                                alt={`${product.name ?? "Product image"} ${idx + 1}`}
-                                className={cn(
-                                  "w-full object-cover transition-transform duration-500 md:group-hover/image:scale-105",
-                                  viewMode === "grid" ? (isCompact ? "h-full" : "aspect-square") : "h-40"
-                                )}
-                                height={800}
-                                priority={idx === 0}
-                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                src={src}
-                                width={800}
-                              />
-                              {/* Subtle bottom gradient for legibility */}
-                              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/20 to-transparent" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    {/* Image with hover/click areas for multiple images */}
+                    <div className="relative rounded-t-2xl overflow-hidden">
+                      {hasMultipleImages && (
+                        <div className="absolute inset-0 z-10 flex pointer-events-auto">
+                          {images.map((_, index) => (
+                            <button
+                              key={index}
+                              aria-label={`View image ${index + 1} of ${images.length}`}
+                              className="flex-1 cursor-pointer"
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setCurrentImageIndex(index);
+                              }}
+                              onMouseEnter={() => setCurrentImageIndex(index)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <Image
+                        alt={product.name ?? "Product image"}
+                        className={cn(
+                          "w-full object-cover transition-opacity duration-300",
+                          viewMode === "grid" ? (isCompact ? "h-full" : "aspect-square") : "h-40"
+                        )}
+                        height={800}
+                        priority={false}
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        src={imageUrl}
+                        width={800}
+                      />
                     </div>
 
-                    {images.length > 1 && (
-                      <>
-                        <button
-                          aria-label="Previous image"
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover/image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto z-10"
-                          onClick={(e) => { stopAll(e); goPrev(e); }}
-                        >
-                          <ChevronRight className="h-5 w-5 rotate-180" />
-                        </button>
-                        <button
-                          aria-label="Next image"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1 shadow-lg transition-opacity opacity-0 pointer-events-none group-hover/image:opacity-100 group-hover/image:pointer-events-auto focus:opacity-100 focus:pointer-events-auto z-10"
-                          onClick={(e) => { stopAll(e); goNext(e); }}
-                        >
-                          <ChevronRight className="h-5 w-5" />
-                        </button>
-
-                        <div className="absolute inset-x-0 bottom-2 items-center justify-center gap-1.5 hidden group-hover:flex transition-all duration-300">
-                          <div className="px-2 py-1 rounded-full bg-black/35 backdrop-blur-sm">
-                            <ul className="flex items-center gap-1.5">
-                              {images.map((_, i) => {
-                                const active = i === selectedImageIndex;
-
-                                return (
-                                  <li key={i}>
-                                    <button
-                                      aria-current={active ? "true" : undefined}
-                                      aria-label={`Go to image ${i + 1} of ${images.length}`}
-                                      className={cn(
-                                        "h-2.5 w-2.5 rounded-full transition",
-                                        active ? "bg-white" : "bg-white/60 hover:bg-white/80"
-                                      )}
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        onSelectImage(product.id, i);
-                                        emblaApi?.scrollTo(i);
-                                      }}
-                                    />
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          </div>
-                        </div>
-                      </>
+                    {/* Image indicators */}
+                    {hasMultipleImages && (
+                      <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5 pointer-events-none z-20">
+                        {images.map((_, index) => (
+                          <div
+                            key={index}
+                            className={cn(
+                              "h-1.5 rounded-full transition-all duration-300",
+                              currentImageIndex === index
+                                ? "w-6 bg-white shadow-md"
+                                : "w-1.5 bg-white/60"
+                            )}
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
 
-                  <div className={cn("bg-gradient-to-b from-background/50 to-background mt-auto", cardPadding)}>
+                  <div
+                    className={cn(
+                      "bg-gradient-to-b from-background/50 to-background mt-auto",
+                      cardPadding
+                    )}
+                  >
                     <div className="space-y-1">
                       {metaLine && (
-                        <p className={cn("uppercase tracking-wider text-muted-foreground font-medium truncate", metaSize)}>
+                        <p
+                          className={cn(
+                            "uppercase tracking-wider text-muted-foreground font-medium truncate",
+                            metaSize
+                          )}
+                        >
                           {metaLine}
                         </p>
                       )}
-                      <h3 className={cn("font-semibold text-foreground leading-tight line-clamp-2 md:group-hover:text-brand-primary transition-colors duration-300", titleSize, minTitleHeight)}>
+                      <h3
+                        className={cn(
+                          "font-semibold text-foreground leading-tight line-clamp-2 md:group-hover:text-brand-primary transition-colors duration-300",
+                          titleSize,
+                          minTitleHeight
+                        )}
+                      >
                         {product.name ?? "Unnamed Product"}
                       </h3>
                     </div>
@@ -368,7 +359,12 @@ const ProductCard = memo(function ProductCard({
                       {inStock ? (
                         <>
                           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
-                          <span className={cn("text-emerald-700 dark:text-emerald-400 font-medium", metaSize)}>
+                          <span
+                            className={cn(
+                              "text-emerald-700 dark:text-emerald-400 font-medium",
+                              metaSize
+                            )}
+                          >
                             In Stock
                           </span>
                         </>
@@ -377,7 +373,9 @@ const ProductCard = memo(function ProductCard({
                           Coming Soon
                         </span>
                       ) : (
-                        <span className="font-primary text-[10px] sm:text-xs text-muted-foreground">Out of Stock</span>
+                        <span className="font-primary text-[10px] sm:text-xs text-muted-foreground">
+                          Out of Stock
+                        </span>
                       )}
                     </div>
                   </div>
@@ -385,7 +383,7 @@ const ProductCard = memo(function ProductCard({
               </CardBody>
             </Link>
 
-            {/* ACTIONS OUTSIDE LINK (absolute in grid) */}
+            {/* GRID ACTIONS */}
             <ActionButtons />
           </>
         ) : (
@@ -397,14 +395,14 @@ const ProductCard = memo(function ProductCard({
             >
               {/* Image */}
               <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm">
-                {imgSrc && (
+                {imageUrl && (
                   <Image
                     fill
                     priority
                     alt={product.name ?? "Product image"}
                     className="object-cover transition-transform duration-300 md:group-hover:scale-110"
                     sizes="(max-width: 640px) 80px, (max-width: 768px) 112px, 144px"
-                    src={imgSrc}
+                    src={imageUrl}
                   />
                 )}
                 {(showNew || showClearance || showComingSoon || discountPct > 0) && (
@@ -465,13 +463,15 @@ const ProductCard = memo(function ProductCard({
                       Coming Soon
                     </span>
                   ) : (
-                    <span className="font-primary text-[10px] sm:text-xs text-muted-foreground">Out of Stock</span>
+                    <span className="font-primary text-[10px] sm:text-xs text-muted-foreground">
+                      Out of Stock
+                    </span>
                   )}
                 </div>
               </div>
             </Link>
 
-            {/* ACTIONS OUTSIDE LINK (right column in list) */}
+            {/* LIST ACTIONS */}
             <ActionButtons compact />
           </div>
         )}
@@ -480,14 +480,11 @@ const ProductCard = memo(function ProductCard({
   );
 });
 
-
 export default function ProductGrid({ products, viewMode }: ProductGridProps) {
   const addToCart = useCartStore((s) => s.smartAddToCart);
-  const [selectedImages, setSelectedImages] = useState<Record<string, number>>({});
 
   const handleAddToCart = (productId: string) => {
     const product = products.find((p) => p.id === productId);
-
     if (!product) return;
 
     const item: CartItem = {
@@ -505,14 +502,6 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
     addToCart(item);
   };
 
-  const handleImageSelect = (productId: string, imageIndex: number) => {
-    setSelectedImages((prev) => {
-      if (prev[productId] === imageIndex) return prev;
-
-      return { ...prev, [productId]: imageIndex };
-    });
-  };
-
   return (
     <div
       aria-label="Products"
@@ -523,29 +512,25 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       }
       role="list"
     >
-      {products.map((product) => (
+      {products.map((product) =>
         viewMode === "grid" ? (
           <div key={product.id} className="h-full">
             <ProductCard
               product={product}
-              selectedImageIndex={selectedImages[product.id] ?? 0}
               size="compact"
               viewMode={viewMode}
               onAdd={handleAddToCart}
-              onSelectImage={handleImageSelect}
             />
           </div>
         ) : (
           <ProductCard
             key={product.id}
             product={product}
-            selectedImageIndex={selectedImages[product.id] ?? 0}
             viewMode={viewMode}
             onAdd={handleAddToCart}
-            onSelectImage={handleImageSelect}
           />
         )
-      ))}
+      )}
     </div>
   );
 }

@@ -17,14 +17,12 @@ import CarouselRail from "@/components/rails/CarouselRail";
 interface ProductRailProps {
   data: ProductRailData;
   locale: Locale;
-  template?: 1 | 2;
   className?: string;
 }
 
 export default async function ProductRail({
   data,
   locale,
-  template = 1,
   className,
 }: ProductRailProps) {
   let products: any[] | null = null;
@@ -87,7 +85,7 @@ export default async function ProductRail({
         <div className="h-12 bg-muted rounded-lg w-64 mb-10 animate-pulse" />
         <div className={gridClass}>
           {Array.from({ length: data.limit }).map((_, idx) => (
-            <ProductCardSkeleton key={idx} template={template} />
+            <ProductCardSkeleton key={idx} />
           ))}
         </div>
       </div>
@@ -122,7 +120,7 @@ export default async function ProductRail({
             {data.subtitle && <p className="font-primary hidden md:block text-muted-foreground mt-2 md:mt-3 text-sm md:text-lg">{tOpt(data.subtitle, locale)}</p>}
           </div>
 
-        {/* VIEW ALL */}
+          {/* VIEW ALL */}
           <Button asChild className="group flex-shrink-0" size="sm" variant="ghost">
             <Link className="font-primary flex items-center gap-1 text-sm font-semibold" href={data.viewAllHref}>
               <span className="font-primary hidden sm:inline">View All</span>
@@ -134,12 +132,12 @@ export default async function ProductRail({
 
         {/* CONTENT */}
         {isCarousel ? (
-          <CarouselRail columns={columns} products={products || []} template={template} />
+          <CarouselRail columns={columns} products={products || []} />
         ) : (
           <div className={gridClass}>
             {products?.map((product) => (
               <div key={product.id} className="h-full">
-                <ProductCard product={product} showActions={true} size="compact" template={template} />
+                <ProductCard product={product} showActions={true} size="compact" />
               </div>
             ))}
           </div>

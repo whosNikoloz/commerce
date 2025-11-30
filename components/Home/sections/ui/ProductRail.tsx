@@ -114,19 +114,20 @@ export default async function ProductRail({
       loadingSkeleton={loadingSkeleton}
     >
       <div className="container mx-auto px-4">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10 gap-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance font-heading">
+        <div className="flex items-center justify-between mb-6 md:mb-10 gap-2">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg md:text-3xl lg:text-4xl font-bold text-foreground font-heading">
               {t(data.title, locale)}
             </h2>
-            {data.subtitle && <p className="text-muted-foreground mt-3 text-lg">{tOpt(data.subtitle, locale)}</p>}
+            {data.subtitle && <p className="hidden md:block text-muted-foreground mt-2 md:mt-3 text-sm md:text-lg">{tOpt(data.subtitle, locale)}</p>}
           </div>
 
         {/* VIEW ALL */}
-          <Button asChild className="group self-start sm:self-auto" variant="ghost">
-            <Link className="flex items-center gap-2 font-semibold" href={data.viewAllHref}>
-              View All
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          <Button asChild className="group flex-shrink-0" size="sm" variant="ghost">
+            <Link className="flex items-center gap-1 text-sm font-semibold" href={data.viewAllHref}>
+              <span className="hidden sm:inline">View All</span>
+              <span className="sm:hidden">All</span>
+              <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
         </div>

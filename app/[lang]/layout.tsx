@@ -105,7 +105,6 @@ export default async function RootLayout({
   // Get available locales from tenant config
   const availableLocales = tenant?.siteConfig?.locales || [...locales];
   const tenantDefaultLocale = tenant?.siteConfig?.localeDefault || defaultLocale;
-  const normalizedLang = lang.toLowerCase();
 
   // Detect if the original URL had a locale prefix
   const pathParts = originalPathname.split("/").filter(Boolean);

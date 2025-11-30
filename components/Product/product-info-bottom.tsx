@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { ShoppingCart, Sparkles, Clock3, Tag, Truck } from "lucide-react";
-import { Badge } from "@heroui/badge";
+import { useEffect, useState, useRef } from "react";
+import { ShoppingCart, Sparkles, Tag } from "lucide-react";
 import { Button } from "@heroui/button";
 
 import { StockStatus, Condition } from "@/types/enums";
+import { useCartUI } from "@/app/context/cart-ui";
 
 type Currency = "₾" | "$" | "€";
 
@@ -39,23 +39,33 @@ export function ProductInfoBottom({
   originalPrice = null,
   discount,
   image = "/placeholder.png",
-  brand,
   stock,
   status,
   isComingSoon = false,
   isNewArrival = false,
   isLiquidated = false,
-  freeShipping = true,
   currency = "₾",
   isVisible,
   onAddToCart,
   onBuyNow,
 }: ProductInfoBottomProps) {
   const [isAnimating, setIsAnimating] = useState(false);
+  const { footerCartRef } = useCartUI();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsAnimating(isVisible);
   }, [isVisible]);
+
+  // Set the footer cart ref for fly-to-cart animation
+  useEffect(() => {
+    if (containerRef.current && isVisible) {
+      footerCartRef.current = containerRef.current;
+    } else if (!isVisible && footerCartRef.current === containerRef.current) {
+      // Clear the ref when this component is hidden
+      footerCartRef.current = null;
+    }
+  }, [isVisible, footerCartRef]);
 
   if (!isVisible) return null;
 
@@ -71,112 +81,100 @@ export function ProductInfoBottom({
 
   return (
     <div
+      ref={containerRef}
       className={[
-        "fixed bottom-14 md:bottom-0 left-0 right-0",
-        "bg-gradient-to-r from-card to-card/95 backdrop-blur-lg border-t-2 border-border/50",
-        "shadow-2xl shadow-black/20 dark:shadow-black/40",
-        "px-4 py-3 transform transition-all duration-300 z-50 ease-in-out",
+        "fixed bottom-16 md:bottom-4 left-1/2 -translate-x-1/2 w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl",
+        "bg-brand-surface/95 dark:bg-brand-surfacedark/95 backdrop-blur-xl",
+        "rounded-2xl border border-border/50",
+        "shadow-xl shadow-black/10 dark:shadow-black/30",
+        "px-3 md:px-4 py-2.5 md:py-3 transform transition-all duration-300 z-40 ease-in-out",
         isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0",
       ].join(" ")}
     >
-      <div className="container mx-auto flex items-center justify-between gap-3">
-        {/* Left: image + name + meta */}
-        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+      <div className="flex items-center justify-between gap-2 md:gap-3">
+        {/* Left: image + name */}
+        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
           <Image
             alt={name}
-            className="rounded-lg h-12 w-12 md:h-16 md:w-16 object-cover flex-shrink-0"
-            height={64}
+            className="rounded-lg h-10 w-10 md:h-12 md:w-12 object-cover flex-shrink-0"
+            height={48}
             src={image}
-            width={64}
+            width={48}
           />
-          <div className="hidden md:flex md:flex-col min-w-0">
-            <span className="text-sm md:text-lg font-semibold truncate text-foreground">{name}</span>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              {freeShipping && (
-                <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/30 shadow-sm">
-                  <Truck className="h-3 w-3 mr-1" />
-                  უფასო მიწოდება
-                </Badge>
-              )}
-              {isComingSoon && (
-                <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0 shadow-md">
-                  <Clock3 className="h-3 w-3 mr-1" />
-                  მალე
-                </Badge>
-              )}
+          <div className="hidden md:flex flex-col min-w-0 gap-1">
+            <span className="text-sm font-semibold truncate text-foreground">{name}</span>
+            <div className="flex items-center gap-1 flex-wrap">
               {isNewArrival && (
-                <Badge className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-md">
-                  <Sparkles className="h-3 w-3 mr-1" />
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
+                  <Sparkles className="h-3 w-3" />
                   ახალი
-                </Badge>
+                </span>
               )}
               {isLiquidated && (
-                <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-md font-bold">
-                  <Tag className="h-3 w-3 mr-1" />
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
+                  <Tag className="h-3 w-3" />
                   ლიკვიდაცია
-                </Badge>
+                </span>
               )}
               {typeof stock === "number" && stock <= 3 && stock > 0 && (
-                <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-md animate-pulse">ბოლო {stock} ც</Badge>
-              )}
-              {brand && (
-                <Badge className="bg-muted/50 text-foreground border border-border/50 shadow-sm">
-                  {brand}
-                </Badge>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400">
+                  ბოლო {stock} ცალი
+                </span>
               )}
             </div>
           </div>
         </div>
 
         {/* Right: price + actions */}
-        <div className="flex items-center gap-2 md:gap-4">
-          <div className="flex items-baseline gap-1 md:gap-2">
-            <span className="text-base md:text-2xl font-bold text-foreground">
-              {price.toFixed(2)} {currency}
-            </span>
-            {hasDiscount && (
-              <>
-                <span className="text-xs md:text-base text-muted-foreground line-through">
-                  {originalPrice!.toFixed(2)} {currency}
-                </span>
-                <Badge className="ml-1 text-xs bg-gradient-to-r from-red-600 to-pink-600 text-white border-0 shadow-md font-bold">
+        <div className="flex items-center gap-2 md:gap-3 flex-1 md:flex-initial justify-end">
+          <div className="flex flex-col items-end gap-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-base md:text-lg font-bold text-foreground whitespace-nowrap">
+                {price.toFixed(2)} {currency}
+              </span>
+              {hasDiscount && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-red-500/10 text-red-700 dark:text-red-400 text-[10px] font-semibold">
                   -{computedDiscount}%
-                </Badge>
-              </>
+                </span>
+              )}
+            </div>
+            {hasDiscount && (
+              <span className="text-[10px] md:text-xs text-muted-foreground line-through whitespace-nowrap">
+                {originalPrice!.toFixed(2)} {currency}
+              </span>
             )}
           </div>
 
           <Button
+            data-badge
             aria-disabled={ctaDisabled}
-            className="h-10 px-3 md:px-4 ml-2 md:ml-4 flex items-center gap-1 md:gap-2
-                       bg-gradient-to-r from-brand-primary to-brand-primary/90
-                       hover:from-brand-primary/90 hover:to-brand-primary/80
-                       text-white rounded-xl font-semibold shadow-lg shadow-brand-primary/30
-                       hover:shadow-xl hover:shadow-brand-primary/40
+            className="h-9 md:h-10 px-4 md:px-5 flex items-center gap-1.5
+                       bg-brand-primary hover:bg-brand-primary/90
+                       text-white rounded-lg font-medium text-sm
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all duration-300 hover:scale-105 active:scale-95"
+                       transition-all duration-200
+                       shadow-sm"
             disabled={ctaDisabled}
             onPress={onAddToCart}
           >
-            <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+            <ShoppingCart className="h-4 w-4" />
             <span className="hidden xs:inline">
-              {isComingSoon ? "მალე" : !inStock ? "ამოიწურა" : "ყიდვა"}
+              {isComingSoon ? "მალე" : !inStock ? "ამოიწურა" : "კალათაში"}
             </span>
           </Button>
 
           <Button
             aria-disabled={ctaDisabled}
-            className="hidden md:inline-flex h-10 px-4
-                       bg-gradient-to-r from-indigo-600 to-purple-600
-                       hover:from-indigo-500 hover:to-purple-500
-                       text-white rounded-xl font-semibold shadow-lg shadow-purple-500/30
-                       hover:shadow-xl hover:shadow-purple-500/40
+            className="hidden lg:inline-flex h-10 px-4
+                       bg-foreground/5 hover:bg-foreground/10
+                       text-foreground rounded-lg font-medium text-sm
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all duration-300 hover:scale-105 active:scale-95"
+                       transition-all duration-200
+                       border border-border/50"
             disabled={ctaDisabled}
             onPress={onBuyNow}
           >
-            პირდაპირ ყიდვა
+            ყიდვა
           </Button>
         </div>
       </div>

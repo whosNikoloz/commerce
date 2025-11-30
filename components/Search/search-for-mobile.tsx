@@ -62,6 +62,7 @@ export default function SearchForMobile({
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const debounceRef = useRef<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useBodyScrollLock(isModalOpen);
 
@@ -123,6 +124,18 @@ export default function SearchForMobile({
       if (debounceRef.current) window.clearTimeout(debounceRef.current);
     };
   }, []);
+
+  // Auto-focus input when modal opens
+  useEffect(() => {
+    if (isModalOpen && inputRef.current) {
+      // Small delay to ensure modal animation is complete
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 150);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isModalOpen]);
 
   const doSearch = async (value: string) => {
     const term = value.trim();
@@ -267,6 +280,7 @@ export default function SearchForMobile({
                 <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg w-full px-3 py-2.5 focus-within:bg-gray-50 dark:focus-within:bg-gray-750 transition-colors">
                   <SearchIcon className="text-gray-400 dark:text-gray-500 w-5 h-5 flex-shrink-0" />
                   <Input
+                    ref={inputRef}
                     aria-controls="search-results"
                     aria-label="Search products"
                     autoComplete="off"

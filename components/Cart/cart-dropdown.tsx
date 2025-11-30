@@ -17,6 +17,7 @@ import HeaderCartButton from "./header-cart-button";
 import { useCartStore } from "@/app/context/cartContext";
 import { useUser } from "@/app/context/userContext";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { useCartUI } from "@/app/context/cart-ui";
 
 const fmt = new Intl.NumberFormat("ka-GE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -24,6 +25,7 @@ export default function CartDropdown() {
   const dictionary = useDictionary();
   const { user } = useUser();
   const router = useRouter();
+  const { cartIconRef } = useCartUI();
 
   const cart = useCartStore((s) => s.cart);
   const cartLen = useCartStore((s) => s.cart.length);
@@ -64,6 +66,13 @@ export default function CartDropdown() {
 
     return () => clearTimeout(t);
   }, [cartChanged]);
+
+  // Set the cart icon ref for fly-to-cart animation
+  useEffect(() => {
+    if (dropdownRef.current) {
+      cartIconRef.current = dropdownRef.current;
+    }
+  }, [cartIconRef]);
 
   const handleClickCart = () => (isOpen ? onClose() : onOpen());
 

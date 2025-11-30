@@ -198,7 +198,7 @@ export const SidebarGroup = ({
   link: Links;
   className?: string;
 } & React.ComponentProps<"div">) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, setOpen } = useSidebar();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleToggle = () => {

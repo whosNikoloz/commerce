@@ -85,7 +85,7 @@ function FacetBlock({
   const values = facet.facetValues ?? [];
 
   const selectedId = selectedRadioValueId(filter, facet);
-  const firstVal = values[0]; 
+  const firstVal = values[0];
 
   switch (facet.displayType) {
     case FacetTypeEnum.CheckboxList:

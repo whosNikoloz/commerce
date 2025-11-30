@@ -9,12 +9,14 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { HomeIcon, ProfileIcon, SearchIcon } from "../icons";
+import { HomeIcon, ProfileIcon } from "../icons";
 import Cartlink from "../Cart/cart-link";
 import { GoBackButton } from "../go-back-button";
+import CategoryDrawer from "../Categories/category-drawer";
+import SearchForMobile from "../Search/search-for-mobile";
 
 import LoginModal from "./login-modal";
 import RegisterModal from "./register-modal";
@@ -32,8 +34,14 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
   const dictionary = useDictionary();
   const { user } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [authMode, setAuthMode] = useState("login");
+  const [searchModalIsOpen, setSearchModalIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Get current language from pathname
+  const lng = pathname?.startsWith("/en") ? "en" : "ka";
 
   useBodyScrollLock(isOpen);
 
@@ -184,46 +192,59 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
                 {authMode === "forgot" && <ForgotPasswordModal />}
               </ModalBody>
               <ModalFooter>
-                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-md">
-                  <div className="flex justify-around items-center py-2 space-x-3">
-                    <Link className="flex flex-col items-center" href="/">
-                      <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
-                      <span className="text-xs text-text-subtle dark:text-text-subtledark">
-                        {dictionary.auth.home}
+                <div className="md:hidden z-50 fixed bottom-1 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
+                  <div className="flex justify-around items-center py-2 gap-1">
+                    <Link className="flex flex-col items-center flex-1 min-w-0" href={`/${lng}`} onClick={handleCloseModal}>
+                      <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark flex-shrink-0" />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                        {dictionary.common.home}
                       </span>
                     </Link>
 
-                    <div
-                      aria-label="Open search"
-                      className="flex flex-col items-center bg-transparent"
-                      role="button"
-                      tabIndex={0}
-                    >
-                      <SearchIcon />
-                      <span className="text-xs">{dictionary.auth.search}</span>
+                    <div className="flex flex-col items-center flex-1 min-w-0">
+                      <SearchForMobile
+                        forBottomNav
+                        isModalOpen={searchModalIsOpen}
+                        searchQuery={searchQuery}
+                        setSearchModalOpen={setSearchModalIsOpen}
+                        setSearchQuery={setSearchQuery}
+                      />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                        {dictionary.common.search}
+                      </span>
                     </div>
 
-                    <Cartlink />
-
-                    <Link className="flex flex-col items-center" href={`/en/contact`}>
-                      <ProfileIcon className="w-6 h-6 text-text-light dark:text-text-lightdark" />
-                      <span className="text-xs">{dictionary.auth.chat}</span>
-                    </Link>
-
-                    <div
-                      aria-label="Close profile menu"
-                      className="flex flex-col items-center bg-transparent"
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onClose()}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          onClose();
-                        }
-                      }}
-                    >
-                      <ProfileIcon />
+                    <div className="flex flex-col items-center flex-1 min-w-0">
+                      <Cartlink showLabel={true} />
                     </div>
+
+                    <div className="flex flex-col items-center flex-1 min-w-0">
+                      <CategoryDrawer />
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                        {dictionary.categories.category}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col items-center flex-1 min-w-0">
+                      <div
+                        aria-label="Close profile menu"
+                        className="flex flex-col items-center bg-transparent"
+                        role="button"
+                        tabIndex={0}
+                        onClick={handleCloseModal}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            handleCloseModal();
+                          }
+                        }}
+                      >
+                        <ProfileIcon />
+                      </div>
+                      <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
+                        {dictionary.common.profile}
+                      </span>
+                    </div>
+
                   </div>
                 </div>
               </ModalFooter>

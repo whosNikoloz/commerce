@@ -3,6 +3,7 @@ import { useCallback } from "react";
 
 import { useCartUI } from "@/app/context/cart-ui";
 import { useTenant } from "@/app/context/tenantContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Options = {
   durationMs?: number;
@@ -12,8 +13,9 @@ type Options = {
 };
 
 export function useFlyToCart(options?: Options) {
-  const { cartIconRef, bumpCartBadge } = useCartUI();
+  const { cartIconRef, footerCartRef, bottomNavCartRef, bumpCartBadge } = useCartUI();
   const { config } = useTenant();
+  const isMobile = useIsMobile();
 
   const flyToCart = useCallback(async (imgEl: HTMLImageElement | null) => {
     // Check if fly-to-cart is enabled in tenant config (default: true)
@@ -25,7 +27,37 @@ export function useFlyToCart(options?: Options) {
       return;
     }
 
-    if (!imgEl || !cartIconRef.current) return;
+    // Determine which cart to fly to based on screen size and cart visibility
+    let targetCart = cartIconRef.current;
+
+    // Priority 1: Check if footer product cart is visible (works on both mobile and desktop)
+    if (footerCartRef.current) {
+      const rect = footerCartRef.current.getBoundingClientRect();
+      const isVisible =
+        rect.top >= 0 &&
+        rect.bottom <= window.innerHeight &&
+        rect.left >= 0 &&
+        rect.right <= window.innerWidth &&
+        rect.width > 0 &&
+        rect.height > 0;
+
+      if (isVisible) {
+        targetCart = footerCartRef.current;
+      }
+    }
+    // Priority 2: If no footer cart, choose based on screen size
+    else {
+      // On mobile, use bottom nav cart if available
+      if (isMobile && bottomNavCartRef.current) {
+        targetCart = bottomNavCartRef.current;
+      }
+      // On desktop, use navbar cart (cartIconRef)
+      else {
+        targetCart = cartIconRef.current;
+      }
+    }
+
+    if (!imgEl || !targetCart) return;
 
     const duration = options?.durationMs ?? 650;
     const rotateDeg = options?.rotateDeg ?? 360;
@@ -34,7 +66,7 @@ export function useFlyToCart(options?: Options) {
 
     // Get positions in viewport coordinates (getBoundingClientRect already accounts for scroll)
     const sourceRect = imgEl.getBoundingClientRect();
-    const targetRect = cartIconRef.current.getBoundingClientRect();
+    const targetRect = targetCart.getBoundingClientRect();
 
     // Clone the image
     const clone = imgEl.cloneNode(true) as HTMLImageElement;

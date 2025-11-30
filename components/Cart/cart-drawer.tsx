@@ -11,6 +11,7 @@ import HeaderCartButton from "./header-cart-button";
 
 
 import { useCartStore } from "@/app/context/cartContext";
+import { useCartUI } from "@/app/context/cart-ui";
 
 export default function CartDrawer() {
   const cart = useCartStore((s) => s.cart);
@@ -18,12 +19,14 @@ export default function CartDrawer() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _totalQuantity = useCartStore((s) => s.getCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
+  const { cartIconRef } = useCartUI();
 
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
 
   const [isOpen, setIsOpen] = useState(false);
   const quantityRef = useRef(cartLines);
+  const containerRef = useRef<HTMLDivElement>(null);
   const closeCart = () => setIsOpen(false);
   const handleClickCart = () => (isOpen ? setIsOpen(false) : setIsOpen(true));
 
@@ -33,8 +36,15 @@ export default function CartDrawer() {
     }
   }, [cartLines, isOpen]);
 
+  // Set the cart icon ref for fly-to-cart animation
+  useEffect(() => {
+    if (containerRef.current) {
+      cartIconRef.current = containerRef.current;
+    }
+  }, [cartIconRef]);
+
   return (
-    <>
+    <div ref={containerRef}>
       <HeaderCartButton className="bg-transparent" onClick={handleClickCart} />
       
 
@@ -171,6 +181,6 @@ export default function CartDrawer() {
           </Transition.Child>
         </Dialog>
       </Transition>
-    </>
+    </div>
   );
 }

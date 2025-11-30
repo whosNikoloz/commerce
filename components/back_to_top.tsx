@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { ArrowUp } from "lucide-react";
 import clsx from "clsx";
 
@@ -22,6 +23,10 @@ export default function BackToTopShadcn({
   const [visible, setVisible] = useState(false);
   const ticking = useRef(false);
   const prefersReducedMotion = useRef(false);
+  const pathname = usePathname();
+
+  // Check if we're on a product page
+  const isProductPage = pathname?.includes("/product/");
 
   useEffect(() => {
     if (typeof window !== "undefined" && "matchMedia" in window) {
@@ -50,6 +55,11 @@ export default function BackToTopShadcn({
     else window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  // Adjust position on product pages to avoid overlapping with product footer
+  const positionClass = isProductPage
+    ? "bottom-28 right-4 md:bottom-8 md:right-8"
+    : offsetClass;
+
   return (
     <Button
       aria-label={ariaLabel}
@@ -58,8 +68,8 @@ export default function BackToTopShadcn({
         "shadow-lg bg-primary text-primary-foreground",
         "hover:brightness-95 active:brightness-90",
         "focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2",
-        "transition-opacity duration-200",
-        offsetClass,
+        "transition-all duration-200",
+        positionClass,
         visible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         className,
       )}

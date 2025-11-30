@@ -13,6 +13,9 @@ import type { CategoryCarouselData, Locale } from "@/types/tenant"
 import type { CategoryModel } from "@/types/category"
 
 import { t } from "@/lib/i18n"
+import { useIsMobile } from "@/hooks/use-mobile"
+import CategoryDrawer from "@/components/Categories/category-drawer"
+import CategoryDropdown from "@/components/Categories/category-dropdown"
 
 interface CategoryCarouselProps {
   data: CategoryCarouselData
@@ -23,7 +26,9 @@ interface CategoryCarouselProps {
 export default function CategoryCarousel({ data, locale, categories }: CategoryCarouselProps) {
   const splideRef = useRef<Splide | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const categoryContainerRef = useRef<HTMLDivElement | null>(null)
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (containerRef.current && categories.length > 0) {
@@ -85,6 +90,17 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
     setImageErrors(prev => new Set(prev).add(categoryId))
   }
 
+  const handleAllCategoriesClick = () => {
+    // Find and click the button inside the category container
+    if (categoryContainerRef.current) {
+      const button = categoryContainerRef.current.querySelector('button')
+
+      if (button) {
+        button.click()
+      }
+    }
+  }
+
   // Filter categories based on configuration
   let displayCategories = categories
 
@@ -123,7 +139,11 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
           {/* Fixed "All Categories" Card */}
           {data.showAllCard && (
             <div className="flex-shrink-0">
-              <Link className="block" href={data.allCategoriesHref || "/categories"}>
+              <button
+                className="block"
+                type="button"
+                onClick={handleAllCategoriesClick}
+              >
                 <div className="h-32 sm:h-40 md:h-48 lg:h-56 w-24 sm:w-28 md:w-36 lg:w-40 cursor-pointer overflow-hidden rounded-lg border border-border transition-all duration-300 hover:-translate-y-1">
                   <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
                     <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-foreground" />
@@ -132,7 +152,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                     </p>
                   </div>
                 </div>
-              </Link>
+              </button>
             </div>
           )}
 
@@ -177,6 +197,17 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Hidden category triggers - conditionally render based on screen size */}
+      <div ref={categoryContainerRef} aria-hidden="true" className="sr-only">
+        {isMobile ? (
+          // Mobile: render CategoryDrawer
+          <CategoryDrawer />
+        ) : (
+          // Desktop: render CategoryDropdown
+          <CategoryDropdown />
+        )}
       </div>
     </section>
   )

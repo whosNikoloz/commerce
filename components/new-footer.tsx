@@ -63,6 +63,7 @@ export default function Footer() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
+
       if (!target.closest('.language-dropdown-container')) {
         setIsLanguageDropdownOpen(false)
       }
@@ -70,6 +71,7 @@ export default function Footer() {
 
     if (isLanguageDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside)
+
       return () => document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isLanguageDropdownOpen])
@@ -282,11 +284,11 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 flex-shrink-0">
                 <Image
-                  src={siteConfig.logo}
-                  alt={companyName}
                   fill
+                  alt={companyName}
                   className="object-contain"
                   sizes="48px"
+                  src={siteConfig.logo}
                 />
               </div>
               <div>
@@ -320,9 +322,9 @@ export default function Footer() {
               {availableLocales.length > 1 && (
                 <div className="relative language-dropdown-container">
                   <button
-                    onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                    className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 transition-colors hover:bg-secondary"
                     aria-label="Select language"
+                    className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 transition-colors hover:bg-secondary"
+                    onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                   >
                     <Globe className="h-4 w-4" />
                     <span className="text-sm font-medium">{languages[language]}</span>
@@ -335,9 +337,9 @@ export default function Footer() {
                         {Object.entries(languages).map(([code, name]) => (
                           <button
                             key={code}
-                            onClick={() => handleLanguageChange(code)}
                             className={`w-full px-4 py-2 text-left text-sm transition-colors hover:bg-secondary ${language === code ? 'bg-secondary/50 font-semibold' : ''
                               }`}
+                            onClick={() => handleLanguageChange(code)}
                           >
                             {name}
                           </button>

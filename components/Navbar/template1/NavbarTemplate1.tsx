@@ -179,16 +179,16 @@ export const NavbarTemplate1 = () => {
       )}
 
       <div className="md:hidden z-50 fixed bottom-0 left-1/2 -translate-x-1/2 w-11/12 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 rounded-2xl shadow-md">
-        <div className="flex justify-around items-center py-2 space-x-1">
-          <Link className="flex flex-col items-center" href={`/${lng}`}>
-            <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark" />
-            <span className="text-xs text-text-subtle dark:text-text-subtledark">
+        <div className="flex justify-around items-center py-2 gap-1">
+          <Link className="flex flex-col items-center flex-1 min-w-0" href={`/${lng}`}>
+            <HomeIcon className="w-6 h-6 text-brand-primary dark:text-brand-primarydark flex-shrink-0" />
+            <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
               {dictionary.common.home}
             </span>
           </Link>
 
           {isMobile && (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center flex-1 min-w-0">
               <SearchForMobile
                 forBottomNav
                 isModalOpen={searchModalIsOpen}
@@ -196,24 +196,26 @@ export const NavbarTemplate1 = () => {
                 setSearchModalOpen={setSearchModalIsOpen}
                 setSearchQuery={setSearchQuery}
               />
-              <span className="text-xs text-text-subtle dark:text-text-subtledark">
+              <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
                 {dictionary.common.search}
               </span>
             </div>
           )}
 
-          <Cartlink />
+          <div className="flex flex-col items-center flex-1 min-w-0">
+            <Cartlink showLabel={true} />
+          </div>
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center flex-1 min-w-0">
             <CategoryDrawer />
-            <span className="text-xs text-text-subtle dark:text-text-subtledark">
+            <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
               {dictionary.categories.category}
             </span>
           </div>
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center flex-1 min-w-0">
             <AuthModal IsMobile={isMobile} />
-            <span className="text-xs text-text-subtle dark:text-text-subtledark">
+            <span className="text-xs text-text-subtle dark:text-text-subtledark truncate w-full text-center">
               {dictionary.common.profile}
             </span>
           </div>

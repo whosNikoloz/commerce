@@ -26,12 +26,7 @@ const nextConfig = {
       },
       { protocol: "https", hostname: "placehold.co", pathname: "/**" },
     ],
-    // ⚠️ Allowing SVGs is risky unless you sanitize them.
     dangerouslyAllowSVG: true,
-    // Remove the 'attachment' (it makes images download instead of display)
-    // contentDispositionType: "inline", // or just omit
-    // Let Next manage image CSP headers; keep your global CSP below.
-    // contentSecurityPolicy: undefined,
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -44,7 +39,6 @@ const nextConfig = {
   poweredByHeader: false,
 
   experimental: {
-    // Works with Turbopack – keeps bundles small by auto-modularizing imports
     optimizePackageImports: [
       "lucide-react",
       "@heroui/system",
@@ -61,36 +55,32 @@ const nextConfig = {
     ],
   },
 
-  // Optimize bundle splitting for production
   webpack: (config, { isServer, dev }) => {
     if (!isServer && !dev) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
-          chunks: 'all',
+          chunks: "all",
           cacheGroups: {
             default: false,
             vendors: false,
-            // Vendor chunk for node_modules
             vendor: {
-              name: 'vendor',
-              chunks: 'all',
+              name: "vendor",
+              chunks: "all",
               test: /node_modules/,
               priority: 20,
             },
-            // Common chunk for shared code
             common: {
-              name: 'common',
+              name: "common",
               minChunks: 2,
-              chunks: 'async',
+              chunks: "async",
               priority: 10,
               reuseExistingChunk: true,
               enforce: true,
             },
-            // Separate chunk for large libraries
             lib: {
               test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
-              name: 'lib',
+              name: "lib",
               priority: 30,
             },
           },
@@ -108,7 +98,6 @@ const nextConfig = {
       apiDomain,
       "https://vercel.live",
       "wss://ws-us3.pusher.com",
-      // HMR / dev over your LAN + localhost
       "ws://localhost:3000",
       "ws://192.168.1.105:3000",
     ].filter(Boolean);
@@ -120,22 +109,27 @@ const nextConfig = {
           { key: "X-DNS-Prefetch-Control", value: "on" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // Dev often needs 'unsafe-inline' and 'unsafe-eval' (source maps/HMR)
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://*.amazonaws.com https://media.veli.store https://picsum.photos https://placehold.co https://extra.ge https://toptools.ge",
               "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
               `connect-src ${connectSrcParts.join(" ")}`,
-              // Helpful for dev tools and HMR
               "worker-src 'self' blob:",
               "frame-ancestors 'self'",
-              "frame-src 'self' https://vercel.live",
+              // ✅ აქ უკვე ნებადართულია Google Maps iframe
+              "frame-src 'self' https://vercel.live https://www.google.com https://maps.google.com",
               "base-uri 'self'",
               "form-action 'self'",
             ].join("; "),
@@ -144,18 +138,29 @@ const nextConfig = {
       },
       {
         source: "/fonts/:path*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
       },
       {
         source: "/_next/static/:path*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
       },
       {
         source: "/_next/image/:path*",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400",
+            value:
+              "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400",
           },
         ],
       },

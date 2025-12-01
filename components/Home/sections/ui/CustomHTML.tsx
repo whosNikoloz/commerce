@@ -15,7 +15,32 @@ export default function CustomHTML({ data, locale: _locale }: CustomHTMLProps) {
 
   // Sanitize HTML to prevent XSS attacks
   const sanitizedHTML = useMemo(() => {
-    let sanitized = DOMPurify.sanitize(data.html, {
+    // Process categoryLink and pageLink attributes BEFORE sanitization
+    let processedHTML = data.html;
+
+    // Replace categoryLink attributes with proper hrefs
+    processedHTML = processedHTML.replace(
+      /<a([^>]*?)categoryLink="([^"]*)"([^>]*?)>/gi,
+      (match, before, categoryId, after) => {
+        // Remove existing href="#" if present and add the category URL
+        const cleanedBefore = before.replace(/href="[^"]*"/gi, '');
+        const cleanedAfter = after.replace(/href="[^"]*"/gi, '');
+        return `<a${cleanedBefore} href="/${_locale}/category/${categoryId}"${cleanedAfter}>`;
+      }
+    );
+
+    // Replace pageLink attributes with proper hrefs
+    processedHTML = processedHTML.replace(
+      /<a([^>]*?)pageLink="([^"]*)"([^>]*?)>/gi,
+      (match, before, pagePath, after) => {
+        // Remove existing href="#" if present and add the page URL
+        const cleanedBefore = before.replace(/href="[^"]*"/gi, '');
+        const cleanedAfter = after.replace(/href="[^"]*"/gi, '');
+        return `<a${cleanedBefore} href="/${_locale}/${pagePath}"${cleanedAfter}>`;
+      }
+    );
+
+    let sanitized = DOMPurify.sanitize(processedHTML, {
       ADD_TAGS: ['iframe'], // Allow iframe if needed (be careful!)
       ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'width', 'height', 'loading'], // Allow iframe attributes
       ALLOW_DATA_ATTR: true, // Allow data-* attributes
@@ -81,7 +106,7 @@ export default function CustomHTML({ data, locale: _locale }: CustomHTMLProps) {
     );
 
     return sanitized;
-  }, [data.html]);
+  }, [data.html, _locale]);
 
   useEffect(() => {
     if (!containerRef.current) return;

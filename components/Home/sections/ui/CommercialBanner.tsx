@@ -32,7 +32,7 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
   return (
     <Link
       className={`group relative block overflow-hidden rounded-2xl  transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-      href={banner.href}
+      href={`/${locale}${banner.href}`}
     >
       <div className="relative hidden md:block h-64 lg:h-80 xl:h-96">
         <Image

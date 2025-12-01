@@ -80,12 +80,12 @@ const ProductCard = memo(function ProductCard({
   const displayPrice = hasDiscount ? product.discountPrice! : product.price;
   const originalPrice = hasDiscount ? product.price : undefined;
 
-  const color = product.productFacetValues?.find(
-    (f) => f.facetName?.toLowerCase() === "color"
-  )?.facetValue;
-  const metaLine = [product.brand?.name, color, formatCondition(product.condition)]
-    .filter(Boolean)
-    .join(" • ");
+  // const color = product.productFacetValues?.find(
+  //   (f) => f.facetName?.toLowerCase() === "color"
+  // )?.facetValue;
+  // const metaLine = [product.brand?.name, color, formatCondition(product.condition)]
+  //   .filter(Boolean)
+  //   .join(" • ");
 
   const showComingSoon = product.isComingSoon === true;
   const showNew = product.isNewArrival === true;
@@ -317,7 +317,7 @@ const ProductCard = memo(function ProductCard({
                     )}
                   >
                     <div className="space-y-1">
-                      {metaLine && (
+                      {/* {metaLine && (
                         <p
                           className={cn(
                             "uppercase tracking-wider text-muted-foreground font-medium truncate",
@@ -326,7 +326,7 @@ const ProductCard = memo(function ProductCard({
                         >
                           {metaLine}
                         </p>
-                      )}
+                      )} */}
                       <h3
                         className={cn(
                           "font-semibold text-foreground leading-tight line-clamp-2 md:group-hover:text-brand-primary transition-colors duration-300",
@@ -429,11 +429,11 @@ const ProductCard = memo(function ProductCard({
               {/* Content */}
               <div className="flex flex-col justify-center flex-1 min-w-0 space-y-1.5">
                 <div className="space-y-0.5">
-                  {metaLine && (
+                  {/* {metaLine && (
                     <p className="font-primary text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide truncate">
                       {metaLine}
                     </p>
-                  )}
+                  )} */}
                   <h3 className="font-heading text-sm sm:text-base md:text-lg font-semibold leading-tight group-hover:text-brand-primary transition-colors line-clamp-2">
                     {product.name ?? "Unnamed Product"}
                   </h3>

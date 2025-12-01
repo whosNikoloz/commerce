@@ -486,11 +486,18 @@ export default function ProductFilters(props: ProductFiltersProps) {
       {/* Desktop sidebar */}
       <aside
         aria-label="Filters"
-        className="hidden lg:block lg:sticky lg:top-4 self-start h-fit max-h-[calc(100vh-2rem)] overflow-y-auto
+        className="hidden lg:block lg:sticky lg:top-4 self-start h-fit max-h-[calc(100vh-2rem)] overflow-y-auto scroll
                    border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6
                    shadow-xl shadow-black/5 dark:shadow-black/20
                    hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30
-                   transition-shadow duration-300"
+                   transition-shadow duration-300 scrollbar-thin pr-2
+                  [&::-webkit-scrollbar]:w-2
+                  [&::-webkit-scrollbar-track]:rounded-full
+                  [&::-webkit-scrollbar-track]:bg-gray-100
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  [&::-webkit-scrollbar-thumb]:bg-gray-300
+                  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
       >
         <SidebarContent {...props} />
       </aside>

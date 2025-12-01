@@ -30,20 +30,20 @@ export default function ProductHeader({
   onViewModeChange,
 }: ProductHeaderProps) {
   return (
-    <header className="bg-gradient-to-r from-card/50 to-card/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-border/40 shadow-lg">
+    <header className="rounded-2xl p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
           <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
             Search Results
           </h1>
-          <p
+          {/* <p
             aria-live="polite"
             className="text-sm lg:text-base text-muted-foreground font-medium flex items-center gap-2"
           >
             <span className="font-primary inline-block w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
             {productCount} products found
-          </p>
-        </div>
+          </p> */}
+        </div>  
 
         <div className="flex items-center gap-2 lg:gap-3">
           <DropdownMenu>

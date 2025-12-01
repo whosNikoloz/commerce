@@ -120,7 +120,7 @@ export async function getMyOrders(page = 1, pageSize = 10): Promise<PagedResult<
 export async function getOrderByIdForClient(id: string): Promise<OrderDetail> {
     const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}?userId=${encodeURIComponent(getUserIdFromToken())}`;
 
-    const res = await apiFetch<any>(url, { method: "GET", requireAuth: true , failIfUnauthenticated : true  } as any);
+    const res = await apiFetch<any>(url, { method: "GET", requireAuth: false , failIfUnauthenticated : false  } as any);
 
     return toCamelCase(res) as OrderDetail;
 }

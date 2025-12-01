@@ -33,9 +33,9 @@
   /* Default font variables - will be overridden by tenant configuration */
   /* If tenant.theme.globalFont is set, all three will use the same font */
   /* Otherwise, tenant.theme.fonts.{primary,secondary,heading} can override individually */
-  --font-primary: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-secondary: 'Courier New', 'Consolas', monospace;
-  --font-heading: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-primary: system-ui, -apple-system, 'Segoe UI', 'Noto Sans Georgian', sans-serif;
+  --font-secondary: 'Courier New', 'Consolas', 'Noto Sans Georgian', monospace;
+  --font-heading: system-ui, -apple-system, 'Segoe UI', 'Noto Sans Georgian', sans-serif;
 }
 
 @keyframes bump {

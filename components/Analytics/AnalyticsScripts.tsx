@@ -1,11 +1,14 @@
 /**
  * Analytics and Tracking Scripts Component
- * Renders tracking scripts based on tenant SEO configuration
+ * Renders tracking scripts based on tenant SEO configuration AND user cookie consent
  */
+
+"use client";
 
 import type { SEOConfig } from "@/types/tenant";
 
 import Script from "next/script";
+import { useCookieConsent } from "@/app/context/cookieConsentContext";
 
 
 interface AnalyticsScriptsProps {
@@ -13,7 +16,12 @@ interface AnalyticsScriptsProps {
 }
 
 export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
+  const { consent } = useCookieConsent();
+
   if (!seo) return null;
+
+  // If no consent yet, don't load any tracking scripts
+  if (!consent) return null;
 
   // Helper to check if a value is a valid non-empty string
   const isValidString = (value: any): value is string => {
@@ -25,10 +33,15 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
     return typeof value === 'number' && !isNaN(value) && value > 0;
   };
 
+  // Check if analytics cookies are allowed
+  const canLoadAnalytics = consent.analytics;
+  // Check if marketing cookies are allowed
+  const canLoadMarketing = consent.marketing;
+
   return (
     <>
-      {/* Google Analytics 4 */}
-      {isValidString(seo.googleAnalyticsId) && (
+      {/* Google Analytics 4 - Only load if analytics consent is given */}
+      {canLoadAnalytics && isValidString(seo.googleAnalyticsId) && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${seo.googleAnalyticsId}`}
@@ -53,8 +66,8 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
         </>
       )}
 
-      {/* Google Tag Manager */}
-      {isValidString(seo.googleTagManagerId) && (
+      {/* Google Tag Manager - Only load if analytics consent is given */}
+      {canLoadAnalytics && isValidString(seo.googleTagManagerId) && (
         <>
           <Script id="google-tag-manager" strategy="afterInteractive">
             {`
@@ -69,8 +82,8 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
         </>
       )}
 
-      {/* Facebook Pixel */}
-      {isValidString(seo.facebookPixelId) && (
+      {/* Facebook Pixel - Only load if marketing consent is given */}
+      {canLoadMarketing && isValidString(seo.facebookPixelId) && (
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -87,8 +100,8 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
         </Script>
       )}
 
-      {/* Hotjar */}
-      {isValidNumber(seo.hotjarId) && (
+      {/* Hotjar - Only load if analytics consent is given */}
+      {canLoadAnalytics && isValidNumber(seo.hotjarId) && (
         <Script id="hotjar" strategy="afterInteractive">
           {`
             (function(h,o,t,j,a,r){
@@ -103,8 +116,8 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
         </Script>
       )}
 
-      {/* Microsoft Clarity */}
-      {isValidString(seo.clarityId) && (
+      {/* Microsoft Clarity - Only load if analytics consent is given */}
+      {canLoadAnalytics && isValidString(seo.clarityId) && (
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
@@ -116,8 +129,8 @@ export default function AnalyticsScripts({ seo }: AnalyticsScriptsProps) {
         </Script>
       )}
 
-      {/* Facebook Pixel noscript fallback */}
-      {isValidString(seo.facebookPixelId) && (
+      {/* Facebook Pixel noscript fallback - Only load if marketing consent is given */}
+      {canLoadMarketing && isValidString(seo.facebookPixelId) && (
         <noscript>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

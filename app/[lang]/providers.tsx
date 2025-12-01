@@ -14,6 +14,10 @@ import { TenantProvider } from "../context/tenantContext";
 import { UserProvider } from "../context/userContext";
 import { CartUIProvider } from "../context/cart-ui";
 import { DictionaryProvider } from "../context/dictionary-provider";
+import { CookieConsentProvider } from "../context/cookieConsentContext";
+import CookieBanner from "@/components/CookieConsent/CookieBanner";
+import ManagePreferencesModal from "@/components/CookieConsent/ManagePreferencesModal";
+import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -21,6 +25,7 @@ export interface ProvidersProps {
   /** SSR-provided tenant config (from app/layout.tsx) */
   initialTenant: TenantConfig;
   dictionary: Record<string, any>;
+  seo: any;
 }
 
 // Optional: sensible defaults for next-themes
@@ -36,7 +41,7 @@ declare module "@react-types/shared" {
   }
 }
 
-export function Providers({ children, themeProps, initialTenant, dictionary }: ProvidersProps) {
+export function Providers({ children, themeProps, initialTenant, dictionary, seo }: ProvidersProps) {
   const router = useRouter();
 
   //console.log("⚙️ [PROVIDERS] Initializing with tenant:", initialTenant.siteConfig.name);
@@ -46,29 +51,36 @@ export function Providers({ children, themeProps, initialTenant, dictionary }: P
       <UserProvider>
         <TenantProvider initialConfig={initialTenant}>
           <NextThemesProvider {...defaultThemeProps} {...themeProps}>
-            <NextTopLoader
-              crawl
-              showSpinner
-              color={`rgb(var(--brand-primary, 34 153 221))`}
-              crawlSpeed={200}
-              easing="ease"
-              height={3}
-              initialPosition={0.08}
-              shadow={`0 0 10px rgb(var(--brand-primary, 34 153 221)), 0 0 5px rgb(var(--brand-primary, 34 153 221))`}
-              showAtBottom={false}
-              speed={200}
-              template={
-                '<div class="bar" role="bar"><div class="peg"></div></div>' +
-                '<div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
-              }
-              zIndex={1600}
-            />
-            <DictionaryProvider dictionary={dictionary}>
-              <CartUIProvider>
-                {children}
-              </CartUIProvider>
-            </DictionaryProvider>
-            <Toaster richColors position="bottom-right" />
+            <CookieConsentProvider>
+              <NextTopLoader
+                crawl
+                showSpinner
+                color={`rgb(var(--brand-primary, 34 153 221))`}
+                crawlSpeed={200}
+                easing="ease"
+                height={3}
+                initialPosition={0.08}
+                shadow={`0 0 10px rgb(var(--brand-primary, 34 153 221)), 0 0 5px rgb(var(--brand-primary, 34 153 221))`}
+                showAtBottom={false}
+                speed={200}
+                template={
+                  '<div class="bar" role="bar"><div class="peg"></div></div>' +
+                  '<div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
+                }
+                zIndex={1600}
+              />
+              <DictionaryProvider dictionary={dictionary}>
+                <CartUIProvider>
+                  {children}
+                </CartUIProvider>
+                <Toaster richColors position="bottom-right" />
+                {/* Analytics Scripts - Respects Cookie Consent */}
+                <AnalyticsScripts seo={seo} />
+                {/* Cookie Consent UI Components */}
+                <CookieBanner />
+                <ManagePreferencesModal />
+              </DictionaryProvider>
+            </CookieConsentProvider>
           </NextThemesProvider>
         </TenantProvider>
       </UserProvider>

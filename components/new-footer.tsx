@@ -146,6 +146,7 @@ export default function Footer() {
     address: dictionary?.common?.address || "Address",
     hours: dictionary?.common?.hours || "Hours",
     contact: dictionary?.common?.contact || "Contact",
+    cookiePolicy: currentLocale === "ka" ? "ქუქიების პოლიტიკა" : "Cookie Policy",
   }
 
   // Build language options
@@ -413,6 +414,11 @@ export default function Footer() {
                 <li>
                   <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/terms-and-conditions`}>
                     {t.terms}
+                  </a>
+                </li>
+                <li>
+                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/cookie-policy`}>
+                    {t.cookiePolicy}
                   </a>
                 </li>
               </ul>

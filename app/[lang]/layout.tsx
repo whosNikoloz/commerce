@@ -17,7 +17,6 @@ import { getTenantByHost } from "@/lib/getTenantByHost";
 import ClientUADataFix from "@/components/ClientUADataFix";
 import { generateFontClassNames } from "@/lib/loadTenantFonts";
 import FloatingCompareButton from "@/components/compare/FloatingCompareButton";
-import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
 // eslint-disable-next-line import/order
 import SmoothScroll from "@/components/SmoothScroll";
 
@@ -231,8 +230,7 @@ export default async function RootLayout({
           type="application/ld+json"
         />
 
-        {/* Analytics and Tracking Scripts */}
-        <AnalyticsScripts seo={seo} />
+        {/* Analytics and Tracking Scripts - Moved to Providers for cookie consent support */}
       </head>
       <body
         suppressHydrationWarning
@@ -247,6 +245,7 @@ export default async function RootLayout({
           <Providers
             dictionary={dictionary}
             initialTenant={tenant}
+            seo={seo}
             themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
           >
             <FontAwesomeLoader />

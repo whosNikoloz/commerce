@@ -108,24 +108,42 @@ export type CategoryCarouselData = {
   cardWidth?: string; // Tailwind class like "w-32", "w-40", etc.
 };
 
+export type BrandCarouselData = {
+  title?: LocalizedText;
+  subtitle?: LocalizedText;
+  showHeader?: boolean;
+  slidesPerView?: number; // Number of slides visible at once
+  showArrows?: boolean;
+  showPagination?: boolean;
+  autoplay?: boolean;
+  autoplayInterval?: number; // in milliseconds
+  cardHeight?: string; // Tailwind class like "h-40", "h-48", etc.
+  cardWidth?: string; // Tailwind class like "w-40", "w-48", etc.
+  maxBrands?: number; // Limit number of brands to display
+  autoScrollSpeed?: number; // Speed multiplier for continuous auto scroll
+};
+
 
 export type CommonSectionType =
   | "CommercialBanner"
   | "ProductRail"
   | "CustomHTML"
-  | "CategoryCarousel";
+  | "CategoryCarousel"
+  | "BrandCarousel";
 
 export type CommonSectionInstance =
   | { type: "CommercialBanner"; enabled: boolean; order: number; data: CommercialBannerData }
   | { type: "ProductRail"; enabled: boolean; order: number; data: ProductRailData }
   | { type: "CustomHTML"; enabled: boolean; order: number; data: CustomHTMLData }
-  | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData };
+  | { type: "CategoryCarousel"; enabled: boolean; order: number; data: CategoryCarouselData }
+  | { type: "BrandCarousel"; enabled: boolean; order: number; data: BrandCarouselData };
 
 export const COMMON_ALLOWED = [
   "CommercialBanner",
   "ProductRail",
   "CustomHTML",
   "CategoryCarousel",
+  "BrandCarousel",
 ] as const;
 
 export type HeroData = {

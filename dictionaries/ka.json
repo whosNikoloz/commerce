@@ -22,7 +22,10 @@
     "addToCart": "კალათაში დამატება",
     "addToCartShort": "დამატება",
     "liquidation": "ლიკვიდაცია",
-    "freeShipping": "სწრაფი მიწოდება მთელ საქართველოში"
+    "freeShipping": "სწრაფი მიწოდება მთელ საქართველოში",
+    "backToBrands": "უკან ბრენდებზე",
+    "products": "პროდუქტები",
+    "browseBrands": "ბრენდების დათვალიერება"
   },
   "admin": {
     "dashboard": {

@@ -50,10 +50,10 @@ export default function Cartlink({ showLabel = false }: CartlinkProps = {}) {
   return (
     <div ref={containerRef} className="flex flex-col items-center">
       <Badge
+        data-badge
         className={`border-0 absolute top-2 right-2 ${cartChanged ? "hidden" : ""}`}
         color="danger"
         content={totalQuantity}
-        data-badge
         size="sm"
         variant="shadow"
       >

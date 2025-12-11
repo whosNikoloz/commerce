@@ -273,6 +273,7 @@ export default function OrderDetailsModal({
       placement="center"
       size={isMobile ? "full" : "4xl"}
       onClose={onClose}
+      onOpenChange={(next) => { if (!next) onClose(); }}
     >
       <ModalContent key={normalizedDetail?.id ?? "none"}>
         {() => (

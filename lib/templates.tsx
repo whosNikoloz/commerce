@@ -93,8 +93,23 @@ const CategoryCarouselDataSchema = z.object({
   cardWidth: z.string().optional(),
 });
 
+const BrandCarouselDataSchema = z.object({
+  title: LocalizedTextSchema.optional(),
+  subtitle: LocalizedTextSchema.optional(),
+  showHeader: z.boolean().optional(),
+  slidesPerView: z.number().optional(),
+  showArrows: z.boolean().optional(),
+  showPagination: z.boolean().optional(),
+  autoplay: z.boolean().optional(),
+  autoplayInterval: z.number().optional(),
+  cardHeight: z.string().optional(),
+  cardWidth: z.string().optional(),
+  maxBrands: z.number().optional(),
+  autoScrollSpeed: z.number().optional(),
+});
+
 /* ================= COMMON SECTIONS (single source of truth) ================= */
-export const COMMON_ALLOWED_SECTIONS = ["CommercialBanner", "ProductRail", "CustomHTML", "CategoryCarousel"] as const;
+export const COMMON_ALLOWED_SECTIONS = ["CommercialBanner", "ProductRail", "CustomHTML", "CategoryCarousel", "BrandCarousel"] as const;
 export type CommonSectionType = (typeof COMMON_ALLOWED_SECTIONS)[number];
 
 const CommonSectionVariants = [
@@ -121,6 +136,12 @@ const CommonSectionVariants = [
     enabled: z.boolean(),
     order: z.number(),
     data: CategoryCarouselDataSchema,
+  }),
+  z.object({
+    type: z.literal("BrandCarousel"),
+    enabled: z.boolean(),
+    order: z.number(),
+    data: BrandCarouselDataSchema,
   }),
 ] as const;
 
@@ -229,6 +250,7 @@ const ProductRail = lazy(() => import("@/components/Home/sections/ui/ProductRail
 const CommercialBanner = lazy(() => import("@/components/Home/sections/ui/CommercialBanner"));
 const CustomHTML = lazy(() => import("@/components/Home/sections/ui/CustomHTML"));
 const CategoryCarousel = lazy(() => import("@/components/Home/sections/ui/CategoryCarouselWrapper"));
+const BrandCarousel = lazy(() => import("@/components/Home/sections/ui/BrandCarouselWrapper"));
 
 const Hero = lazy(() => import("@/components/Home/sections/template1/Hero/Hero"));
 const HeroBrand = lazy(() => import("@/components/Home/sections/template2/HeroBrand"));
@@ -238,6 +260,7 @@ const commonRegistry: Record<CommonSectionType, SectionComponent> = {
   ProductRail,
   CustomHTML,
   CategoryCarousel,
+  BrandCarousel,
 };
 
 export const TEMPLATE_1_ALLOWED_SECTIONS = (["Hero", ...COMMON_ALLOWED_SECTIONS] as const) satisfies readonly Template1SectionType[];

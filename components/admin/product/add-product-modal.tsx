@@ -23,11 +23,8 @@ import { FacetSelector } from "./facet-selector";
 
 import { Button } from "@/components/ui/button";
 import { StockStatus, Condition } from "@/types/enums";
-import {
-  createProduct,
-  getAllProductGroups,
-  type ProductGroupModel,
-} from "@/app/api/services/productService";
+import { createProduct } from "@/app/api/services/productService";
+import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productGroupService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GoBackButton } from "@/components/go-back-button";
 
@@ -66,7 +63,7 @@ export default function AddProductModal({
   brands,
   onProductAdded,
 }: AddProductModalProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
 
   const [loading, setLoading] = useState(false);
@@ -213,6 +210,7 @@ export default function AddProductModal({
         scrollBehavior="inside"
         size={isMobile ? "full" : "4xl"}
         onClose={handleClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent className="h-full">
           {() => (

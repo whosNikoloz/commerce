@@ -115,10 +115,12 @@ const ProductCard = memo(function ProductCard({
 
     if (!user) {
       toast.error("Please log in to add items to your wishlist");
+
       return;
     }
     if (!product.id) {
       toast.error("Product ID is missing");
+
       return;
     }
 
@@ -154,9 +156,9 @@ const ProductCard = memo(function ProductCard({
           compact ? "h-10 w-10 sm:h-12 sm:w-12 rounded-xl" : "h-8 w-8 sm:h-9 sm:w-9 rounded-full",
           "backdrop-blur-md shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60"
         )}
-        style={inWishlist ? { backgroundColor: "#ef4444", color: "white" } : {}}
         disabled={wishlistLoading}
         size="icon"
+        style={inWishlist ? { backgroundColor: "#ef4444", color: "white" } : {}}
         variant="secondary"
         onClick={handleWishlistToggle}
       >
@@ -169,9 +171,9 @@ const ProductCard = memo(function ProductCard({
           compact ? "h-10 w-10 sm:h-12 sm:w-12 rounded-xl" : "h-8 w-8 sm:h-9 sm:w-9 rounded-full",
           "text-white shadow-lg transition-all hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60"
         )}
-        style={{ backgroundColor: themeColor }}
         disabled={!inStock || showComingSoon}
         size="icon"
+        style={{ backgroundColor: themeColor }}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -485,6 +487,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
 
   const handleAddToCart = (productId: string) => {
     const product = products.find((p) => p.id === productId);
+
     if (!product) return;
 
     const item: CartItem = {

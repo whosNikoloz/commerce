@@ -8,6 +8,7 @@
 import type { SEOConfig } from "@/types/tenant";
 
 import Script from "next/script";
+
 import { useCookieConsent } from "@/app/context/cookieConsentContext";
 
 

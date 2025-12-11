@@ -264,8 +264,8 @@ export function ProductCard({
                   actionIconSize,
                   "bg-white/95 hover:bg-white dark:bg-zinc-800/90 dark:hover:bg-zinc-800"
                 )}
-                style={inCompare ? { backgroundColor: themeColor, color: 'white' } : {}}
                 size="icon"
+                style={inCompare ? { backgroundColor: themeColor, color: 'white' } : {}}
                 type="button"
                 variant="secondary"
                 onClick={handleCompareToggle}
@@ -279,9 +279,9 @@ export function ProductCard({
                   actionIconSize,
                   "bg-white/95 hover:bg-white dark:bg-zinc-800/90 dark:hover:bg-zinc-800"
                 )}
-                style={inWishlist ? { backgroundColor: '#ef4444', color: 'white' } : {}}
                 disabled={wishlistLoading}
                 size="icon"
+                style={inWishlist ? { backgroundColor: '#ef4444', color: 'white' } : {}}
                 type="button"
                 variant="secondary"
                 onClick={(e) => {
@@ -343,8 +343,8 @@ export function ProductCard({
                 // Hide on desktop, show on hover and always show on mobile
                 ""
               )}
-              style={{ backgroundColor: themeColor }}
               disabled={!isInStock || product.isComingSoon || addingToCart}
+              style={{ backgroundColor: themeColor }}
               type="button"
               onClick={(e) => {
                 e.preventDefault();

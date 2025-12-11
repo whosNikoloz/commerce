@@ -46,7 +46,7 @@ export default function ReviewImagesModal({
   onChanged,
   trigger,
 }: ReviewImagesModalProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -259,6 +259,7 @@ export default function ReviewImagesModal({
         placement={isMobile ? "top" : "center"}
         size={isMobile ? "full" : "3xl"}
         onClose={handleCloseModal}
+        onOpenChange={onOpenChange}
       >
         <ModalContent>
           {() => (

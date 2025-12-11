@@ -128,9 +128,9 @@ export const NavbarTemplate1 = () => {
                       unoptimized
                       alt="Site Logo"
                       className=" select-none transition-transform duration-300 group-hover:scale-105 object-contain"
-                      height={100}
+                      height={70}
                       src={logoSrc}
-                      width={100}
+                      width={70}
                     />
                   </Link>
                 </div>

@@ -39,7 +39,7 @@ export default function AddFacetModal({
   presetCategoryId?: string;
   onCreated?: () => void;
 }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
 
@@ -140,6 +140,7 @@ export default function AddFacetModal({
         scrollBehavior="inside"
         size={isMobile ? "full" : "3xl"}
         onClose={handleClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent className="h-full">
           {() => (

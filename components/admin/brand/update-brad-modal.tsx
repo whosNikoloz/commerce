@@ -33,7 +33,7 @@ export default function UpdateBrandModal({
   initialName = "",
   onSave,
 }: UpdateBrandModalProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [description, setDescription] = useState(initialDescription);
   const [origin, setOrigin] = useState(initialOrigin);
   const [name, setName] = useState(initialName);
@@ -69,6 +69,7 @@ export default function UpdateBrandModal({
         scrollBehavior="inside"
         size={isMobile ? "full" : "3xl"}
         onClose={onClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent className="h-full">
           {() => (

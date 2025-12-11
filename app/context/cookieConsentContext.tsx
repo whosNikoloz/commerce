@@ -39,8 +39,10 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(CONSENT_KEY);
+
       if (stored) {
         const parsed = JSON.parse(stored);
+
         // Check if version matches
         if (parsed.version === CONSENT_VERSION) {
           setConsent(parsed.consent);
@@ -143,8 +145,10 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
 export function useCookieConsent() {
   const context = useContext(CookieConsentContext);
+
   if (context === undefined) {
     throw new Error("useCookieConsent must be used within a CookieConsentProvider");
   }
+
   return context;
 }

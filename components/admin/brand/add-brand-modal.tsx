@@ -31,7 +31,7 @@ export default function AddBrandModal({
   defaultDescription = "",
   onCreate,
 }: AddBrandModalProps) {
-  const { isOpen, onOpen, onClose  } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
 
   const [name, setName] = useState(defaultName);
@@ -87,6 +87,7 @@ export default function AddBrandModal({
         scrollBehavior="inside"
         size={isMobile ? "full" : "3xl"}
         onClose={handleClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent className="h-full">
           {() => (

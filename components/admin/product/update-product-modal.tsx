@@ -1,10 +1,11 @@
 "use client";
 
 import type { BrandModel } from "@/types/brand";
+import type { CategoryModel } from "@/types/category";
 import type { ProductFacetValueModel } from "@/types/facet";
 
-import { useEffect, useState } from "react";
-import { Box, Clock3, Edit, Sparkles, Layers } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Box, Clock3, Edit, Sparkles, Layers, X, ChevronRight, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import {
   Modal,
@@ -21,7 +22,7 @@ import { GoBackButton } from "../../go-back-button";
 
 import { FacetSelector } from "./facet-selector";
 
-import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productService";
+import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productGroupService";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -39,13 +40,15 @@ interface UpdateProductModalProps {
   initialIsNewArrival?: boolean;
   initialFacetValues?: ProductFacetValueModel[];
   brands?: BrandModel[];
+  categories?: CategoryModel[];
   onSave: (
     id: string,
     newDescription: string,
     brandId: string,
+    categoryId: string,
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
     facetValues: ProductFacetValueModel[],
-    productGroupId?: string,
+    productGroupId?: string | null,
   ) => void | Promise<void>;
 }
 
@@ -60,11 +63,13 @@ export default function UpdateProductModal({
   initialIsNewArrival = false,
   initialFacetValues = [],
   brands = [],
+  categories = [],
   onSave,
 }: UpdateProductModalProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [description, setDescription] = useState(initialDescription);
   const [brandId, setBrandId] = useState(initialBrandId);
+  const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [productGroupId, setProductGroupId] = useState(initialProductGroupId);
   const [productGroups, setProductGroups] = useState<ProductGroupModel[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
@@ -77,21 +82,49 @@ export default function UpdateProductModal({
 
   const isMobile = useIsMobile();
 
+  // Ensure the form is prefilled with the latest product data every time the modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    setDescription(initialDescription);
+    setBrandId(initialBrandId);
+    setCategoryId(initialCategoryId);
+    setProductGroupId(initialProductGroupId);
+    setIsLiquidated(initialIsLiquidated);
+    setIsComingSoon(initialIsComingSoon);
+    setIsNewArrival(initialIsNewArrival);
+    setSelectedFacetValues(initialFacetValues);
+  }, [
+    isOpen,
+    initialDescription,
+    initialBrandId,
+    initialCategoryId,
+    initialProductGroupId,
+    initialIsLiquidated,
+    initialIsComingSoon,
+    initialIsNewArrival,
+    initialFacetValues,
+  ]);
+
   // Fetch product groups when modal opens
   useEffect(() => {
-    if (isOpen && (initialCategoryId || initialBrandId)) {
+    if (isOpen && (categoryId || brandId)) {
       fetchProductGroups();
     }
-  }, [isOpen, initialCategoryId, initialBrandId]);
+  }, [isOpen, categoryId, brandId]);
 
   const fetchProductGroups = async () => {
-    if (!initialCategoryId && !initialBrandId) return;
+    if (!categoryId && !brandId) {
+      setProductGroups([]);
+
+      return;
+    }
 
     setLoadingGroups(true);
     try {
       const groups = await getAllProductGroups(
-        initialCategoryId || undefined,
-        initialBrandId || undefined
+        categoryId || undefined,
+        brandId || undefined
       );
 
       // eslint-disable-next-line no-console
@@ -109,8 +142,8 @@ export default function UpdateProductModal({
   };
 
   const handleSave = async () => {
-    if (!brandId) {
-      alert("Please select a brand");
+    if (!brandId || !categoryId) {
+      alert("Please select a brand and category");
 
       return;
     }
@@ -122,9 +155,10 @@ export default function UpdateProductModal({
           productId,
           description,
           brandId,
+          categoryId,
           { isLiquidated, isComingSoon, isNewArrival },
           selectedFacetValues,
-          productGroupId || undefined
+          productGroupId || null
         ),
       );
       onClose();
@@ -136,13 +170,161 @@ export default function UpdateProductModal({
  
 
   const validBrandId = brands.some(b => b.id === brandId) ? brandId : undefined;
-  const selectedKeys = validBrandId ? new Set([validBrandId]) : new Set<string>();
+  const validCategoryId = categories.some(c => c.id === categoryId) ? categoryId : undefined;
+  const brandSelectedKeys = validBrandId ? new Set([validBrandId]) : new Set<string>();
+
+  // Category tree helpers
+  const { categoriesByParent, categoriesById } = useMemo(() => {
+    const byParent: Record<string, CategoryModel[]> = {};
+    const byId: Record<string, CategoryModel> = {};
+
+    categories.forEach((cat) => {
+      byId[cat.id] = cat;
+      const parentKey = cat.parentId ?? "root";
+
+      byParent[parentKey] = byParent[parentKey] || [];
+      byParent[parentKey].push(cat);
+    });
+
+    Object.values(byParent).forEach((list) => {
+      list.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    });
+
+    return { categoriesByParent: byParent, categoriesById: byId };
+  }, [categories]);
+
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [showCategoryTree, setShowCategoryTree] = useState(false);
+
+  useEffect(() => {
+    if (!categoryId) return;
+
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      let current = categoriesById[categoryId];
+
+      while (current?.parentId) {
+        next.add(current.parentId);
+        current = categoriesById[current.parentId];
+      }
+
+      return next;
+    });
+  }, [categoryId, categoriesById]);
+
+  // Auto-expand top-level categories that have children so the tree is visible immediately
+  useEffect(() => {
+    const roots = categoriesByParent["root"] || [];
+    const next = new Set<string>();
+
+    roots.forEach((root: CategoryModel) => {
+      if ((categoriesByParent[root.id] || []).length > 0) {
+        next.add(root.id);
+      }
+    });
+
+    setExpandedCategories((prev) => {
+      // preserve existing expansions, but ensure roots with children are open
+      const merged = new Set(prev);
+
+      next.forEach((id) => merged.add(id));
+
+      return merged;
+    });
+  }, [categoriesByParent]);
+
+  const getChildren = (parentId: string | null) =>
+    categoriesByParent[parentId ?? "root"] || [];
+
+  const renderCategoryTree = (parentId: string | null, depth = 0) => {
+    const children = getChildren(parentId);
+
+    if (!children.length) return null;
+
+    return (
+      <div
+        className={depth > 0 ? "ml-4 pl-3 border-l border-slate-200 dark:border-slate-700" : ""}
+      >
+        {children.map((cat: CategoryModel) => {
+          const hasChildren = getChildren(cat.id).length > 0;
+          const isExpanded = expandedCategories.has(cat.id);
+          const isSelected = categoryId === cat.id;
+
+          return (
+            <div key={cat.id} className="py-0.5">
+              <div
+                className={[
+                  "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer transition-all",
+                  isSelected
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700"
+                    : "hover:bg-slate-100 dark:hover:bg-slate-700/70 text-slate-800 dark:text-slate-100 border border-transparent",
+                ].join(" ")}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setCategoryId(cat.id);
+                  setProductGroupId("");
+                  setSelectedFacetValues([]);
+                  setShowCategoryTree(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setCategoryId(cat.id);
+                    setProductGroupId("");
+                    setSelectedFacetValues([]);
+                    setShowCategoryTree(false);
+                  }
+                }}
+              >
+                {hasChildren ? (
+                  <button
+                    aria-label={isExpanded ? "Collapse category" : "Expand category"}
+                    className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedCategories((prev) => {
+                        const next = new Set(prev);
+
+                        next.has(cat.id) ? next.delete(cat.id) : next.add(cat.id);
+
+                        return next;
+                      });
+                    }}
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                ) : (
+                  <div className="w-5 h-5" />
+                )}
+
+                <span className="flex-1 truncate">{cat.name || "Untitled"}</span>
+              </div>
+
+              {hasChildren && isExpanded && renderCategoryTree(cat.id, depth + 1)}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
    useEffect(() => {
       if (!validBrandId && brands.length > 0) {
         setBrandId(brands[0].id); 
       }
     }, [brands, validBrandId]);
+
+   useEffect(() => {
+      if (!validCategoryId && categories.length > 0) {
+        setCategoryId(categories[0].id);
+      }
+    }, [categories, validCategoryId]);
 
   return (
     <>
@@ -160,12 +342,13 @@ export default function UpdateProductModal({
           backdrop: "bg-black/60 backdrop-blur-lg",
           base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl",
         }}
-        hideCloseButton={isMobile}
+        hideCloseButton={true}
         isOpen={isOpen}
         placement="center"
         scrollBehavior="inside"
         size={isMobile ? "full" : "4xl"}
         onClose={onClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent>
           {() => (
@@ -174,8 +357,16 @@ export default function UpdateProductModal({
 
               {isMobile ? (
                 <ModalHeader className="flex flex-col gap-2 px-4 pt-6 pb-0 z-50 relative">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2">
                     <GoBackButton onClick={onClose} />
+                    <button
+                      aria-label="Close modal"
+                      className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                      type="button"
+                      onClick={onClose}
+                    >
+                      <X className="h-5 w-5 text-slate-700 dark:text-slate-200" />
+                    </button>
                   </div>
 
                   {/* Tabs for Mobile */}
@@ -213,6 +404,14 @@ export default function UpdateProductModal({
                         განაახლე პროდუქტის ინფორმაცია და აღწერა
                       </p>
                     </div>
+                    <button
+                      aria-label="Close modal"
+                      className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                      type="button"
+                      onClick={onClose}
+                    >
+                      <X className="h-5 w-5 text-slate-700 dark:text-slate-200" />
+                    </button>
                   </div>
 
                   {/* Tabs for Desktop */}
@@ -249,6 +448,47 @@ export default function UpdateProductModal({
                          scrollbarWidth: 'thin',
                          scrollbarColor: '#cbd5e1 transparent'
                        }}>
+                  {/* Category Selection */}
+                  <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                    <div className="mb-2">
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        Category
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Edit category selection from the tree (similar to facet settings/values).
+                      </p>
+                    </div>
+                    {categories.length > 0 ? (
+                      <div className="space-y-2">
+                        <Button
+                          className="w-full justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowCategoryTree((prev) => !prev)}
+                        >
+                          <span className="truncate text-left">
+                            {categoryId && categoriesById[categoryId]
+                              ? categoriesById[categoryId].name
+                              : "Select category"}
+                          </span>
+                          <ChevronDown
+                            className={`h-4 w-4 opacity-60 transition-transform ${showCategoryTree ? "rotate-180" : ""}`}
+                          />
+                        </Button>
+
+                        {showCategoryTree && (
+                          <div className="space-y-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-2">
+                            {renderCategoryTree(null)}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                        No categories available. Check console for errors.
+                      </div>
+                    )}
+                  </div>
+
                   {/* Brand Selection */}
                   <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                     <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
@@ -259,13 +499,14 @@ export default function UpdateProductModal({
                         label="ბრენდი"
                         // remove disallowEmptySelection OR ensure you always have a valid key
                         // disallowEmptySelection
-                        selectedKeys={selectedKeys}
+                        selectedKeys={brandSelectedKeys}
                         selectionMode="single"
                         variant="bordered"
                         onSelectionChange={(keys) => {
                           const k = Array.from(keys)[0] as string | undefined;
 
                           setBrandId(k ?? "");
+                          setProductGroupId("");
                         }}
                       >
                         {brands.map((b) => (
@@ -370,14 +611,14 @@ export default function UpdateProductModal({
                   </div>
 
                     {/* Facets */}
-                    {initialCategoryId && (
+                    {categoryId && (
                       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60 p-3">
                         <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block flex items-center gap-1">
                           <Layers className="h-3 w-3" />
                           Product Facets
                         </Label>
                         <FacetSelector
-                          categoryId={initialCategoryId}
+                          categoryId={categoryId}
                           selectedFacetValues={selectedFacetValues}
                           onChange={setSelectedFacetValues}
                         />

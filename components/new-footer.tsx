@@ -146,7 +146,7 @@ export default function Footer() {
     address: dictionary?.common?.address || "Address",
     hours: dictionary?.common?.hours || "Hours",
     contact: dictionary?.common?.contact || "Contact",
-    cookiePolicy: currentLocale === "ka" ? "ქუქიების პოლიტიკა" : "Cookie Policy",
+    cookiePolicy: currentLocale === "ka" ? "Cookie პოლიტიკა" : "Cookie Policy",
   }
 
   // Build language options
@@ -284,11 +284,11 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 flex-shrink-0">
                 <Image
-                  fill
                   alt={companyName}
                   className="object-contain"
-                  sizes="48px"
-                  src={siteConfig.logo}
+                  height={100}
+                  src={siteConfig.logoDark || siteConfig.logoLight || `https://via.placeholder.com/100x100.png?text=${logoText}`}
+                  width={100}
                 />
               </div>
               <div>
@@ -436,6 +436,11 @@ export default function Footer() {
               {socialLinks.facebook && (
                 <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.facebook} rel="noopener noreferrer" target="_blank">
                   Facebook
+                </a>
+              )}
+              {socialLinks.tiktok && (
+                <a className="font-primary text-xs text-muted-foreground hover:text-foreground transition-colors" href={socialLinks.tiktok} rel="noopener noreferrer" target="_blank">
+                  Tiktok
                 </a>
               )}
               {socialLinks.instagram && (

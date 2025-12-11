@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { X, Shield, BarChart3, Target, Settings } from "lucide-react";
+
 import { useCookieConsent, CookieConsent } from "@/app/context/cookieConsentContext";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
@@ -101,6 +102,7 @@ export default function ManagePreferencesModal() {
       marketing: true,
       preferences: true,
     };
+
     setPreferences(allAccepted);
     updateConsent(allAccepted);
   };
@@ -112,6 +114,7 @@ export default function ManagePreferencesModal() {
       marketing: false,
       preferences: false,
     };
+
     setPreferences(allRejected);
     updateConsent(allRejected);
   };
@@ -151,10 +154,10 @@ export default function ManagePreferencesModal() {
     <>
       {/* Backdrop */}
       <button
-        type="button"
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-200 cursor-default"
-        onClick={closeManageModal}
         aria-label="Close modal"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-200 cursor-default"
+        type="button"
+        onClick={closeManageModal}
       />
 
       {/* Modal */}
@@ -171,9 +174,9 @@ export default function ManagePreferencesModal() {
               </p>
             </div>
             <button
-              onClick={closeManageModal}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
               aria-label="Close modal"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
+              onClick={closeManageModal}
             >
               <X className="w-6 h-6" />
             </button>
@@ -214,13 +217,13 @@ export default function ManagePreferencesModal() {
                           </span>
                         ) : (
                           <button
-                            onClick={() => handleToggle(category.key)}
+                            aria-label={`Toggle ${category.title}`}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                               isEnabled
                                 ? "bg-brand-primary"
                                 : "bg-gray-200 dark:bg-gray-700"
                             }`}
-                            aria-label={`Toggle ${category.title}`}
+                            onClick={() => handleToggle(category.key)}
                           >
                             <span
                               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -240,21 +243,21 @@ export default function ManagePreferencesModal() {
           {/* Footer */}
           <div className="flex items-center justify-between gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
             <button
-              onClick={handleRejectAll}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              onClick={handleRejectAll}
             >
               {t.rejectAll}
             </button>
             <div className="flex gap-3">
               <button
-                onClick={handleAcceptAll}
                 className="px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition-colors"
+                onClick={handleAcceptAll}
               >
                 {t.acceptAll}
               </button>
               <button
-                onClick={handleSave}
                 className="px-6 py-2 bg-brand-primary hover:bg-brand-primarydark text-white rounded-lg font-medium transition-colors"
+                onClick={handleSave}
               >
                 {t.savePreferences}
               </button>

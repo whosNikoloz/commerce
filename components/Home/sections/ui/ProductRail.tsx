@@ -11,7 +11,7 @@ import { SectionContainer } from "./SectionContainer";
 import { Button } from "@/components/ui/button";
 import { searchProductsByFilter } from "@/app/api/services/productService";
 import { t, tOpt } from "@/lib/i18n";
-import CarouselRail from "@/components/rails/CarouselRail";
+import CarouselRail from "@/components/Home/sections/ui/CarouselRail";
 
 
 interface ProductRailProps {
@@ -111,7 +111,7 @@ export default async function ProductRail({
       isEmpty={!products || products.length === 0}
       loadingSkeleton={loadingSkeleton}
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 py-5">
         <div className="flex items-center justify-between mb-6 md:mb-10 gap-2">
           <div className="flex-1 min-w-0">
             <h2 className="font-heading text-lg md:text-3xl lg:text-4xl font-bold text-foreground">

@@ -4,8 +4,8 @@
 import type { CategoryModel } from "@/types/category";
 import type { FacetModel, FacetValueModel } from "@/types/facet";
 
-import { useEffect, useMemo, useState } from "react";
-import { Edit } from "lucide-react";
+import { JSX, useEffect, useMemo, useState } from "react";
+import { Edit, ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import {
   Modal,
@@ -15,7 +15,6 @@ import {
   ModalHeader,
 } from "@heroui/modal";
 import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 
 import FacetValuesEditor from "./facet-values-editor";
@@ -84,6 +83,8 @@ export default function UpdateFacetModal({
   const [isCustom, setIsCustom] = useState(!!facet.isCustom);
   const [selectedCategories, setSelectedCategories] = useState<string[]>(facet.categoryIds ?? []);
   const [values, setValues] = useState<FacetValueNode[]>(toTree(facet.facetValues ?? []));
+  const [showCategoryTree, setShowCategoryTree] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!open) return;
@@ -92,6 +93,7 @@ export default function UpdateFacetModal({
     setIsCustom(!!facet.isCustom);
     setSelectedCategories(facet.categoryIds ?? []);
     setValues(toTree(facet.facetValues ?? []));
+    setShowCategoryTree(false);
   }, [open, facet]);
 
   const model: FacetModel = useMemo(
@@ -105,6 +107,130 @@ export default function UpdateFacetModal({
     }),
     [facet, name, displayType, isCustom, selectedCategories, values]
   );
+
+  // Category tree helpers
+  const { categoriesByParent, categoriesById } = useMemo(() => {
+    const byParent: Record<string, CategoryModel[]> = {};
+    const byId: Record<string, CategoryModel> = {};
+
+    categories.forEach((cat) => {
+      byId[cat.id] = cat;
+      const parentKey = cat.parentId ?? "root";
+
+      byParent[parentKey] = byParent[parentKey] || [];
+      byParent[parentKey].push(cat);
+    });
+
+    Object.values(byParent).forEach((list) => {
+      list.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    });
+
+    return { categoriesByParent: byParent, categoriesById: byId };
+  }, [categories]);
+
+  const getChildren = (parentId: string | null) => categoriesByParent[parentId ?? "root"] || [];
+
+  useEffect(() => {
+    if (!selectedCategories.length) return;
+    const selectedId = selectedCategories[0];
+
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      let current = categoriesById[selectedId];
+
+      while (current?.parentId) {
+        next.add(current.parentId);
+        current = categoriesById[current.parentId];
+      }
+
+      return next;
+    });
+  }, [selectedCategories, categoriesById]);
+
+  useEffect(() => {
+    const roots = categoriesByParent["root"] || [];
+    const next = new Set<string>();
+
+    roots.forEach((root) => {
+      if (getChildren(root.id).length > 0) next.add(root.id);
+    });
+
+    setExpandedCategories((prev) => {
+      const merged = new Set(prev);
+
+      next.forEach((id) => merged.add(id));
+
+      return merged;
+    });
+  }, [categoriesByParent]);
+
+  const renderCategoryTree = (parentId: string | null, depth = 0): JSX.Element | null => {
+    const children = getChildren(parentId);
+
+    if (!children.length) return null;
+
+    return (
+      <div className={depth > 0 ? "ml-4 pl-3 border-l border-slate-200 dark:border-slate-700" : ""}>
+        {children.map((cat) => {
+          const hasChildren = getChildren(cat.id).length > 0;
+          const isExpanded = expandedCategories.has(cat.id);
+          const isSelected = selectedCategories.includes(cat.id);
+
+          return (
+            <div key={cat.id} className="py-0.5">
+              <div
+                className={[
+                  "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer transition-all",
+                  isSelected
+                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700"
+                    : "hover:bg-slate-100 dark:hover:bg-slate-700/70 text-slate-800 dark:text-slate-100 border border-transparent",
+                ].join(" ")}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setSelectedCategories([cat.id]);
+                  setShowCategoryTree(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedCategories([cat.id]);
+                    setShowCategoryTree(false);
+                  }
+                }}
+              >
+                {hasChildren ? (
+                  <button
+                    aria-label={isExpanded ? "Collapse category" : "Expand category"}
+                    className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedCategories((prev) => {
+                        const next = new Set(prev);
+
+                        next.has(cat.id) ? next.delete(cat.id) : next.add(cat.id);
+
+                        return next;
+                      });
+                    }}
+                  >
+                    {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  </button>
+                ) : (
+                  <div className="w-5 h-5" />
+                )}
+
+                <span className="flex-1 truncate">{cat.name || "Untitled"}</span>
+              </div>
+
+              {hasChildren && isExpanded && renderCategoryTree(cat.id, depth + 1)}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   async function handleSave() {
     setLoading(true);
@@ -211,24 +337,44 @@ export default function UpdateFacetModal({
                 </div>
 
                 {/* Categories */}
-                <Select
-                  label="Category"
-                  labelPlacement="outside"
-                  placeholder="Select category"
-                  selectedKeys={selectedCategories[0] ? [selectedCategories[0]] : []}
-                  variant="bordered"
-                  onSelectionChange={(keys) => {
-                    const selected = Array.from(keys)[0] as string;
+                <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                  <div className="mb-2">
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Category</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Edit category selection from the tree (similar to facet settings/values).
+                    </p>
+                  </div>
 
-                    setSelectedCategories(selected ? [selected] : []);
-                  }}
-                >
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} textValue={c.name}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </Select>
+                  {categories.length > 0 ? (
+                    <div className="space-y-2">
+                      <Button
+                        className="w-full justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowCategoryTree((prev) => !prev)}
+                      >
+                        <span className="truncate text-left">
+                          {selectedCategories[0] && categoriesById[selectedCategories[0]]
+                            ? categoriesById[selectedCategories[0]].name
+                            : "Select category"}
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 opacity-60 transition-transform ${showCategoryTree ? "rotate-180" : ""}`}
+                        />
+                      </Button>
+
+                      {showCategoryTree && (
+                        <div className="space-y-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-2">
+                            {renderCategoryTree(null)}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                      No categories available. Check console for errors.
+                    </div>
+                  )}
+                </div>
 
                 {/* Facet Values */}
                 <div className="space-y-2">

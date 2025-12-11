@@ -16,10 +16,12 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GoBackButton } from "@/components/go-back-button";
 import {
+  addProductsToGroup,
+  getProductGroupWithProducts,
   ProductGroupModel,
-  searchProductsByFilter,
-  updateProductGroup,
-} from "@/app/api/services/productService";
+  removeProductsFromGroup,
+} from "@/app/api/services/productGroupService";
+import { searchProductsByFilter } from "@/app/api/services/productService";
 import { ProductResponseModel } from "@/types/product";
 import { FilterModel } from "@/types/filter";
 import { Input } from "@/components/ui/input";
@@ -53,21 +55,46 @@ export function EditProductGroupModal({
 }: EditProductGroupModalProps) {
   const isMobile = useIsMobile();
   const [filteredProducts, setFilteredProducts] = useState<ProductResponseModel[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingGroupDetails, setLoadingGroupDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [localProductIds, setLocalProductIds] = useState<string[]>([]);
+  const [initialProductIds, setInitialProductIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const isLoading = loadingProducts || loadingGroupDetails;
 
   useEffect(() => {
-    if (open) {
-      setLocalProductIds(group.productIds || []);
-    }
-  }, [open, group.productIds]);
+    if (!open) return;
+
+    const loadGroupDetails = async () => {
+      setLoadingGroupDetails(true);
+      try {
+        const data = await getProductGroupWithProducts(group.id);
+        const ids =
+          data.productIds ??
+          data.products?.map((p) => p.id).filter(Boolean) ??
+          [];
+
+        setLocalProductIds(ids);
+        setInitialProductIds(ids);
+      } catch (error) {
+        console.error("Failed to fetch product group details:", error);
+        const fallback = group.productIds ?? [];
+
+        setLocalProductIds(fallback);
+        setInitialProductIds(fallback);
+      } finally {
+        setLoadingGroupDetails(false);
+      }
+    };
+
+    loadGroupDetails();
+  }, [open, group.id, group.productIds]);
 
   useEffect(() => {
     if (open) {
       const fetchProducts = async () => {
-        setLoading(true);
+        setLoadingProducts(true);
         try {
           const filter: FilterModel = {};
 
@@ -92,7 +119,7 @@ export function EditProductGroupModal({
           console.error("Failed to fetch products:", error);
           setFilteredProducts([]);
         } finally {
-          setLoading(false);
+          setLoadingProducts(false);
         }
       };
 
@@ -131,28 +158,45 @@ export function EditProductGroupModal({
     setLocalProductIds((prev) => prev.filter((id) => id !== productId));
   };
 
+  const addedProductIds = useMemo(
+    () => localProductIds.filter((id) => !initialProductIds.includes(id)),
+    [localProductIds, initialProductIds],
+  );
+
+  const removedProductIds = useMemo(
+    () => initialProductIds.filter((id) => !localProductIds.includes(id)),
+    [initialProductIds, localProductIds],
+  );
+
+  const hasChanges = addedProductIds.length > 0 || removedProductIds.length > 0;
+
   const handleSave = async () => {
+    if (!hasChanges) {
+      onOpenChange(false);
+      return;
+    }
+
     setSaving(true);
     try {
-      await updateProductGroup({
-        ...group,
-        productIds: localProductIds,
-      });
+      if (addedProductIds.length > 0) {
+        await addProductsToGroup(group.id, addedProductIds);
+      }
+
+      if (removedProductIds.length > 0) {
+        await removeProductsFromGroup(removedProductIds, group.id);
+      }
 
       toast("Product group updated successfully");
 
       onGroupUpdated?.();
       onOpenChange(false);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to update product group:", error);
-      toast("Product group updated successfully");
+      toast.error("Failed to update product group");
     } finally {
       setSaving(false);
     }
   };
-
-  const hasChanges = JSON.stringify(localProductIds.sort()) !== JSON.stringify((group.productIds || []).sort());
 
   const formatPrice = (price?: number) => {
     if (price === undefined || price === null) return "N/A";
@@ -237,7 +281,7 @@ export function EditProductGroupModal({
             />
           </div>
 
-          {loading ? (
+          {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
             </div>

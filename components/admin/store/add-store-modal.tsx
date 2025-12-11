@@ -26,7 +26,7 @@ interface AddStoreModalProps {
 }
 
 export default function AddStoreModal({ onSuccess }: AddStoreModalProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateStoreRequest>({
@@ -102,6 +102,7 @@ export default function AddStoreModal({ onSuccess }: AddStoreModalProps) {
         scrollBehavior="inside"
         size={isMobile ? "full" : "3xl"}
         onClose={handleClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent className="h-full">
           <form className="flex h-full flex-col" onSubmit={handleSubmit}>

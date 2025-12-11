@@ -17,6 +17,7 @@ import {
   Plus,
   Minus,
   MoreVertical,
+  Edit,
 } from "lucide-react";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
@@ -51,6 +52,10 @@ import {
 
 const AddCategoryModal = dynamic(() => import("./add-category-modal"), { ssr: false });
 const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
+const EditCategoryModal = dynamic(
+  () => import("./edit-category-modal").then((m) => m.EditCategoryModal),
+  { ssr: false },
+);
 
 interface Props {
   initialCategories: CategoryModel[];
@@ -65,6 +70,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryModel | null>(null);
+  const [categoryToEdit, setCategoryToEdit] = useState<CategoryModel | null>(null);
 
   const refreshCategories = async () => {
     try {
@@ -296,6 +302,18 @@ export function CategoriesTreeView({ initialCategories }: Props) {
 
           {/* Actions - Desktop */}
           <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+            <Button
+              className="h-8 px-3"
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                setCategoryToEdit(category);
+              }}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
             <ReviewImagesModal
               categoryId={category.id}
               existing={(category.images ?? []).map((url, idx) => ({
@@ -343,6 +361,14 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                       Show Category
                     </>
                   )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setCategoryToEdit(category);
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -518,6 +544,18 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {categoryToEdit && (
+        <EditCategoryModal
+          categories={categories}
+          category={categoryToEdit}
+          open={Boolean(categoryToEdit)}
+          onCategoryUpdated={refreshCategories}
+          onOpenChange={(open) => {
+            if (!open) setCategoryToEdit(null);
+          }}
+        />
+      )}
     </Card>
   );
 }

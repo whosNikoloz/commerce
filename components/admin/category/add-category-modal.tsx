@@ -31,7 +31,7 @@ export default function AddCategoryModal({
   categories,
   onCategoryAdded,
 }: AddCategoryModalProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
 
@@ -116,6 +116,7 @@ export default function AddCategoryModal({
         scrollBehavior="inside"
         size={isMobile ? "full" : "3xl"}
         onClose={handleClose}
+        onOpenChange={onOpenChange}
       >
         <ModalContent className="h-full">
           {() => (

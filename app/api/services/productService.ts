@@ -5,7 +5,7 @@ import { FilterModel } from "@/types/filter";
 import { PagedList } from "@/types/pagination";
 import { FinaProductRestArrayModel, FinaProductRestResponse } from "@/types/product-rest";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL + "Product";
+const PRODUCT_API_BASE = process.env.NEXT_PUBLIC_API_URL + "Product";
 const API_Fina_BASE = process.env.NEXT_PUBLIC_API_URL + "api/FinaProductRest";
 
 export function mapSort(sortBy: string): {
@@ -30,7 +30,7 @@ export function mapSort(sortBy: string): {
 }
 
 export async function getAllProducts(): Promise<ProductResponseModel[]> {
-  return apiFetch<ProductResponseModel[]>(`${API_BASE}/get-all-products`);
+  return apiFetch<ProductResponseModel[]>(`${PRODUCT_API_BASE}/get-all-products`);
 }
 
 export async function getProductById(
@@ -45,14 +45,14 @@ export async function getProductById(
 
   const queryString = params.toString();
   const url = queryString
-    ? `${API_BASE}/get-products-by-${id}?${queryString}`
-    : `${API_BASE}/get-products-by-${id}`;
+    ? `${PRODUCT_API_BASE}/get-products-by-${id}?${queryString}`
+    : `${PRODUCT_API_BASE}/get-products-by-${id}`;
 
   return apiFetch<ProductResponseModel>(url);
 }
 
 export async function getProductsByCategory(id: string): Promise<ProductRequestModel[]> {
-  return apiFetch<ProductRequestModel[]>(`${API_BASE}/get-products-by-category?id=${id}`);
+  return apiFetch<ProductRequestModel[]>(`${PRODUCT_API_BASE}/get-products-by-category?id=${id}`);
 }
 
 export async function getProductRestsByIds(
@@ -81,7 +81,7 @@ export async function searchProducts(
   });
 
   return apiFetch<PagedList<ProductResponseModel>>(
-    `${API_BASE}/get-product-by-searching?${params.toString()}`,
+    `${PRODUCT_API_BASE}/get-product-by-searching?${params.toString()}`,
   );
 }
 
@@ -116,7 +116,7 @@ export async function searchProductsByFilter(params: {
   });
 
   return apiFetch<PagedList<ProductResponseModel>>(
-    `${API_BASE}/get-products-by-filtering?${qs.toString()}`,
+    `${PRODUCT_API_BASE}/get-products-by-filtering?${qs.toString()}`,
     {
       method: "POST",
       body: JSON.stringify(params.filter),
@@ -126,34 +126,34 @@ export async function searchProductsByFilter(params: {
 }
 
 export async function createProduct(data: ProductRequestModel): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/add-product`, {
+  return apiFetch<string>(`${PRODUCT_API_BASE}/add-product`, {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
 export async function updateProduct(data: ProductRequestModel): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/update-product`, {
+  return apiFetch<string>(`${PRODUCT_API_BASE}/update-product`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteProduct(data: ProductRequestModel): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/delete-product`, {
+  return apiFetch<string>(`${PRODUCT_API_BASE}/delete-product`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteProductById(id: string): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/delete-product-by-${id}`, {
+  return apiFetch<string>(`${PRODUCT_API_BASE}/delete-product-by-${id}`, {
     method: "PUT",
   });
 }
 
 export async function deleteImage(id: string, key: string): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-product-${id}`, {
+  return apiFetch<string>(`${PRODUCT_API_BASE}/delete-image-${key}-by-product-${id}`, {
     method: "DELETE",
   });
 }
@@ -169,63 +169,9 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
     formData.append("files", file, file.name);
   });
 
-  return apiFetch<string[]>(`${API_BASE}/images`, {
+  return apiFetch<string[]>(`${PRODUCT_API_BASE}/images`, {
     method: "POST",
     body: formData,
     requireAuth: true , failIfUnauthenticated : true 
   });
 }
-
-// Product Groups API
-export interface ProductGroupModel {
-  brandId?: string;
-  categoryId?: string;
-  productIds: string[];
-  id: string;
-  name: string;
-  productCount : number;
-}
-
-export async function getAllProductGroups(
-  categoryId?: string,
-  brandId?: string
-): Promise<ProductGroupModel[]> {
-  const params = new URLSearchParams();
-
-  if (categoryId) params.append("categoryId", categoryId);
-  if (brandId) params.append("brandId", brandId);
-
-  const queryString = params.toString();
-  const url = queryString ? `${API_BASE}/groups?${queryString}` : `${API_BASE}/groups`;
-
-  return apiFetch<ProductGroupModel[]>(url);
-}
-
-export interface CreateProductGroupModel {
-  id: string;
-  name: string;
-  categoryId?: string;
-  brandId?: string;
-  productIds: string[];
-}
-
-export async function createProductGroup(group: Omit<CreateProductGroupModel, "id">): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/groups`, {
-    method: "POST",
-    body: JSON.stringify(group),
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-export async function updateProductGroup(group: ProductGroupModel): Promise<string> {
-  return apiFetch<string>(`${API_BASE}/groups/${group.id}`, {
-    method: "PUT",
-    body: JSON.stringify(group),
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-export async function getProductVariants(productId: string): Promise<ProductResponseModel[]> {
-  return apiFetch<ProductResponseModel[]>(`${API_BASE}/${productId}/variants`);
-}
-

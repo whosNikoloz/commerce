@@ -13,7 +13,7 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 
 import { Button } from "@/components/ui/button";
-import { createProductGroup } from "@/app/api/services/productService";
+import { createProductGroup } from "@/app/api/services/productGroupService";
 import { CategoryModel } from "@/types/category";
 import { BrandModel } from "@/types/brand";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -69,7 +69,6 @@ export function CreateProductGroupModal({
         name: name.trim(),
         categoryId: categoryId || undefined,
         brandId: brandId || undefined,
-        productIds: [],
       });
 
       toast("Product group created successfully");

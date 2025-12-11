@@ -4,7 +4,7 @@ import type { CategoryModel } from "@/types/category";
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { Tag, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Tag, Eye, EyeOff, Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
 
@@ -39,6 +39,10 @@ import {
 
 const AddCategoryModal = dynamic(() => import("./add-category-modal"), { ssr: false });
 const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
+const EditCategoryModal = dynamic(
+  () => import("./edit-category-modal").then((m) => m.EditCategoryModal),
+  { ssr: false },
+);
 
 interface Props {
   initialCategories: CategoryModel[];
@@ -52,6 +56,7 @@ export function CategoriesTable({ initialCategories }: Props) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryModel | null>(null);
+  const [categoryToEdit, setCategoryToEdit] = useState<CategoryModel | null>(null);
 
   useEffect(() => {
     setCategories(initialCategories ?? []);
@@ -177,11 +182,9 @@ export function CategoriesTable({ initialCategories }: Props) {
                 <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
                   Status
                 </TableHead>
-                {isCustomMerchant && (
-                  <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                    Actions
-                  </TableHead>
-                )}
+                <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -288,41 +291,49 @@ export function CategoriesTable({ initialCategories }: Props) {
                     </TableCell>
 
                     {/* ACTIONS */}
-                    
-                      <TableCell>
-                        <div className="flex items-center gap-2 justify-end">
-                          <ReviewImagesModal
-                            categoryId={category.id}
-                            existing={(category.images ?? []).map((url, idx) => ({
-                              key: idx.toString(),
-                              url,
-                            }))}
-                            maxFiles={8}
-                            maxSizeMB={5}
-                            onChanged={(urls) => handleImagesChanged(category.id, urls)}
-                          />
-                          {isCustomMerchant && (
-                            <Button
-                              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => {
-                                setCategoryToDelete(category);
-                                setDeleteDialogOpen(true);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 justify-end">
+                        <Button
+                          className="h-9 px-3"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setCategoryToEdit(category)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                        <ReviewImagesModal
+                          categoryId={category.id}
+                          existing={(category.images ?? []).map((url, idx) => ({
+                            key: idx.toString(),
+                            url,
+                          }))}
+                          maxFiles={8}
+                          maxSizeMB={5}
+                          onChanged={(urls) => handleImagesChanged(category.id, urls)}
+                        />
+                        {isCustomMerchant && (
+                          <Button
+                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              setCategoryToDelete(category);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 );
               })}
 
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell className="text-center py-12" colSpan={isCustomMerchant ? 7 : 6}>
+                  <TableCell className="text-center py-12" colSpan={7}>
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                         <Tag className="h-8 w-8 text-slate-400" />
@@ -462,32 +473,43 @@ export function CategoriesTable({ initialCategories }: Props) {
                     </div>
                   </div>
 
-                  {isCustomMerchant && (
-                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex gap-2">
-                      <ReviewImagesModal
-                        categoryId={category.id}
-                        existing={(category.images ?? []).map((url, idx) => ({
-                          key: idx.toString(),
-                          url,
-                        }))}
-                        maxFiles={8}
-                        maxSizeMB={5}
-                        onChanged={(urls) => handleImagesChanged(category.id, urls)}
-                      />
-                      <Button
-                        className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          setCategoryToDelete(category);
-                          setDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Category
-                      </Button>
-                    </div>
-                  )}
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex gap-2">
+                    <Button
+                      className="flex-1 h-9 px-3"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setCategoryToEdit(category)}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    {isCustomMerchant && (
+                      <>
+                        <ReviewImagesModal
+                          categoryId={category.id}
+                          existing={(category.images ?? []).map((url, idx) => ({
+                            key: idx.toString(),
+                            url,
+                          }))}
+                          maxFiles={8}
+                          maxSizeMB={5}
+                          onChanged={(urls) => handleImagesChanged(category.id, urls)}
+                        />
+                        <Button
+                          className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            setCategoryToDelete(category);
+                            setDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Category
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -537,6 +559,18 @@ export function CategoriesTable({ initialCategories }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {categoryToEdit && (
+        <EditCategoryModal
+          categories={categories}
+          category={categoryToEdit}
+          open={Boolean(categoryToEdit)}
+          onCategoryUpdated={refreshCategories}
+          onOpenChange={(open) => {
+            if (!open) setCategoryToEdit(null);
+          }}
+        />
+      )}
     </Card>
   );
 }

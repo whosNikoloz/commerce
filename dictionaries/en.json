@@ -22,7 +22,10 @@
     "addToCart": "Add to Cart",
     "addToCartShort": "Add",
     "liquidation": "Liquidation",
-    "freeShipping": "Fast delivery across Georgia"
+    "freeShipping": "Fast delivery across Georgia",
+    "backToBrands": "Back to Brands",
+    "products": "Products",
+    "browseBrands": "Browse Other Brands"
   },
   "admin": {
     "dashboard": {
@@ -434,6 +437,28 @@
         "heading": "FAQs",
         "subtitle": "Manage frequently asked questions"
       }
+    },
+    "brands": {
+      "title": "Brands",
+      "description": "Explore all our brands and discover quality products",
+      "heading": "Explore Our Brands",
+      "subtitle": "Discover trusted brands and quality products from around the world"
+    },
+    "brand": {
+      "notFound": "Brand Not Found",
+      "productsFrom": "Products from",
+      "exploreProducts": "Explore our full range of products",
+      "noProducts": "No products available",
+      "checkBackLater": "Check back later for new products"
     }
+  },
+  "brands": {
+    "brandsCount": "Brands",
+    "searchPlaceholder": "Search brands...",
+    "noResults": "No brands found",
+    "tryDifferentSearch": "Try adjusting your search",
+    "noBrandsFound": "No brands found",
+    "brands": "brands",
+    "resultsFound": "brand(s) found"
   }
 }

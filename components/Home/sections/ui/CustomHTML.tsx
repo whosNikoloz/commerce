@@ -25,6 +25,7 @@ export default function CustomHTML({ data, locale: _locale }: CustomHTMLProps) {
         // Remove existing href="#" if present and add the category URL
         const cleanedBefore = before.replace(/href="[^"]*"/gi, '');
         const cleanedAfter = after.replace(/href="[^"]*"/gi, '');
+
         return `<a${cleanedBefore} href="/${_locale}/category/${categoryId}"${cleanedAfter}>`;
       }
     );
@@ -36,6 +37,7 @@ export default function CustomHTML({ data, locale: _locale }: CustomHTMLProps) {
         // Remove existing href="#" if present and add the page URL
         const cleanedBefore = before.replace(/href="[^"]*"/gi, '');
         const cleanedAfter = after.replace(/href="[^"]*"/gi, '');
+
         return `<a${cleanedBefore} href="/${_locale}/${pagePath}"${cleanedAfter}>`;
       }
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Search, Eye, Edit2, Package, Layers, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -11,8 +11,9 @@ import { CategoryModel } from "@/types/category";
 import { BrandModel } from "@/types/brand";
 import {
   ProductGroupModel,
+  deleteProductGroup,
   getAllProductGroups,
-} from "@/app/api/services/productService";
+} from "@/app/api/services/productGroupService";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -60,27 +61,30 @@ export function ProductGroupsTable({
   // Create modal
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
+  const getProductCount = (group: ProductGroupModel) =>
+    group.productCount ?? group.productIds?.length ?? 0;
+
+  const fetchGroups = useCallback(async () => {
+    setLoading(true);
+    try {
+      const groups = await getAllProductGroups(
+        selectedCategoryId || undefined,
+        selectedBrandId || undefined
+      );
+
+      setProductGroups(groups);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to fetch product groups:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategoryId, selectedBrandId]);
+
   // Fetch product groups based on filters
   useEffect(() => {
-    const fetchGroups = async () => {
-      setLoading(true);
-      try {
-        const groups = await getAllProductGroups(
-          selectedCategoryId || undefined,
-          selectedBrandId || undefined
-        );
-
-        setProductGroups(groups);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Failed to fetch product groups:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGroups();
-  }, [selectedCategoryId, selectedBrandId]);
+  }, [fetchGroups]);
 
   // Filter groups by search term
   const filteredGroups = useMemo(() => {
@@ -113,24 +117,22 @@ export function ProductGroupsTable({
   };
 
   const handleGroupUpdated = () => {
-    // Refresh the product groups list
-    const fetchGroups = async () => {
-      setLoading(true);
-      try {
-        const groups = await getAllProductGroups(
-          selectedCategoryId || undefined,
-          selectedBrandId || undefined
-        );
-
-        setProductGroups(groups);
-      } catch (error) {
-        console.error("Failed to fetch product groups:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGroups();
+  };
+
+  const handleDelete = async (group: ProductGroupModel) => {
+    const confirmed = window.confirm(`Delete product group "${group.name}"? This cannot be undone.`);
+
+    if (!confirmed) return;
+
+    try {
+      await deleteProductGroup(group.id);
+      await fetchGroups();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to delete product group:", error);
+      alert("Failed to delete product group");
+    }
   };
 
   return (
@@ -222,7 +224,7 @@ export function ProductGroupsTable({
                         className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 border border-blue-200 dark:border-blue-800"
                         variant="secondary"
                       >
-                        {getCategoryName(selectedCategoryId)}
+                        {getCategoryName(selectedCategoryId ?? undefined)}
                       </Badge>
                     )}
                     {selectedBrandId && (
@@ -230,7 +232,7 @@ export function ProductGroupsTable({
                         className="bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 border border-purple-200 dark:border-purple-800"
                         variant="secondary"
                       >
-                        {getBrandName(selectedBrandId)}
+                        {getBrandName(selectedBrandId ?? undefined)}
                       </Badge>
                     )}
                   </div>
@@ -289,7 +291,7 @@ export function ProductGroupsTable({
                                   className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
                                   variant="outline"
                                 >
-                                  {getCategoryName(group.categoryId)}
+                                  {getCategoryName(group.categoryId ?? undefined)}
                                 </Badge>
                               </TableCell>
                               <TableCell>
@@ -297,7 +299,7 @@ export function ProductGroupsTable({
                                   className="bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800"
                                   variant="outline"
                                 >
-                                  {getBrandName(group.brandId)}
+                                  {getBrandName(group.brandId ?? undefined)}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
@@ -305,7 +307,7 @@ export function ProductGroupsTable({
                                   className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
                                   variant="secondary"
                                 >
-                                  {group.productIds?.length || 0}
+                                  {getProductCount(group)}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-right">
@@ -327,6 +329,14 @@ export function ProductGroupsTable({
                                   >
                                     <Edit2 className="h-4 w-4 mr-1" />
                                     Edit
+                                  </Button>
+                                  <Button
+                                    className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDelete(group)}
+                                  >
+                                    Delete
                                   </Button>
                                 </div>
                               </TableCell>
@@ -357,7 +367,7 @@ export function ProductGroupsTable({
                                 className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
                                 variant="secondary"
                               >
-                                {group.productIds?.length || 0} products
+                                {getProductCount(group)} products
                               </Badge>
                             </div>
 
@@ -366,13 +376,13 @@ export function ProductGroupsTable({
                                 className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
                                 variant="outline"
                               >
-                                {getCategoryName(group.categoryId)}
+                                {getCategoryName(group.categoryId ?? undefined)}
                               </Badge>
                               <Badge
                                 className="bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800"
                                 variant="outline"
                               >
-                                {getBrandName(group.brandId)}
+                                {getBrandName(group.brandId ?? undefined)}
                               </Badge>
                             </div>
 
@@ -394,6 +404,14 @@ export function ProductGroupsTable({
                               >
                                 <Edit2 className="h-4 w-4 mr-1" />
                                 Edit
+                              </Button>
+                              <Button
+                                className="flex-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDelete(group)}
+                              >
+                                Delete
                               </Button>
                             </div>
                           </CardContent>

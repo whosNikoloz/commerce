@@ -60,12 +60,12 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
   //       const { headers: nextHeaders } = await import("next/headers");
   //       const h = await nextHeaders();
 
-  //       headers.set("X-Client-Domain", "new.toptools.ge");
+  //       headers.set("X-Client-Domain", "www.toptools.ge");
   //     } catch {
-  //       headers.set("X-Client-Domain", "unknown");
+  //       headers.set("X-Client-Domain", "www.toptools.ge");
   //     }
   //   } else {
-  //     headers.set("X-Client-Domain", "new.toptools.ge");
+  //     headers.set("X-Client-Domain", "www.toptools.ge");
   //   }
   // }
   if (!headers.has("X-Client-Domain")) {

@@ -33,7 +33,9 @@
       "Bash(for:*)",
       "Bash(do echo \"File: $file\")",
       "Bash(done)",
-      "Bash(del \"D:\\MyProjects\\nextjs\\commerce\\components\\Home\\sections\\ui\\ProductCardHoverExample.tsx\")"
+      "Bash(del \"D:\\MyProjects\\nextjs\\commerce\\components\\Home\\sections\\ui\\ProductCardHoverExample.tsx\")",
+      "Bash(git push:*)",
+      "Bash(vercel --version:*)"
     ],
     "deny": [],
     "ask": []

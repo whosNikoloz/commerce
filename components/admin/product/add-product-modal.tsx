@@ -6,7 +6,7 @@ import type { BrandModel } from "@/types/brand";
 import type { ProductFacetValueModel } from "@/types/facet";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import {
   Modal,
@@ -18,6 +18,8 @@ import {
 } from "@heroui/modal";
 import { Input, Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
+
+import { ProductGroupCategoryTree } from "../product-group/product-group-category-tree";
 
 import { FacetSelector } from "./facet-selector";
 
@@ -74,6 +76,7 @@ export default function AddProductModal({
 
   const [productGroups, setProductGroups] = useState<ProductGroupModel[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
 
   // Normalize product groups for HeroUI `items`
   const productGroupOptions = useMemo(
@@ -91,6 +94,7 @@ export default function AddProductModal({
     setFormData(initialFormState);
     setSelectedFacetValues([]);
     setProductGroups([]);
+    setCategorySearchTerm("");
   };
 
   const handleOpen = () => {
@@ -131,6 +135,19 @@ export default function AddProductModal({
 
     fetchGroups();
   }, [formData.categoryId, formData.brandId]);
+
+  const handleCategorySelect = (categoryId: string | null) => {
+    setFormData((prev) => ({
+      ...prev,
+      categoryId: categoryId ?? "",
+      productGroupId: "",
+    }));
+  };
+
+  const selectedCategoryName = useMemo(
+    () => categories.find((cat) => cat.id === formData.categoryId)?.name,
+    [categories, formData.categoryId]
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -366,105 +383,127 @@ export default function AddProductModal({
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <Select
-                      isRequired
-                      classNames={{
-                        trigger:
-                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
-                      }}
-                      label="Category"
-                      labelPlacement="outside"
-                      placeholder="Select category"
-                      selectedKeys={
-                        formData.categoryId ? [formData.categoryId] : []
-                      }
-                      variant="bordered"
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
+                    <div className="lg:col-span-3">
+                      <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 shadow-sm p-3 space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex flex-col min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                              Category Tree
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                              {selectedCategoryName
+                                ? `Selected: ${selectedCategoryName}`
+                                : "Pick a category to attach this product."}
+                            </p>
+                          </div>
+                          {formData.categoryId && (
+                            <Button
+                              className="text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleCategorySelect(null)}
+                            >
+                              Clear
+                            </Button>
+                          )}
+                        </div>
 
-                        setFormData((prev) => ({
-                          ...prev,
-                          categoryId: selected || "",
-                          productGroupId: "",
-                        }));
-                      }}
-                    >
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id}>{cat.name}</SelectItem>
-                      ))}
-                    </Select>
+                        <Input
+                          classNames={{
+                            inputWrapper:
+                              "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                          }}
+                          placeholder="Search categories..."
+                          startContent={<Search className="h-4 w-4 text-blue-500" />}
+                          value={categorySearchTerm}
+                          variant="bordered"
+                          onChange={(e) => setCategorySearchTerm(e.target.value)}
+                        />
 
-                    <Select
-                      isRequired
-                      classNames={{
-                        trigger:
-                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
-                      }}
-                      label="Brand"
-                      labelPlacement="outside"
-                      placeholder="Select brand"
-                      selectedKeys={
-                        formData.brandId ? [formData.brandId] : []
-                      }
-                      variant="bordered"
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
+                        <div className="h-64 rounded-lg border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900">
+                          <ProductGroupCategoryTree
+                            categories={categories}
+                            searchTerm={categorySearchTerm}
+                            selectedCategoryId={formData.categoryId || null}
+                            onSelectCategory={handleCategorySelect}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                        setFormData((prev) => ({
-                          ...prev,
-                          brandId: selected || "",
-                          productGroupId: "",
-                        }));
-                      }}
-                    >
-                      {brands.map((brand) => (
-                        <SelectItem key={brand.id}>{brand.name}</SelectItem>
-                      ))}
-                    </Select>
+                    <div className="lg:col-span-2 space-y-3">
+                      <Select
+                        isRequired
+                        classNames={{
+                          trigger:
+                            "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                        }}
+                        label="Brand"
+                        labelPlacement="outside"
+                        placeholder="Select brand"
+                        selectedKeys={
+                          formData.brandId ? [formData.brandId] : []
+                        }
+                        variant="bordered"
+                        onSelectionChange={(keys) => {
+                          const selected = Array.from(keys)[0] as string;
+
+                          setFormData((prev) => ({
+                            ...prev,
+                            brandId: selected || "",
+                            productGroupId: "",
+                          }));
+                        }}
+                      >
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id}>{brand.name}</SelectItem>
+                        ))}
+                      </Select>
+
+                      <Select
+                        classNames={{
+                          trigger:
+                            "rounded-lg border-slate-200 mt-5 dark:border-slate-700 bg-white dark:bg-slate-900",
+                        }}
+                        description={
+                          !formData.categoryId && !formData.brandId
+                            ? "Select a category or brand first to see available product groups."
+                            : "Optional - connect products that are variants of each other."
+                        }
+                        isDisabled={
+                          loadingGroups ||
+                          (!formData.categoryId && !formData.brandId)
+                        }
+                        items={productGroupOptions}
+                        label="Product Group (Variants)"
+                        labelPlacement="outside"
+                        placeholder={
+                          loadingGroups
+                            ? "Loading groups..."
+                            : "Select product group (optional)"
+                        }
+                        selectedKeys={
+                          formData.productGroupId
+                            ? [formData.productGroupId]
+                            : []
+                        }
+                        variant="bordered"
+                        onSelectionChange={(keys) => {
+                          const selected = Array.from(keys)[0] as string;
+
+                          setFormData((prev) => ({
+                            ...prev,
+                            productGroupId: selected || "none",
+                          }));
+                        }}
+                      >
+                        {(item) => (
+                          <SelectItem key={item.id}>{item.label}</SelectItem>
+                        )}
+                      </Select>
+                    </div>
                   </div>
-
-                  <Select
-                    classNames={{
-                      trigger:
-                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
-                    }}
-                    description={
-                      !formData.categoryId && !formData.brandId
-                        ? "Select a category or brand first to see available product groups."
-                        : "Optional – connect products that are variants of each other."
-                    }
-                    isDisabled={
-                      loadingGroups ||
-                      (!formData.categoryId && !formData.brandId)
-                    }
-                    items={productGroupOptions}
-                    label="Product Group (Variants)"
-                    labelPlacement="outside"
-                    placeholder={
-                      loadingGroups
-                        ? "Loading groups..."
-                        : "Select product group (optional)"
-                    }
-                    selectedKeys={
-                      formData.productGroupId
-                        ? [formData.productGroupId]
-                        : []
-                    }
-                    variant="bordered"
-                    onSelectionChange={(keys) => {
-                      const selected = Array.from(keys)[0] as string;
-
-                      setFormData((prev) => ({
-                        ...prev,
-                        productGroupId: selected || "none",
-                      }));
-                    }}
-                  >
-                    {(item) => (
-                      <SelectItem key={item.id}>{item.label}</SelectItem>
-                    )}
-                  </Select>
                 </section>
 
                 {/* Inventory */}

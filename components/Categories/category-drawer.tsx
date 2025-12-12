@@ -7,9 +7,11 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, ChevronRightIcon, ArrowLeftIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Button } from "@heroui/button";
 
 import { getAllCategories } from "@/app/api/services/categoryService";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type ChildrenMap = Record<string, CategoryModel[]>;
 
@@ -39,6 +41,8 @@ function buildTree(categories: CategoryModel[]) {
 }
 
 export default function CategoryDrawer() {
+  const dictionary = useDictionary();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,6 +55,7 @@ export default function CategoryDrawer() {
   const hasLoadedRef = useRef(false);
 
   const { childrenMap, roots } = useMemo(() => buildTree(categories), [categories]);
+  const localeCode = pathname.startsWith("/en") ? "en" : "ka";
 
   const openDrawer = () => {
     setIsOpen(true);
@@ -112,7 +117,7 @@ export default function CategoryDrawer() {
     const id = normalizeId(node.id);
     const kids = getChildren(id);
     const hasChildren = kids.length > 0;
-    const imageUrl = node.images && node.images.length > 0 ? node.images[0] : "/placeholder.svg";
+    const imageUrl = node.images && node.images.length > 0 ? node.images[0] : "/placeholder.png";
     const hasError = imageErrors.has(id);
 
     return (
@@ -122,7 +127,7 @@ export default function CategoryDrawer() {
         >
           <Link
             className="flex-1 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 min-w-0"
-            href={`/category/${id}`}
+            href={`/${localeCode}/category/${id}`}
             onClick={closeDrawer}
           >
             <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -131,18 +136,18 @@ export default function CategoryDrawer() {
                 alt={node.name || "Category"}
                 className="object-cover"
                 sizes="40px"
-                src={hasError ? "/placeholder.svg" : imageUrl}
+                src={hasError ? "/placeholder.png" : imageUrl}
                 onError={() => handleImageError(id)}
               />
             </div>
             <span className="font-primary text-sm md:text-base font-medium text-gray-800 dark:text-gray-100 truncate min-w-0">
-              {node.name ?? "Category"}
+              {node.name ?? dictionary.categories?.category ?? "Category"}
             </span>
           </Link>
 
           {hasChildren ? (
             <button
-              aria-label="View subcategories"
+              aria-label={dictionary.categories?.viewCategories ?? "View subcategories"}
               className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0"
               type="button"
               onClick={() => navigateToCategory(id)}
@@ -150,7 +155,7 @@ export default function CategoryDrawer() {
               <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-300" />
             </button>
           ) : (
-            <span className="font-primary px-1 sm:px-2 text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">—</span>
+            <></>
           )}
         </div>
       </li>
@@ -161,7 +166,7 @@ export default function CategoryDrawer() {
     <>
       <Button
         isIconOnly
-        aria-label="Open categories menu"
+        aria-label={dictionary.categories?.viewCategories ?? "Browse categories"}
         className="relative rounded-full bg-transparent h-6 w-6"
         variant="solid"
         onPress={openDrawer}
@@ -211,7 +216,7 @@ export default function CategoryDrawer() {
                     <Squares2X2Icon className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                   )}
                   <h2 className="font-heading text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white truncate min-w-0">
-                    {currentParent ? currentParent.name : "Categories"}
+                    {currentParent ? currentParent.name : (dictionary.categories?.category ?? "Categories")}
                   </h2>
                 </div>
                 <button
@@ -240,14 +245,16 @@ export default function CategoryDrawer() {
                   <div className="text-center py-10">
                     <p className="font-primary text-red-600 dark:text-red-400">{error}</p>
                     <Button className="mt-4" color="primary" variant="flat" onPress={loadCategories}>
-                      Try again
+                      {dictionary.common?.retry ?? "Try again"}
                     </Button>
                   </div>
                 )}
 
                 {!loading && !error && currentCategories.length === 0 && (
                   <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-                    {currentParent ? "No subcategories available." : "No categories available."}
+                    {currentParent
+                      ? dictionary.categories?.noSubcategories ?? "No subcategories available."
+                      : dictionary.categories?.noCategories ?? "No categories available."}
                   </div>
                 )}
 
@@ -263,7 +270,7 @@ export default function CategoryDrawer() {
               {/* Footer */}
               <div className="p-3 sm:p-5 border-t border-gray-200 dark:border-gray-700">
                 <Button fullWidth as={Link} color="primary" href="/category" onPress={closeDrawer}>
-                  View all categories
+                  {dictionary.categories?.allCategories ?? "View All Categories"}
                 </Button>
               </div>
             </Dialog.Panel>

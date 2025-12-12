@@ -50,8 +50,10 @@ export default function AdminPage() {
               ? next
               : `/${currentLang}/admin`;
 
-          router.replace(target);
-          router.refresh();
+          // Avoid pointless navigation refreshes when we're already on the target.
+          if (router && target !== window.location.pathname + window.location.search) {
+            router.replace(target);
+          }
         } else {
           onOpen(); // show login modal
         }

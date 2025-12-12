@@ -129,9 +129,9 @@ export default function CarouselRail({ products, columns: _columns = 4 }: Props)
             flickPower: 300,
             breakpoints: {
               2000: { perPage: perPageDesktop, gap: "0.75rem" },
-              1536: { perPage: 9, gap: "0.75rem" },
-              1280: { perPage: 7, gap: "0.75rem" },
-              1024: { perPage: 6, gap: "0.75rem" },
+              1536: { perPage: 6, gap: "0.75rem" },
+              1280: { perPage:5, gap: "0.75rem" },
+              1024: { perPage: 4, gap: "0.75rem" },
               768: { perPage: 4, gap: "0.5rem" },
               640: { perPage: 3, gap: "0.5rem" },
               480: { perPage: 2, gap: "0.5rem" },

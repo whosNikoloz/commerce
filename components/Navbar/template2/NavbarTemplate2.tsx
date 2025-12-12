@@ -274,7 +274,7 @@ export const NavbarTemplate2 = () => {
           )}
 
           <div className="flex flex-col items-center gap-1 min-w-[60px]">
-            <Cartlink />
+            <Cartlink showLabel={false}/>
           </div>
 
           <div className="flex flex-col items-center gap-1 min-w-[60px] group">

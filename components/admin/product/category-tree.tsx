@@ -130,6 +130,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
                         ? "hover:bg-blue-100 dark:hover:bg-blue-900/40"
                         : "hover:bg-slate-100 dark:hover:bg-slate-700",
                     ].join(" ")}
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleExpanded(cat.id);

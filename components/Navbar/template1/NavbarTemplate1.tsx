@@ -125,12 +125,11 @@ export const NavbarTemplate1 = () => {
                 <div className="flex items-center">
                   <Link className="flex items-center  group" href={`/${lng}`}>
                     <Image
-                      unoptimized
                       alt="Site Logo"
                       className=" select-none transition-transform duration-300 group-hover:scale-105 object-contain"
-                      height={70}
+                      height={60}
                       src={logoSrc}
-                      width={70}
+                      width={60}
                     />
                   </Link>
                 </div>
@@ -203,7 +202,7 @@ export const NavbarTemplate1 = () => {
           )}
 
           <div className="flex flex-col items-center flex-1 min-w-0">
-            <Cartlink showLabel={true} />
+            <Cartlink showLabel={false} />
           </div>
 
           <div className="flex flex-col items-center flex-1 min-w-0">

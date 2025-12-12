@@ -361,8 +361,8 @@ export function ProductCard({
               ) : (
                 <>
                   <ShoppingCart className={cn(iconDimension)} />
-                  <span className="font-primary hidden sm:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
-                  <span className="font-primary sm:hidden">{dic?.common?.addToCartShort || "Add"}</span>
+                  <span className="font-primary hidden 2xl:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
+                  <span className="font-primary 2xl:hidden">{dic?.common?.addToCartShort || "Add"}</span>
                 </>
               )}
             </Button>

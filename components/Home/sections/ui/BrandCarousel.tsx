@@ -121,7 +121,7 @@ export default function BrandCarousel({ data, locale, brands }: BrandCarouselPro
                           {imageUrl && !hasError ? (
                             <Image
                               fill
-                              alt={brand.name || "Brand"}
+                              alt=""
                               className="object-contain transition-transform duration-300 group-hover:scale-105"
                               sizes="(max-width: 640px) 220px, (max-width: 768px) 260px, (max-width: 1024px) 280px, 320px"
                               src={imageUrl}

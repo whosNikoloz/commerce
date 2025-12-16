@@ -22,6 +22,11 @@ const nextConfig = {
         pathname: "/**",
       },
       { protocol: "https", hostname: "placehold.co", pathname: "/**" },
+      {
+        protocol: "https",
+        hostname: "via.placeholder.com",
+        pathname: "/**",
+      },
     ],
     dangerouslyAllowSVG: true,
     formats: ["image/avif", "image/webp"],
@@ -34,6 +39,12 @@ const nextConfig = {
   compress: true,
   reactStrictMode: true,
   poweredByHeader: false,
+
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? {
+      exclude: ["error", "warn"],
+    } : false,
+  },
 
   experimental: {
     optimizePackageImports: [
@@ -107,6 +118,14 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
+          },
+          {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
@@ -120,15 +139,15 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://*.amazonaws.com https://picsum.photos https://placehold.co",
+              "img-src 'self' data: blob: https://*.amazonaws.com https://picsum.photos https://placehold.co https://via.placeholder.com https://maps.googleapis.com https://maps.gstatic.com",
               "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
               `connect-src ${connectSrcParts.join(" ")}`,
               "worker-src 'self' blob:",
               "frame-ancestors 'self'",
-              // ✅ აქ უკვე ნებადართულია Google Maps iframe
               "frame-src 'self' https://vercel.live https://www.google.com https://maps.google.com",
               "base-uri 'self'",
               "form-action 'self'",
+              "upgrade-insecure-requests",
             ].join("; "),
           },
         ],

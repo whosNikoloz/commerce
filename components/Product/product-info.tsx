@@ -99,14 +99,14 @@ export function ProductInfo({
   const isBuyingDisabled =
     stockLoading || !!stockError || !inStockByStatus || !hasPositiveQty;
 
-  // Status badge style
+  // Status badge style - Enhanced contrast
   const statusBadgeClass = stockLoading
-    ? "bg-slate-500 text-white"
+    ? "bg-slate-700 text-white font-semibold"
     : stockError
-      ? "bg-red-600 text-white"
+      ? "bg-red-700 text-white font-semibold"
       : !inStockByStatus
-        ? "bg-slate-600 text-white"
-        : "bg-emerald-600 text-white";
+        ? "bg-slate-700 text-white font-semibold"
+        : "bg-emerald-700 text-white font-semibold shadow-sm border border-emerald-800";
 
   return (
     <div className="space-y-5">
@@ -218,11 +218,12 @@ export function ProductInfo({
         )}
 
         {/* Actions — MOBILE */}
-        <div className="md:hidden mt-5 grid grid-cols-1 gap-2">
+        <div className="md:hidden mt-5 grid grid-cols-1 gap-3">
           <Button
             aria-disabled={isBuyingDisabled}
-            className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
             disabled={isBuyingDisabled}
+            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
             onClick={onAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
@@ -241,7 +242,7 @@ export function ProductInfo({
 
           <Button
             aria-disabled={isBuyingDisabled}
-            className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 justify-center rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
             disabled={isBuyingDisabled}
             onClick={onBuyNow}
           >
@@ -254,11 +255,12 @@ export function ProductInfo({
         </div>
 
         {/* Actions — DESKTOP */}
-        <div className="hidden md:grid mt-5 grid-cols-1 gap-2">
+        <div className="hidden md:grid mt-5 grid-cols-1 gap-3">
           <Button
             aria-disabled={isBuyingDisabled}
-            className="w-full h-11 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 justify-center gap-2 rounded-lg bg-brand-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
             disabled={isBuyingDisabled}
+            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
             onClick={onAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
@@ -277,7 +279,7 @@ export function ProductInfo({
 
           <Button
             aria-disabled={isBuyingDisabled}
-            className="w-full h-11 justify-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 justify-center rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
             disabled={isBuyingDisabled}
             onClick={onBuyNow}
           >

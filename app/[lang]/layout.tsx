@@ -177,43 +177,47 @@ export default async function RootLayout({
     ? `https://fonts.googleapis.com/css2?${fontNames.map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;500;600;700&`).join('')}display=swap`
     : null;
 
+  const fallbackDescription =
+    site.description ||
+    `${site.name} online store`;
+
   return (
-    <html suppressHydrationWarning lang={safeLang} style={style}>
+    <html suppressHydrationWarning data-scroll-behavior="smooth" lang={safeLang} style={style}>
       <head>
         <meta content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" name="viewport" />
         <meta content="IE=edge" httpEquiv="X-UA-Compatible" />
         <meta content={themeColor} name="theme-color" />
         <meta content={themeColor} name="msapplication-TileColor" />
+        <meta content={fallbackDescription} name="description" />
         <link href={site.favicon} rel="icon" sizes="any" />
         <link href={site.favicon} rel="apple-touch-icon" />
 
-        {/* Google Fonts preconnect */}
+        {/* Google Fonts - preconnect only, stylesheet loads async */}
         <link href="https://fonts.googleapis.com" rel="preconnect" />
         <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
 
         {/* Load tenant fonts from Google Fonts */}
         {googleFontsUrl && (
-          <link href={googleFontsUrl} rel="stylesheet" />
+          <>
+            <link rel="preload" href={googleFontsUrl} as="style" />
+            <link href={googleFontsUrl} rel="stylesheet" />
+            <noscript>
+              <link href={googleFontsUrl} rel="stylesheet" />
+            </noscript>
+          </>
         )}
 
-        {/* Resource hints for performance */}
-        <link href="https://cdnjs.cloudflare.com" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://cdnjs.cloudflare.com" rel="dns-prefetch" />
-
-        {/* Preconnect to image CDN sources */}
-        <link crossOrigin="anonymous" href="https://media.veli.store" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://extra.ge" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://ecommerce-outdoor.s3.eu-north-1.amazonaws.com" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://finasyncecomm.s3.eu-central-1.amazonaws.com" rel="dns-prefetch" />
-
-        {/* API preconnect for better performance */}
+        {/* Critical resource preconnect - limit to 4 per Lighthouse recommendation */}
+        <link crossOrigin="anonymous" href="https://finasyncecomm.s3.eu-central-1.amazonaws.com" rel="preconnect" />
         {process.env.NEXT_PUBLIC_API_URL && (
           <link crossOrigin="anonymous" href={new URL(process.env.NEXT_PUBLIC_API_URL).origin} rel="preconnect" />
         )}
 
-        {/* Preload critical images */}
-        <link as="image" href={site.logo} rel="preload" />
-        {site.ogImage && site.ogImage !== site.logo && <link as="image" href={site.ogImage} rel="preload" />}
+        {/* DNS prefetch for less critical resources */}
+        <link href="https://cdnjs.cloudflare.com" rel="dns-prefetch" />
+        <link href="https://media.veli.store" rel="dns-prefetch" />
+        <link href="https://extra.ge" rel="dns-prefetch" />
+        <link href="https://ecommerce-outdoor.s3.eu-north-1.amazonaws.com" rel="dns-prefetch" />
 
         <style
           dangerouslySetInnerHTML={{

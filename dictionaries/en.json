@@ -460,5 +460,24 @@
     "noBrandsFound": "No brands found",
     "brands": "brands",
     "resultsFound": "brand(s) found"
+  },
+  "footer": {
+    "information": "Information",
+    "delivery": "Delivery",
+    "faq": "FAQ",
+    "guarantee": "Guarantee",
+    "privacy": "Privacy Policy",
+    "returns": "Return Policy",
+    "stores": "Stores",
+    "terms": "Terms & Conditions",
+    "about": "About Us",
+    "help": "Help & Support",
+    "language": "Language",
+    "location": "Location",
+    "visitStores": "Visit Our Stores",
+    "address": "Address",
+    "hours": "Hours",
+    "contact": "Contact",
+    "cookiePolicy": "Cookie Policy"
   }
 }

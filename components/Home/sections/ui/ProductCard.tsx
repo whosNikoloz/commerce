@@ -96,8 +96,8 @@ export function ProductCard({
   const minTitleHeight = isCompact ? "min-h-[1.75rem]" : "min-h-[2.5rem]";
   const discountBadge = isCompact ? "text-[9px] px-1.5 py-[2px]" : "text-xs px-2.5 py-1";
   const imgSizes = isCompact
-    ? "(max-width:640px) 45vw, (max-width:1024px) 45vw, 45vw,"
-    : "(max-width:640px) 90vw, (max-width:1024px) 45vw,, 45vw,";
+    ? "(max-width:640px) 230px, (max-width:1024px) 230px, 230px"
+    : "(max-width:640px) 230px, (max-width:1024px) 230px, 230px";
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -248,8 +248,13 @@ export function ProductCard({
           {discountPercent > 0 && (
             <div className="absolute left-3 top-3 pointer-events-none z-20">
               <div
-                className={cn("rounded-full text-white font-bold shadow-lg", discountBadge)}
-                style={{ backgroundColor: themeColor }}
+                className={cn("rounded-full font-bold shadow-lg", discountBadge)}
+                style={{
+                  backgroundColor: themeColor,
+                  color: 'white',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,0.9)',
+                  border: '1px solid rgba(0,0,0,0.2)'
+                }}
               >
                 -{discountPercent}%
               </div>
@@ -361,8 +366,8 @@ export function ProductCard({
               ) : (
                 <>
                   <ShoppingCart className={cn(iconDimension)} />
-                  <span className="font-primary hidden 2xl:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
-                  <span className="font-primary 2xl:hidden">{dic?.common?.addToCartShort || "Add"}</span>
+                  <span className="font-primary hidden xl:inline">{dic?.common?.addToCart || "Add to Cart"}</span>
+                  <span className="font-primary xl:hidden">{dic?.common?.addToCartShort || "Add"}</span>
                 </>
               )}
             </Button>

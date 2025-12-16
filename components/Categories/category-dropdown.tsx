@@ -187,6 +187,8 @@ export default function CategoryDropdown() {
     <div className="">
       {/* Trigger Button */}
       <button
+        aria-expanded={isOpen}
+        aria-label={isOpen ? "Close categories menu" : "Open categories menu"}
         className={cn(
           "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm relative z-[10001]",
           isOpen
@@ -225,7 +227,9 @@ export default function CategoryDropdown() {
                   {/* Header row */}
                   <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 via-neutral-50/70 to-transparent dark:from-primary/10 dark:via-neutral-900/80">
                     <h2 className="font-heading text-base md:text-lg font-semibold" >{dictionary?.categories?.allCategories || "All Categories"}</h2>
-                    <button className="font-primary inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    <button
+                      aria-label="Close categories menu"
+                      className="font-primary inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                       onClick={() => setIsOpen(false)}
                     >
                       <X className="w-4 h-4" />
@@ -279,6 +283,8 @@ export default function CategoryDropdown() {
                                   return (
                                     <button
                                       key={cat.id}
+                                      aria-expanded={isActive}
+                                      aria-label={`${cat.name} - ${isActive ? 'Hide' : 'Show'} subcategories`}
                                       className={cn(
                                         "group flex items-stretch p-3 rounded-2xl transition-all border text-left",
                                         isActive

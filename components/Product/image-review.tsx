@@ -196,7 +196,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
                       fill
                       alt={`${productName} view ${index + 1}`}
                       className="object-contain p-4"
-                      loading={index === 0 ? undefined : "eager"}
+                      loading={index === 0 ? "eager" : "lazy"}
                       priority={index === 0}
                       sizes="(max-width: 768px) 100vw, 50vw"
                       src={image || placeholder}
@@ -211,7 +211,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
           {/* Navigation buttons */}
           <button
             aria-label="Previous image"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full p-2 shadow-lg z-20 transition-all"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full shadow-lg z-20 transition-all h-12 w-12 flex items-center justify-center"
             onClick={(e) => {
               e.stopPropagation();
               prevImage();
@@ -221,7 +221,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
           </button>
           <button
             aria-label="Next image"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full p-2 shadow-lg z-20 transition-all"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full shadow-lg z-20 transition-all h-12 w-12 flex items-center justify-center"
             onClick={(e) => {
               e.stopPropagation();
               nextImage();
@@ -275,6 +275,8 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
                     fill
                     alt={`Product view ${index + 1}`}
                     className="object-cover"
+                    loading="lazy"
+                    sizes="96px"
                     src={image || placeholder}
                   />
                 </div>
@@ -300,7 +302,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
                       fill
                       alt={`${productName} view ${index + 1}`}
                       className="object-contain"
-                      loading={index === 0 ? undefined : "eager"}
+                      loading={index === 0 ? "eager" : "lazy"}
                       priority={index === 0}
                       sizes="(min-width: 1024px) 600px, 100vw"
                       src={image || placeholder}
@@ -326,7 +328,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
 
           <button
             aria-label="Previous image"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white z-20"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full shadow-md hover:bg-white z-20 h-12 w-12 flex items-center justify-center"
             onClick={(e) => {
               e.stopPropagation();
               prevImage();
@@ -336,7 +338,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
           </button>
           <button
             aria-label="Next image"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full p-2 shadow-md hover:bg-white text-white hover:text-black  z-20"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 rounded-full shadow-md hover:bg-white text-white hover:text-black  z-20 h-12 w-12 flex items-center justify-center"
             onClick={(e) => {
               e.stopPropagation();
               nextImage();

@@ -135,9 +135,9 @@ export default async function ProductRail({
           <CarouselRail columns={columns} products={products || []} />
         ) : (
           <div className={gridClass}>
-            {products?.map((product) => (
+            {products?.map((product, index) => (
               <div key={product.id} className="h-full">
-                <ProductCard product={product} showActions={true} size="compact" />
+                <ProductCard priority={index < 4} product={product} showActions={true} size="compact" />
               </div>
             ))}
           </div>

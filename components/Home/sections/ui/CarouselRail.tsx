@@ -74,9 +74,9 @@ export default function CarouselRail({ products, columns: _columns = 4 }: Props)
   if (products.length <= perPageDesktop) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-        {products.map((p) => (
+        {products.map((p, index) => (
           <div key={p.id} className="h-full">
-            <ProductCard product={p} showActions={true} size="compact" />
+            <ProductCard priority={index < 4} product={p} showActions={true} size="compact" />
           </div>
         ))}
       </div>
@@ -140,9 +140,9 @@ export default function CarouselRail({ products, columns: _columns = 4 }: Props)
 
           }}
         >
-          {products.map((p) => (
+          {products.map((p, index) => (
             <SplideSlide key={p.id}>
-              <ProductCard product={p} showActions={true} size="compact" />
+              <ProductCard priority={index < 6} product={p} showActions={true} size="compact" />
             </SplideSlide>
           ))}
         </Splide>

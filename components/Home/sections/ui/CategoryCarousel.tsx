@@ -139,7 +139,9 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
           {/* Fixed "All Categories" Card */}
           {data.showAllCard && (
             <div className="flex-shrink-0">
-              <button className="font-primary block"
+              <button
+                aria-label={t(data.allCardText || { ka: "ყველა კატეგორია", en: "View all categories" }, locale)}
+                className="font-primary block"
                 type="button"
                 onClick={handleAllCategoriesClick}
               >
@@ -173,7 +175,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                             {/* Image */}
                             <Image
                               fill
-                              alt={category.name || "Category"}
+                              alt=""
                               className="object-contain transition-transform duration-300 group-hover:scale-105"
                               sizes="(max-width: 640px) 128px, (max-width: 768px) 160px, (max-width: 1024px) 192px, 224px"
                               src={hasError ? "/placeholder.svg" : imageUrl}
@@ -199,7 +201,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
       </div>
 
       {/* Hidden category triggers - conditionally render based on screen size */}
-      <div ref={categoryContainerRef} aria-hidden="true" className="sr-only">
+      <div ref={categoryContainerRef} className="sr-only">
         {isMobile ? (
           // Mobile: render CategoryDrawer
           <CategoryDrawer />

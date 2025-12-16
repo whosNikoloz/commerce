@@ -231,7 +231,6 @@ export default function SearchForMobile({
           <SearchIcon className="text-gray-500" />
           <Input
             readOnly
-            aria-controls="search-results"
             aria-label="Search products"
             className="w-full pl-2 py-3 bg-transparent text-[16px]  rounded-full text-foreground
                 focus:outline-none
@@ -281,12 +280,12 @@ export default function SearchForMobile({
                   <SearchIcon className="text-gray-400 dark:text-gray-500 w-5 h-5 flex-shrink-0" />
                   <Input
                     ref={inputRef}
-                    aria-controls="search-results"
                     aria-label="Search products"
                     autoComplete="off"
                     className="w-full bg-transparent border-none focus:outline-none text-gray-900 dark:text-gray-100 text-[16px] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                     id="search-input"
                     placeholder={dictionary.search.placeholder}
+                    role="searchbox"
                     type="search"
                     value={searchQuery}
                     onChange={handleSearchChange}

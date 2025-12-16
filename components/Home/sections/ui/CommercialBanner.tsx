@@ -31,6 +31,7 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
 
   return (
     <Link
+      aria-label={t(banner.alt, locale)}
       className={`group relative block overflow-hidden rounded-2xl  transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
       href={`/${locale}${banner.href}`}
     >

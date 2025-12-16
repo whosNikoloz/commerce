@@ -167,13 +167,14 @@ const Search = ({
       <div className="flex items-center gap-1 bg-muted/50 rounded-full shadow-md border  cursor-pointer w-full mx-auto p-0 px-4 transition focus-within:border-blue-500 focus-within:ring focus-within:ring-blue-300">
         <SearchIcon className="text-gray-500" />
         <Input
-          aria-controls="search-results"
+          aria-expanded={isOpen}
           aria-label="Search products"
           autoComplete="off"
           className="w-full pl-2 py-3 bg-transparent rounded-full text-foreground placeholder-muted-foreground transition-all
                     outline-none focus:outline-none ring-0 focus:ring-0 focus:border-transparent"
           id="search-input"
           placeholder={dictionary.search.placeholder}
+          role="combobox"
           type="search"
           value={searchQuery}
           onBlur={handleSearchBlur}

@@ -140,12 +140,12 @@ export default function Footer() {
     terms: dictionary?.footer?.terms || "Terms & Conditions",
     about: dictionary?.footer?.about || "About Us",
     help: dictionary?.footer?.help || "Help & Support",
-    language: dictionary?.common?.language || "Language",
-    location: dictionary?.common?.location || "Location",
+    language: dictionary?.footer?.language || "Language",
+    location: dictionary?.footer?.location || "Location",
     visitStores: dictionary?.footer?.visitStores || "Visit Our Stores",
-    address: dictionary?.common?.address || "Address",
-    hours: dictionary?.common?.hours || "Hours",
-    contact: dictionary?.common?.contact || "Contact",
+    address: dictionary?.footer?.address || "Address",
+    hours: dictionary?.footer?.hours || "Hours",
+    contact: dictionary?.footer?.contact || "Contact",
     cookiePolicy: currentLocale === "ka" ? "Cookie პოლიტიკა" : "Cookie Policy",
   }
 

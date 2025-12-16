@@ -7,6 +7,7 @@ import { CheckCircle } from 'lucide-react';
 
 import { useGA4 } from '@/hooks/useGA4';
 import { useCartStore } from '@/app/context/cartContext';
+import { useDictionary } from '@/app/context/dictionary-provider';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -17,6 +18,9 @@ function PaymentSuccessContent() {
   const clearCart = useCartStore((s) => s.clearCart);
   const [orderInfo, setOrderInfo] = useState<{ orderId: string; paymentId?: string } | null>(null);
   const [purchaseTracked, setPurchaseTracked] = useState(false);
+
+  /* Hook */
+  const { dictionary } = useDictionary();
 
   useEffect(() => {
     const paymentId = searchParams.get('paymentId');
@@ -73,23 +77,23 @@ function PaymentSuccessContent() {
           </div>
 
           {/* Success Message */}
-          <h1 className="font-heading mb-2 text-3xl font-bold text-gray-900">Payment Successful!</h1>
+          <h1 className="font-heading mb-2 text-3xl font-bold text-gray-900">{dictionary.checkout.success.title}</h1>
           <p className="font-primary mb-6 text-gray-600">
-            Thank you for your purchase. Your order has been confirmed.
+            {dictionary.checkout.success.message}
           </p>
 
           {/* Order Information */}
           {orderInfo && (
             <div className="mb-6 rounded-lg bg-gray-50 p-4 text-left">
-              <h2 className="font-heading mb-2 text-sm font-semibold text-gray-700">Order Details</h2>
+              <h2 className="font-heading mb-2 text-sm font-semibold text-gray-700">{dictionary.checkout.success.orderDetails}</h2>
               <div className="space-y-1 text-sm text-gray-600">
                 <div className="flex justify-between">
-                  <span>Order ID:</span>
+                  <span>{dictionary.checkout.success.orderId}</span>
                   <span className="font-primary font-mono font-medium">{orderInfo.orderId}</span>
                 </div>
                 {orderInfo.paymentId && (
                   <div className="flex justify-between">
-                    <span>Payment ID:</span>
+                    <span>{dictionary.checkout.success.paymentId}</span>
                     <span className="font-primary font-mono font-medium">{orderInfo.paymentId}</span>
                   </div>
                 )}
@@ -100,7 +104,7 @@ function PaymentSuccessContent() {
           {/* Confirmation Email Notice */}
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
             <p className="font-primary text-sm text-blue-800">
-              📧 A confirmation email will be sent to your email address shortly.
+              {dictionary.checkout.success.emailConfirmation}
             </p>
           </div>
 
@@ -110,13 +114,13 @@ function PaymentSuccessContent() {
               className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
               href="/"
             >
-              Continue Shopping
+              {dictionary.checkout.success.continueShopping}
             </Link>
             <Link
               className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
               href="/orders"
             >
-              View My Orders
+              {dictionary.checkout.success.viewOrders}
             </Link>
           </div>
         </div>

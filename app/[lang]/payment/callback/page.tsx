@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useTBCPayment } from '@/hooks/payment/useTBCPayment';
 import { useBOGPayment } from '@/hooks/payment/useBOGPayment';
 import { usePaymentHub } from '@/hooks/payment/usePaymentHub';
+import { useDictionary } from '@/app/context/dictionary-provider';
 
 function PaymentCallbackContent() {
   const searchParams = useSearchParams();
@@ -18,15 +19,18 @@ function PaymentCallbackContent() {
   const { getPaymentStatus: getBOGStatus, loading: bogLoading } = useBOGPayment();
   const { status: hubStatus } = usePaymentHub(paymentId, provider === 'tbc');
 
+  // Get dictionary
+  const { dictionary } = useDictionary();
+
   const loading = tbcLoading || bogLoading;
 
   const [status, setStatus] = useState<'checking' | 'success' | 'failed' | 'pending'>('checking');
-  const [message, setMessage] = useState('Processing your payment...');
+  const [message, setMessage] = useState(dictionary.checkout.processing.description);
 
   useEffect(() => {
     if (!paymentId && !orderId) {
       setStatus('failed');
-      setMessage('Payment ID or Order ID not found');
+      setMessage(dictionary.checkout.errors.invalidProvider); // Or generic error
 
       return;
     }
@@ -42,19 +46,19 @@ function PaymentCallbackContent() {
 
           if (statusUpper === 'SUCCEEDED') {
             setStatus('success');
-            setMessage('Payment completed successfully!');
+            setMessage(dictionary.checkout.processing.successMessage);
             setTimeout(() => {
               router.push('/checkout/success?paymentId=' + paymentId);
             }, 2000);
           } else if (statusUpper === 'FAILED' || statusUpper === 'CANCELED' || statusUpper === 'CANCELLED') {
             setStatus('failed');
-            setMessage('Payment failed or was cancelled');
+            setMessage(dictionary.checkout.processing.failed);
             setTimeout(() => {
               router.push('/checkout/failed?reason=' + encodeURIComponent(statusUpper));
             }, 2000);
           } else {
             setStatus('pending');
-            setMessage('Payment is being processed...');
+            setMessage(dictionary.checkout.processing.description);
             if (!hubStatus) {
               setTimeout(() => checkPayment(), 3000);
             }
@@ -65,32 +69,32 @@ function PaymentCallbackContent() {
 
           if (statusUpper === 'COMPLETED' || statusUpper === 'APPROVED') {
             setStatus('success');
-            setMessage('Payment completed successfully!');
+            setMessage(dictionary.checkout.processing.successMessage);
             setTimeout(() => {
               router.push('/checkout/success?orderId=' + orderId);
             }, 2000);
           } else if (statusUpper === 'FAILED' || statusUpper === 'CANCELLED' || statusUpper === 'DECLINED') {
             setStatus('failed');
-            setMessage('Payment failed or was cancelled');
+            setMessage(dictionary.checkout.processing.failed);
             setTimeout(() => {
               router.push('/checkout/failed?reason=' + encodeURIComponent(statusUpper));
             }, 2000);
           } else {
             setStatus('pending');
-            setMessage('Payment is being processed...');
+            setMessage(dictionary.checkout.processing.description);
             setTimeout(() => checkPayment(), 3000);
           }
         } else {
           setStatus('failed');
-          setMessage('Invalid payment provider or missing payment information');
+          setMessage(dictionary.checkout.errors.invalidProvider);
           setTimeout(() => {
             router.push('/checkout/failed?reason=Invalid+payment+information');
           }, 2000);
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_error) {
         setStatus('failed');
-        setMessage('Error checking payment status');
+        setMessage(dictionary.checkout.processing.errorChecking);
         setTimeout(() => {
           router.push('/checkout/failed?reason=Error+checking+payment');
         }, 2000);
@@ -98,7 +102,7 @@ function PaymentCallbackContent() {
     };
 
     checkPayment();
-  }, [searchParams, getTBCStatus, getBOGStatus, router, paymentId, orderId, provider, hubStatus]);
+  }, [searchParams, getTBCStatus, getBOGStatus, router, paymentId, orderId, provider, hubStatus, dictionary]);
 
   // Handle real-time updates from SignalR
   useEffect(() => {
@@ -107,20 +111,20 @@ function PaymentCallbackContent() {
 
       if (statusUpper === 'SUCCEEDED') {
         setStatus('success');
-        setMessage(hubStatus.message || 'Payment completed successfully!');
+        setMessage(hubStatus.message || dictionary.checkout.processing.successMessage);
 
         setTimeout(() => {
           router.push('/checkout/success?paymentId=' + paymentId);
         }, 2000);
       } else if (statusUpper === 'FAILED' || statusUpper === 'CANCELED' || statusUpper === 'CANCELLED') {
         setStatus('failed');
-        setMessage(hubStatus.message || 'Payment failed or was cancelled');
+        setMessage(hubStatus.message || dictionary.checkout.processing.failed);
       } else {
         setStatus('pending');
-        setMessage(hubStatus.message || 'Payment is being processed...');
+        setMessage(hubStatus.message || dictionary.checkout.processing.description);
       }
     }
-  }, [hubStatus, router, paymentId]);
+  }, [hubStatus, router, paymentId, dictionary]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
@@ -129,7 +133,7 @@ function PaymentCallbackContent() {
           {loading || status === 'checking' || status === 'pending' ? (
             <>
               <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-gray-800">Processing Payment</h2>
+              <h2 className="font-heading mb-2 text-2xl font-semibold text-gray-800">{dictionary.checkout.processing.title}</h2>
               <p className="font-primary text-gray-600">{message}</p>
             </>
           ) : status === 'success' ? (
@@ -139,9 +143,9 @@ function PaymentCallbackContent() {
                   <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
                 </svg>
               </div>
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-green-800">Payment Successful!</h2>
+              <h2 className="font-heading mb-2 text-2xl font-semibold text-green-800">{dictionary.checkout.processing.success}</h2>
               <p className="font-primary text-gray-600">{message}</p>
-              <p className="font-primary mt-2 text-sm text-gray-500">Redirecting to confirmation page...</p>
+              <p className="font-primary mt-2 text-sm text-gray-500">{dictionary.checkout.processing.redirecting}</p>
             </>
           ) : (
             <>
@@ -150,12 +154,12 @@ function PaymentCallbackContent() {
                   <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
                 </svg>
               </div>
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-red-800">Payment Failed</h2>
+              <h2 className="font-heading mb-2 text-2xl font-semibold text-red-800">{dictionary.checkout.processing.failed}</h2>
               <p className="font-primary text-gray-600">{message}</p>
               <button className="font-primary mt-6 rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                 onClick={() => router.push('/checkout')}
               >
-                Try Again
+                {dictionary.checkout.processing.tryAgain}
               </button>
             </>
           )}

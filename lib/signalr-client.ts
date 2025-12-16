@@ -28,7 +28,7 @@ export class PaymentHubClient {
       // eslint-disable-next-line no-console
       console.log('SignalR Connected');
 
-      await this.connection.invoke('JoinPaymentGroup', this.paymentId);
+      await this.connection.invoke('SendTransactionStatusUpdate', this.paymentId);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('SignalR Connection Error:', err);

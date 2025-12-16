@@ -4,11 +4,13 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { XCircle, RefreshCw } from 'lucide-react';
+import { useDictionary } from '@/app/context/dictionary-provider';
 
 function PaymentFailedContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [paymentInfo, setPaymentInfo] = useState<{ reason?: string } | null>(null);
+  const { dictionary } = useDictionary();
 
   useEffect(() => {
     const reason = searchParams.get('reason');
@@ -33,37 +35,37 @@ function PaymentFailedContent() {
           </div>
 
           <h1 className="font-heading mb-2 text-center text-2xl font-bold text-gray-900">
-            Payment Failed
+            {dictionary.checkout.failed.title}
           </h1>
 
           {paymentInfo?.reason && (
             <div className="mb-6 rounded-lg bg-red-50 p-4">
               <p className="font-primary text-sm text-red-800">
-                <strong>Reason:</strong> {paymentInfo.reason}
+                <strong>{dictionary.checkout.failed.reason}</strong> {paymentInfo.reason}
               </p>
             </div>
           )}
 
           <div className="mb-6">
             <p className="font-primary mb-4 text-center text-gray-600">
-              We couldn&apos;t process your payment. This could be due to:
+              {dictionary.checkout.failed.message}
             </p>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start">
                 <span className="font-primary mr-2">•</span>
-                <span>Insufficient funds</span>
+                <span>{dictionary.checkout.failed.reasons.funds}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-primary mr-2">•</span>
-                <span>Card declined by bank</span>
+                <span>{dictionary.checkout.failed.reasons.declined}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-primary mr-2">•</span>
-                <span>Incorrect card details</span>
+                <span>{dictionary.checkout.failed.reasons.details}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-primary mr-2">•</span>
-                <span>Payment cancelled</span>
+                <span>{dictionary.checkout.failed.reasons.cancelled}</span>
               </li>
             </ul>
           </div>
@@ -73,23 +75,23 @@ function PaymentFailedContent() {
               onClick={handleRetry}
             >
               <RefreshCw className="h-5 w-5" />
-              Try Again
+              {dictionary.checkout.failed.tryAgain}
             </button>
 
             <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50"
               href="/cart"
             >
-              Back to Cart
+              {dictionary.checkout.failed.backToCart}
             </Link>
 
             <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50"
               href="/"
             >
-              Continue Shopping
+              {dictionary.checkout.success.continueShopping}
             </Link>
 
             <Link className="block w-full text-center text-sm text-blue-600 hover:underline" href="mailto:support@example.com">
-              Contact Support
+              {dictionary.checkout.failed.contactSupport}
             </Link>
           </div>
         </div>

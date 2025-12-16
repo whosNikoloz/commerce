@@ -21,21 +21,20 @@ export async function POST(request: NextRequest) {
 
     const backendUrl = process.env.BACKEND_API_URL || "https://localhost:7043";
 
-    const paymentRequest = {
-      userId,
-      amount: amount,
+    const origin = request.nextUrl.origin;
+    const queryParams = new URLSearchParams({
+      orderId,
+      amount: amount.toString(),
       currency,
-      returnUrl: returnUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/callback?provider=tbc`,
-      extraInfo,
-      language,
-      //merchantPaymentId: orderId,
-    };
+      returnUrl: returnUrl || `${origin}/payment/callback?provider=tbc`,
+      extraInfo: extraInfo || "",
+      lang: language,
+    });
 
     const response = await apiFetch<{ paymentId: string; redirectUrl: string }>(
-      `${backendUrl}/TBCPayment/create`,
+      `${backendUrl}/TBCPayment/create?${queryParams.toString()}`,
       {
         method: "POST",
-        body: JSON.stringify(paymentRequest),
       }
     );
 

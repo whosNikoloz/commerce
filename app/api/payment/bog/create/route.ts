@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
       description: item.name || "Item",
     }));
 
+    const origin = request.nextUrl.origin;
+
     const paymentRequest = {
       userId,
       intent: "CAPTURE",
@@ -45,8 +47,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       shop_order_id: orderId,
-      redirect_url: returnUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/callback?provider=bog`,
-      callback_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/bog/callback`,
+      redirect_url: returnUrl || `${origin}/payment/callback?provider=bog`,
+      callback_url: `${origin}/api/payment/bog/callback`,
       locale,
       show_shop_order_id_on_extract: true,
     };

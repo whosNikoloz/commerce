@@ -174,7 +174,53 @@
       "invalidProvider": "Invalid payment provider selected",
       "redirectUrlMissing": "Failed to get payment URL",
       "paymentFailed": "Payment processing failed"
-    }
+    },
+    "processing": {
+      "title": "Processing Payment",
+      "description": "Please wait while we verify your payment.",
+      "success": "Payment Successful!",
+      "successMessage": "Payment completed successfully!",
+      "redirecting": "Redirecting to confirmation page...",
+      "failed": "Payment Failed",
+      "errorChecking": "Error checking payment status",
+      "tryAgain": "Try Again"
+    },
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Thank you for your purchase. Your order has been confirmed.",
+      "orderDetails": "Order Details",
+      "orderId": "Order ID:",
+      "paymentId": "Payment ID:",
+      "emailConfirmation": "📧 A confirmation email will be sent to your email address shortly.",
+      "continueShopping": "Continue Shopping",
+      "viewOrders": "View My Orders"
+    },
+    "failed": {
+      "title": "Payment Failed",
+      "reason": "Reason:",
+      "message": "We couldn't process your payment. This could be due to:",
+      "reasons": {
+        "funds": "Insufficient funds",
+        "declined": "Card declined by bank",
+        "details": "Incorrect card details",
+        "cancelled": "Payment cancelled"
+      },
+      "tryAgain": "Try Again",
+      "backToCart": "Back to Cart",
+      "contactSupport": "Contact Support"
+    },
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "free": "Free",
+    "freeShippingOver": "Free shipping on orders over {amount}",
+    "returnPolicy": "Easy 30-day returns",
+    "secureEncryption": "Secure 256-bit SSL encryption",
+    "reviewAndPay": "Review & Pay",
+    "termsAgreement": "By placing this order, you agree to our Terms of Service and Privacy Policy.",
+    "orderSummary": "Order Summary",
+    "processingLabel": "Processing..."
   },
   "category": {
     "meta": {

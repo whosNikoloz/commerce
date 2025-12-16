@@ -114,14 +114,13 @@ export default function OrderSummary({
             <span>{dictionary.checkout.returnPolicy}</span>
           </div>
         </div>
-
         <Button
           className="w-full bg-brand-primary text-white"
           disabled={isProcessing}
           size="lg"
           onClick={onSubmit}
         >
-          {isProcessing ? dictionary.checkout.processing : (submitButtonLabel ?? dictionary.checkout.reviewAndPay)}
+          {isProcessing ? dictionary.checkout.processingLabel : (submitButtonLabel ?? dictionary.checkout.reviewAndPay)}
         </Button>
 
         <p className="font-primary text-xs text-text-subtle dark:text-text-subtledark text-center">

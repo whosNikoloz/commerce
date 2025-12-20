@@ -115,34 +115,26 @@ export default function BrandCarousel({ data, locale, brands }: BrandCarouselPro
 
                 return (
                   <li key={brand.id} className="splide__slide">
-                    <Link className="group block h-full" href={`/${locale}/brand/${brand.id}`}>
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="relative flex h-32 w-full items-center justify-center rounded-xl border border-border bg-card/80 px-6 py-4 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/10 sm:h-36 md:h-40">
-                          {imageUrl && !hasError ? (
-                            <Image
-                              fill
-                              alt=""
-                              className="object-contain transition-transform duration-300 group-hover:scale-105"
-                              sizes="(max-width: 640px) 220px, (max-width: 768px) 260px, (max-width: 1024px) 280px, 320px"
-                              src={imageUrl}
-                              onError={() => handleImageError(brand.id)}
-                            />
-                          ) : (
-                            <span className="font-heading text-base md:text-lg font-semibold text-muted-foreground">
-                              {brand.name || "Brand"}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-center">
-                          <p className="font-heading text-sm md:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <Link
+                      className="group block h-full"
+                      href={`/${locale}/brand/${brand.id}`}
+                      aria-label={brand.name || "Brand"}
+                    >
+                      <div className="relative flex h-24 w-full items-center justify-center px-6 py-4 sm:h-28 md:h-32">
+                        {imageUrl && !hasError ? (
+                          <Image
+                            fill
+                            alt={brand.name || "Brand"}
+                            className="object-contain opacity-70 transition-opacity duration-200 hover:opacity-100"
+                            sizes="(max-width: 640px) 180px, (max-width: 768px) 220px, (max-width: 1024px) 240px, 280px"
+                            src={imageUrl}
+                            onError={() => handleImageError(brand.id)}
+                          />
+                        ) : (
+                          <span className="font-heading text-sm md:text-base font-semibold text-muted-foreground">
                             {brand.name || "Brand"}
-                          </p>
-                          {brand.origin && (
-                            <p className="font-primary text-xs text-muted-foreground mt-0.5">
-                              {brand.origin}
-                            </p>
-                          )}
-                        </div>
+                          </span>
+                        )}
                       </div>
                     </Link>
                   </li>

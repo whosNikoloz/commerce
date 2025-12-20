@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { createPortal } from "react-dom";
 import { ArrowUp } from "lucide-react";
 import clsx from "clsx";
 
@@ -21,6 +22,7 @@ export default function BackToTopShadcn({
   ariaLabel = "Back to top",
 }: Props) {
   const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const ticking = useRef(false);
   const prefersReducedMotion = useRef(false);
   const pathname = usePathname();
@@ -29,6 +31,7 @@ export default function BackToTopShadcn({
   const isProductPage = pathname?.includes("/product/");
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== "undefined" && "matchMedia" in window) {
       prefersReducedMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     }
@@ -57,10 +60,10 @@ export default function BackToTopShadcn({
 
   // Adjust position on product pages to avoid overlapping with product footer
   const positionClass = isProductPage
-    ? "bottom-28 right-4 md:bottom-8 md:right-8"
+    ? "bottom-28 left-4 md:bottom-8 md:left-8"
     : offsetClass;
 
-  return (
+  const button = (
     <Button
       aria-label={ariaLabel}
       className={clsx(
@@ -82,4 +85,9 @@ export default function BackToTopShadcn({
       <ArrowUp className="h-5 w-5 md:h-6 md:w-6" />
     </Button>
   );
+
+  // Use portal to render directly to body, bypassing any CSS transforms
+  if (!mounted) return null;
+
+  return createPortal(button, document.body);
 }

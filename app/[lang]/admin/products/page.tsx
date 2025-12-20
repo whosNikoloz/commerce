@@ -36,7 +36,7 @@ export default async function ProductsPage(
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="font-heading text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-slate-100 dark:via-blue-100 dark:to-indigo-100 bg-clip-text text-transparent">
+        <h1 className="font-heading text-4xl h-14 md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-slate-100 dark:via-blue-100 dark:to-indigo-100 bg-clip-text text-transparent">
           {dict.pages.admin.products.heading}
         </h1>
         <p className="font-primary text-slate-600 dark:text-slate-400 text-lg font-medium">

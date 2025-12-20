@@ -112,6 +112,7 @@ export type BrandCarouselData = {
   title?: LocalizedText;
   subtitle?: LocalizedText;
   showHeader?: boolean;
+  brandIds?: string[]; // Selected brand IDs to display
   slidesPerView?: number; // Number of slides visible at once
   showArrows?: boolean;
   showPagination?: boolean;
@@ -475,6 +476,8 @@ export type UIConfig = {
   cartVariant?: CartVariant;
   enableFlyToCart?: boolean;
   enableSmoothScrolling?: boolean;
+  enableSnowfall?: boolean;
+  enableSantaHat?: boolean;
 };
 
 

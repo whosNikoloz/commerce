@@ -19,6 +19,7 @@ import { CookieConsentProvider } from "../context/cookieConsentContext";
 import CookieBanner from "@/components/CookieConsent/CookieBanner";
 import ManagePreferencesModal from "@/components/CookieConsent/ManagePreferencesModal";
 import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
+import Snowfall from "@/components/Effects/Snowfall";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -71,6 +72,7 @@ export function Providers({ children, themeProps, initialTenant, dictionary, seo
                 zIndex={1600}
               />
               <DictionaryProvider dictionary={dictionary}>
+                {/* Holiday Banner */}
                 <CartUIProvider>
                   {children}
                 </CartUIProvider>
@@ -78,9 +80,11 @@ export function Providers({ children, themeProps, initialTenant, dictionary, seo
                 {/* Analytics Scripts - Respects Cookie Consent */}
                 <AnalyticsScripts seo={seo} />
                 {/* Cookie Consent UI Components */}
-                <CookieBanner />
+                {/* <CookieBanner /> */}
                 <ManagePreferencesModal />
               </DictionaryProvider>
+              {/* Christmas Effects */}
+              {initialTenant.ui?.enableSnowfall && <Snowfall snowflakeCount={50} />}
             </CookieConsentProvider>
           </NextThemesProvider>
         </TenantProvider>

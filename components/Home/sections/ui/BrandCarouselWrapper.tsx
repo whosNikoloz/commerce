@@ -24,7 +24,14 @@ export default async function BrandCarouselWrapper({ data, locale }: BrandCarous
     return null
   }
 
-  const limitedBrands = data.maxBrands ? brands.slice(0, data.maxBrands) : brands
+  // Filter by brandIds if provided
+  let filteredBrands = brands
+  if (data.brandIds && data.brandIds.length > 0) {
+    filteredBrands = brands.filter(brand => data.brandIds!.includes(brand.id))
+  }
+
+  // Apply maxBrands limit
+  const limitedBrands = data.maxBrands ? filteredBrands.slice(0, data.maxBrands) : filteredBrands
 
   return <BrandCarousel brands={limitedBrands} data={data} locale={locale} />
 }

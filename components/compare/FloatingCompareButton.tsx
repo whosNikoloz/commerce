@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ArrowLeftRight, X, ChevronDown, ChevronUp } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -16,8 +17,13 @@ export default function FloatingCompareButton() {
   const router = useRouter();
   const currentLang = lang || "en";
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  if (items.length === 0) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (items.length === 0 || !mounted) return null;
 
   const handleCompare = () => {
     const ids = items.map((item) => item.id).join(",");
@@ -25,8 +31,8 @@ export default function FloatingCompareButton() {
     router.push(`/${currentLang}/compare-products?ids=${encodeURIComponent(ids)}`);
   };
 
-  return (
-    <div className="fixed bottom-24 right-6 z-50 animate-fadeIn">
+  const compareButton = (
+    <div className="fixed bottom-24 left-6 z-50 animate-fadeIn">
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {/* Header - Always visible */}
         <button className="font-primary w-full px-4 py-3 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
@@ -98,4 +104,7 @@ export default function FloatingCompareButton() {
       </div>
     </div>
   );
+
+  // Use portal to render directly to body, bypassing any CSS transforms
+  return createPortal(compareButton, document.body);
 }

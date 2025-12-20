@@ -44,7 +44,7 @@ export default async function ProductGroupsPage(
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-3xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="font-heading text-3xl h-14 font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             {dict.pages.admin.productGroups.heading}
           </h1>
           <p className="font-primary text-muted-foreground mt-2">

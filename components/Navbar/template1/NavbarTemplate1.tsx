@@ -17,6 +17,7 @@ import { GoBackButton } from "../../go-back-button";
 import CategoryDrawer from "../../Categories/category-drawer";
 import CategoryDropdown from "../../Categories/category-dropdown";
 import AuthModal from "../../AuthModal/auth-modal";
+import SantaHat from "../../Effects/SantaHat";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
@@ -124,13 +125,16 @@ export const NavbarTemplate1 = () => {
               <div className="flex items-center justify-between space-x-2 h-16">
                 <div className="flex items-center">
                   <Link className="flex items-center  group" href={`/${lng}`}>
-                    <Image
-                      alt="Site Logo"
-                      className=" select-none transition-transform duration-300 group-hover:scale-105 object-contain"
-                      height={60}
-                      src={logoSrc}
-                      width={60}
-                    />
+                    <div style={{ position: "relative", display: "inline-block" }}>
+                      <Image
+                        alt="Site Logo"
+                        className=" select-none transition-transform duration-300 group-hover:scale-105 object-contain"
+                        height={isMobile ? 45 : 60}
+                        src={logoSrc}
+                        width={isMobile ? 45 : 60}
+                      />
+                      {config?.ui?.enableSantaHat && <SantaHat size={isMobile ? 32 : 45} />}
+                    </div>
                   </Link>
                 </div>
                 <div className="items-center hidden md:flex">

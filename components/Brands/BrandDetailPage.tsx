@@ -8,9 +8,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Locale } from "@/i18n.config";
 import { BrandModel } from "@/types/brand";
-import { apiFetch } from "@/app/api/client/fetcher";
 import { ProductResponseModel } from "@/types/product";
 import ProductGrid from "@/components/Categories/ProductGrid";
+import { searchProductsByFilter } from "@/app/api/services/productService";
 
 interface BrandDetailPageProps {
     locale: Locale;
@@ -27,12 +27,13 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response = await apiFetch<{
-                    items: ProductResponseModel[];
-                    totalCount: number;
-                }>(
-                    `${process.env.NEXT_PUBLIC_API_URL}Product/get-all-products?brandIds=${brand.id}&limit=100`
-                );
+                const response = await searchProductsByFilter({
+                    filter: {
+                        brandIds: [brand.id],
+                    },
+                    pageSize: 100,
+                    page: 1,
+                });
 
                 setProducts(response.items || []);
             } catch (error) {
@@ -49,8 +50,8 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
     const brandName = brand.name || "Unknown Brand";
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            {/* Back Button */}
+        <div className="min-h-screen">
+            {/* Back Button
             <div className="container mx-auto px-4 pt-6">
                 <Link href={`/${locale}/brands`}>
                     <Button className="gap-2" size="sm" variant="ghost">
@@ -58,12 +59,12 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                         {dict?.common?.backToBrands || "Back to Brands"}
                     </Button>
                 </Link>
-            </div>
+            </div> */}
 
             {/* Brand Header */}
             <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border-b border-border/50">
-                <div className="container mx-auto px-4 py-12 md:py-16">
-                    <div className="max-w-5xl mx-auto">
+                <div className="container mx-auto px-4 py-12">
+                    <div className="max-w-5xl mx-auto mt-10">
                         <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
                             {/* Brand Logo */}
                             <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-background border-2 border-border/50 overflow-hidden flex items-center justify-center p-4 shadow-lg">

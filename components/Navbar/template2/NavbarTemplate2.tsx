@@ -17,6 +17,7 @@ import { GoBackButton } from "../../go-back-button";
 import CategoryDrawer from "../../Categories/category-drawer";
 import CategoryDropdown from "../../Categories/category-dropdown";
 import AuthModal from "../../AuthModal/auth-modal";
+import SantaHat from "../../Effects/SantaHat";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryById } from "@/app/api/services/categoryService";
@@ -147,10 +148,11 @@ export const NavbarTemplate2 = () => {
                         unoptimized
                         alt="Site Logo"
                         className="select-none transition-all duration-500 group-hover:scale-110 object-contain drop-shadow-sm"
-                        height={isScrolled ? 60 : 80}
+                        height={isMobile ? 45 : (isScrolled ? 60 : 80)}
                         src={logoSrc}
-                        width={isScrolled ? 60 : 80}
+                        width={isMobile ? 45 : (isScrolled ? 60 : 80)}
                       />
+                      {config?.ui?.enableSantaHat && <SantaHat size={isMobile ? 32 : (isScrolled ? 45 : 55)} />}
                       <div className="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/5 dark:group-hover:bg-brand-primarydark/5 rounded-full blur-xl transition-all duration-500" />
                     </div>
                   </Link>

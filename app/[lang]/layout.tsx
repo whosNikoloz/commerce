@@ -245,13 +245,13 @@ export default async function RootLayout({
       >
         {/* ... GTM ... */}
 
-        <SmoothScroll enabled={tenant.ui?.enableSmoothScrolling}>
-          <Providers
-            dictionary={dictionary}
-            initialTenant={tenant}
-            seo={seo}
-            themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
-          >
+        <Providers
+          dictionary={dictionary}
+          initialTenant={tenant}
+          seo={seo}
+          themeProps={{ attribute: "class", defaultTheme: tenant.theme.mode }}
+        >
+          <SmoothScroll enabled={tenant.ui?.enableSmoothScrolling}>
             <FontAwesomeLoader />
             {/* <WebVitals /> */}
             <LayoutWrapper>
@@ -262,8 +262,8 @@ export default async function RootLayout({
               <BackToTopShadcn threshold={320} />
               <FloatingCompareButton />
             </LayoutWrapper>
-          </Providers>
-        </SmoothScroll>
+          </SmoothScroll>
+        </Providers>
       </body>
     </html>
   );

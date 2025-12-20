@@ -32,9 +32,11 @@ export default function Snowfall({ snowflakeCount = 50 }: SnowfallProps) {
     if (!mounted) return;
 
     const canvas = canvasRef.current;
+
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d", { alpha: true });
+
     if (!ctx) return;
 
     // Set canvas size
@@ -42,6 +44,7 @@ export default function Snowfall({ snowflakeCount = 50 }: SnowfallProps) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
+
     updateCanvasSize();
 
     // Get theme color
@@ -60,6 +63,7 @@ export default function Snowfall({ snowflakeCount = 50 }: SnowfallProps) {
         opacity: isDark ? Math.random() * 0.4 + 0.4 : Math.random() * 0.5 + 0.5, // Higher opacity for light theme
       }));
     };
+
     initSnowflakes();
 
     // Animation loop

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Heart, ShoppingCart, ArrowLeftRight, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 
-import { cn, resolveImageUrl, formatPrice } from "@/lib/utils";
+import { cn, resolveImageUrl, formatPrice, isS3Url } from "@/lib/utils";
 import { ProductResponseModel } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 // shadcn/ui
@@ -76,6 +76,12 @@ export function ProductCard({
   const discountPercent = hasDiscount
     ? Math.max(0, Math.round(((product.price - (product.discountPrice as number)) / product.price) * 100))
     : 0;
+
+  // Limit to max 4 zones
+  const maxZones = 4;
+  const displayZones = Math.min(images.length, maxZones);
+  const hasMoreImages = images.length > maxZones;
+  const remainingImagesCount = images.length - maxZones;
 
   const conditionLabel =
     product.condition === Condition.New
@@ -193,28 +199,10 @@ export function ProductCard({
       <CardContent className="p-0 relative pointer-events-none"> {/* prevent blocking clicks to link */}
         <div className="relative">
           <AspectRatio
-            className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60 rounded-t-2xl")}
+            className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60 rounded-t-2xl relative")}
             ratio={1}
             onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
           >
-            {hasMultipleImages && (
-              <div className="absolute inset-0 z-10 flex pointer-events-auto">
-                {images.map((_, index) => (
-                  <button
-                    key={index}
-                    aria-label={`View image ${index + 1} of ${images.length}`}
-                    className="flex-1 cursor-pointer"
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setCurrentImageIndex(index);
-                    }}
-                    onMouseEnter={() => setCurrentImageIndex(index)}
-                  />
-                ))}
-              </div>
-            )}
             <Image
               ref={imgRef as any}
               fill
@@ -222,28 +210,59 @@ export function ProductCard({
               className="object-cover transition-opacity duration-300"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
-              //quality={priority ? 85 : 72}
               sizes={imgSizes}
               src={imageUrl}
+              unoptimized={isS3Url(imageUrl)}
             />
-          </AspectRatio>
 
-          {/* Image Carousel Indicators */}
-          {hasMultipleImages && (
-            <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5 pointer-events-none z-20">
-              {images.map((_, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "h-1.5 rounded-full transition-all duration-300",
-                    currentImageIndex === index
-                      ? "w-6 bg-white shadow-md"
-                      : "w-1.5 bg-white/60"
-                  )}
-                />
-              ))}
-            </div>
-          )}
+            {/* Hover zones - with subtle visual hints (desktop only) */}
+            {hasMultipleImages && (
+              <div className="hidden md:flex absolute inset-0 z-10 gap-[2px] pointer-events-none">
+                {images.slice(0, 4).map((_, index) => (
+                  <Link
+                    key={index}
+                    href={`/${currentLang}/product/${product.id}`}
+                    className="flex-1 hover:bg-white/5 transition-all duration-200 relative pointer-events-auto"
+                    onMouseEnter={() => setCurrentImageIndex(index)}
+                  >
+                    {/* Subtle edge highlight on hover */}
+                    <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity border-x border-white/10 pointer-events-none" />
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Show "+X" overlay on entire image when hovering 4th zone (desktop only) */}
+            {hasMultipleImages && hasMoreImages && currentImageIndex === 3 && (
+              <div className="hidden md:flex absolute inset-0 bg-black/90 items-center justify-center backdrop-blur-sm z-20 pointer-events-none">
+                <span className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
+                  +{remainingImagesCount}
+                </span>
+              </div>
+            )}
+
+            {/* Bottom line indicators (desktop only) */}
+            {hasMultipleImages && (
+              <div className="hidden md:flex absolute bottom-3 left-0 right-0 items-center justify-center gap-1 pointer-events-none z-20 px-4">
+                {images.slice(0, 4).map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "h-1 flex-1 max-w-16 rounded-full transition-all duration-200",
+                      currentImageIndex === index
+                        ? "shadow-md"
+                        : "bg-white/40"
+                    )}
+                    style={
+                      currentImageIndex === index
+                        ? { backgroundColor: themeColor }
+                        : { backgroundColor: 'rgba(255, 255, 255, 0.4)' }
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </AspectRatio>
 
           {discountPercent > 0 && (
             <div className="absolute left-3 top-3 pointer-events-none z-20">

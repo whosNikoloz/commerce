@@ -28,6 +28,20 @@ export function formatPrice(price: number, currency: string = "GEL"): string {
 }
 
 /**
+ * Checks if a URL is from S3 storage
+ * Returns true for amazonaws.com URLs to prevent server-side optimization
+ */
+export function isS3Url(url: string | null | undefined): boolean {
+  if (!url) return false;
+
+  // Check for S3 patterns:
+  // - bucket.s3.region.amazonaws.com
+  // - s3.region.amazonaws.com/bucket
+  // - *.amazonaws.com (catch-all)
+  return url.includes('.amazonaws.com') || url.includes('.s3.');
+}
+
+/**
  * Resolves image URLs to absolute paths
  * Converts relative /assets/ paths to full backend URLs
  */

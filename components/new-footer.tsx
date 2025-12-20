@@ -242,9 +242,16 @@ export default function Footer() {
                           <MapPin className="h-4 w-4" />
                           {t.address}
                         </p>
-                        <p className="font-primary text-sm text-foreground">
+                        <a
+                          className="font-primary text-sm font-medium text-primary hover:underline transition-colors cursor-pointer inline-flex items-center gap-1 group"
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getLocalizedText(currentStore.address, currentLocale))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Open ${getLocalizedText(currentStore.address, currentLocale)} in Google Maps`}
+                        >
                           {getLocalizedText(currentStore.address, currentLocale)}
-                        </p>
+                          <MapPin className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
                       </div>
 
                       {/* Phone */}
@@ -308,12 +315,12 @@ export default function Footer() {
                 {theme === "light" ? (
                   <>
                     <Moon className="h-4 w-4" />
-                    <span className="font-primary text-sm font-medium">Dark</span>
+                    {/* <span className="font-primary text-sm font-medium">Dark</span> */}
                   </>
                 ) : (
                   <>
                     <Sun className="h-4 w-4" />
-                    <span className="font-primary text-sm font-medium">Light</span>
+                    {/* <span className="font-primary text-sm font-medium">Light</span> */}
                   </>
                 )}
               </button>

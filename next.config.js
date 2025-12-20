@@ -21,6 +21,11 @@ const nextConfig = {
         hostname: "finasyncecomm.s3.eu-central-1.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "ecommerce-outdoor.s3.eu-north-1.amazonaws.com",
+        pathname: "/**",
+      },
       { protocol: "https", hostname: "placehold.co", pathname: "/**" },
       {
         protocol: "https",
@@ -33,7 +38,7 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 86400,
-    unoptimized: false,
+    unoptimized: false, // Default is optimized; components will selectively use unoptimized for S3
   },
 
   compress: true,

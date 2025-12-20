@@ -4,6 +4,8 @@ import Image from "next/image";
 import { Package } from "lucide-react";
 import { useState } from "react";
 
+import { isS3Url } from "@/lib/utils";
+
 interface ProductImageProps {
   src?: string | null;
   alt: string;
@@ -15,6 +17,7 @@ interface ProductImageProps {
   objectFit?: "contain" | "cover"; // cover fills the box, contain shows full image
   priority?: boolean;
   sizes?: string;
+  unoptimized?: boolean; // Manually override optimization setting
 }
 
 /**
@@ -37,6 +40,7 @@ export function ProductImage({
   objectFit = "cover",
   priority = false,
   sizes,
+  unoptimized,
 }: ProductImageProps) {
   const [imageError, setImageError] = useState(false);
   const hasValidImage = src && !imageError;
@@ -48,6 +52,9 @@ export function ProductImage({
   const imageClasses = objectFit === "cover"
     ? "object-cover"
     : "object-contain";
+
+  // Automatically detect S3 URLs and disable optimization to prevent server-side re-fetching
+  const shouldBeUnoptimized = unoptimized !== undefined ? unoptimized : isS3Url(src);
 
   // Render placeholder if no image
   if (!hasValidImage) {
@@ -70,6 +77,7 @@ export function ProductImage({
           priority={priority}
           sizes={sizes}
           src={src}
+          unoptimized={shouldBeUnoptimized}
           onError={() => setImageError(true)}
         />
       ) : (
@@ -79,6 +87,7 @@ export function ProductImage({
           height={height || 400}
           priority={priority}
           src={src}
+          unoptimized={shouldBeUnoptimized}
           width={width || 400}
           onError={() => setImageError(true)}
         />

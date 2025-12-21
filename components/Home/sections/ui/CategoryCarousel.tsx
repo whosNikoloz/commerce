@@ -119,18 +119,20 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
   }
 
   return (
-    <section className="relative py-8 md:py-12">
+    <section className="relative py-10 md:py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         {data.showHeader && (
-          <div className="mb-8">
+          <div className="mb-8 md:mb-10 flex flex-col gap-3 md:gap-4">
             {data.title && (
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance font-heading">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance font-heading tracking-tight">
                 {t(data.title, locale)}
               </h2>
             )}
             {data.subtitle && (
-              <p className="font-primary text-muted-foreground mt-3 text-lg">{t(data.subtitle, locale)}</p>
+              <p className="font-primary text-muted-foreground text-base md:text-lg max-w-2xl">
+                {t(data.subtitle, locale)}
+              </p>
             )}
           </div>
         )}
@@ -145,7 +147,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                 type="button"
                 onClick={handleAllCategoriesClick}
               >
-                <div className="h-32 sm:h-40 md:h-48 lg:h-56 w-24 sm:w-28 md:w-36 lg:w-40 cursor-pointer overflow-hidden rounded-lg border border-border transition-all duration-300 hover:-translate-y-1">
+                <div className="h-32 sm:h-40 md:h-48 lg:h-56 w-24 sm:w-28 md:w-36 lg:w-40 cursor-pointer overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
                   <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3">
                     <Squares2X2Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-foreground" />
                     <p className="font-primary text-[10px] sm:text-xs md:text-sm font-semibold text-foreground text-center">
@@ -171,22 +173,27 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
                     return (
                       <li key={category.id} className="splide__slide">
                         <Link className="block h-full" href={`/category/${category.id}`}>
-                          <div className="group relative h-32 sm:h-40 md:h-48 lg:h-56 w-full cursor-pointer overflow-hidden rounded-lg border border-border transition-all duration-300 hover:-translate-y-1">
-                            {/* Image */}
-                            <Image
-                              fill
-                              alt=""
-                              className="object-contain transition-transform duration-300 group-hover:scale-105"
-                              sizes="(max-width: 640px) 128px, (max-width: 768px) 160px, (max-width: 1024px) 192px, 224px"
-                              src={hasError ? "/placeholder.svg" : imageUrl}
-                              onError={() => handleImageError(category.id)}
-                            />
+                          <div className="relative h-32 sm:h-40 md:h-48 lg:h-56 w-full cursor-pointer rounded-2xl overflow-hidden border border-border/60 bg-card shadow-sm">
+                            {/* Background accent */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10" />
 
-                            {/* Text Label - always visible at bottom */}
-                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-background/80 backdrop-blur-sm">
-                              <p className="font-primary text-foreground text-xs sm:text-sm md:text-base font-semibold text-center leading-tight">
+                            {/* Image */}
+                            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 lg:w-28 lg:h-28">
+                              <Image
+                                fill
+                                alt={category.name || "Category"}
+                                className="object-contain drop-shadow-md"
+                                sizes="(max-width: 640px) 56px, (max-width: 768px) 64px, (max-width: 1024px) 96px, 112px"
+                                src={hasError ? "/placeholder.png" : imageUrl}
+                                onError={() => handleImageError(category.id)}
+                              />
+                            </div>
+
+                            {/* Text content */}
+                            <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4 z-10">
+                              <h3 className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm font-heading font-semibold text-foreground truncate">
                                 {category.name}
-                              </p>
+                              </h3>
                             </div>
                           </div>
                         </Link>

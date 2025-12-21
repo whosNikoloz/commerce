@@ -283,7 +283,7 @@ function ProductCard({ product, onRemove, currentLang }: ProductCardProps) {
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           src={
             resolveImageUrl(product.images?.[0]) ||
-            "/placeholder.svg?height=160&width=208"
+            "/placeholder.png"
           }
         />
         <button className="font-primary absolute top-2 right-2 p-1.5 bg-white dark:bg-slate-800 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white rounded-full transition-colors shadow-md"

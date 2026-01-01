@@ -199,6 +199,7 @@ const ProductCard = memo(function ProductCard({
     >
       <meta content={product.name ?? "Product"} itemProp="name" />
       {imageUrl && <meta content={imageUrl} itemProp="image" />}
+      {product.description && <meta content={product.description} itemProp="description" />}
 
       <Card
         className={cn(
@@ -368,7 +369,9 @@ const ProductCard = memo(function ProductCard({
                         itemType="https://schema.org/Offer"
                       >
                         <meta content="GEL" itemProp="priceCurrency" />
-                        <span itemProp="price">{formatPrice(displayPrice)}</span>
+                        <meta content={displayPrice.toString()} itemProp="price" />
+                        <meta content={inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
+                        {formatPrice(displayPrice)}
                       </span>
                       {originalPrice && (
                         <span className={cn("text-muted-foreground/70 line-through", metaSize)}>

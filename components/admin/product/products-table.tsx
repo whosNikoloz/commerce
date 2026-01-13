@@ -358,6 +358,21 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             <Badge className={`text-xs ${getConditionClass(product.condition)}`}>
               {getConditionLabel(product.condition)}
             </Badge>
+            {product.isLiquidated && (
+              <Badge className="bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 text-xs">
+                Liquidated
+              </Badge>
+            )}
+            {product.isComingSoon && (
+              <Badge className="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 text-xs">
+                Coming Soon
+              </Badge>
+            )}
+            {product.isNewArrival && (
+              <Badge className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 text-xs">
+                New Arrival
+              </Badge>
+            )}
           </div>
 
           <div className="mt-1 flex items-center justify-between gap-2">
@@ -624,6 +639,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                           <TableHead className="hidden lg:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             Condition
                           </TableHead>
+                          <TableHead className="hidden xl:table-cell text-slate-700 dark:text-slate-300 font-bold">
+                            Flags
+                          </TableHead>
                           <TableHead className="hidden sm:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             Visible
                           </TableHead>
@@ -702,6 +720,25 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                               >
                                 {getConditionLabel(product.condition)}
                               </Badge>
+                            </TableCell>
+                            <TableCell className="hidden xl:table-cell">
+                              <div className="flex flex-wrap gap-1">
+                                {product.isLiquidated && (
+                                  <Badge className="bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 text-xs">
+                                    Liquidated
+                                  </Badge>
+                                )}
+                                {product.isComingSoon && (
+                                  <Badge className="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 text-xs">
+                                    Coming Soon
+                                  </Badge>
+                                )}
+                                {product.isNewArrival && (
+                                  <Badge className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 text-xs">
+                                    New Arrival
+                                  </Badge>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell className="hidden sm:table-cell">
                               <Switch

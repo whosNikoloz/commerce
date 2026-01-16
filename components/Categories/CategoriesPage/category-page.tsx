@@ -92,8 +92,9 @@ export default function CategoryPage({
   const [facetDates, setFacetDates] =
     useState<Record<string, { from?: string; to?: string }>>({});
 
-
-  // Filters (init from URL once, then keep URL in sync)
+  // Filters (init from URL)
+  // We use this state mainly to render the UI selections.
+  // Updates to this state should come FROM the URL, not user interactions directly.
   const [filter, setFilter] = useState<FilterModel>({
     brandIds: [],
     categoryIds: category ? [category.id] : [],
@@ -112,7 +113,7 @@ export default function CategoryPage({
       setNotFound(true);
       setLoading(false);
     }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   }, [categoryId, __initialCategory]);
 
   const facets: FacetModel[] = useMemo(() => category?.facets ?? [], [category]);
@@ -120,9 +121,26 @@ export default function CategoryPage({
   // Lookup map from facetValueId to facetId
   const facetValueToFacetId = useMemo(() => buildFacetValueToFacetIdMap(facets), [facets]);
 
+  // Lookup map from facetValueId to Name (for UI chips)
+  const facetValueLookup = useMemo(() => {
+    const map: Record<string, string> = {};
+    facets.forEach((f) => {
+      f.facetValues?.forEach((fv) => {
+        if (fv.id) {
+          map[fv.id] = fv.value ?? fv.id;
+        }
+      });
+    });
+    return map;
+  }, [facets]);
+
+  // 1. Listen to URL changes -> Update Filter State AND Fetch Data
   useEffect(() => {
     if (!category) return;
 
+    // Skip fetch on initial mount if we have server data
+    // BUT we still need to set the filter state from params in case the server data
+    // matches the params (which it should) so the UI is correct.
     const brandsParam = params.getAll("brand");
     const condParam = params.getAll("cond").map((v) => Number(v)) as Condition[];
     const stockParam = params.get("stock");
@@ -136,7 +154,8 @@ export default function CategoryPage({
     setCurrentPage(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1);
     setSortBy(sortFromUrl);
 
-    setFilter({
+    // Sync URL params to State
+    const newFilter: FilterModel = {
       brandIds: brandsParam,
       categoryIds: [category.id],
       condition: condParam.filter((x) => x === 0 || x === 1 || x === 2),
@@ -146,87 +165,35 @@ export default function CategoryPage({
       facetFilters: facetIds
         .map((facetValueId) => {
           const facetId = facetValueToFacetId[facetValueId];
-
           return facetId ? { facetId, facetValueId } : null;
         })
         .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
-    });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  }, [category?.id, params, __initialPage, __initialSort, facetValueToFacetId]);
+    };
 
-  const facetValueLookup = useMemo(() => {
-    const map: Record<string, string> = {};
+    setFilter(newFilter);
 
-    (category?.facets ?? []).forEach((f) =>
-      (f.facetValues ?? []).forEach((v) => {
-        map[v.id] = v.value ?? v.id;
-      }),
-    );
-
-    return map;
-  }, [category]);
-
-  // Fetch when filter/sort/page changes (URL ↔ state sync)
-  useEffect(() => {
-    if (!category) return;
-
-    // Skip fetch on initial mount if we have server data
     if (hasUsedInitialData) {
       setHasUsedInitialData(false);
-
       return;
     }
 
-    const effectiveFilter = { ...filter, categoryIds: [category.id] };
     let cancelled = false;
 
     (async () => {
       setLoadingProducts(true);
-
-      // reflect in URL - only add non-default parameters
-      startTransition(() => {
-        const next = new URLSearchParams();
-
-        // Only add page if not 1
-        if (currentPage > 1) {
-          next.set("page", String(currentPage));
-        }
-
-        // Only add sort if not default
-        if (sortBy !== "featured") {
-          next.set("sort", sortBy);
-        }
-
-        (effectiveFilter.brandIds ?? []).forEach((b) => next.append("brand", b));
-        (effectiveFilter.condition ?? []).forEach((c) => next.append("cond", String(c)));
-        if (effectiveFilter.stockStatus !== undefined)
-          next.set("stock", String(effectiveFilter.stockStatus));
-        if (effectiveFilter.minPrice !== undefined)
-          next.set("min", String(effectiveFilter.minPrice));
-        if (effectiveFilter.maxPrice !== undefined)
-          next.set("max", String(effectiveFilter.maxPrice));
-        (effectiveFilter.facetFilters ?? []).forEach((f) => next.append("facet", f.facetValueId));
-
-        const queryString = next.toString();
-        const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-
-        router.replace(newUrl, { scroll: false });
-      });
-
       try {
         const res = await searchProductsByFilter({
-            filter: {
-              ...effectiveFilter,
-              facetRanges,
-              facetNumerics,
-              facetSearches,
-              facetDates,
-            } as any,
-            page: currentPage,
-            pageSize: itemsPerPage,
-            sortBy,
-          });
-
+          filter: {
+            ...newFilter,
+            facetRanges,
+            facetNumerics,
+            facetSearches,
+            facetDates,
+          } as any,
+          page: Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1,
+          pageSize: itemsPerPage,
+          sortBy: sortFromUrl,
+        });
 
         if (cancelled) return;
         setProducts(res.items ?? []);
@@ -244,16 +211,77 @@ export default function CategoryPage({
     return () => {
       cancelled = true;
     };
-  }, [category?.id, filter, sortBy, currentPage, router, startTransition, hasUsedInitialData, facetRanges, facetNumerics, facetSearches, facetDates]);
+  }, [category?.id, params, __initialPage, __initialSort, facetValueToFacetId, hasUsedInitialData, facetRanges, facetNumerics, facetSearches, facetDates]);
 
-  // if (notFound) return <CategoryNotFound />;
-  // if (loading || !category) return <Loading />;
+
+
+
+  // Helper to update URL (which then triggers the effect above)
+  const updateUrl = (updates: {
+    page?: number;
+    sort?: string;
+    brandIds?: string[];
+    condition?: Condition[];
+    stockStatus?: StockStatus;
+    minPrice?: number;
+    maxPrice?: number;
+    facetFilters?: { facetValueId: string }[];
+  }) => {
+    const next = new URLSearchParams(params.toString());
+
+    if (updates.page !== undefined) {
+      if (updates.page > 1) next.set("page", String(updates.page));
+      else next.delete("page");
+    }
+
+    if (updates.sort !== undefined) {
+      if (updates.sort !== "featured") next.set("sort", updates.sort);
+      else next.delete("sort");
+    }
+
+    if (updates.brandIds !== undefined) {
+      next.delete("brand");
+      updates.brandIds.forEach(b => next.append("brand", b));
+    }
+
+    if (updates.condition !== undefined) {
+      next.delete("cond");
+      updates.condition.forEach(c => next.append("cond", String(c)));
+    }
+
+    if (updates.stockStatus !== undefined) {
+      next.set("stock", String(updates.stockStatus));
+    } else if (updates.stockStatus === undefined && updates.hasOwnProperty("stockStatus")) { // Explicit undefined passed
+      next.delete("stock");
+    }
+
+    if (updates.minPrice !== undefined) next.set("min", String(updates.minPrice));
+    else if (updates.hasOwnProperty("minPrice")) next.delete("min");
+
+    if (updates.maxPrice !== undefined) next.set("max", String(updates.maxPrice));
+    else if (updates.hasOwnProperty("maxPrice")) next.delete("max");
+
+    if (updates.facetFilters !== undefined) {
+      next.delete("facet");
+      updates.facetFilters.forEach(f => next.append("facet", f.facetValueId));
+    }
+
+    const queryString = next.toString();
+    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+
+    // Use replace to avoid cluttering history, or push if you want history.
+    // Usually filtering is push, but rapid changes (slider) might be replace.
+    // For now using replace to match previous behavior, but usually push is better for UX.
+    router.replace(newUrl, { scroll: false });
+  };
+
+
   if (notFound) return <CategoryNotFound />;
-    if (loading || !category) {
-      return (
-        <div className="min-h-screen mt-16 container mx-auto px-2 sm:px-4 py-4 lg:py-6">
-          <SkeletonProductGrid count={12} onViewModeChange={() => {}} />
-        </div>
+  if (loading || !category) {
+    return (
+      <div className="min-h-screen mt-16 container mx-auto px-2 sm:px-4 py-4 lg:py-6">
+        <SkeletonProductGrid count={12} onViewModeChange={() => { }} />
+      </div>
     );
   }
 
@@ -261,75 +289,83 @@ export default function CategoryPage({
   const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
   const buildSubHref = (sub: CategoryModel) => `/category/${sub.id}`;
 
+  // Calculate dynamic price range from loaded products
+  // Default to 0-1000 if no products or invalid prices
+  const productPrices = products.map(p => p.price).filter(p => typeof p === 'number' && !isNaN(p));
+  // If we have filtered products, the range will shrink to them.
+  //Ideally we want the range of the *unfiltered* result, but we don't have that.
+  // A common UX pattern: The slider range is 0 to Max(ALL_PRODUCTS), and the handles select the filter.
+  // Since we only have the current page, let's try to be smart.
+  // If user hasn't filtered by price, we show Min/Max of current page.
+  // If user HAS filtered by price, the slider handles are at the filter values.
+  // Using 0-5000 as a safer fallback than 1000.
+  // User requested range to start from 0
+  const calculatedMin = 0;
+  const calculatedMax = productPrices.length ? Math.max(...productPrices) : 1000;
+  // Ensure we at least cover the selected range if it's wider
+  const displayMin = filter.minPrice !== undefined ? Math.min(filter.minPrice, calculatedMin) : (calculatedMin < 100 ? 0 : calculatedMin); // anchor to 0 if close
+  const displayMax = filter.maxPrice !== undefined ? Math.max(filter.maxPrice, calculatedMax) : (calculatedMax > 1000 ? calculatedMax : 1000);
+
+
   const onBrandToggle = (brandId: string) => {
-    setFilter((prev) => ({ ...prev, brandIds: toggleInArray(prev.brandIds, brandId) }));
-    setCurrentPage(1);
+    const newBrands = toggleInArray(filter.brandIds, brandId);
+    updateUrl({ brandIds: newBrands, page: 1 });
   };
   const onConditionToggle = (cond: Condition) => {
-    setFilter((prev) => ({ ...prev, condition: toggleInArray(prev.condition, cond) }));
-    setCurrentPage(1);
+    const newCond = toggleInArray(filter.condition, cond);
+    updateUrl({ condition: newCond, page: 1 });
   };
   const onStockChange = (status?: StockStatus) => {
-    setFilter((prev) => ({ ...prev, stockStatus: status }));
-    setCurrentPage(1);
+    updateUrl({ stockStatus: status, page: 1 });
   };
   const onPriceChange = (min?: number, max?: number) => {
-    setFilter((prev) => ({ ...prev, minPrice: min, maxPrice: max }));
-    setCurrentPage(1);
+    updateUrl({ minPrice: min, maxPrice: max, page: 1 });
   };
   const onFacetToggle = (facetId: string, facetValueId: string) => {
-    setFilter((prev) => ({
-      ...prev,
-      facetFilters: toggleFacetValue(prev.facetFilters, facetId, facetValueId),
-    }));
-    setCurrentPage(1);
+    const newFacets = toggleFacetValue(filter.facetFilters, facetId, facetValueId);
+    updateUrl({ facetFilters: newFacets, page: 1 });
   };
   const onFacetRadioChange = (facetId: string, facetValueId: string) => {
-    setFilter((prev) => {
-      const current = prev.facetFilters ?? [];
-      const target = facets.find((f) => f.id === facetId);
-      const removeIds = new Set(
-        (target?.facetValues ?? []).map((v) => v.id).filter(Boolean) as string[],
-      );
-      const cleaned = current.filter((ff) => !removeIds.has(ff.facetValueId));
-
-      return { ...prev, facetFilters: [...cleaned, { facetId, facetValueId }] };
-    });
-    setCurrentPage(1);
+    const current = filter.facetFilters ?? [];
+    const target = facets.find((f) => f.id === facetId);
+    const removeIds = new Set(
+      (target?.facetValues ?? []).map((v) => v.id).filter(Boolean) as string[],
+    );
+    const cleaned = current.filter((ff) => !removeIds.has(ff.facetValueId));
+    const newFacets = [...cleaned, { facetId, facetValueId }];
+    updateUrl({ facetFilters: newFacets, page: 1 });
   };
 
   const onFacetRangeChange = (facetId: string, min?: number, max?: number) => {
-  setFacetRanges(prev => ({ ...prev, [facetId]: { min, max } }));
-  setCurrentPage(1);
-};
+    setFacetRanges(prev => ({ ...prev, [facetId]: { min, max } }));
+    setCurrentPage(1); // Facet ranges seem local state driven in original code?
+    // Note: The original code didn't sync these to URL properly. Leaving as is for minimal regression,
+    // but resetting page to 1 is correct.
+    // If these trigger fetches, they should be in the dependency array of the fetch effect (they are).
+  };
 
-const onFacetNumericChange = (facetId: string, value?: number) => {
-  setFacetNumerics(prev => ({ ...prev, [facetId]: value }));
-  setCurrentPage(1);
-};
+  const onFacetNumericChange = (facetId: string, value?: number) => {
+    setFacetNumerics(prev => ({ ...prev, [facetId]: value }));
+    setCurrentPage(1);
+  };
 
-const onFacetSearchChange = (facetId: string, text: string) => {
-  setFacetSearches(prev => ({ ...prev, [facetId]: text }));
-  setCurrentPage(1);
-};
+  const onFacetSearchChange = (facetId: string, text: string) => {
+    setFacetSearches(prev => ({ ...prev, [facetId]: text }));
+    setCurrentPage(1);
+  };
 
-const onFacetDateRangeChange = (facetId: string, from?: string, to?: string) => {
-  setFacetDates(prev => ({ ...prev, [facetId]: { ...prev[facetId], from, to } }));
-  setCurrentPage(1);
-};
+  const onFacetDateRangeChange = (facetId: string, from?: string, to?: string) => {
+    setFacetDates(prev => ({ ...prev, [facetId]: { ...prev[facetId], from, to } }));
+    setCurrentPage(1);
+  };
 
 
   const clearFilters = () => {
-    setFilter({
-      brandIds: [],
-      categoryIds: [category.id],
-      condition: [],
-      stockStatus: undefined,
-      minPrice: undefined,
-      maxPrice: undefined,
-      facetFilters: [],
-    });
-    setCurrentPage(1);
+    // Reset everything in URL
+    const next = new URLSearchParams();
+    next.set("page", "1"); // or just delete page
+    // Keep category implied by route
+    router.replace(window.location.pathname, { scroll: false });
   };
 
   const activeFiltersCount =
@@ -344,78 +380,67 @@ const onFacetDateRangeChange = (facetId: string, from?: string, to?: string) => 
       <div className="max-w-[100vw]">
         <div className="container mx-auto px-2 sm:px-4 py-4 lg:py-6">
           <div className="grid lg:grid-cols-[280px_1fr] gap-4 lg:gap-8 lg:items-start">
-          <ProductFilters
-            activeFiltersCount={activeFiltersCount}
-            brands={brands}
-            buildSubHref={buildSubHref}
-            clearFilters={clearFilters}
-            facets={(category.facets ?? []) as FacetModel[]}
-            filter={filter}
-            subcategories={subcategories}
-            onBrandToggle={onBrandToggle}
-            onConditionToggle={onConditionToggle}
-            onFacetDateRangeChange={onFacetDateRangeChange}
-            onFacetNumericChange={onFacetNumericChange}
-            onFacetRadioChange={onFacetRadioChange}
-            onFacetRangeChange={onFacetRangeChange}
-            onFacetSearchChange={onFacetSearchChange}
-            onFacetToggle={onFacetToggle}
-            onPriceChange={onPriceChange}
-            onStockChange={onStockChange}
-          />
-
-          <div className="space-y-4 lg:space-y-6">
-            <ProductHeader
+            <ProductFilters
               activeFiltersCount={activeFiltersCount}
-              brandLookup={Object.fromEntries(brands.map((b) => [b.id, b.name ?? b.id]))}
-              facetValueLookup={facetValueLookup}
+              brands={brands}
+              buildSubHref={buildSubHref}
+              clearFilters={clearFilters}
+              facets={(category.facets ?? []) as FacetModel[]}
               filter={filter}
-              productCount={totalCount}
-              sortBy={sortBy}
-              title={category.name ?? ""}
-              viewMode={viewMode}
-              onClearAll={clearFilters}
-              onClearPrice={() =>
-                setFilter((f) => ({ ...f, minPrice: undefined, maxPrice: undefined }))
-              }
-              onClearStockStatus={() => setFilter((f) => ({ ...f, stockStatus: undefined }))}
-              onRemoveBrand={(id) =>
-                setFilter((f) => ({ ...f, brandIds: (f.brandIds ?? []).filter((x) => x !== id) }))
-              }
-              onRemoveCategory={(id) =>
-                setFilter((f) => ({
-                  ...f,
-                  categoryIds: (f.categoryIds ?? []).filter((x) => x !== id),
-                }))
-              }
-              onRemoveCondition={(c) =>
-                setFilter((f) => ({ ...f, condition: (f.condition ?? []).filter((x) => x !== c) }))
-              }
-              onRemoveFacet={(vid) =>
-                setFilter((f) => ({
-                  ...f,
-                  facetFilters: (f.facetFilters ?? []).filter((x) => x.facetValueId !== vid),
-                }))
-              }
-              onSortChange={(v) => {
-                setSortBy(v);
-                setCurrentPage(1);
-              }}
-              onViewModeChange={setViewMode}
+              priceMax={displayMax}
+              priceMin={displayMin}
+              subcategories={subcategories}
+              onBrandToggle={onBrandToggle}
+              onConditionToggle={onConditionToggle}
+              onFacetDateRangeChange={onFacetDateRangeChange}
+              onFacetNumericChange={onFacetNumericChange}
+              onFacetRadioChange={onFacetRadioChange}
+              onFacetRangeChange={onFacetRangeChange}
+              onFacetSearchChange={onFacetSearchChange}
+              onFacetToggle={onFacetToggle}
+              onPriceChange={onPriceChange}
+              onStockChange={onStockChange}
             />
 
-            {loadingProducts ? (
-              <SkeletonProductGrid count={12} onViewModeChange={setViewMode} />
-            ) : (
-              <ProductGrid products={products} viewMode={viewMode} />
-            )}
+            <div className="space-y-4 lg:space-y-6">
+              <ProductHeader
+                activeFiltersCount={activeFiltersCount}
+                brandLookup={Object.fromEntries(brands.map((b) => [b.id, b.name ?? b.id]))}
+                facetValueLookup={facetValueLookup}
+                filter={filter}
+                productCount={totalCount}
+                sortBy={sortBy}
+                title={category.name ?? ""}
+                viewMode={viewMode}
+                onClearAll={clearFilters}
+                onClearPrice={() => onPriceChange(undefined, undefined)}
+                onClearStockStatus={() => onStockChange(undefined)}
+                onRemoveBrand={(id) => onBrandToggle(id)}
+                onRemoveCategory={(id) => { }} // Category removal logic if needed
+                onRemoveCondition={(c) => onConditionToggle(c)}
+                onRemoveFacet={(vid) => {
+                  // reverse lookup facetId from vid if possible, or iterate
+                  const pair = filter.facetFilters?.find(f => f.facetValueId === vid);
+                  if (pair) onFacetToggle(pair.facetId, vid);
+                }}
+                onSortChange={(v) => {
+                  updateUrl({ sort: v, page: 1 });
+                }}
+                onViewModeChange={setViewMode}
+              />
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+              {loadingProducts ? (
+                <SkeletonProductGrid count={12} onViewModeChange={setViewMode} />
+              ) : (
+                <ProductGrid products={products} viewMode={viewMode} />
+              )}
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(p) => updateUrl({ page: p })}
+              />
+            </div>
           </div>
         </div>
       </div>

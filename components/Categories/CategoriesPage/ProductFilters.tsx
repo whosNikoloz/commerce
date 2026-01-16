@@ -1,5 +1,5 @@
-"use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Filter } from "lucide-react";
 
@@ -47,6 +47,8 @@ type ProductFiltersProps = {
   clearFilters: () => void;
   activeFiltersCount: number;
   buildSubHref: (sub: CategoryModel) => string;
+  priceMin?: number;
+  priceMax?: number;
 };
 
 
@@ -264,10 +266,20 @@ function SidebarContent({
   onFacetSearchChange,
   onFacetDateRangeChange,
   buildSubHref,
+  priceMin = 0,
+  priceMax = 1000,
 }: ProductFiltersProps) {
-  const dict = useDictionary();
-  const minPrice = typeof filter.minPrice === "number" ? filter.minPrice : 0;
-  const maxPrice = typeof filter.maxPrice === "number" ? filter.maxPrice : 1000;
+  const { dict } = useDictionary();
+
+  // Local state for debouncing slider/input
+  const minPrice = typeof filter.minPrice === "number" ? filter.minPrice : priceMin;
+  const maxPrice = typeof filter.maxPrice === "number" ? filter.maxPrice : priceMax;
+  const [localPriceRange, setLocalPriceRange] = useState([minPrice, maxPrice]);
+
+  // Sync local state when props change (e.g. initial load or URL update from other source)
+  useEffect(() => {
+    setLocalPriceRange([minPrice, maxPrice]);
+  }, [minPrice, maxPrice]);
 
   return (
     <div className="space-y-6">
@@ -311,28 +323,51 @@ function SidebarContent({
             <div className="space-y-4">
               <Slider
                 className="w-full mt-2"
-                max={1000}
-                min={0}
+                max={priceMax}
+                min={priceMin}
                 step={10}
-                value={[minPrice, maxPrice]}
-                onValueChange={(v: number[]) => onPriceChange(v?.[0], v?.[1])}
+                value={[localPriceRange[0], localPriceRange[1]]}
+                onValueChange={(v) => {
+                  setLocalPriceRange([v[0], v[1]]);
+                }}
+                onValueCommit={(v) => {
+                  onPriceChange(v[0], v[1]);
+                }}
               />
               <div className="flex items-center justify-between text-sm">
-                <span className="font-primary text-text-subtle dark:text-text-subtledark">₾{minPrice}</span>
-                <span className="font-primary text-text-subtle dark:text-text-subtledark">₾{maxPrice}</span>
+                <span className="font-primary text-text-subtle dark:text-text-subtledark">₾{localPriceRange[0]}</span>
+                <span className="font-primary text-text-subtle dark:text-text-subtledark">₾{localPriceRange[1]}</span>
               </div>
               <div className="flex gap-2">
                 <Input
                   className="w-24 bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
                   type="number"
-                  value={String(minPrice)}
-                  onChange={(e) => onPriceChange(Number(e.target.value) || 0, maxPrice)}
+                  value={String(localPriceRange[0])}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setLocalPriceRange([val, localPriceRange[1]]);
+                  }}
+                  onBlur={() => onPriceChange(localPriceRange[0], localPriceRange[1])}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onPriceChange(localPriceRange[0], localPriceRange[1]);
+                    }
+                  }}
                 />
                 <Input
                   className="w-24 bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
                   type="number"
-                  value={String(maxPrice)}
-                  onChange={(e) => onPriceChange(minPrice, Number(e.target.value) || 1000)}
+                  value={String(localPriceRange[1])}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setLocalPriceRange([localPriceRange[0], val]);
+                  }}
+                  onBlur={() => onPriceChange(localPriceRange[0], localPriceRange[1])}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onPriceChange(localPriceRange[0], localPriceRange[1]);
+                    }
+                  }}
                 />
               </div>
             </div>

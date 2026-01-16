@@ -213,6 +213,7 @@ const ProductCard = memo(function ProductCard({
             <Link
               className="flex flex-col h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60 rounded-2xl"
               href={`/${currentLang}/product/${product.id}`}
+              onMouseLeave={() => setCurrentImageIndex(0)}
             >
               <CardBody className="p-0 flex flex-col h-full">
                 <div className="relative flex-1 flex flex-col">
@@ -287,15 +288,14 @@ const ProductCard = memo(function ProductCard({
                       {hasMultipleImages && (
                         <div className="hidden md:flex absolute inset-0 z-10 gap-[2px] pointer-events-none">
                           {images.slice(0, 4).map((_, index) => (
-                            <Link
+                            <div
                               key={index}
-                              href={`/${currentLang}/product/${product.id}`}
-                              className="flex-1 hover:bg-white/5 transition-all duration-200 relative pointer-events-auto"
+                              className="flex-1 hover:bg-white/5 transition-all duration-200 relative pointer-events-auto cursor-pointer"
                               onMouseEnter={() => setCurrentImageIndex(index)}
                             >
                               {/* Subtle edge highlight on hover */}
                               <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity border-x border-white/10 pointer-events-none" />
-                            </Link>
+                            </div>
                           ))}
                         </div>
                       )}
@@ -534,7 +534,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       aria-label="Products"
       className={
         viewMode === "grid"
-          ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 md:gap-3"
+          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2 md:gap-3"
           : "space-y-3 sm:space-y-4"
       }
       role="list"

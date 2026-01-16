@@ -269,7 +269,7 @@ function SidebarContent({
   priceMin = 0,
   priceMax = 1000,
 }: ProductFiltersProps) {
-  const { dict } = useDictionary();
+  const dict = useDictionary();
 
   // Local state for debouncing slider/input
   const minPrice = typeof filter.minPrice === "number" ? filter.minPrice : priceMin;
@@ -515,6 +515,7 @@ function SidebarContent({
 export default function ProductFilters(props: ProductFiltersProps) {
   const { activeFiltersCount } = props;
   const dict = useDictionary();
+
 
   return (
     <>

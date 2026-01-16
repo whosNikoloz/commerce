@@ -206,7 +206,7 @@ export function ImageCropper({
         // Compress the cropped image
         const compressedFile = await compressImage(croppedFile, {
           maxWidthOrHeight: 1920,
-          maxSizeMB: 4,
+          maxSizeMB: 0.5,
           quality: 0.85,
         });
 

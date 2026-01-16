@@ -12,7 +12,7 @@ export interface CompressionOptions {
 
 const DEFAULT_OPTIONS: Required<CompressionOptions> = {
   maxWidthOrHeight: 1920, // Max dimension
-  maxSizeMB: 4, // Target max 4MB
+  maxSizeMB: 0.5, // Target max 0.5MB (500KB)
   quality: 0.85, // 85% quality
   fileType: "image/jpeg",
 };
@@ -32,8 +32,9 @@ export async function compressImage(
   // If file is already small enough and not too large in dimensions, return as-is
   const fileSizeMB = file.size / 1024 / 1024;
 
-  if (fileSizeMB <= opts.maxSizeMB * 0.8) {
-    // If it's 80% or less of target, probably fine
+  // We use a threshold of 95% of the max size to avoid re-compressing files that are already compliant
+  // but very close to the limit, preserving their original quality.
+  if (fileSizeMB <= opts.maxSizeMB * 0.95) {
     const dimensions = await getImageDimensions(file);
 
     if (dimensions.width <= opts.maxWidthOrHeight && dimensions.height <= opts.maxWidthOrHeight) {

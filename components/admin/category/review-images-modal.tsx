@@ -42,7 +42,7 @@ export default function ReviewImagesModal({
   categoryId,
   existing,
   maxFiles = 8,
-  maxSizeMB = 5,
+  maxSizeMB = 0.5,
   onChanged,
   trigger,
 }: ReviewImagesModalProps) {
@@ -95,7 +95,7 @@ export default function ReviewImagesModal({
       try {
         const compressed = await compressImages(toAdd, {
           maxWidthOrHeight: 1920,
-          maxSizeMB: 4,
+          maxSizeMB: maxSizeMB || 0.5,
           quality: 0.85,
         });
 

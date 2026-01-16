@@ -28,10 +28,6 @@
     "browseBrands": "Browse Other Brands"
   },
   "admin": {
-    "dashboard": {
-      "title": "Dashboard",
-      "description": "Welcome back! Here's what's happening with your store today."
-    },
     "login": {
       "title": "Sign In",
       "email": "Email",
@@ -402,93 +398,78 @@
       "dashboard": {
         "title": "Admin Dashboard",
         "description": "Manage your store from the admin dashboard",
-        "heading": "Dashboard",
-        "subtitle": "Welcome back! Here's what's happening with your store today."
+        "revenue": "Revenue",
+        "orders": "Orders",
+        "customers": "Customers",
+        "products": "Products",
+        "vsLastMonth": "vs last month",
+        "recentOrders": "Recent Orders",
+        "recentCustomers": "Recent Customers",
+        "recentProducts": "Recent Products",
+        "quickActions": "Quick Actions",
+        "viewAll": "View All",
+        "manageYourStoreEfficiently": "Manage your store efficiently",
+        "addNewProduct": "Add New Product",
+        "addNewCategory": "Add New Category",
+        "addNewOrder": "Add New Order",
+        "addNewCustomer": "Add New Customer"
       },
       "analytics": {
         "title": "Analytics",
-        "description": "View key metrics and performance of your store",
-        "heading": "Analytics",
-        "subtitle": "Track your store's performance and insights"
+        "description": "View key metrics and performance of your store"
       },
       "brands": {
         "title": "Brands",
-        "description": "Manage your brand catalog and origins",
-        "heading": "Brands",
-        "subtitle": "Manage your brand catalog and country origins"
+        "description": "Manage your brand catalog and origins"
       },
       "categories": {
         "title": "Categories",
-        "description": "Organize your product hierarchy and facets",
-        "heading": "Categories",
-        "subtitle": "Organize your product hierarchy and attributes"
+        "description": "Organize your product hierarchy and facets"
       },
       "products": {
         "title": "Products",
-        "description": "Manage your product inventory and details",
-        "heading": "Products",
-        "subtitle": "Manage your product inventory and pricing"
+        "description": "Manage your product inventory and details"
       },
       "productGroups": {
         "title": "Product Groups",
-        "description": "Manage product groups filtered by category and brand",
-        "heading": "Product Groups",
-        "subtitle": "Organize products into collections"
+        "description": "Manage product groups filtered by category and brand"
       },
       "facets": {
         "title": "Facets",
-        "description": "Create, edit and organize attributes like Size, Resolution, Color",
-        "heading": "Facets",
-        "subtitle": "Manage product attributes and filters"
+        "description": "Create, edit and organize attributes like Size, Resolution, Color"
       },
       "stores": {
         "title": "Stores",
-        "description": "Manage store locations and transfer products between them",
-        "heading": "Stores",
-        "subtitle": "Manage your store locations and inventory"
+        "description": "Manage store locations and transfer products between them"
       },
       "shipping": {
         "title": "Shipping",
-        "description": "Manage shipping methods, zones, and delivery options",
-        "heading": "Shipping",
-        "subtitle": "Configure shipping methods and zones"
+        "description": "Manage shipping methods, zones, and delivery options"
       },
       "payments": {
         "title": "Payments",
-        "description": "Monitor transactions and configure payment methods",
-        "heading": "Payments",
-        "subtitle": "View transactions and manage payment providers"
+        "description": "Monitor transactions and configure payment methods"
       },
       "orders": {
         "title": "Orders",
-        "description": "Track and manage customer orders and fulfillment",
-        "heading": "Orders",
-        "subtitle": "Manage customer orders and fulfillment"
+        "description": "Track and manage customer orders and fulfillment"
       },
       "customers": {
         "title": "Customers",
-        "description": "Manage customer relationships and track customer lifetime value",
-        "heading": "Customers",
-        "subtitle": "View and manage your customer base"
+        "description": "Manage customer relationships and track customer lifetime value"
       },
       "sync": {
         "title": "Synchronization",
-        "description": "Trigger sync jobs, monitor status, and view a live activity log",
-        "heading": "Synchronization",
-        "subtitle": "Sync data and monitor integration status"
+        "description": "Trigger sync jobs, monitor status, and view a live activity log"
       },
       "faqs": {
         "title": "FAQs",
-        "description": "Manage frequently asked questions and answers",
-        "heading": "FAQs",
-        "subtitle": "Manage frequently asked questions"
+        "description": "Manage frequently asked questions and answers"
       }
     },
     "brands": {
       "title": "Brands",
-      "description": "Explore all our brands and discover quality products",
-      "heading": "Explore Our Brands",
-      "subtitle": "Discover trusted brands and quality products from around the world"
+      "description": "Explore all our brands and discover quality products"
     },
     "brand": {
       "notFound": "Brand Not Found",

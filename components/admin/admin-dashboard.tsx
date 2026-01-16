@@ -8,12 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTenant } from "@/app/context/tenantContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 import { getAllOrders } from "@/app/api/services/orderService";
 import { OrderSummary, OrderStatus } from "@/types/orderTypes";
 
 const stats = [
   {
-    titleKey: "admin.revenue",
+    titleKey: "revenue",
     value: "₾45,231.89",
     trend: "+20.1%",
     icon: DollarSign,
@@ -22,7 +23,7 @@ const stats = [
     borderColor: "border-emerald-200 dark:border-emerald-800/50",
   },
   {
-    titleKey: "admin.orders",
+    titleKey: "orders",
     value: "1,234",
     trend: "+15%",
     icon: ShoppingCart,
@@ -31,7 +32,7 @@ const stats = [
     borderColor: "border-blue-200 dark:border-blue-800/50",
   },
   {
-    titleKey: "admin.customers",
+    titleKey: "customers",
     value: "456",
     trend: "+12%",
     icon: Users,
@@ -40,7 +41,7 @@ const stats = [
     borderColor: "border-purple-200 dark:border-purple-800/50",
   },
   {
-    titleKey: "admin.products",
+    titleKey: "products",
     value: "789",
     trend: "+25%",
     icon: Package,
@@ -50,13 +51,7 @@ const stats = [
   },
 ];
 
-const translations: Record<string, string> = {
-  "admin.revenue": "Revenue",
-  "admin.orders": "Orders",
-  "admin.customers": "Customers",
-  "admin.products": "Products",
-  "admin.recentOrders": "Recent Orders",
-};
+
 
 function getStatusBadgeClass(status: OrderStatus): string {
   switch (status) {
@@ -100,7 +95,7 @@ function formatDate(dateString: string): string {
 }
 
 export default function AdminDashboard() {
-  const t = (key: string, fallback?: string) => translations[key] || fallback || key;
+  const dict = useDictionary();
   const { config } = useTenant();
   const isFinaMerchant = config?.merchantType === "FINA";
 
@@ -144,8 +139,8 @@ export default function AdminDashboard() {
               <div className={`absolute inset-0 ${stat.bgColor} opacity-30 group-hover:opacity-50 transition-opacity duration-500`} />
               <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/5 dark:to-transparent" />
               <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3 pt-6">
-                <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                  {t(stat.titleKey) || stat.titleKey}
+                <CardTitle className="text-xl font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                  {dict.pages?.admin?.dashboard?.[stat.titleKey] || stat.titleKey}
                 </CardTitle>
                 <div className={`p-3.5 rounded-2xl ${stat.bgColor} shadow-lg group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500 ring-2 ring-white/50 dark:ring-slate-800/50`}>
                   <Icon className={`h-6 w-6 ${stat.color}`} />
@@ -160,7 +155,7 @@ export default function AdminDashboard() {
                     <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
                     {stat.trend}
                   </Badge>
-                  <span className="font-primary text-xs text-slate-600 dark:text-slate-400 font-medium">vs last month</span>
+                  <span className="font-primary text-xs text-slate-600 dark:text-slate-400 font-medium">{dict.pages?.admin?.dashboard?.vsLastMonth || "vs last month"}</span>
                 </div>
               </CardContent>
             </Card>
@@ -180,10 +175,10 @@ export default function AdminDashboard() {
                   <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
                     <BarChart3 className="h-5 w-5 text-white" />
                   </div>
-                  {t('admin.recentOrders', 'Recent Orders')}
+                  {dict.pages?.admin?.dashboard?.recentOrders || "Recent Orders"}
                 </CardTitle>
                 <CardDescription className="text-slate-600 dark:text-slate-400 mt-2 font-medium">
-                  Latest customer orders and transactions
+                  {dict.pages?.admin?.dashboard?.manageYourStoreEfficiently || "Latest customer orders and transactions"}
                 </CardDescription>
               </div>
               <Button
@@ -194,7 +189,7 @@ export default function AdminDashboard() {
               >
                 <Link href="/admin/orders">
                   <Eye className="mr-2 h-4 w-4" />
-                  View All
+                  {dict.pages?.admin?.dashboard?.viewAll || "View All"}
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -266,10 +261,10 @@ export default function AdminDashboard() {
               <div className="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
                 <Plus className="h-5 w-5 text-white" />
               </div>
-              {t('admin.quickActions', 'Quick Actions')}
+              {dict.pages?.admin?.dashboard?.quickActions || "Quick Actions"}
             </CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400 mt-2 font-medium">
-              Manage your store efficiently
+              {dict.pages?.admin?.dashboard?.manageYourStoreEfficiently || "Manage your store efficiently"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 relative">
@@ -286,8 +281,7 @@ export default function AdminDashboard() {
                     <Package className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-4 text-left flex-1 min-w-0">
-                    <div className="font-bold text-base truncate">{t('admin.addProduct', 'Add New Product')}</div>
-                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 truncate">Not available for FINA merchants</div>
+                    <div className="font-bold text-base truncate">{dict.pages?.admin?.dashboard?.addNewProduct || "Add New Product"}</div>
                   </div>
                 </div>
               ) : (
@@ -296,8 +290,7 @@ export default function AdminDashboard() {
                     <Package className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-4 text-left flex-1 min-w-0">
-                    <div className="font-bold text-base truncate">{t('admin.addProduct', 'Add New Product')}</div>
-                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 truncate">Create and manage inventory</div>
+                    <div className="font-bold text-base truncate">{dict.pages?.admin?.dashboard?.addNewProduct || "Add New Product"}</div>
                   </div>
                 </Link>
               )}
@@ -316,7 +309,7 @@ export default function AdminDashboard() {
                     <FolderTree className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-4 text-left flex-1 min-w-0">
-                    <div className="font-bold text-base truncate">Add Category</div>
+                    <div className="font-bold text-base truncate">{dict.pages?.admin?.dashboard?.addNewCategory || "Add Category"}</div>
                     <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5 truncate">Not available for FINA merchants</div>
                   </div>
                 </div>
@@ -326,8 +319,7 @@ export default function AdminDashboard() {
                     <FolderTree className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-4 text-left flex-1 min-w-0">
-                    <div className="font-bold text-base truncate">Add Category</div>
-                    <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5 truncate">Organize your catalog</div>
+                    <div className="font-bold text-base truncate">{dict.pages?.admin?.dashboard?.addNewCategory || "Add Category"}</div>
                   </div>
                 </Link>
               )}
@@ -344,8 +336,7 @@ export default function AdminDashboard() {
                   <ShoppingCart className="h-5 w-5 text-white" />
                 </div>
                 <div className="ml-4 text-left flex-1 min-w-0">
-                  <div className="font-bold text-base truncate">Process Orders</div>
-                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-0.5 truncate">Manage pending orders</div>
+                  <div className="font-bold text-base truncate">{dict.pages?.admin?.dashboard?.addNewOrder || "Process Orders"}</div>
                 </div>
               </Link>
             </Button>
@@ -361,8 +352,7 @@ export default function AdminDashboard() {
                   <Users className="h-5 w-5 text-white" />
                 </div>
                 <div className="ml-4 text-left flex-1 min-w-0">
-                  <div className="font-bold text-base truncate">View Customers</div>
-                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-0.5 truncate">Manage customer relationships</div>
+                  <div className="font-bold text-base truncate">{dict.pages?.admin?.dashboard?.addNewCustomer || "View Customers"}</div>
                 </div>
               </Link>
             </Button>

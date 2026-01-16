@@ -27,6 +27,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { StockStatus, Condition } from "@/types/enums";
 
 
 interface UpdateProductModalProps {
@@ -38,6 +39,8 @@ interface UpdateProductModalProps {
   initialIsLiquidated?: boolean;
   initialIsComingSoon?: boolean;
   initialIsNewArrival?: boolean;
+  initialStockStatus?: StockStatus;
+  initialCondition?: Condition;
   initialFacetValues?: ProductFacetValueModel[];
   brands?: BrandModel[];
   categories?: CategoryModel[];
@@ -49,6 +52,8 @@ interface UpdateProductModalProps {
     flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
     facetValues: ProductFacetValueModel[],
     productGroupId?: string | null,
+    stockStatus?: StockStatus,
+    condition?: Condition,
   ) => void | Promise<void>;
 }
 
@@ -61,6 +66,8 @@ export default function UpdateProductModal({
   initialIsLiquidated = false,
   initialIsComingSoon = false,
   initialIsNewArrival = false,
+  initialStockStatus = StockStatus.InStock,
+  initialCondition = Condition.New,
   initialFacetValues = [],
   brands = [],
   categories = [],
@@ -76,6 +83,8 @@ export default function UpdateProductModal({
   const [isLiquidated, setIsLiquidated] = useState(initialIsLiquidated);
   const [isComingSoon, setIsComingSoon] = useState(initialIsComingSoon);
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
+  const [stockStatus, setStockStatus] = useState(initialStockStatus);
+  const [condition, setCondition] = useState(initialCondition);
   const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>(initialFacetValues);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"settings" | "description">("settings");
@@ -93,6 +102,8 @@ export default function UpdateProductModal({
     setIsLiquidated(initialIsLiquidated);
     setIsComingSoon(initialIsComingSoon);
     setIsNewArrival(initialIsNewArrival);
+    setStockStatus(initialStockStatus);
+    setCondition(initialCondition);
     setSelectedFacetValues(initialFacetValues);
   }, [
     isOpen,
@@ -103,6 +114,8 @@ export default function UpdateProductModal({
     initialIsLiquidated,
     initialIsComingSoon,
     initialIsNewArrival,
+    initialStockStatus,
+    initialCondition,
     initialFacetValues,
   ]);
 
@@ -158,7 +171,9 @@ export default function UpdateProductModal({
           categoryId,
           { isLiquidated, isComingSoon, isNewArrival },
           selectedFacetValues,
-          productGroupId || null
+          productGroupId || null,
+          stockStatus,
+          condition
         ),
       );
       onClose();
@@ -167,7 +182,7 @@ export default function UpdateProductModal({
     }
   };
 
- 
+
 
   const validBrandId = brands.some(b => b.id === brandId) ? brandId : undefined;
   const validCategoryId = categories.some(c => c.id === categoryId) ? categoryId : undefined;
@@ -314,17 +329,17 @@ export default function UpdateProductModal({
     );
   };
 
-   useEffect(() => {
-      if (!validBrandId && brands.length > 0) {
-        setBrandId(brands[0].id); 
-      }
-    }, [brands, validBrandId]);
+  useEffect(() => {
+    if (!validBrandId && brands.length > 0) {
+      setBrandId(brands[0].id);
+    }
+  }, [brands, validBrandId]);
 
-   useEffect(() => {
-      if (!validCategoryId && categories.length > 0) {
-        setCategoryId(categories[0].id);
-      }
-    }, [categories, validCategoryId]);
+  useEffect(() => {
+    if (!validCategoryId && categories.length > 0) {
+      setCategoryId(categories[0].id);
+    }
+  }, [categories, validCategoryId]);
 
   return (
     <>
@@ -372,21 +387,19 @@ export default function UpdateProductModal({
                   {/* Tabs for Mobile */}
                   <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700">
                     <button
-                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
-                        activeTab === "settings"
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "settings"
                           ? "border-blue-500 text-blue-600 dark:text-blue-400"
                           : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                      }`}
+                        }`}
                       onClick={() => setActiveTab("settings")}
                     >
                       ⚙️ Settings
                     </button>
                     <button
-                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
-                        activeTab === "description"
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "description"
                           ? "border-blue-500 text-blue-600 dark:text-blue-400"
                           : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                      }`}
+                        }`}
                       onClick={() => setActiveTab("description")}
                     >
                       📝 Description
@@ -417,21 +430,19 @@ export default function UpdateProductModal({
                   {/* Tabs for Desktop */}
                   <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700 px-6">
                     <button
-                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
-                        activeTab === "settings"
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "settings"
                           ? "border-blue-500 text-blue-600 dark:text-blue-400"
                           : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                      }`}
+                        }`}
                       onClick={() => setActiveTab("settings")}
                     >
                       ⚙️ Settings
                     </button>
                     <button
-                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
-                        activeTab === "description"
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "description"
                           ? "border-blue-500 text-blue-600 dark:text-blue-400"
                           : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                      }`}
+                        }`}
                       onClick={() => setActiveTab("description")}
                     >
                       📝 Description
@@ -444,171 +455,218 @@ export default function UpdateProductModal({
                 {/* Tab Content */}
                 {activeTab === "settings" && (
                   <div className={`space-y-4 overflow-y-auto ${isMobile ? "h-[calc(100vh-12rem)]" : "h-[calc(100vh-16rem)]"}`}
-                       style={{
-                         scrollbarWidth: 'thin',
-                         scrollbarColor: '#cbd5e1 transparent'
-                       }}>
-                  {/* Category Selection */}
-                  <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                    <div className="mb-2">
-                      <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                        Category
-                      </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Edit category selection from the tree (similar to facet settings/values).
-                      </p>
+                    style={{
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: '#cbd5e1 transparent'
+                    }}>
+                    {/* Category Selection */}
+                    <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <div className="mb-2">
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                          Category
+                        </p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          Edit category selection from the tree (similar to facet settings/values).
+                        </p>
+                      </div>
+                      {categories.length > 0 ? (
+                        <div className="space-y-2">
+                          <Button
+                            className="w-full justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                            type="button"
+                            variant="outline"
+                            onClick={() => setShowCategoryTree((prev) => !prev)}
+                          >
+                            <span className="truncate text-left">
+                              {categoryId && categoriesById[categoryId]
+                                ? categoriesById[categoryId].name
+                                : "Select category"}
+                            </span>
+                            <ChevronDown
+                              className={`h-4 w-4 opacity-60 transition-transform ${showCategoryTree ? "rotate-180" : ""}`}
+                            />
+                          </Button>
+
+                          {showCategoryTree && (
+                            <div className="space-y-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-2">
+                              {renderCategoryTree(null)}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                          No categories available. Check console for errors.
+                        </div>
+                      )}
                     </div>
-                    {categories.length > 0 ? (
-                      <div className="space-y-2">
-                        <Button
-                          className="w-full justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
-                          type="button"
-                          variant="outline"
-                          onClick={() => setShowCategoryTree((prev) => !prev)}
+
+                    {/* Brand Selection */}
+                    <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                        ბრენდი
+                      </Label>
+                      {brands.length > 0 ? (
+                        <HSelect
+                          label="ბრენდი"
+                          // remove disallowEmptySelection OR ensure you always have a valid key
+                          // disallowEmptySelection
+                          selectedKeys={brandSelectedKeys}
+                          selectionMode="single"
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const k = Array.from(keys)[0] as string | undefined;
+
+                            setBrandId(k ?? "");
+                            setProductGroupId("");
+                          }}
                         >
-                          <span className="truncate text-left">
-                            {categoryId && categoriesById[categoryId]
-                              ? categoriesById[categoryId].name
-                              : "Select category"}
-                          </span>
-                          <ChevronDown
-                            className={`h-4 w-4 opacity-60 transition-transform ${showCategoryTree ? "rotate-180" : ""}`}
-                          />
-                        </Button>
-
-                        {showCategoryTree && (
-                          <div className="space-y-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-2">
-                            {renderCategoryTree(null)}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                        No categories available. Check console for errors.
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Brand Selection */}
-                  <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                    <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
-                      ბრენდი
-                    </Label>
-                    {brands.length > 0 ? (
-                      <HSelect
-                        label="ბრენდი"
-                        // remove disallowEmptySelection OR ensure you always have a valid key
-                        // disallowEmptySelection
-                        selectedKeys={brandSelectedKeys}
-                        selectionMode="single"
-                        variant="bordered"
-                        onSelectionChange={(keys) => {
-                          const k = Array.from(keys)[0] as string | undefined;
-
-                          setBrandId(k ?? "");
-                          setProductGroupId("");
-                        }}
-                      >
-                        {brands.map((b) => (
-                          <HSelectItem key={String(b.id)} textValue={b.name}>
-                            {b.name}
-                          </HSelectItem>
-                        ))}
-                      </HSelect>
-                    ) : (
-                      <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                        No brands available. Check console for errors.
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Flag switches */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                      <Switch
-                        checked={isLiquidated}
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-rose-500 data-[state=checked]:to-rose-600"
-                        id="is-liquidated"
-                        onCheckedChange={setIsLiquidated}
-                      />
-                      <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
-                        <Box className="w-3 h-3 mb-0.5" />
-                        ლიკვ.
-                      </span>
+                          {brands.map((b) => (
+                            <HSelectItem key={String(b.id)} textValue={b.name}>
+                              {b.name}
+                            </HSelectItem>
+                          ))}
+                        </HSelect>
+                      ) : (
+                        <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                          No brands available. Check console for errors.
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                      <Switch
-                        checked={isComingSoon}
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-violet-500 data-[state=checked]:to-indigo-600 scale-75"
-                        id="is-coming-soon"
-                        onCheckedChange={setIsComingSoon}
-                      />
-                      <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
-                        <Clock3 className="w-3 h-3 mb-0.5" />
-                        მალე
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                      <Switch
-                        checked={isNewArrival}
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600 scale-75"
-                        id="is-new-arrival"
-                        onCheckedChange={setIsNewArrival}
-                      />
-                      <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
-                        <Sparkles className="w-3 h-3 mb-0.5" />
-                        ახალი
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Group Selector */}
-                  <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                    <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
-                      Product Group
-                      <span className="font-primary text-xs font-normal text-slate-500 ml-1">
-                        (Optional)
-                      </span>
-                    </Label>
-                    {loadingGroups ? (
-                      <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                        Loading groups...
+                    {/* Flag switches */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                        <Switch
+                          checked={isLiquidated}
+                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-rose-500 data-[state=checked]:to-rose-600"
+                          id="is-liquidated"
+                          onCheckedChange={setIsLiquidated}
+                        />
+                        <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                          <Box className="w-3 h-3 mb-0.5" />
+                          ლიკვ.
+                        </span>
                       </div>
-                    ) : (
-                      <HSelect
-                        label="Product Group"
-                        placeholder="Select product group (optional)"
-                        selectedKeys={productGroupId ? new Set([productGroupId]) : new Set(["none"])}
-                        selectionMode="single"
-                        variant="bordered"
-                        onSelectionChange={(keys) => {
-                          const k = Array.from(keys)[0] as string | undefined;
 
-                          // eslint-disable-next-line no-console
-                          console.log('✅ [Update Modal] Selected productGroupId:', k);
-                          setProductGroupId(k === "none" ? "" : k ?? "");
-                        }}
-                      >
-                        {[
-                          <HSelectItem key="none" textValue="None (standalone product)">
-                            None (standalone product)
-                          </HSelectItem>,
-                          ...productGroups.map((group) => {
+                      <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                        <Switch
+                          checked={isComingSoon}
+                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-violet-500 data-[state=checked]:to-indigo-600 scale-75"
+                          id="is-coming-soon"
+                          onCheckedChange={setIsComingSoon}
+                        />
+                        <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                          <Clock3 className="w-3 h-3 mb-0.5" />
+                          მალე
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                        <Switch
+                          checked={isNewArrival}
+                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600 scale-75"
+                          id="is-new-arrival"
+                          onCheckedChange={setIsNewArrival}
+                        />
+                        <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                          <Sparkles className="w-3 h-3 mb-0.5" />
+                          ახალი
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Product Group Selector */}
+                    <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                        Product Group
+                        <span className="font-primary text-xs font-normal text-slate-500 ml-1">
+                          (Optional)
+                        </span>
+                      </Label>
+                      {loadingGroups ? (
+                        <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                          Loading groups...
+                        </div>
+                      ) : (
+                        <HSelect
+                          label="Product Group"
+                          placeholder="Select product group (optional)"
+                          selectedKeys={productGroupId ? new Set([productGroupId]) : new Set(["none"])}
+                          selectionMode="single"
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const k = Array.from(keys)[0] as string | undefined;
+
                             // eslint-disable-next-line no-console
-                            //console.log('🔍 [Update Modal] Rendering group:', { id: group.id, name: group.name, fullObject: group });
+                            console.log('✅ [Update Modal] Selected productGroupId:', k);
+                            setProductGroupId(k === "none" ? "" : k ?? "");
+                          }}
+                        >
+                          {[
+                            <HSelectItem key="none" textValue="None (standalone product)">
+                              None (standalone product)
+                            </HSelectItem>,
+                            ...productGroups.map((group) => {
+                              // eslint-disable-next-line no-console
+                              //console.log('🔍 [Update Modal] Rendering group:', { id: group.id, name: group.name, fullObject: group });
 
-                            return (
-                              <HSelectItem key={group.id} textValue={group.name}>
-                                {group.name} (ID: {group.id})
-                              </HSelectItem>
-                            );
-                          })
-                        ]}
-                      </HSelect>
-                    )}
-                  </div>
+                              return (
+                                <HSelectItem key={group.id} textValue={group.name}>
+                                  {group.name} (ID: {group.id})
+                                </HSelectItem>
+                              );
+                            })
+                          ]}
+                        </HSelect>
+                      )}
+                    </div>
+
+                    {/* Stock Status & Condition */}
+                    <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                        Inventory & Condition
+                      </Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <HSelect
+                          label="Stock Status"
+                          selectedKeys={new Set([stockStatus.toString()])}
+                          selectionMode="single"
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const k = Array.from(keys)[0] as string | undefined;
+                            setStockStatus(k ? parseInt(k) as StockStatus : StockStatus.InStock);
+                          }}
+                        >
+                          <HSelectItem key={StockStatus.InStock.toString()} textValue="In Stock">
+                            In Stock
+                          </HSelectItem>
+                          <HSelectItem key={StockStatus.OutOfStock.toString()} textValue="Out of Stock">
+                            Out of Stock
+                          </HSelectItem>
+                        </HSelect>
+
+                        <HSelect
+                          label="Condition"
+                          selectedKeys={new Set([condition.toString()])}
+                          selectionMode="single"
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const k = Array.from(keys)[0] as string | undefined;
+                            setCondition(k ? parseInt(k) as Condition : Condition.New);
+                          }}
+                        >
+                          <HSelectItem key={Condition.New.toString()} textValue="New">
+                            New
+                          </HSelectItem>
+                          <HSelectItem key={Condition.Used.toString()} textValue="Used">
+                            Used
+                          </HSelectItem>
+                          <HSelectItem key={Condition.LikeNew.toString()} textValue="Like New">
+                            Like New
+                          </HSelectItem>
+                        </HSelect>
+                      </div>
+                    </div>
 
                     {/* Facets */}
                     {categoryId && (

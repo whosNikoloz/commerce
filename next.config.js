@@ -27,9 +27,12 @@ const nextConfig = {
         pathname: "/**",
       },
       { protocol: "https", hostname: "placehold.co", pathname: "/**" },
+      { protocol: "https", hostname: "via.placeholder.com", pathname: "/**" },
+
+      // ✅ NEW – Resorter360 storage
       {
         protocol: "https",
-        hostname: "via.placeholder.com",
+        hostname: "storage.resorter360.ge",
         pathname: "/**",
       },
     ],
@@ -38,7 +41,7 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 86400,
-    unoptimized: true, // Bypass image optimization to avoid Vercel monthly limit
+    unoptimized: true,
   },
 
   compress: true,
@@ -46,9 +49,10 @@ const nextConfig = {
   poweredByHeader: false,
 
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production" ? {
-      exclude: ["error", "warn"],
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? { exclude: ["error", "warn"] }
+        : false,
   },
 
   experimental: {
@@ -105,9 +109,11 @@ const nextConfig = {
 
   async headers() {
     const apiDomain = getApiDomain();
+
     const connectSrcParts = [
       "'self'",
       "https://*.amazonaws.com",
+      "https://storage.resorter360.ge", // ✅ NEW
       apiDomain,
       "https://vercel.live",
       "wss://ws-us3.pusher.com",
@@ -144,7 +150,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://*.amazonaws.com https://picsum.photos https://placehold.co https://via.placeholder.com https://maps.googleapis.com https://maps.gstatic.com",
+              "img-src 'self' data: blob: https://*.amazonaws.com https://storage.resorter360.ge https://picsum.photos https://placehold.co https://via.placeholder.com https://maps.googleapis.com https://maps.gstatic.com",
               "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
               `connect-src ${connectSrcParts.join(" ")}`,
               "worker-src 'self' blob:",

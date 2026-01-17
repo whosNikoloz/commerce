@@ -144,7 +144,7 @@ export type OAuthCredentials = {
 };
 
 export async function getOAuthCredentials(): Promise<OAuthCredentials> {
-  const data = await apiFetch<any>(`${TENANT_BASE}oauth-credentials`, {
+  const data = await apiFetch<any>(`${BASE}oauth-credentials`, {
     method: "GET",
   });
 

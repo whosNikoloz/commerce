@@ -2,12 +2,37 @@ import type { TenantConfig } from "@/types/tenant";
 
 import { apiFetch } from "@/app/api/client/fetcher";
 
-const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}Tenant`;
+function getApiBase(): string {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  
+  if (!apiUrl) {
+    throw new Error(
+      "NEXT_PUBLIC_API_URL environment variable is not set. Please configure it in your Vercel project settings."
+    );
+  }
+
+  // Ensure the URL ends with a slash
+  const normalizedUrl = apiUrl.endsWith("/") ? apiUrl : `${apiUrl}/`;
+  
+  return `${normalizedUrl}Tenant`;
+}
 
 export async function getTenantByHostApi(): Promise<TenantConfig> {
-  return apiFetch<TenantConfig>(`${API_BASE}/tenant-configuration`, {
-    cache: "no-store",
-  }); 
+  try {
+    const API_BASE = getApiBase();
+    return await apiFetch<TenantConfig>(`${API_BASE}/tenant-configuration`, {
+      cache: "no-store",
+    });
+  } catch (error) {
+    // Log more details in production for debugging
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Failed to fetch tenant configuration:", {
+      error: errorMessage,
+      apiUrl: process.env.NEXT_PUBLIC_API_URL ? "Set" : "Missing",
+      url: process.env.NEXT_PUBLIC_API_URL,
+    });
+    throw error;
+  }
 }
 
 // export async function getTenantById(id: string): Promise<TenantConfig> {

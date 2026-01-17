@@ -25,11 +25,12 @@ function normalizeHost(host?: string) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const h = await headers();
-  const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
-  const tenant = await getTenantByHost(host);
-  const site = tenant.siteConfig;
-  const seo = site.seo || {};
+  try {
+    const h = await headers();
+    const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
+    const tenant = await getTenantByHost(host);
+    const site = tenant.siteConfig;
+    const seo = site.seo || {};
 
   const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
 
@@ -73,6 +74,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: { icon: site.favicon },
   };
+  } catch (error) {
+    // Fallback metadata if tenant config fails to load
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Failed to generate metadata:", errorMessage);
+    
+    // Return minimal metadata to prevent complete failure
+    return {
+      title: "E-commerce Store",
+      description: "Online store",
+    };
+  }
 }
 
 export const viewport: Viewport = {
@@ -97,7 +109,24 @@ export default async function RootLayout({
 
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
-  const tenant = await getTenantByHost(host);
+  
+  let tenant;
+  try {
+    tenant = await getTenantByHost(host);
+  } catch (error) {
+    // Log the error with full details for debugging
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("❌ Critical error loading tenant configuration:", {
+      host,
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      apiUrl: process.env.NEXT_PUBLIC_API_URL ? "Set" : "Missing",
+    });
+    
+    // Re-throw to let Next.js error boundary handle it
+    // This ensures the error is properly displayed
+    throw error;
+  }
   const requestHeaders = await headers();
   const originalPathname = requestHeaders.get("x-pathname") || "";
 

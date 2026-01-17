@@ -95,13 +95,18 @@ export function OAuthButtons({ onSuccess, variant = "bordered", className }: OAu
       window.addEventListener("message", messageHandler);
 
       // Check if popup was closed
-      const checkClosed = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(checkClosed);
-          window.removeEventListener("message", messageHandler);
-          setLoading(null);
-        }
-      }, 500);
+      // const checkClosed = setInterval(() => {
+      //   try {
+      //     if (popup.closed) {
+      //       clearInterval(checkClosed);
+      //       window.removeEventListener("message", messageHandler);
+      //       setLoading(null);
+      //     }
+      //   } catch (error) {
+      //     // If we can't access popup.closed due to COOP isolation, 
+      //     // we just wait for the postMessage or manual closure.
+      //   }
+      // }, 500);
     } catch (error: any) {
       toast.error(`OAuth error: ${error.message}`);
       setLoading(null);

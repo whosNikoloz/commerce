@@ -61,14 +61,14 @@ export async function GET(_request: NextRequest) {
 
         if (error) {
           console.error('OAuth error:', error);
-          window.opener?.postMessage({ type: 'oauth-error', provider: 'google', error }, window.location.origin);
+          window.opener?.postMessage({ type: 'oauth-error', provider: 'google', error }, '*');
           window.close();
           return;
         }
 
         if (!accessToken) {
           console.error('No access token received');
-          window.opener?.postMessage({ type: 'oauth-error', provider: 'google', error: 'No access token' }, window.location.origin);
+          window.opener?.postMessage({ type: 'oauth-error', provider: 'google', error: 'No access token' }, '*');
           window.close();
           return;
         }
@@ -91,14 +91,15 @@ export async function GET(_request: NextRequest) {
         const data = await response.json();
 
         // Send success message to parent window
-        if (window.opener) {
+        if (window.opener && !window.opener.closed) {
           window.opener.postMessage({
             type: 'oauth-success',
             provider: 'google',
             tokens: data
-          }, window.location.origin);
-          window.close();
+          }, '*');
+          setTimeout(() => window.close(), 100);
         } else {
+          console.warn("window.opener is null or closed. Redirecting to home.");
           // If not in popup, redirect to home with tokens in session
           window.location.href = '/';
         }
@@ -108,8 +109,8 @@ export async function GET(_request: NextRequest) {
           type: 'oauth-error',
           provider: 'google',
           error: err.message
-        }, window.location.origin);
-        window.close();
+        }, '*');
+        setTimeout(() => window.close(), 100);
       }
     })();
   </script>

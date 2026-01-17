@@ -999,7 +999,7 @@ export default function UserPanel() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14 border-2">
-            <AvatarImage alt={user?.userName} src={"/avatars/default.png"} />
+            <AvatarImage alt={user?.userName} />
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
               {user?.userName?.charAt(0).toUpperCase() || "?"}
             </AvatarFallback>

@@ -1,30 +1,25 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { IconArrowLeft, IconHome, IconBox, IconTags, IconFileDownloadFilled, IconBook, IconLetterB } from "@tabler/icons-react";
+import { IconArrowLeft, IconHome, IconBox, IconTags, IconBook, IconLetterB } from "@tabler/icons-react";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
-import { CreditCard, Database, FileQuestionIcon, Package, TruckIcon, Layers, Store, Palette } from "lucide-react";
+import { CreditCard, Database, FileQuestionIcon, Package, Layers, Palette } from "lucide-react";
 
 import { ProfileIcon } from "../icons";
 
 import { Sidebar, SidebarBody, SidebarLink, SidebarGroup } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useTenant } from "@/app/context/tenantContext";
 
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { config } = useTenant();
 
   const router = useRouter();
   const pathname = usePathname();
   const { lang } = useParams<{ lang?: string }>();
   const currentLang = lang || "en";
-
-  // Check if merchant is FINA type (can sync)
-  const isFinaMerchant = config?.merchantType === "FINA";
 
 
   // ✅ Auto-close on route change (only on mobile)
@@ -103,46 +98,21 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
           ),
         },
         {
-          label: "Payments",
+          label: "Transactions",
           href: `/${currentLang}/admin/payments`,
           icon: (
             <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
-        {
-          label: "Shippings",
-          href: `/${currentLang}/admin/shipping`,
-          icon: (
-            <TruckIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          ),
-        },
       ]
     },
     {
-      label: "Settings",
+      label: "Content",
       href: "#",
-      icon: <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+      icon: <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
       items: [
         {
-          label: "Stores",
-          href: `/${currentLang}/admin/stores`,
-          icon: (
-            <Store className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          ),
-        },
-        ...(isFinaMerchant
-          ? [
-            {
-              label: "Sync",
-              href: `/${currentLang}/admin/sync`,
-              icon: (
-                <IconFileDownloadFilled className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              ),
-            },
-          ]
-          : []),
-        {
-          label: "Faqs",
+          label: "FAQs",
           href: `/${currentLang}/admin/faqs`,
           icon: (
             <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />

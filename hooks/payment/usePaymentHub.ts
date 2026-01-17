@@ -21,7 +21,16 @@ export function usePaymentHub(paymentId: string | null, enabled: boolean = true)
 
         hubRef.current = hub;
 
+        // Set connection timeout (10 seconds)
+        const connectionTimeout = setTimeout(() => {
+          if (!isConnected) {
+            setError('Connection timeout. Using polling fallback.');
+            setIsConnected(false);
+          }
+        }, 10000);
+
         await hub.connect();
+        clearTimeout(connectionTimeout);
         setIsConnected(true);
         setError(null);
 
@@ -30,10 +39,40 @@ export function usePaymentHub(paymentId: string | null, enabled: boolean = true)
           console.log('Payment status update:', update);
           setStatus(update);
         });
-      } catch (err) {
+
+        // Handle connection errors
+        const connection = (hub as any).connection;
+        if (connection) {
+          connection.onclose((error: any) => {
+            if (error) {
+              console.error('SignalR connection closed with error:', error);
+              setError('Connection lost. Using polling fallback.');
+              setIsConnected(false);
+            }
+          });
+
+          connection.onreconnecting(() => {
+            setError('Reconnecting to payment updates...');
+          });
+
+          connection.onreconnected(() => {
+            setError(null);
+            setIsConnected(true);
+          });
+        }
+      } catch (err: any) {
         // eslint-disable-next-line no-console
         console.error('Failed to connect to payment hub:', err);
-        setError('Failed to connect to payment updates');
+        
+        // Provide more specific error messages
+        if (err?.message?.includes('timeout') || err?.message?.includes('ECONNREFUSED')) {
+          setError('Cannot connect to payment server. Using polling fallback.');
+        } else if (err?.message?.includes('404') || err?.message?.includes('Not Found')) {
+          setError('Payment hub not found. Using polling fallback.');
+        } else {
+          setError('Failed to connect to real-time updates. Using polling fallback.');
+        }
+        
         setIsConnected(false);
       }
     };

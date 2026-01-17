@@ -41,16 +41,14 @@ export default async function ProductGroupsPage(
   ]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-3xl h-14 font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            {dict.pages.admin.productGroups.heading}
-          </h1>
-          <p className="font-primary text-muted-foreground mt-2">
-            {dict.pages.admin.productGroups.subtitle}
-          </p>
-        </div>
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="font-heading text-4xl md:text-5xl h-14 font-black tracking-tight bg-gradient-to-r from-slate-900 via-emerald-900 to-teal-900 dark:from-slate-100 dark:via-emerald-100 dark:to-teal-100 bg-clip-text text-transparent">
+          {dict.pages.admin.productGroups.title}
+        </h1>
+        <p className="font-primary text-slate-600 dark:text-slate-400 text-lg font-medium">
+          {dict.pages.admin.productGroups.description}
+        </p>
       </div>
 
       <Suspense fallback={<ProductGroupsTableSkeleton />}>
@@ -65,8 +63,9 @@ export default async function ProductGroupsPage(
 
 function ProductGroupsTableSkeleton() {
   return (
-    <Card className="bg-white/70 dark:bg-slate-900/70 border-white/20 backdrop-blur-xl">
-      <CardContent className="p-6">
+    <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none rounded-lg" />
+      <CardContent className="p-6 relative">
         <div className="space-y-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-[400px] w-full" />

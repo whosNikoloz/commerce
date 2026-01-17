@@ -81,6 +81,7 @@ export interface CreateOrderPayload {
     shippingCountry?: string
     customerNotes?: string
     currency?: string
+    paymentReturnUrl?: string  // Per guide: URL where user returns after payment
 }
 
 export async function createOrder(

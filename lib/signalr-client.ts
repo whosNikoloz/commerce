@@ -18,7 +18,7 @@ export class PaymentHubClient {
     }
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${this.hubUrl}/paymentHub`)
+      .withUrl(`${this.hubUrl}/transactionHub`)
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
@@ -28,7 +28,7 @@ export class PaymentHubClient {
       // eslint-disable-next-line no-console
       console.log('SignalR Connected');
 
-      await this.connection.invoke('SendTransactionStatusUpdate', this.paymentId);
+      await this.connection.invoke('JoinGroup', this.paymentId);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('SignalR Connection Error:', err);
@@ -47,7 +47,9 @@ export class PaymentHubClient {
   async disconnect(): Promise<void> {
     if (this.connection) {
       try {
-        await this.connection.invoke('LeavePaymentGroup', this.paymentId);
+        // Note: Guide doesn't specify a LeaveGroup method, but keeping for cleanup
+        // If backend doesn't support this, it will fail silently
+        await this.connection.invoke('LeaveGroup', this.paymentId).catch(() => {});
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('Error leaving payment group:', err);

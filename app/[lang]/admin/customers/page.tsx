@@ -33,10 +33,10 @@ export default async function CustomersPage(
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-3xl font-bold h-14 tracking-tight">
-          {dict.pages.admin.customers.heading}
+          {dict.pages.admin.customers.title}
         </h1>
         <p className="font-primary text-muted-foreground">
-          {dict.pages.admin.customers.subtitle}
+          {dict.pages.admin.customers.description}
         </p>
       </div>
 

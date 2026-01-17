@@ -35,10 +35,10 @@ export default async function BrandsPage(
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="font-heading text-4xl md:text-5xl h-14 font-black tracking-tight bg-gradient-to-r from-slate-900 via-purple-900 to-violet-900 dark:from-slate-100 dark:via-purple-100 dark:to-violet-100 bg-clip-text text-transparent">
-          {dict.pages.admin.brands.heading}
+          {dict.pages.admin.brands.title}
         </h1>
         <p className="font-primary text-slate-600 dark:text-slate-400 text-lg font-medium">
-          {dict.pages.admin.brands.subtitle}
+          {dict.pages.admin.brands.description}
         </p>
       </div>
 

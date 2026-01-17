@@ -33,11 +33,11 @@ export default async function PaymentsPage(
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-3xl h-14 font-bold tracking-tight">
-          {dict.pages.admin.payments.heading}
+          {dict.pages.admin.payments.title}
         </h1>
 
         <p className="font-primary text-muted-foreground">
-          {dict.pages.admin.payments.subtitle}
+          {dict.pages.admin.payments.description}
         </p>
       </div>
 

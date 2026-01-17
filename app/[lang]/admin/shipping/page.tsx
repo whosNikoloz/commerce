@@ -33,11 +33,11 @@ export default async function ShippingPage(
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-3xl font-bold h-14 tracking-tight">
-          {dict.pages.admin.shipping.heading}
+          {dict.pages.admin.shipping.title}
         </h1>
 
         <p className="font-primary text-muted-foreground">
-          {dict.pages.admin.shipping.subtitle}
+          {dict.pages.admin.shipping.description}
         </p>
       </div>
 

@@ -122,17 +122,39 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      const orderItems = cart.map((i) => ({
-        productId: i.id,
-        quantity: i.quantity,
-      }));
+      // Format order items with variant field (per guide)
+      const orderItems = cart.map((i) => {
+        // Format variant from selectedFacets if available
+        // CartItem type doesn't include selectedFacets, but it may exist at runtime
+        const itemWithFacets = i as typeof i & { selectedFacets?: Record<string, string> };
+        let variant: string | undefined;
+        if (itemWithFacets.selectedFacets && Object.keys(itemWithFacets.selectedFacets).length > 0) {
+          variant = Object.entries(itemWithFacets.selectedFacets)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(", ");
+        }
 
+        return {
+          productId: i.id,
+          quantity: i.quantity,
+          variant: variant || undefined,
+        };
+      });
+
+      // Per guide: Create order with paymentReturnUrl
+      // Backend should return paymentRedirectUrl and paymentId if payment is created automatically
+      const paymentReturnUrl = `${window.location.origin}/payment/callback?provider=${provider}`;
+      
       const orderResponse = await createOrder({
         orderItems,
-        shippingAddress: "Default Address",
-        shippingCity: "Tbilisi",
-        shippingCountry: "Georgia",
+        shippingAddress: "Default Address", // TODO: Get from form
+        shippingCity: "Tbilisi", // TODO: Get from form
+        shippingState: "Tbilisi", // TODO: Get from form
+        shippingZipCode: "0108", // TODO: Get from form
+        shippingCountry: "Georgia", // TODO: Get from form
+        customerNotes: undefined, // TODO: Get from form if available
         currency: "GEL",
+        paymentReturnUrl, // Per guide: URL where user returns after payment
       }, user.id);
 
       const orderId = orderResponse.id;
@@ -140,45 +162,54 @@ export default function CheckoutPage() {
       // Track payment info being added
       trackPaymentInfo(cart, provider.toUpperCase());
 
-      let data: { orderId?: string; paymentId?: string; redirectUrl: string };
-
-      if (provider === "bog") {
-        data = await apiPost<{ orderId: string; redirectUrl: string }>(
-          "/api/payment/bog/create",
-          {
-            userId: user.id,
-            amount: total,
-            orderItems,
-            orderId,
-            returnUrl: `${window.location.origin}/payment/callback?provider=bog`,
-            locale: "KA",
-          }
+      // Per guide: Backend MUST return paymentRedirectUrl and paymentId in order response
+      // The backend creates the payment automatically when creating the order
+      if (!orderResponse.paymentRedirectUrl || !orderResponse.paymentId) {
+        throw new Error(
+          orderResponse.paymentErrorMessage || 
+          dictionary.checkout.errors.paymentFailed ||
+          "Payment could not be created. Please try again."
         );
-      } else if (provider === "tbc") {
-        data = await apiPost<{ paymentId: string; redirectUrl: string }>(
-          "/api/payment/tbc/create",
-          {
-            userId: user.id,
-            amount: total,
-            currency: "GEL",
-            returnUrl: `${window.location.origin}/payment/callback?provider=tbc`,
-            extraInfo: `Order ${orderId}`,
-            language: "KA",
-          }
-        );
-      } else {
-        throw new Error(dictionary.checkout.errors.invalidProvider);
       }
 
-      if (!data?.redirectUrl) throw new Error(dictionary.checkout.errors.redirectUrlMissing);
-
+      // Per guide: Store order and payment IDs for callback page
       if (typeof window !== "undefined") {
         sessionStorage.setItem("lastOrderId", orderId);
+        sessionStorage.setItem("currentPaymentId", orderResponse.paymentId);
       }
 
-      window.location.href = data.redirectUrl;
+      // Per guide: Redirect to TBC payment page
+      window.location.href = orderResponse.paymentRedirectUrl;
     } catch (e: any) {
-      setError(e?.message ?? dictionary.checkout.errors.paymentFailed);
+      console.error('Checkout error:', e);
+      
+      // Handle specific error types
+      let errorMessage = dictionary.checkout.errors.paymentFailed || 'Payment failed';
+      
+      if (e?.response?.status === 400) {
+        // Bad request - likely validation error
+        errorMessage = e?.response?.data?.detail || e?.message || 'Invalid order data. Please check your information.';
+      } else if (e?.response?.status === 401) {
+        // Unauthorized
+        errorMessage = 'Please log in to complete your purchase.';
+        router.push('/cart?login=required');
+      } else if (e?.response?.status === 403) {
+        // Forbidden
+        errorMessage = 'You do not have permission to complete this action.';
+      } else if (e?.response?.status === 404) {
+        // Not found
+        errorMessage = 'Product or service not found. Please refresh and try again.';
+      } else if (e?.response?.status >= 500) {
+        // Server error
+        errorMessage = 'Server error. Please try again in a moment.';
+      } else if (e?.message) {
+        // Use error message if available
+        errorMessage = e.message;
+      } else if (typeof e === 'string') {
+        errorMessage = e;
+      }
+      
+      setError(errorMessage);
       setIsProcessing(false);
     }
   };

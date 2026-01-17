@@ -51,6 +51,12 @@ export interface OrderDetail extends OrderSummary {
     trackingSteps: TrackingStep[];
     user : UserModel;
     currency: string;
+    // Payment fields from order creation response (per guide)
+    paymentId?: string | null;
+    paymentRedirectUrl?: string | null;
+    paymentSuccess?: boolean | null;
+    paymentErrorMessage?: string | null;
+    orderNumber?: string | null;
 }
 
 export interface PagedResult<T> {

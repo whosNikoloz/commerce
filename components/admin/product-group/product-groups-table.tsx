@@ -154,8 +154,8 @@ export function ProductGroupsTable({
 
         {/* Main Content */}
         <div className="lg:col-span-3">
-          <Card className="bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
+          <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none" />
             <CardHeader className="pb-4 relative">
               <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 flex-1">
@@ -202,10 +202,10 @@ export function ProductGroupsTable({
 
                   {/* Search */}
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500 dark:text-cyan-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 h-4 w-4" />
                     <Input
                       aria-label="Search product groups"
-                      className="pl-10 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 focus:border-cyan-500 dark:focus:border-cyan-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
+                      className="pl-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 focus:border-emerald-400 dark:focus:border-emerald-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
                       placeholder="Search product groups..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -244,7 +244,7 @@ export function ProductGroupsTable({
               <div className="max-h-[calc(100vh-280px)] overflow-auto">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
                   </div>
                 ) : filteredGroups.length === 0 ? (
                   <div className="text-center py-12 px-4">
@@ -322,7 +322,7 @@ export function ProductGroupsTable({
                                     View
                                   </Button> */}
                                   <Button
-                                    className="border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
+                                    className="border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                                     size="sm"
                                     variant="outline"
                                     onClick={() => handleEdit(group)}
@@ -351,7 +351,7 @@ export function ProductGroupsTable({
                       {filteredGroups.map((group) => (
                         <Card
                           key={group.id}
-                          className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700"
+                          className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700"
                         >
                           <CardContent className="p-4 space-y-3">
                             <div className="flex items-start justify-between">
@@ -388,7 +388,7 @@ export function ProductGroupsTable({
 
                             <div className="flex gap-2 pt-2">
                               <Button
-                                className="flex-1 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
+                                className="flex-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleEdit(group)}
@@ -397,7 +397,7 @@ export function ProductGroupsTable({
                                 View
                               </Button>
                               <Button
-                                className="flex-1 border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
+                                className="flex-1 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleEdit(group)}

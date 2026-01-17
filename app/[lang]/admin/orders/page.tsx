@@ -33,11 +33,11 @@ export default async function OrdersPage(
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-3xl h-14 font-bold tracking-tight">
-          {dict.pages.admin.orders.heading}
+          {dict.pages.admin.orders.title}
         </h1>
 
         <p className="font-primary text-muted-foreground">
-          {dict.pages.admin.orders.subtitle}
+          {dict.pages.admin.orders.description}
         </p>
       </div>
 

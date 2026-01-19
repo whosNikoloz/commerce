@@ -167,8 +167,7 @@ export default function CheckoutPage() {
       if (!orderResponse.paymentRedirectUrl || !orderResponse.paymentId) {
         throw new Error(
           orderResponse.paymentErrorMessage || 
-          dictionary.checkout.errors.paymentFailed ||
-          "Payment could not be created. Please try again."
+          dictionary.checkout.errors.paymentFailed
         );
       }
 
@@ -184,7 +183,7 @@ export default function CheckoutPage() {
       console.error('Checkout error:', e);
       
       // Handle specific error types
-      let errorMessage = dictionary.checkout.errors.paymentFailed || 'Payment failed';
+      let errorMessage = dictionary.checkout.errors.paymentFailed;
       
       if (e?.response?.status === 400) {
         // Bad request - likely validation error

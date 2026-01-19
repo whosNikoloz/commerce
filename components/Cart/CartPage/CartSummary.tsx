@@ -55,7 +55,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
   };
 
   const shipping = getShippingCost();
-  const tax = (subtotal - promoDiscount) * 0.08;
+  const tax = 0.00 //(subtotal - promoDiscount) * 0.08;
   const total = subtotal - promoDiscount + shipping + tax;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

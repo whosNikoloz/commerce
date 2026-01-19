@@ -17,8 +17,8 @@ export async function generateMetadata({
     const dict = await getDictionary(lang);
 
     return i18nPageMetadataAsync({
-        title: dict?.pages?.brands?.title || "Brands",
-        description: dict?.pages?.brands?.description || "Explore all our brands and discover quality products",
+        title: dict?.pages?.brands?.title,
+        description: dict?.pages?.brands?.description,
         lang,
         path: "/brands",
     });

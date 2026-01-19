@@ -16,7 +16,9 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/modal";
-import { Input, Textarea } from "@heroui/input";
+import { Input } from "@heroui/input";
+
+import { CustomEditor } from "../../wysiwyg-text-custom";
 import { Select, SelectItem } from "@heroui/select";
 
 import { ProductGroupCategoryTree } from "../product-group/product-group-category-tree";
@@ -29,6 +31,7 @@ import { createProduct } from "@/app/api/services/productService";
 import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productGroupService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GoBackButton } from "@/components/go-back-button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface AddProductModalProps {
   categories: CategoryModel[];
@@ -67,6 +70,9 @@ export default function AddProductModal({
 }: AddProductModalProps) {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
+  const dictionary = useDictionary();
+  const t = dictionary?.admin?.products?.addModal || {};
+  const tCommon = dictionary?.common || {};
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormState>(initialFormState);
@@ -213,7 +219,7 @@ export default function AddProductModal({
         onClick={handleOpen}
       >
         <Plus className="h-4 w-4" />
-        Add Product
+        {dictionary?.admin?.products?.table?.addProduct}
       </Button>
 
       <Modal
@@ -240,10 +246,10 @@ export default function AddProductModal({
                   <GoBackButton onClick={handleClose} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Add New Product
+                      {t?.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Create a product with pricing, stock and attributes.
+                      {t?.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -251,10 +257,10 @@ export default function AddProductModal({
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Add New Product
+                      {t?.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Manage your product inventory, pricing and attributes.
+                      {t?.subtitle}
                     </p>
                   </div>
                 </ModalHeader>
@@ -272,7 +278,7 @@ export default function AddProductModal({
                 <section className="space-y-3">
                   <div>
                     <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100 mb-10">
-                      Basic Information
+                      {t?.basicInformation}
                     </h3>
                   </div>
 
@@ -282,9 +288,9 @@ export default function AddProductModal({
                       inputWrapper:
                         "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                     }}
-                    label="Product Name"
+                    label={t?.productName}
                     labelPlacement="outside"
-                    placeholder="e.g., iPhone 15 Pro"
+                    placeholder={t?.productNamePlaceholder}
                     value={formData.name}
                     variant="bordered"
                     onChange={(e) =>
@@ -295,34 +301,32 @@ export default function AddProductModal({
                     }
                   />
 
-                  <Textarea
-                    classNames={{
-                      inputWrapper:
-                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
-                    }}
-                    label="Description"
-                    labelPlacement="outside"
-                    minRows={3}
-                    placeholder="Product description..."
-                    value={formData.description}
-                    variant="bordered"
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      {t?.description}
+                    </label>
+                    <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden min-h-[200px]">
+                      <CustomEditor
+                        value={formData.description}
+                        onChange={(value) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            description: value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
                 </section>
 
                 {/* Pricing */}
                 <section className="space-y-3">
                   <div>
                     <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      Pricing
+                      {t?.pricing}
                     </h3>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Set the regular and discounted selling price.
+                      {t?.pricingDescription}
                     </p>
                   </div>
 
@@ -333,7 +337,7 @@ export default function AddProductModal({
                         inputWrapper:
                           "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                       }}
-                      label="Price (₾)"
+                      label={t?.price}
                       labelPlacement="outside"
                       min="0"
                       placeholder="0.00"
@@ -354,7 +358,7 @@ export default function AddProductModal({
                         inputWrapper:
                           "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                       }}
-                      label="Discount Price (₾)"
+                      label={t?.discountPrice}
                       labelPlacement="outside"
                       min="0"
                       placeholder="0.00"
@@ -376,10 +380,10 @@ export default function AddProductModal({
                 <section className="space-y-3">
                   <div>
                     <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      Classification
+                      {t?.classification}
                     </h3>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Organize this product by category, brand and variant group.
+                      {t?.classificationDescription}
                     </p>
                   </div>
 
@@ -389,12 +393,12 @@ export default function AddProductModal({
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex flex-col min-w-0">
                             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
-                              Category Tree
+                              {t?.categoryTree}
                             </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                               {selectedCategoryName
-                                ? `Selected: ${selectedCategoryName}`
-                                : "Pick a category to attach this product."}
+                                ? `${selectedCategoryName}`
+                                : t?.pickCategory}
                             </p>
                           </div>
                           {formData.categoryId && (
@@ -404,7 +408,7 @@ export default function AddProductModal({
                               variant="ghost"
                               onClick={() => handleCategorySelect(null)}
                             >
-                              Clear
+                              {tCommon?.back}
                             </Button>
                           )}
                         </div>
@@ -414,7 +418,7 @@ export default function AddProductModal({
                             inputWrapper:
                               "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                           }}
-                          placeholder="Search categories..."
+                          placeholder={t?.searchCategories}
                           startContent={<Search className="h-4 w-4 text-blue-500" />}
                           value={categorySearchTerm}
                           variant="bordered"
@@ -439,9 +443,9 @@ export default function AddProductModal({
                           trigger:
                             "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                         }}
-                        label="Brand"
+                        label={t?.brand}
                         labelPlacement="outside"
-                        placeholder="Select brand"
+                        placeholder={t?.selectBrand}
                         selectedKeys={
                           formData.brandId ? [formData.brandId] : []
                         }
@@ -468,20 +472,20 @@ export default function AddProductModal({
                         }}
                         description={
                           !formData.categoryId && !formData.brandId
-                            ? "Select a category or brand first to see available product groups."
-                            : "Optional - connect products that are variants of each other."
+                            ? t?.selectCategoryOrBrandFirst
+                            : undefined
                         }
                         isDisabled={
                           loadingGroups ||
                           (!formData.categoryId && !formData.brandId)
                         }
                         items={productGroupOptions}
-                        label="Product Group (Variants)"
+                        label={t?.productGroup}
                         labelPlacement="outside"
                         placeholder={
                           loadingGroups
-                            ? "Loading groups..."
-                            : "Select product group (optional)"
+                            ? tCommon?.loading
+                            : t?.selectProductGroup
                         }
                         selectedKeys={
                           formData.productGroupId
@@ -510,10 +514,10 @@ export default function AddProductModal({
                 <section className="space-y-3">
                   <div>
                     <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      Inventory & Condition
+                      {t.inventoryCondition || "Inventory & Condition"}
                     </h3>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Control how this product appears in stock and condition filters.
+                      {t.inventoryConditionDescription || "Control how this product appears in stock and condition filters."}
                     </p>
                   </div>
 
@@ -523,7 +527,7 @@ export default function AddProductModal({
                         trigger:
                           "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                       }}
-                      label="Stock Status"
+                      label={t.stockStatus || "Stock Status"}
                       labelPlacement="outside"
                       selectedKeys={[formData.status]}
                       variant="bordered"
@@ -537,10 +541,10 @@ export default function AddProductModal({
                       }}
                     >
                       <SelectItem key={StockStatus.InStock.toString()}>
-                        In Stock
+                        {tCommon.inStock || "In Stock"}
                       </SelectItem>
                       <SelectItem key={StockStatus.OutOfStock.toString()}>
-                        Out of Stock
+                        {tCommon.soldOut || "Out of Stock"}
                       </SelectItem>
                     </Select>
 
@@ -549,7 +553,7 @@ export default function AddProductModal({
                         trigger:
                           "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                       }}
-                      label="Condition"
+                      label={t.condition || "Condition"}
                       labelPlacement="outside"
                       selectedKeys={[formData.condition]}
                       variant="bordered"
@@ -563,13 +567,13 @@ export default function AddProductModal({
                       }}
                     >
                       <SelectItem key={Condition.New.toString()}>
-                        New
+                        {tCommon.new || "New"}
                       </SelectItem>
                       <SelectItem key={Condition.Used.toString()}>
-                        Used
+                        {tCommon.used || "Used"}
                       </SelectItem>
                       <SelectItem key={Condition.LikeNew.toString()}>
-                        Like New
+                        {tCommon.likeNew || "Like New"}
                       </SelectItem>
                     </Select>
                   </div>
@@ -579,10 +583,10 @@ export default function AddProductModal({
                 <section className="space-y-3 pb-1">
                   <div>
                     <h3 className="font-heading text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      Attributes & Filters
+                      {t.attributesFilters || "Attributes & Filters"}
                     </h3>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Attach facet values (size, color, material, etc.) so customers can filter.
+                      {t.attachFacetValues || "Attach facet values (size, color, material, etc.) so customers can filter."}
                     </p>
                   </div>
 
@@ -598,7 +602,7 @@ export default function AddProductModal({
               <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
                 <div className="flex w-full items-center justify-between gap-3">
                   <p className="font-primary hidden text-xs text-slate-500 dark:text-slate-400 md:block">
-                    You can edit all details later from the product page.
+                    {t.editDetailsLater || "You can edit all details later from the product page."}
                   </p>
 
                   <div className="ml-auto flex items-center gap-2">
@@ -610,7 +614,7 @@ export default function AddProductModal({
                       variant="outline"
                       onClick={handleClose}
                     >
-                      Cancel
+                      {t.cancel || "Cancel"}
                     </Button>
                     <Button
                       className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-700"
@@ -618,7 +622,7 @@ export default function AddProductModal({
                       size={isMobile ? "sm" : "default"}
                       type="submit"
                     >
-                      {loading ? "Creating..." : "Create Product"}
+                      {loading ? (tCommon.loading || "Creating...") : (t.create || "Create Product")}
                     </Button>
                   </div>
                 </div>

@@ -47,14 +47,14 @@ function PaymentCallbackContent() {
     // Per guide: paymentId is required for TBC, orderId for BOG
     if (provider === 'tbc' && !paymentId) {
       setStatus('failed');
-      setMessage(dictionary.checkout.errors.invalidProvider || 'Payment ID is required');
+      setMessage(dictionary.checkout.errors.invalidProvider);
 
       return;
     }
 
     if (provider === 'bog' && !orderId) {
       setStatus('failed');
-      setMessage(dictionary.checkout.errors.invalidProvider || 'Order ID is required');
+      setMessage(dictionary.checkout.errors.invalidProvider);
 
       return;
     }
@@ -191,7 +191,7 @@ function PaymentCallbackContent() {
           setMessage('Unable to verify payment status after multiple attempts. Please check your order or contact support.');
         } else {
           setStatus('failed');
-          setMessage(dictionary.checkout.processing.errorChecking || 'Error checking payment status');
+          setMessage(dictionary.checkout.processing.errorChecking);
           setTimeout(() => {
             router.push('/checkout/failed?reason=Error+checking+payment');
           }, 2000);

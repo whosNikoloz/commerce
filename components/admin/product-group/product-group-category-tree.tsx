@@ -77,10 +77,10 @@ export function ProductGroupCategoryTree({
   ) => {
     const visibleCats = searchTerm
       ? cats.filter(
-          (c) =>
-            c.parentId === parentId &&
-            filteredCategories.some((fc) => fc.id === c.id)
-        )
+        (c) =>
+          c.parentId === parentId &&
+          filteredCategories.some((fc) => fc.id === c.id)
+      )
       : cats.filter((c) => c.parentId === parentId);
 
     if (visibleCats.length === 0) return null;
@@ -103,10 +103,10 @@ export function ProductGroupCategoryTree({
                 className={[
                   "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 relative border-2",
                   isSelected
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-emerald-300 dark:border-emerald-700 shadow-md"
+                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-300 dark:border-blue-700 shadow-md"
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
                   isHighlighted && !isSelected
-                    ? "ring-2 ring-emerald-300 dark:ring-emerald-700"
+                    ? "ring-2 ring-blue-300 dark:ring-blue-700"
                     : "",
                 ].join(" ")}
                 role="button"
@@ -126,7 +126,7 @@ export function ProductGroupCategoryTree({
                     className={[
                       "p-1 rounded-md transition-all duration-200",
                       isSelected
-                        ? "hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+                        ? "hover:bg-blue-100 dark:hover:bg-blue-900/40"
                         : "hover:bg-slate-100 dark:hover:bg-slate-700",
                     ].join(" ")}
                     type="button"
@@ -137,18 +137,18 @@ export function ProductGroupCategoryTree({
                   >
                     {isExpanded ? (
                       <ChevronDown
-                        className={`h-3.5 w-3.5 ${isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
+                        className={`h-3.5 w-3.5 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
                       />
                     ) : (
                       <ChevronRight
-                        className={`h-3.5 w-3.5 ${isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
+                        className={`h-3.5 w-3.5 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
                       />
                     )}
                   </button>
                 ) : (
                   <div className="w-5 h-5 flex items-center justify-center">
                     <div
-                      className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-emerald-500" : "bg-slate-400 dark:bg-slate-600"}`}
+                      className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-blue-500" : "bg-slate-400 dark:bg-slate-600"}`}
                     />
                   </div>
                 )}
@@ -177,10 +177,10 @@ export function ProductGroupCategoryTree({
                   className={[
                     "flex-1 text-sm font-semibold truncate",
                     isSelected
-                      ? "text-emerald-900 dark:text-emerald-300"
+                      ? "text-blue-900 dark:text-blue-300"
                       : "text-slate-900 dark:text-slate-100",
                     isHighlighted && !isSelected
-                      ? "underline decoration-emerald-500/50"
+                      ? "underline decoration-blue-500/50"
                       : "",
                   ].join(" ")}
                   title={cat.name}
@@ -194,7 +194,7 @@ export function ProductGroupCategoryTree({
                     className={[
                       "text-xs px-2 py-0.5 h-5 font-bold",
                       isSelected
-                        ? "bg-emerald-200 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"
+                        ? "bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
                         : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
                     ].join(" ")}
                     variant="secondary"
@@ -235,7 +235,7 @@ export function ProductGroupCategoryTree({
             className={[
               "flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-300 border-2",
               selectedCategoryId === null
-                ? "bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-emerald-300 dark:border-emerald-700 shadow-md"
+                ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-300 dark:border-blue-700 shadow-md"
                 : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
             ].join(" ")}
             role="button"
@@ -249,15 +249,15 @@ export function ProductGroupCategoryTree({
             }}
           >
             <Folder
-              className={`h-4 w-4 ${selectedCategoryId === null ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
+              className={`h-4 w-4 ${selectedCategoryId === null ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
             />
             <span
-              className={`text-sm font-semibold ${selectedCategoryId === null ? "text-emerald-900 dark:text-emerald-300" : "text-slate-900 dark:text-slate-100"}`}
+              className={`text-sm font-semibold ${selectedCategoryId === null ? "text-blue-900 dark:text-blue-300" : "text-slate-900 dark:text-slate-100"}`}
             >
               All Categories
             </span>
             <Badge
-              className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategoryId === null ? "bg-emerald-200 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}
+              className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategoryId === null ? "bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}
               variant="secondary"
             >
               {rootCategories.length}

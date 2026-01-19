@@ -12,6 +12,7 @@ import HeaderCartButton from "./header-cart-button";
 
 import { useCartStore } from "@/app/context/cartContext";
 import { useCartUI } from "@/app/context/cart-ui";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function CartDrawer() {
   const cart = useCartStore((s) => s.cart);
@@ -20,7 +21,8 @@ export default function CartDrawer() {
   const _totalQuantity = useCartStore((s) => s.getCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
   const { cartIconRef } = useCartUI();
-
+  const dictionary = useDictionary();
+  
   const updateCartItem = useCartStore((s) => s.updateCartItem);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
 
@@ -75,7 +77,7 @@ export default function CartDrawer() {
               <div className="flex items-center justify-between px-3 py-3 sm:px-4 sm:py-3.5 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-2">
                   <ShoppingCartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-300" />
-                  <h2 className="font-heading text-sm sm:text-base font-bold text-gray-800 dark:text-white">My Cart</h2>
+                  <h2 className="font-heading text-sm sm:text-base font-bold text-gray-800 dark:text-white">{dictionary.cart.myCart}</h2>
                 </div>
                 <button
                   aria-label="Close cart"
@@ -90,7 +92,7 @@ export default function CartDrawer() {
                 <div className="flex flex-col items-center justify-center flex-1 p-4 text-center">
                   <ShoppingCartIcon className="h-12 w-12 sm:h-14 sm:w-14 text-gray-400 dark:text-gray-500" />
                   <p className="font-primary mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                    Your cart is empty.
+                    {dictionary.cart.startShopping}
                   </p>
                 </div>
               ) : (
@@ -161,7 +163,7 @@ export default function CartDrawer() {
 
                   <div className="sticky bottom-0 px-3 py-3 sm:px-4 sm:py-3.5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
                     <div className="flex justify-between items-center text-sm sm:text-base font-bold mb-2.5">
-                      <span className="font-primary text-gray-700 dark:text-gray-300">Total:</span>
+                      <span className="font-primary text-gray-700 dark:text-gray-300">{dictionary.cart.total}</span>
                       <span className="font-primary text-brand-primary dark:text-brand-primaryDark">
                         ₾{subtotal.toFixed(2)}
                       </span>
@@ -172,7 +174,7 @@ export default function CartDrawer() {
                       href="/cart"
                       onPress={closeCart}
                     >
-                      <span className="font-primary text-sm">ნახვა</span>
+                      <span className="font-primary text-sm">{dictionary.cart.view}</span>
                     </Button>
                   </div>
                 </div>

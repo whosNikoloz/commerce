@@ -8,241 +8,351 @@
     "failed": "Failed",
     "back": "Back",
     "profile": "Profile",
+
     "new": "New",
     "used": "Used",
-    "likeNew": "Like New",
-    "unknownCondition": "Unknown Condition",
-    "inStock": "In Stock",
-    "comingSoon": "Coming Soon",
-    "unknownStatus": "Unknown Status",
-    "loadError": "Failed to Load",
-    "lastStock": "Last {count} pcs",
-    "remainingStock": "{count} pcs left",
-    "soldOut": "Sold Out",
-    "addToCart": "Add to Cart",
+    "likeNew": "Like new",
+    "unknownCondition": "Unknown condition",
+
+    "inStock": "In stock",
+    "comingSoon": "Coming soon",
+    "unknownStatus": "Unknown status",
+    "soldOut": "Sold out",
+
+    "loadError": "Failed to load",
+    "lastStock": "Last {count} items",
+    "remainingStock": "{count} items remaining",
+
+    "addToCart": "Add to cart",
     "addToCartShort": "Add",
     "liquidation": "Liquidation",
+
     "freeShipping": "Fast delivery across Georgia",
-    "backToBrands": "Back to Brands",
+    "backToBrands": "Back to brands",
     "products": "Products",
-    "browseBrands": "Browse Other Brands"
+    "browseBrands": "Browse other brands"
   },
-  "admin": {
+
+  "auth": {
     "login": {
-      "title": "Sign In",
+      "title": "Login",
       "email": "Email",
       "password": "Password",
-      "button": "Sign In"
+      "button": "Login",
+      "fillEmail": "Please enter your email",
+      "invalidEmail": "Please enter a valid email address",
+      "fillPassword": "Please enter your password",
+      "loginFailed": "Login failed. Please check your credentials",
+      "userNotFound": "No user found with this email",
+      "forgotPassword": "Forgot password?",
+      "or": "or",
+      "switchMode": "Don't have an account? Register"
     },
-    "brands": {
-      "title": "Brands",
-      "description": "Manage your brand catalog and origins",
-      "loadingTitle": "Brands",
-      "loadingDescription": "Loading Brands..."
+    "register": {
+      "title": "Register",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "verificationCode": "Verification code",
+      "button": "Register",
+      "confirm": "Confirm registration",
+
+      "fillUsername": "Please enter a username",
+      "fillEmail": "Please enter your email",
+      "invalidEmail": "Please enter a valid email address",
+      "fillPassword": "Please enter a password",
+      "fillConfirmPassword": "Please confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "requestCodeFirst": "Please request a verification code first",
+      "enterCode": "Please enter the verification code",
+      "registrationFailed": "Registration failed. Please try again",
+      "codeSent": "A verification code has been sent to your email",
+      "or": "or",
+      "switchMode": "Already have an account? Login",
+
+      "passwordRequirements": {
+        "minChars": "6+ characters",
+        "digit": "1 digit",
+        "lower": "Lowercase letter",
+        "upper": "Uppercase letter",
+        "special": "Special character"
+      }
     },
-    "categories": {
-      "title": "Categories",
-      "description": "Organize your product hierarchy and facets",
-      "loadingTitle": "Categories"
+    "forgotPassword": {
+      "title": "Reset password",
+      "email": "Email",
+      "button": "Send reset link",
+      "subText": "Enter your email address and we’ll send you a link to reset your password."
     },
-    "facets": {
-      "title": "Facets",
-      "description": "Create, edit and organize attributes like Size, Resolution, Color",
-      "loadingTitle": "Facets"
-    },
-    "products": {
-      "title": "Products",
-      "description": "Manage your product inventory and details",
-      "loadingTitle": "Products"
-    },
-    "productGroups": {
-      "title": "Product Groups",
-      "description": "Manage product groups filtered by category and brand",
-      "loadingTitle": "Product Groups"
-    },
-    "stores": {
-      "title": "Stores",
-      "description": "Manage store locations and transfer products between them",
-      "loadingTitle": "Stores"
-    },
-    "shipping": {
-      "title": "Shipping",
-      "description": "Manage shipping methods, zones, and delivery options",
-      "loadingTitle": "Shipping"
-    },
-    "payments": {
-      "title": "Payments",
-      "description": "Monitor transactions and configure payment methods",
-      "loadingTitle": "Payments"
-    },
-    "orders": {
-      "title": "Orders",
-      "description": "Track and manage customer orders and fulfillment",
-      "loadingTitle": "Orders"
-    },
-    "customers": {
-      "title": "Customers",
-      "description": "Manage customer relationships and track customer lifetime value",
-      "loadingTitle": "Customers"
-    },
-    "sync": {
-      "title": "Synchronization",
-      "description": "Trigger sync jobs, monitor status, and view a live activity log"
-    },
-    "analytics": {
-      "title": "Analytics",
-      "description": "View key metrics and performance of your store.",
-      "loadingTitle": "Analytics"
-    },
-    "faqs": {
-      "title": "FAQs",
-      "description": "Manage frequently asked questions and answers",
-      "loadingTitle": "FAQs"
+    "errorPage": {
+      "title": "Authentication error",
+      "googleFailed": "Google sign-in failed — please try again.",
+      "genericFailed": "Something went wrong. Please try again.",
+      "goHome": "Back to home"
     }
   },
-  "cart": {
-    "title": "Cart",
-    "shoppingCart": "Shopping Cart",
-    "description": "Review your cart and proceed to checkout.",
-    "page": {
-      "title": "Shopping Cart",
-      "description": "Review your cart items and proceed to checkout"
+
+  "admin": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "button": "Login"
     },
-    "empty": "Your cart is empty.",
-    "emptyDescription": "Looks like you haven't added anything to your cart yet. Start shopping now!",
-    "emptyDescriptionShort": "Add products to purchase",
-    "checkout": "Checkout",
-    "item": "item",
-    "items": "items",
-    "inYourCart": "in your cart",
-    "continueShopping": "Continue Shopping",
-    "startShopping": "Start Shopping",
-    "view": "View",
-    "buy": "Buy",
-    "checkingStock": "Checking stock...",
-    "outOfStock": "Out of stock",
-    "stock": "In stock: {count}",
-    "stockLimitExceeded": "Limited to {count} in stock",
-    "orderSummary": "Order Summary",
-    "loginRequired": "Login Required",
-    "loginRequiredMsg": "Please sign in to proceed with checkout.",
-    "loginRequiredToast": "Please log in first",
-    "dismiss": "Dismiss",
-    "subtotal": "Subtotal",
-    "discount": "Discount",
-    "shipping": "Shipping",
-    "free": "Free",
-    "tax": "Tax",
-    "total": "Total",
-    "addMoreForFreeShipping": "Add {amount} more for free shipping",
-    "proceedToCheckout": "Proceed to Checkout",
-    "loginToCheckout": "Login to Checkout",
-    "freeShippingOver": "Free shipping on orders over {amount}",
-    "returnPolicy": "Easy 30-day returns",
-    "secureCheckout": "Secure SSL encrypted checkout"
-  },
-  "checkout": {
-    "title": "Checkout",
-    "description": "Review your order and complete checkout.",
-    "page": {
-      "title": "Checkout",
-      "description": "Complete your purchase securely"
+
+     "sidebar": {
+      "dashboard": "Dashboard",
+
+      "catalog": "Catalog",
+      "products": "Products",
+      "productGroups": "Product Groups",
+      "categories": "Categories",
+      "facets": "Facets",
+      "brands": "Brands",
+
+      "sales": "Sales",
+      "orders": "Orders",
+      "customers": "Customers",
+      "transactions": "Transactions",
+
+      "content": "Content",
+      "faqs": "FAQs",
+      "analytics": "Analytics",
+      "siteConfig": "Site Config"
     },
-    "completePurchase": "Complete your purchase securely",
-    "paymentSuccess": "Payment successful. Thank you!",
-    "paymentFailed": "Payment failed or cancelled. Please try again.",
-    "checkingPayment": "Checking payment…",
-    "redirecting": "Redirecting to payment...",
-    "paySecurely": "Pay Securely",
-    "secureHostedCheckout": "Secure hosted checkout",
-    "chooseProvider": "Choose Payment Provider",
-    "providers": {
-      "bog": "Bank of Georgia",
-      "tbc": "TBC Bank"
-    },
-    "status": {
-      "loading": "Checking payment status...",
-      "success": "Payment successful! Thank you for your purchase.",
-      "failed": "Payment failed or was cancelled. Please try again."
-    },
-    "errors": {
-      "userNotLoggedIn": "You must be logged in to place an order",
-      "invalidProvider": "Invalid payment provider selected",
-      "redirectUrlMissing": "Failed to get payment URL",
-      "paymentFailed": "Payment processing failed"
-    },
-    "processing": {
-      "title": "Processing Payment",
-      "description": "Please wait while we verify your payment.",
-      "success": "Payment Successful!",
-      "successMessage": "Payment completed successfully!",
-      "redirecting": "Redirecting to confirmation page...",
-      "failed": "Payment Failed",
-      "errorChecking": "Error checking payment status",
-      "tryAgain": "Try Again"
-    },
-    "success": {
-      "title": "Payment Successful!",
-      "message": "Thank you for your purchase. Your order has been confirmed.",
-      "orderDetails": "Order Details",
-      "orderId": "Order ID:",
-      "paymentId": "Payment ID:",
-      "emailConfirmation": "📧 A confirmation email will be sent to your email address shortly.",
-      "continueShopping": "Continue Shopping",
-      "viewOrders": "View My Orders"
-    },
-    "failed": {
-      "title": "Payment Failed",
-      "reason": "Reason:",
-      "message": "We couldn't process your payment. This could be due to:",
-      "reasons": {
-        "funds": "Insufficient funds",
-        "declined": "Card declined by bank",
-        "details": "Incorrect card details",
-        "cancelled": "Payment cancelled"
+
+    "products": {
+      "table": {
+        "title": "Products",
+        "description": "Manage your product inventory and details",
+        "categories": "Categories",
+        "addProduct": "Add product",
+        "allCategories": "All categories",
+        "searchCategories": "Search categories...",
+        "searchProducts": "Search products..."
       },
-      "tryAgain": "Try Again",
-      "backToCart": "Back to Cart",
-      "contactSupport": "Contact Support"
-    },
-    "subtotal": "Subtotal",
-    "shipping": "Shipping",
-    "tax": "Tax",
-    "total": "Total",
-    "free": "Free",
-    "freeShippingOver": "Free shipping on orders over {amount}",
-    "returnPolicy": "Easy 30-day returns",
-    "secureEncryption": "Secure 256-bit SSL encryption",
-    "reviewAndPay": "Review & Pay",
-    "termsAgreement": "By placing this order, you agree to our Terms of Service and Privacy Policy.",
-    "orderSummary": "Order Summary",
-    "processingLabel": "Processing..."
+
+      "addModal": {
+        "title": "Add new product",
+        "subtitle": "Manage product inventory, pricing, and attributes.",
+
+        "basicInformation": "Basic information",
+        "productName": "Product name",
+        "productNamePlaceholder": "e.g., iPhone 15 Pro",
+        "description": "Description",
+        "descriptionPlaceholder": "Product description...",
+
+        "pricing": "Pricing",
+        "pricingDescription": "Set regular and discounted prices.",
+        "price": "Price (₾)",
+        "discountPrice": "Discount price (₾)",
+
+        "classification": "Classification",
+        "classificationDescription": "Assign the product to a category, brand, and variant group.",
+        "categoryTree": "Category tree",
+        "pickCategory": "Select a category for this product.",
+        "searchCategories": "Search categories...",
+        "allCategories": "All categories",
+
+        "brand": "Brand",
+        "selectBrand": "Select brand",
+
+        "productGroup": "Product group (variants)",
+        "selectProductGroup": "Select product group (optional)",
+        "selectCategoryOrBrandFirst": "Select a category or brand first to view product groups.",
+
+        "inventoryCondition": "Inventory and condition",
+        "inventoryConditionDescription": "Define how this product appears in stock and condition filters.",
+        "stockStatus": "Stock status",
+        "inStock": "In stock",
+
+        "condition": "Condition",
+        "new": "New",
+
+        "attributesFilters": "Attributes and filters",
+        "attachFacetValues": "Attach attribute values (size, color, material, etc.) for customer filtering.",
+        "selectCategoryFirstForFacets": "Please select a category first to view attributes",
+        "editDetailsLater": "All details can be edited later from the product page.",
+
+        "cancel": "Cancel",
+        "create": "Create"
+      },
+
+      "editModal": {
+        "title": "Update product description",
+        "subtitle": "Update product information and description",
+
+        "settingsTab": "Settings",
+        "descriptionTab": "Description",
+
+        "category": "Category",
+        "editCategoryDescription": "Change the category selection from the tree (similar to attribute settings).",
+
+        "inventory": "Inventory",
+        "brand": "Brand",
+
+        "productGroup": "Product group (optional)",
+        "noneStandalone": "No (standalone product)",
+
+        "inventoryCondition": "Inventory and condition",
+        "stockStatus": "Stock status",
+        "inStock": "In stock",
+
+        "condition": "Condition",
+        "new": "New",
+        "liquidation": "Liquidation",
+        "comingSoon": "Coming soon",
+
+        "productFacets": "Product attributes"
+      }
+    }
   },
+
+  "pages": {
+    "admin": {
+      "dashboard": {
+        "title": "Admin dashboard",
+        "description": "Manage your store from the admin panel",
+
+        "revenue": "Revenue",
+        "orders": "Orders",
+        "customers": "Customers",
+        "products": "Products",
+        "vsLastMonth": "vs last month",
+
+        "recentOrders": "Recent orders",
+        "recentCustomers": "Recent customers",
+        "recentProducts": "Recent products",
+
+        "quickActions": "Actions",
+        "viewAll": "All",
+
+        "manageYourStoreEfficiently": "Manage your store",
+        "addNewProduct": "Add new product",
+        "addNewCategory": "Add new category",
+        "addNewOrder": "Add new order",
+        "addNewCustomer": "Add new customer"
+      },
+
+      "brands": {
+        "title": "Brands",
+        "description": "Manage your brand catalog and origins",
+        "loadingTitle": "Brands",
+        "loadingDescription": "Loading brands..."
+      },
+      "categories": {
+        "title": "Categories",
+        "description": "Organize product hierarchy and attributes",
+        "loadingTitle": "Categories"
+      },
+      "facets": {
+        "title": "Attributes",
+        "description": "Create, edit, and organize attributes such as size, resolution, and color",
+        "loadingTitle": "Attributes"
+      },
+      "products": {
+        "title": "Products",
+        "description": "Manage your product inventory and details",
+        "loadingTitle": "Products"
+      },
+      "productGroups": {
+        "title": "Product groups",
+        "description": "Manage product groups by category and brand",
+        "loadingTitle": "Product groups"
+      },
+      "stores": {
+        "title": "Stores",
+        "description": "Manage store locations and move products between them",
+        "loadingTitle": "Stores"
+      },
+      "shipping": {
+        "title": "Shipping",
+        "description": "Manage shipping methods, zones, and options",
+        "loadingTitle": "Shipping"
+      },
+      "payments": {
+        "title": "Payments",
+        "description": "Monitor transactions and configure payment methods",
+        "loadingTitle": "Payments"
+      },
+      "orders": {
+        "title": "Orders",
+        "description": "Track and manage customer orders and fulfillment",
+        "loadingTitle": "Orders"
+      },
+      "customers": {
+        "title": "Customers",
+        "description": "Manage customer relationships and track lifetime value",
+        "loadingTitle": "Customers"
+      },
+      "sync": {
+        "title": "Sync",
+        "description": "Run synchronization, monitor status, and view logs"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "View key metrics and store performance.",
+        "loadingTitle": "Analytics"
+      },
+      "faqs": {
+        "title": "FAQs",
+        "description": "Manage frequently asked questions and answers",
+        "loadingTitle": "FAQs"
+      }
+    },
+
+    "brands": {
+      "title": "Brands",
+      "description": "Explore all our brands and discover quality products"
+    },
+    "brand": {
+      "notFound": "Brand not found",
+      "productsFrom": "Products",
+      "exploreProducts": "Explore the full product range",
+      "noProducts": "Products are unavailable",
+      "checkBackLater": "Check back later for new products"
+    }
+  },
+
   "category": {
     "meta": {
       "defaultTitle": "Category",
       "defaultDescription": "Browse categories.",
       "categoryDescription": "Shop {{category}} products.",
       "notFoundTitle": "Category not found",
-      "notFoundDescription": "The requested category could not be found or was removed."
+      "notFoundDescription": "The requested category was not found or has been removed."
     },
     "search": {
       "title": "Search: {{query}}",
       "description": "Browse products matching \"{{query}}\".",
       "inCategoryTitle": "{{category}} — Search: \"{{query}}\"",
-      "inCategoryDescription": "Products in {{category}} matching \"{{query}}\"."
+      "inCategoryDescription": "Products in {{category}} that match \"{{query}}\"."
     },
     "breadcrumbs": {
       "home": "Home",
       "catalog": "Catalog",
       "search": "Search",
       "searchWithQuery": "Search: {{query}}"
+    },
+    "drawer": {
+      "title": "Categories",
+      "browseProducts": "Browse products",
+      "viewingSubcategories": "Viewing subcategories",
+      "loadingCategories": "Loading categories...",
+      "noCategoriesFound": "No categories found.",
+      "ariaOpenMenu": "Open categories menu",
+      "ariaCloseMenu": "Close categories menu",
+      "ariaShowSubcategories": "Show subcategories",
+      "ariaHideSubcategories": "Hide subcategories"
     }
   },
+
   "searchPage": {
     "resultsFor": "Search results for \"{{query}}\"",
     "noResults": "No products found for \"{{query}}\""
   },
+
   "search": {
     "placeholder": "Search products...",
     "recentSearches": "Recent searches",
@@ -251,24 +361,26 @@
     "error": "Error",
     "tryAgain": "Please try again.",
     "noResults": "No products found.",
-    "noHistory": "No recent searches yet.",
+    "noHistory": "No search history yet.",
     "startTyping": "Start typing to search.",
     "unnamedProduct": "Unnamed product",
-    "browseCategories": "Browse Categories"
+    "browseCategories": "Browse categories"
   },
+
   "product": {
     "notFound": {
       "title": "Product not found",
-      "description": "The product you're looking for doesn't exist or was removed.",
+      "description": "The product you're looking for does not exist or has been removed.",
       "browseCategories": "Browse categories",
-      "goHome": "Go home"
+      "goHome": "Go to home"
     }
   },
+
   "compare": {
     "page": {
       "title": "Compare products",
       "emptySubtitle": "To start comparing, please add products.",
-      "backToHome": "Back to homepage"
+      "backToHome": "Back to home"
     },
     "actions": {
       "differences": "Show differences",
@@ -288,223 +400,221 @@
     "status": {
       "loading": "Loading…",
       "errorLoadingProducts": "Error loading products.",
-      "linkCopied": "Link copied to clipboard."
+      "linkCopied": "Link copied."
     },
     "share": {
       "title": "Compare products"
     }
   },
-  "auth": {
-    "home": "Home",
-    "search": "Search",
-    "chat": "Chat",
-    "login": {
-      "title": "Sign In",
-      "email": "Email",
-      "password": "Password",
-      "button": "Sign In",
-      "fillEmail": "Please enter your email",
-      "invalidEmail": "Please enter a valid email address",
-      "fillPassword": "Please enter your password",
-      "loginFailed": "Login failed. Please check your credentials",
-      "userNotFound": "User not found with this email",
-      "forgotPassword": "Forgot Password?",
-      "or": "Or",
-      "switchMode": "Don't have an account? Sign up"
+
+  "cart": {
+    "title": "Cart",
+    "description": "Review your cart and proceed to checkout.",
+
+    "empty": "Your cart is empty.",
+    "emptyDescription": "Looks like you haven’t added anything to your cart yet. Start shopping now!",
+    "emptyDescriptionShort": "Add products to purchase",
+
+    "checkout": "Checkout",
+
+    "item": "Item",
+    "items": "Items",
+    "inYourCart": "In your cart",
+
+    "continueShopping": "Continue shopping",
+    "startShopping": "Start shopping",
+    "view": "View",
+    "buy": "Buy",
+
+    "checkingStock": "Checking stock...",
+    "outOfStock": "Out of stock",
+    "stock": "In stock: {count}",
+    "stockLimitExceeded": "Limited to {count} items in stock",
+
+    "orderSummary": "Order summary",
+
+    "loginRequired": "Login required",
+    "loginRequiredMsg": "Please log in to continue checkout.",
+    "loginRequiredToast": "Please log in first",
+    "dismiss": "Dismiss",
+
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "free": "Free",
+    "tax": "Tax",
+    "total": "Total",
+
+    "myCart": "My cart",
+
+    "addMoreForFreeShipping": "Add {amount} more for free shipping",
+    "proceedToCheckout": "Proceed to checkout",
+    "loginToCheckout": "Log in to checkout",
+
+    "freeShippingOver": "Free shipping on orders over {amount}",
+    "returnPolicy": "Easy 30-day returns",
+    "secureCheckout": "Secure SSL-encrypted checkout"
+  },
+
+  "checkout": {
+    "title": "Checkout",
+    "description": "Review your order and complete payment.",
+
+    "completePurchase": "Complete your purchase securely",
+    "checkingPayment": "Checking payment…",
+    "redirecting": "Redirecting to payment...",
+    "paySecurely": "Secure payment",
+    "secureHostedCheckout": "Secure hosted checkout",
+
+    "chooseProvider": "Choose a payment provider",
+    "providers": {
+      "bog": "Bank of Georgia",
+      "tbc": "TBC Bank"
     },
-    "register": {
-      "title": "Sign Up",
-      "username": "Username",
-      "email": "Email",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "verificationCode": "Verification Code",
-      "button": "Sign Up",
-      "confirm": "Confirm Registration",
-      "fillUsername": "Please enter a username",
-      "fillEmail": "Please enter your email",
-      "invalidEmail": "Please enter a valid email address",
-      "fillPassword": "Please enter a password",
-      "fillConfirmPassword": "Please confirm your password",
-      "passwordsDoNotMatch": "Passwords do not match",
-      "requestCodeFirst": "Please request a verification code first",
-      "enterCode": "Please enter the verification code",
-      "registrationFailed": "Registration failed. Please try again",
-      "codeSent": "Verification code sent to your email",
-      "or": "Or",
-      "switchMode": "Already have an account? Sign in",
-      "passwordRequirements": {
-        "minChars": "6+ chars",
-        "digit": "1 digit",
-        "lower": "lowercase",
-        "upper": "uppercase",
-        "special": "special char"
-      }
+
+    "status": {
+      "loading": "Checking payment status...",
+      "success": "Payment successful! Thank you for your purchase.",
+      "failed": "Payment failed or was cancelled. Please try again."
     },
-    "forgotPassword": {
-      "title": "Reset Password",
-      "email": "Email",
-      "button": "Send Reset Link",
-      "subText": "Enter your email address and we'll send you a link to reset your password."
+
+    "errors": {
+      "userNotLoggedIn": "You must be logged in to place an order",
+      "invalidProvider": "Invalid payment provider selected",
+      "redirectUrlMissing": "Payment URL was not found",
+      "paymentFailed": "Payment processing failed"
     },
-    "errorPage": {
-      "title": "Authentication Error",
-      "googleFailed": "Google login failed — please try again.",
-      "genericFailed": "Something went wrong, please try again.",
-      "goHome": "Go back to home"
+
+    "processing": {
+      "title": "Processing payment",
+      "description": "Please wait while we verify your payment.",
+      "success": "Payment successful!",
+      "successMessage": "Your payment was completed successfully!",
+      "redirecting": "Redirecting to the confirmation page...",
+      "failed": "Payment failed",
+      "errorChecking": "Error checking payment status",
+      "tryAgain": "Try again"
+    },
+
+    "success": {
+      "title": "Payment successful!",
+      "message": "Thank you for your purchase. Your order has been confirmed.",
+      "orderDetails": "Order details",
+      "orderId": "Order ID:",
+      "paymentId": "Payment ID:",
+      "emailConfirmation": "📧 A confirmation email will be sent to your email shortly.",
+      "continueShopping": "Continue shopping",
+      "viewOrders": "View my orders"
+    },
+
+    "failed": {
+      "title": "Payment failed",
+      "reason": "Reason:",
+      "message": "We couldn’t process your payment. This may be due to:",
+      "reasons": {
+        "funds": "Insufficient funds",
+        "declined": "Card was declined by the bank",
+        "details": "Invalid card details",
+        "cancelled": "Payment was cancelled"
+      },
+      "tryAgain": "Try again",
+      "backToCart": "Back to cart",
+      "contactSupport": "Support"
+    },
+
+    "summary": {
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total",
+      "free": "Free",
+      "freeShippingOver": "Free shipping on orders over {amount}",
+      "returnPolicy": "Easy 30-day returns",
+      "secureEncryption": "Secure 256-bit SSL encryption",
+      "reviewAndPay": "Review and pay",
+      "termsAgreement": "By placing this order, you agree to our Terms of Service and Privacy Policy.",
+      "orderSummary": "Order summary",
+      "processingLabel": "Processing..."
     }
   },
+
   "userPanel": {
     "meta": {
-      "title": "My Account",
-      "description": "Manage your profile, orders, and preferences."
+      "title": "My account",
+      "description": "Manage your profile, orders, and settings."
     }
   },
+
   "info": {
     "about": {
-      "title": "About Us",
+      "title": "About us",
       "description": "Learn more about our company, mission, and values."
     }
   },
+
   "notFound": {
     "code": "404",
     "title": "Page not found",
-    "description": "The page you are looking for doesn't exist or was removed.",
-    "goHome": "Go home",
+    "description": "The page you are looking for does not exist or has been removed.",
+    "goHome": "Home",
     "viewCategories": "Browse categories"
   },
+
   "categories": {
     "category": "Categories",
-    "allCategories": "All Categories"
+    "allCategories": "All categories"
   },
+
   "filters": {
+    "filters": "Filters",
+    "clearAllFilters": "Clear all filters",
+
     "categories": "Categories",
-    "priceRange": "Price Range",
+    "priceRange": "Price range",
     "brands": "Brands",
     "stock": "Stock",
     "condition": "Condition",
-    "clearAllFilters": "Clear all filters",
-    "filters": "Filters",
+
     "all": "All",
     "inStock": "In stock",
     "outOfStock": "Out of stock",
+
     "new": "New",
     "used": "Used",
     "likeNew": "Like new",
-    "to": "to"
+
+    "to": "From"
   },
-  "pages": {
-    "admin": {
-      "dashboard": {
-        "title": "Admin Dashboard",
-        "description": "Manage your store from the admin dashboard",
-        "revenue": "Revenue",
-        "orders": "Orders",
-        "customers": "Customers",
-        "products": "Products",
-        "vsLastMonth": "vs last month",
-        "recentOrders": "Recent Orders",
-        "recentCustomers": "Recent Customers",
-        "recentProducts": "Recent Products",
-        "quickActions": "Quick Actions",
-        "viewAll": "View All",
-        "manageYourStoreEfficiently": "Manage your store efficiently",
-        "addNewProduct": "Add New Product",
-        "addNewCategory": "Add New Category",
-        "addNewOrder": "Add New Order",
-        "addNewCustomer": "Add New Customer"
-      },
-      "analytics": {
-        "title": "Analytics",
-        "description": "View key metrics and performance of your store"
-      },
-      "brands": {
-        "title": "Brands",
-        "description": "Manage your brand catalog and origins"
-      },
-      "categories": {
-        "title": "Categories",
-        "description": "Organize your product hierarchy and facets"
-      },
-      "products": {
-        "title": "Products",
-        "description": "Manage your product inventory and details"
-      },
-      "productGroups": {
-        "title": "Product Groups",
-        "description": "Manage product groups filtered by category and brand"
-      },
-      "facets": {
-        "title": "Facets",
-        "description": "Create, edit and organize attributes like Size, Resolution, Color"
-      },
-      "stores": {
-        "title": "Stores",
-        "description": "Manage store locations and transfer products between them"
-      },
-      "shipping": {
-        "title": "Shipping",
-        "description": "Manage shipping methods, zones, and delivery options"
-      },
-      "payments": {
-        "title": "Payments",
-        "description": "Monitor transactions and configure payment methods"
-      },
-      "orders": {
-        "title": "Orders",
-        "description": "Track and manage customer orders and fulfillment"
-      },
-      "customers": {
-        "title": "Customers",
-        "description": "Manage customer relationships and track customer lifetime value"
-      },
-      "sync": {
-        "title": "Synchronization",
-        "description": "Trigger sync jobs, monitor status, and view a live activity log"
-      },
-      "faqs": {
-        "title": "FAQs",
-        "description": "Manage frequently asked questions and answers"
-      }
-    },
-    "brands": {
-      "title": "Brands",
-      "description": "Explore all our brands and discover quality products"
-    },
-    "brand": {
-      "notFound": "Brand Not Found",
-      "productsFrom": "Products from",
-      "exploreProducts": "Explore our full range of products",
-      "noProducts": "No products available",
-      "checkBackLater": "Check back later for new products"
-    }
-  },
+
   "brands": {
+    "brands": "Brands",
     "brandsCount": "Brands",
     "searchPlaceholder": "Search brands...",
     "noResults": "No brands found",
-    "tryDifferentSearch": "Try adjusting your search",
+    "tryDifferentSearch": "Try a different search",
     "noBrandsFound": "No brands found",
-    "brands": "brands",
-    "resultsFound": "brand(s) found"
+    "resultsFound": "Brand(s) found"
   },
+
   "footer": {
     "information": "Information",
     "delivery": "Delivery",
     "faq": "FAQ",
     "guarantee": "Guarantee",
-    "privacy": "Privacy Policy",
-    "returns": "Return Policy",
+    "privacy": "Privacy policy",
+    "returns": "Returns policy",
     "stores": "Stores",
-    "terms": "Terms & Conditions",
-    "about": "About Us",
-    "help": "Help & Support",
+    "terms": "Terms and conditions",
+    "about": "About us",
+    "help": "Help & support",
+
     "language": "Language",
     "location": "Location",
-    "visitStores": "Visit Our Stores",
+
+    "visitStores": "Visit our stores",
     "address": "Address",
-    "hours": "Hours",
+    "hours": "Working hours",
     "contact": "Contact",
-    "cookiePolicy": "Cookie Policy"
+    "cookiePolicy": "Cookie policy"
   }
 }

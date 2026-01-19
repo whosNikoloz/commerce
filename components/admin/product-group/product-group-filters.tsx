@@ -61,12 +61,12 @@ export default function ProductGroupFilters({
 
   return (
     <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden h-full flex flex-col h-min">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
 
       <CardHeader className="pb-3 relative flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-lg shadow-sm">
+            <div className="p-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg shadow-sm">
               <Filter className="h-4 w-4 text-white" />
             </div>
             <CardTitle className="text-lg font-black text-slate-900 dark:text-slate-100">
@@ -90,138 +90,138 @@ export default function ProductGroupFilters({
       </CardHeader>
 
       <CardContent className="pt-0 relative flex-1 flex flex-col overflow-hidden space-y-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <h3 className="font-heading text-sm font-bold text-slate-900 dark:text-slate-100">
+              Brands
+            </h3>
+            <Badge
+              className="text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+              variant="outline"
+            >
+              {brands.length}
+            </Badge>
+          </div>
+          {selectedBrandId !== null && (
+            <Button
+              aria-label="Clear brand selection"
+              className="h-6 w-6 p-0 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+              size="sm"
+              variant="ghost"
+              onClick={clearBrandSelection}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+
+        {brands.length === 0 ? (
+          <div className="text-center py-6">
+            <Tag className="h-10 w-10 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
+            <p className="font-primary text-slate-600 dark:text-slate-400 text-xs font-medium">
+              No brands found
+            </p>
+          </div>
+        ) : (
+          <Select
+            value={selectedBrandId || "all"}
+            onValueChange={handleBrandSelect}
+          >
+            <SelectTrigger className="w-full bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 text-slate-900 dark:text-slate-100 font-medium shadow-sm">
+              <div className="flex items-center gap-2 flex-1">
+                <Tag
+                  className={`h-4 w-4 ${selectedBrandId ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}
+                />
+                <SelectValue placeholder="Select a brand">
+                  {selectedBrand?.name || "All Brands"}
+                </SelectValue>
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 max-h-[300px]">
+              <SelectItem
+                className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30 focus:bg-blue-50 dark:focus:bg-blue-900/30"
+                value="all"
+              >
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                  <span className="font-primary font-semibold">All Brands</span>
+                  <Badge
+                    className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                    variant="secondary"
+                  >
+                    {brands.length}
+                  </Badge>
+                </div>
+              </SelectItem>
+              {brands.map((brand) => (
+                <SelectItem
+                  key={brand.id}
+                  className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30 focus:bg-blue-50 dark:focus:bg-blue-900/30"
+                  value={brand.id}
+                >
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span className="font-primary font-semibold truncate">
+                      {brand.name || "Unnamed Brand"}
+                    </span>
+                    {brand.origin && (
+                      <Badge
+                        className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                        variant="secondary"
+                      >
+                        {brand.origin}
+                      </Badge>
+                    )}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        <div className="flex-1 flex flex-col overflow-hidden h-min">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <h3 className="font-heading text-sm font-bold text-slate-900 dark:text-slate-100">
-                Brands
+                Categories
               </h3>
               <Badge
-                className="text-xs font-bold bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border border-teal-200 dark:border-teal-800"
+                className="text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
                 variant="outline"
               >
-                {brands.length}
+                {categories.filter((c) => c.parentId === null).length}
               </Badge>
             </div>
-            {selectedBrandId !== null && (
+            {selectedCategoryId !== null && (
               <Button
-                aria-label="Clear brand selection"
-                className="h-6 w-6 p-0 text-slate-500 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors"
+                aria-label="Clear category selection"
+                className="h-6 w-6 p-0 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                 size="sm"
                 variant="ghost"
-                onClick={clearBrandSelection}
+                onClick={clearCategorySelection}
               >
                 <X className="h-3 w-3" />
               </Button>
             )}
           </div>
 
-          {brands.length === 0 ? (
-            <div className="text-center py-6">
-              <Tag className="h-10 w-10 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
-              <p className="font-primary text-slate-600 dark:text-slate-400 text-xs font-medium">
-                No brands found
-              </p>
-            </div>
-          ) : (
-            <Select
-              value={selectedBrandId || "all"}
-              onValueChange={handleBrandSelect}
-            >
-              <SelectTrigger className="w-full bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-teal-500 dark:focus:border-teal-500 text-slate-900 dark:text-slate-100 font-medium shadow-sm">
-                <div className="flex items-center gap-2 flex-1">
-                  <Tag
-                    className={`h-4 w-4 ${selectedBrandId ? "text-teal-600 dark:text-teal-400" : "text-slate-500 dark:text-slate-400"}`}
-                  />
-                  <SelectValue placeholder="Select a brand">
-                    {selectedBrand?.name || "All Brands"}
-                  </SelectValue>
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 max-h-[300px]">
-                <SelectItem
-                  className="cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/30 focus:bg-teal-50 dark:focus:bg-teal-900/30"
-                  value="all"
-                >
-                  <div className="flex items-center gap-2">
-                    <Tag className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                    <span className="font-primary font-semibold">All Brands</span>
-                    <Badge
-                      className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
-                      variant="secondary"
-                    >
-                      {brands.length}
-                    </Badge>
-                  </div>
-                </SelectItem>
-                {brands.map((brand) => (
-                  <SelectItem
-                    key={brand.id}
-                    className="cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/30 focus:bg-teal-50 dark:focus:bg-teal-900/30"
-                    value={brand.id}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                      <span className="font-primary font-semibold truncate">
-                        {brand.name || "Unnamed Brand"}
-                      </span>
-                      {brand.origin && (
-                        <Badge
-                          className="ml-auto text-xs px-2 py-0.5 h-5 font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
-                          variant="secondary"
-                        >
-                          {brand.origin}
-                        </Badge>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          <div className="flex-1 flex flex-col overflow-hidden h-min">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <h3 className="font-heading text-sm font-bold text-slate-900 dark:text-slate-100">
-                  Categories
-                </h3>
-                <Badge
-                  className="text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
-                  variant="outline"
-                >
-                  {categories.filter((c) => c.parentId === null).length}
-                </Badge>
-              </div>
-              {selectedCategoryId !== null && (
-                <Button
-                  aria-label="Clear category selection"
-                  className="h-6 w-6 p-0 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
-                  size="sm"
-                  variant="ghost"
-                  onClick={clearCategorySelection}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              )}
-            </div>
-
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 h-3.5 w-3.5" />
-              <Input
-                aria-label="Search categories"
-                className="pl-9 h-8 text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 focus:border-emerald-400 dark:focus:border-emerald-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
-                placeholder="Search..."
-                value={categorySearchTerm}
-                onChange={(e) => setCategorySearchTerm(e.target.value)}
-              />
-            </div>
-
-              <ProductGroupCategoryTree
-                categories={categories}
-                searchTerm={categorySearchTerm}
-                selectedCategoryId={selectedCategoryId}
-                onSelectCategory={onSelectCategory}
-              />
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 h-3.5 w-3.5" />
+            <Input
+              aria-label="Search categories"
+              className="pl-9 h-8 text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 focus:border-blue-400 dark:focus:border-blue-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
+              placeholder="Search..."
+              value={categorySearchTerm}
+              onChange={(e) => setCategorySearchTerm(e.target.value)}
+            />
           </div>
+
+          <ProductGroupCategoryTree
+            categories={categories}
+            searchTerm={categorySearchTerm}
+            selectedCategoryId={selectedCategoryId}
+            onSelectCategory={onSelectCategory}
+          />
+        </div>
       </CardContent>
     </Card>
   );

@@ -19,12 +19,12 @@ type ChildrenMap = Record<string, CategoryModel[]>;
 
 function PortalWrapper({ children }: { children: React.ReactNode }) {
   if (typeof document === "undefined") return null;
-
   return createPortal(children, document.body);
 }
 
 export default function CategoryDropdown() {
   const dictionary = useDictionary();
+
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -34,6 +34,9 @@ export default function CategoryDropdown() {
   const pathname = usePathname();
   const localeCode = pathname.startsWith("/en") ? "en" : "ka";
 
+  const tDrawer = dictionary?.category?.drawer;
+  const tCategories = dictionary?.categories;
+
   // Fetch categories once on mount
   useEffect(() => {
     if (hasLoadedRef.current) return;
@@ -42,10 +45,10 @@ export default function CategoryDropdown() {
       try {
         setLoading(true);
         const data = await getAllCategories();
-
         setCategories(Array.isArray(data) ? data : []);
         hasLoadedRef.current = true;
       } catch (e) {
+        // keep console error (dev only)
         console.error("Failed to load categories", e);
       } finally {
         setLoading(false);
@@ -57,14 +60,12 @@ export default function CategoryDropdown() {
   useEffect(() => {
     if (!isOpen) return;
 
-    // Lock both html and body to prevent any scrolling
     const originalBodyOverflow = document.body.style.overflow;
     const originalHtmlOverflow = document.documentElement.style.overflow;
     const originalBodyPosition = document.body.style.position;
     const originalBodyWidth = document.body.style.width;
     const scrollY = window.scrollY;
 
-    // Completely prevent scrolling
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     document.body.style.position = "fixed";
@@ -72,7 +73,6 @@ export default function CategoryDropdown() {
     document.body.style.width = "100%";
 
     return () => {
-      // Restore original state
       document.documentElement.style.overflow = originalHtmlOverflow;
       document.body.style.overflow = originalBodyOverflow;
       document.body.style.position = originalBodyPosition;
@@ -94,9 +94,7 @@ export default function CategoryDropdown() {
 
     categories.forEach((c) => {
       const key =
-        c.parentId && c.parentId.trim().length > 0
-          ? c.parentId.trim()
-          : ROOT;
+        c.parentId && c.parentId.trim().length > 0 ? c.parentId.trim() : ROOT;
 
       if (!m[key]) m[key] = [];
       m[key].push(c);
@@ -112,7 +110,7 @@ export default function CategoryDropdown() {
   // Parents into rows
   const categoryRows = useMemo(() => {
     const rows: CategoryModel[][] = [];
-    const COLUMNS = 4; // ცოტა ნაკლები, რომ ჰორიზონტალური ბარათები სუნთქავდეს
+    const COLUMNS = 4;
 
     for (let i = 0; i < topLevel.length; i += COLUMNS) {
       rows.push(topLevel.slice(i, i + COLUMNS));
@@ -128,16 +126,15 @@ export default function CategoryDropdown() {
   const activeCategoryData = activeCategory
     ? categories.find((c) => c.id === activeCategory)
     : null;
+
   const activeSubcategories = activeCategory
     ? childrenMap[activeCategory] || []
     : [];
 
   const getCategoryHref = (id: string) => `/${localeCode}/category/${id}`;
 
-  // Parent card – ჰორიზონტალური: ტექსტი მარცხნივ, სურათი მარჯვნივ
   const renderParentCard = (cat: CategoryModel, isActive: boolean) => (
     <div className="flex items-center justify-between w-full gap-3">
-      {/* Text side (left) */}
       <div className="flex flex-col items-start text-left flex-1">
         <span
           className={cn(
@@ -147,25 +144,25 @@ export default function CategoryDropdown() {
         >
           {cat.name}
         </span>
+
         <span className="font-primary mt-1 text-[11px] md:text-xs text-muted-foreground flex items-center gap-1">
           {isActive ? (
             <>
-              Viewing subcategories
+              {tDrawer?.viewingSubcategories}
               <ChevronRight className="w-3 h-3" />
             </>
           ) : (
-            "Browse products"
+            tDrawer?.browseProducts
           )}
         </span>
       </div>
 
-      {/* Image side (right) */}
       <div className="flex items-center gap-2">
         <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-xl overflow-hidden bg-white dark:bg-neutral-800 border border-border/60 flex items-center justify-center">
           {cat.images && cat.images[0] ? (
             <Image
               fill
-              alt={cat.name || "Category"}
+              alt={cat.name || (tDrawer?.title ?? "Category")}
               className="object-cover"
               src={cat.images[0]}
             />
@@ -173,6 +170,7 @@ export default function CategoryDropdown() {
             <Boxes className="w-6 h-6 text-muted-foreground/60" />
           )}
         </div>
+
         <ChevronRight
           className={cn(
             "w-4 h-4 text-muted-foreground transition-transform duration-300",
@@ -184,20 +182,21 @@ export default function CategoryDropdown() {
   );
 
   return (
-    <div className="">
+    <div>
       {/* Trigger Button */}
       <button
         aria-expanded={isOpen}
-        aria-label={isOpen ? "Close categories menu" : "Open categories menu"}
-        className={cn(
-          "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm relative z-[10001]",
+        aria-label={
           isOpen
-            ? ""
-            : ""
+            ? tDrawer?.ariaCloseMenu ?? "Close categories menu"
+            : tDrawer?.ariaOpenMenu ?? "Open categories menu"
+        }
+        className={cn(
+          "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm relative z-[10001]"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <></> : <Squares2X2Icon className="w-5 h-5" />}
+        {isOpen ? null : <Squares2X2Icon className="w-5 h-5" />}
       </button>
 
       {/* FULLSCREEN overlay via portal */}
@@ -207,28 +206,32 @@ export default function CategoryDropdown() {
             <>
               {/* Backdrop */}
               <motion.div
-                animate={{ opacity: 1 }}
-                className="fixed inset-0 bg-black/50 z-[10000] backdrop-blur-sm"
-                exit={{ opacity: 0 }}
                 initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/50 z-[10000] backdrop-blur-sm"
                 onClick={() => setIsOpen(false)}
               />
 
               {/* Main panel – with inside scrolling only */}
               <motion.div
-                animate={{ opacity: 1, y: 0 }}
-                className="fixed inset-0 z-[10000] flex items-start justify-center pt-28 md:pt-32 pb-4 px-2 md:px-6 pointer-events-none"
-                exit={{ opacity: 0, y: 12 }}
                 initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
+                className="fixed inset-0 z-[10000] flex items-start justify-center pt-28 md:pt-32 pb-4 px-2 md:px-6 pointer-events-none"
               >
-                {/* Card container – scrolls inside only */}
                 <div className="relative w-full max-w-6xl rounded-3xl bg-white dark:bg-neutral-900 shadow-[0_24px_80px_rgba(0,0,0,0.4)] border border-primary/40 backdrop-blur-xl overflow-hidden max-h-full flex flex-col pointer-events-auto">
-                  {/* Header row */}
+                  {/* Header */}
                   <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 via-neutral-50/70 to-transparent dark:from-primary/10 dark:via-neutral-900/80">
-                    <h2 className="font-heading text-base md:text-lg font-semibold" >{dictionary?.categories?.allCategories || "All Categories"}</h2>
+                    <h2 className="font-heading text-base md:text-lg font-semibold">
+                      {tCategories?.allCategories ??
+                        tDrawer?.title ??
+                        "Categories"}
+                    </h2>
+
                     <button
-                      aria-label="Close categories menu"
+                      aria-label={tDrawer?.ariaCloseMenu ?? "Close categories menu"}
                       className="font-primary inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs md:text-sm bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                       onClick={() => setIsOpen(false)}
                     >
@@ -236,15 +239,15 @@ export default function CategoryDropdown() {
                     </button>
                   </div>
 
-                  {/* Body – scrolls INSIDE card only (like veli.store) */}
+                  {/* Body */}
                   <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 py-4 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent">
                     {loading ? (
                       <div className="p-8 text-center text-muted-foreground">
-                        Loading categories...
+                        {tDrawer?.loadingCategories ?? "Loading categories..."}
                       </div>
                     ) : topLevel.length === 0 ? (
                       <div className="p-8 text-center text-muted-foreground">
-                        No categories found.
+                        {tDrawer?.noCategoriesFound ?? "No categories found."}
                       </div>
                     ) : (
                       <div className="flex flex-col gap-8">
@@ -284,7 +287,17 @@ export default function CategoryDropdown() {
                                     <button
                                       key={cat.id}
                                       aria-expanded={isActive}
-                                      aria-label={`${cat.name} - ${isActive ? 'Hide' : 'Show'} subcategories`}
+                                      aria-label={
+                                        isActive
+                                          ? `${cat.name} - ${
+                                              tDrawer?.ariaHideSubcategories ??
+                                              "Hide subcategories"
+                                            }`
+                                          : `${cat.name} - ${
+                                              tDrawer?.ariaShowSubcategories ??
+                                              "Show subcategories"
+                                            }`
+                                      }
                                       className={cn(
                                         "group flex items-stretch p-3 rounded-2xl transition-all border text-left",
                                         isActive
@@ -305,17 +318,16 @@ export default function CategoryDropdown() {
                                   activeCategoryData &&
                                   activeSubcategories.length > 0 && (
                                     <motion.div
-                                      animate={{ height: "auto", opacity: 1 }}
-                                      className="overflow-hidden w-full"
-                                      exit={{ height: 0, opacity: 0 }}
                                       initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
                                       transition={{
                                         duration: 0.28,
                                         ease: "easeInOut",
                                       }}
+                                      className="overflow-hidden w-full"
                                     >
                                       <div className="mt-2 mb-6 rounded-2xl border border-border bg-neutral-50/90 dark:bg-neutral-900/80 p-3 md:p-4">
-                                        {/* Smaller subcategory rows */}
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
                                           {activeSubcategories.map((sub) => (
                                             <Link
@@ -324,18 +336,20 @@ export default function CategoryDropdown() {
                                               href={getCategoryHref(sub.id)}
                                               onClick={() => setIsOpen(false)}
                                             >
-                                              {/* Left: smaller name */}
                                               <span className="font-primary text-xs md:text-sm font-medium text-muted-foreground group-hover:text-foreground text-left line-clamp-2">
                                                 {sub.name}
                                               </span>
 
-                                              {/* Right: small icon (sub style) */}
                                               <div className="flex items-center gap-1">
                                                 <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-border/50 flex items-center justify-center overflow-hidden">
                                                   {sub.images && sub.images[0] ? (
                                                     <Image
                                                       fill
-                                                      alt={sub.name || "Category"}
+                                                      alt={
+                                                        sub.name ||
+                                                        (tDrawer?.title ??
+                                                          "Category")
+                                                      }
                                                       className="object-cover"
                                                       src={sub.images[0]}
                                                     />
@@ -343,6 +357,7 @@ export default function CategoryDropdown() {
                                                     <Boxes className="w-4 h-4 text-muted-foreground/70" />
                                                   )}
                                                 </div>
+
                                                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0" />
                                               </div>
                                             </Link>

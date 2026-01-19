@@ -4,7 +4,7 @@ import type { CategoryModel } from "@/types/category";
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { Tag, Eye, EyeOff, Trash2, Edit } from "lucide-react";
+import { Tag, Eye, EyeOff, Edit } from "lucide-react";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
 
@@ -135,7 +135,7 @@ export function CategoriesTable({ initialCategories }: Props) {
 
   return (
     <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none rounded-lg" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none rounded-lg" />
       <CardHeader className="relative">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {isCustomMerchant && (
@@ -147,7 +147,7 @@ export function CategoriesTable({ initialCategories }: Props) {
               aria-label="Search categories"
               className="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2.5 text-sm
                          text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 dark:focus:border-emerald-600
+                         focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 dark:focus:border-blue-600
                          shadow-sm hover:shadow-md transition-all duration-300 font-medium"
               placeholder="Search categories..."
               type="text"
@@ -198,7 +198,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                 return (
                   <TableRow
                     key={category.id}
-                    className="hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-950/20 dark:hover:to-teal-950/20
+                    className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/20 dark:hover:to-indigo-950/20
                                transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
                   >
                     {/* IMAGE */}
@@ -244,7 +244,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                     <TableCell>
                       {parent ? (
                         <Badge
-                          className="border-2 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 font-semibold px-3 py-1"
+                          className="border-2 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 font-semibold px-3 py-1"
                           variant="outline"
                         >
                           {parent.name}
@@ -269,13 +269,13 @@ export function CategoriesTable({ initialCategories }: Props) {
                       <div className="flex items-center gap-3">
                         <Switch
                           checked={isActive}
-                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
+                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
                           onCheckedChange={(val) => toggleCategoryVisibility(category.id, val)}
                         />
                         {isActive ? (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 ring-1 ring-emerald-200 dark:ring-emerald-800">
-                            <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                            <span className="font-primary text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 ring-1 ring-blue-200 dark:ring-blue-800">
+                            <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <span className="font-primary text-xs font-bold text-blue-700 dark:text-blue-400">
                               Active
                             </span>
                           </div>
@@ -294,13 +294,11 @@ export function CategoriesTable({ initialCategories }: Props) {
                     <TableCell>
                       <div className="flex items-center gap-2 justify-end">
                         <Button
-                          className="h-9 px-3"
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
                           size="sm"
-                          variant="outline"
                           onClick={() => setCategoryToEdit(category)}
                         >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
+                          <Edit className="h-4 w-4" />
                         </Button>
                         <ReviewImagesModal
                           categoryId={category.id}
@@ -314,7 +312,6 @@ export function CategoriesTable({ initialCategories }: Props) {
                         />
                         {isCustomMerchant && (
                           <Button
-                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                             size="sm"
                             variant="destructive"
                             onClick={() => {
@@ -322,7 +319,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                               setDeleteDialogOpen(true);
                             }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            Delete
                           </Button>
                         )}
                       </div>
@@ -383,9 +380,9 @@ export function CategoriesTable({ initialCategories }: Props) {
                 </div>
 
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 p-4 border-b-2 border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
                       <Tag className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -417,7 +414,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                       </div>
                       {parent ? (
                         <Badge
-                          className="border-2 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 font-semibold px-2 py-0.5 text-xs"
+                          className="border-2 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 font-semibold px-2 py-0.5 text-xs"
                           variant="outline"
                         >
                           {parent.name}
@@ -452,13 +449,13 @@ export function CategoriesTable({ initialCategories }: Props) {
                     <div className="flex items-center gap-3">
                       <Switch
                         checked={isActive}
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
+                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
                         onCheckedChange={(val) => toggleCategoryVisibility(category.id, val)}
                       />
                       {isActive ? (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 ring-1 ring-emerald-200 dark:ring-emerald-800">
-                          <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                          <span className="font-primary text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 ring-1 ring-blue-200 dark:ring-blue-800">
+                          <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                          <span className="font-primary text-xs font-bold text-blue-700 dark:text-blue-400">
                             Active
                           </span>
                         </div>
@@ -475,9 +472,8 @@ export function CategoriesTable({ initialCategories }: Props) {
 
                   <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex gap-2">
                     <Button
-                      className="flex-1 h-9 px-3"
+                      className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                       size="sm"
-                      variant="outline"
                       onClick={() => setCategoryToEdit(category)}
                     >
                       <Edit className="h-4 w-4 mr-1" />
@@ -496,7 +492,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           onChanged={(urls) => handleImagesChanged(category.id, urls)}
                         />
                         <Button
-                          className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
+                          className="flex-1"
                           size="sm"
                           variant="destructive"
                           onClick={() => {
@@ -504,8 +500,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                             setDeleteDialogOpen(true);
                           }}
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Category
+                          Delete
                         </Button>
                       </>
                     )}

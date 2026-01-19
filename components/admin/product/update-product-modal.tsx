@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { StockStatus, Condition } from "@/types/enums";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 
 interface UpdateProductModalProps {
@@ -90,6 +91,9 @@ export default function UpdateProductModal({
   const [activeTab, setActiveTab] = useState<"settings" | "description">("settings");
 
   const isMobile = useIsMobile();
+  const dictionary = useDictionary();
+  const t = dictionary?.admin?.products?.editModal || {};
+  const tCommon = dictionary?.common || {};
 
   // Ensure the form is prefilled with the latest product data every time the modal opens
   useEffect(() => {
@@ -393,7 +397,7 @@ export default function UpdateProductModal({
                         }`}
                       onClick={() => setActiveTab("settings")}
                     >
-                      ⚙️ Settings
+                      ⚙️ {t.settingsTab || "Settings"}
                     </button>
                     <button
                       className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "description"
@@ -402,7 +406,7 @@ export default function UpdateProductModal({
                         }`}
                       onClick={() => setActiveTab("description")}
                     >
-                      📝 Description
+                      📝 {t.descriptionTab || "Description"}
                     </button>
                   </div>
                 </ModalHeader>
@@ -411,10 +415,10 @@ export default function UpdateProductModal({
                   <div className="flex items-center justify-between px-6">
                     <div className="flex flex-col">
                       <h2 className="font-heading text-2xl font-black text-slate-900 dark:text-slate-100">
-                        პროდუქტის აღწერის განახლება
+                        {t.title || "Update Product"}
                       </h2>
                       <p className="font-primary text-sm text-slate-600 dark:text-slate-400 font-medium">
-                        განაახლე პროდუქტის ინფორმაცია და აღწერა
+                        {t.subtitle || "Update product information and description"}
                       </p>
                     </div>
                     <button
@@ -436,7 +440,7 @@ export default function UpdateProductModal({
                         }`}
                       onClick={() => setActiveTab("settings")}
                     >
-                      ⚙️ Settings
+                      ⚙️ {t.settingsTab || "Settings"}
                     </button>
                     <button
                       className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "description"
@@ -445,7 +449,7 @@ export default function UpdateProductModal({
                         }`}
                       onClick={() => setActiveTab("description")}
                     >
-                      📝 Description
+                      📝 {t.descriptionTab || "Description"}
                     </button>
                   </div>
                 </ModalHeader>
@@ -463,10 +467,10 @@ export default function UpdateProductModal({
                     <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <div className="mb-2">
                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                          Category
+                          {t.category || "Category"}
                         </p>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          Edit category selection from the tree (similar to facet settings/values).
+                          {t.editCategoryDescription || "Edit category selection from the tree."}
                         </p>
                       </div>
                       {categories.length > 0 ? (
@@ -503,11 +507,11 @@ export default function UpdateProductModal({
                     {/* Brand Selection */}
                     <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
-                        ბრენდი
+                        {t.brand || "Brand"}
                       </Label>
                       {brands.length > 0 ? (
                         <HSelect
-                          label="ბრენდი"
+                          label={t.brand || "Brand"}
                           // remove disallowEmptySelection OR ensure you always have a valid key
                           // disallowEmptySelection
                           selectedKeys={brandSelectedKeys}
@@ -544,7 +548,7 @@ export default function UpdateProductModal({
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
                           <Box className="w-3 h-3 mb-0.5" />
-                          ლიკვ.
+                          {t.liquidation || tCommon.liquidation || "Liq."}
                         </span>
                       </div>
 
@@ -557,7 +561,7 @@ export default function UpdateProductModal({
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
                           <Clock3 className="w-3 h-3 mb-0.5" />
-                          მალე
+                          {t.comingSoon || tCommon.comingSoon || "Soon"}
                         </span>
                       </div>
 
@@ -570,7 +574,7 @@ export default function UpdateProductModal({
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
                           <Sparkles className="w-3 h-3 mb-0.5" />
-                          ახალი
+                          {t.new || tCommon.new || "New"}
                         </span>
                       </div>
                     </div>
@@ -578,19 +582,16 @@ export default function UpdateProductModal({
                     {/* Product Group Selector */}
                     <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
-                        Product Group
-                        <span className="font-primary text-xs font-normal text-slate-500 ml-1">
-                          (Optional)
-                        </span>
+                        {t.productGroup || "Product Group"}
                       </Label>
                       {loadingGroups ? (
                         <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                          Loading groups...
+                          {tCommon.loading || "Loading..."}
                         </div>
                       ) : (
                         <HSelect
-                          label="Product Group"
-                          placeholder="Select product group (optional)"
+                          label={t.productGroup || "Product Group"}
+                          placeholder={t.noneStandalone || "None (standalone product)"}
                           selectedKeys={productGroupId ? new Set([productGroupId]) : new Set(["none"])}
                           selectionMode="single"
                           variant="bordered"
@@ -603,8 +604,8 @@ export default function UpdateProductModal({
                           }}
                         >
                           {[
-                            <HSelectItem key="none" textValue="None (standalone product)">
-                              None (standalone product)
+                            <HSelectItem key="none" textValue={t.noneStandalone || "None (standalone product)"}>
+                              {t.noneStandalone || "None (standalone product)"}
                             </HSelectItem>,
                             ...productGroups.map((group) => {
                               // eslint-disable-next-line no-console
@@ -624,11 +625,11 @@ export default function UpdateProductModal({
                     {/* Stock Status & Condition */}
                     <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
-                        Inventory & Condition
+                        {t.inventoryCondition || "Inventory & Condition"}
                       </Label>
                       <div className="grid grid-cols-2 gap-3">
                         <HSelect
-                          label="Stock Status"
+                          label={t.stockStatus || "Stock Status"}
                           selectedKeys={new Set([stockStatus.toString()])}
                           selectionMode="single"
                           variant="bordered"
@@ -637,16 +638,16 @@ export default function UpdateProductModal({
                             setStockStatus(k ? parseInt(k) as StockStatus : StockStatus.InStock);
                           }}
                         >
-                          <HSelectItem key={StockStatus.InStock.toString()} textValue="In Stock">
-                            In Stock
+                          <HSelectItem key={StockStatus.InStock.toString()} textValue={tCommon.inStock || "In Stock"}>
+                            {tCommon.inStock || "In Stock"}
                           </HSelectItem>
-                          <HSelectItem key={StockStatus.OutOfStock.toString()} textValue="Out of Stock">
-                            Out of Stock
+                          <HSelectItem key={StockStatus.OutOfStock.toString()} textValue={tCommon.soldOut || "Out of Stock"}>
+                            {tCommon.soldOut || "Out of Stock"}
                           </HSelectItem>
                         </HSelect>
 
                         <HSelect
-                          label="Condition"
+                          label={t.condition || "Condition"}
                           selectedKeys={new Set([condition.toString()])}
                           selectionMode="single"
                           variant="bordered"
@@ -655,14 +656,14 @@ export default function UpdateProductModal({
                             setCondition(k ? parseInt(k) as Condition : Condition.New);
                           }}
                         >
-                          <HSelectItem key={Condition.New.toString()} textValue="New">
-                            New
+                          <HSelectItem key={Condition.New.toString()} textValue={tCommon.new || "New"}>
+                            {tCommon.new || "New"}
                           </HSelectItem>
-                          <HSelectItem key={Condition.Used.toString()} textValue="Used">
-                            Used
+                          <HSelectItem key={Condition.Used.toString()} textValue={tCommon.used || "Used"}>
+                            {tCommon.used || "Used"}
                           </HSelectItem>
-                          <HSelectItem key={Condition.LikeNew.toString()} textValue="Like New">
-                            Like New
+                          <HSelectItem key={Condition.LikeNew.toString()} textValue={tCommon.likeNew || "Like New"}>
+                            {tCommon.likeNew || "Like New"}
                           </HSelectItem>
                         </HSelect>
                       </div>
@@ -673,7 +674,7 @@ export default function UpdateProductModal({
                       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60 p-3">
                         <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block flex items-center gap-1">
                           <Layers className="h-3 w-3" />
-                          Product Facets
+                          {t.productFacets || "Product Facets"}
                         </Label>
                         <FacetSelector
                           categoryId={categoryId}
@@ -701,7 +702,7 @@ export default function UpdateProductModal({
                   variant="outline"
                   onClick={onClose}
                 >
-                  გაუქმება
+                  {dictionary?.admin?.products?.addModal?.cancel || "Cancel"}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
@@ -711,10 +712,10 @@ export default function UpdateProductModal({
                   {loading ? (
                     <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving...
+                      {tCommon.loading || "Saving..."}
                     </span>
                   ) : (
-                    "შენახვა"
+                    dictionary?.common?.success === "წარმატებული" ? "შენახვა" : "Save"
                   )}
                 </Button>
               </ModalFooter>

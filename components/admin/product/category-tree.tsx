@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface CategoryTreeProps {
   Categories: CategoryModel[];
@@ -30,6 +31,8 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const dictionary = useDictionary();
+  const t = dictionary?.admin?.products.table || {};
 
   const toggleExpanded = (categoryId: string) => {
     const next = new Set(expanded);
@@ -82,8 +85,8 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
   const renderTree = (cats: CategoryModel[], parentId: string | null = null, level: number = 0) => {
     const visibleCats = searchTerm
       ? cats.filter(
-          (c) => c.parentId === parentId && filteredCategories.some((fc) => fc.id === c.id),
-        )
+        (c) => c.parentId === parentId && filteredCategories.some((fc) => fc.id === c.id),
+      )
       : cats.filter((c) => c.parentId === parentId);
 
     if (visibleCats.length === 0) return null;
@@ -222,7 +225,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
               <Filter className="h-4 w-4 text-white" />
             </div>
             <CardTitle className="text-lg font-black text-slate-900 dark:text-slate-100">
-              Categories
+              {t.categories}
             </CardTitle>
             <Badge
               className="text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
@@ -287,7 +290,7 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
               >
                 <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
                 <span className={`text-sm font-semibold ${selectedCategory === null ? "text-blue-900 dark:text-blue-300" : "text-slate-900 dark:text-slate-100"}`}>
-                  All Categories
+                  {t.allCategories}
                 </span>
                 <Badge
                   className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategory === null ? "bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}

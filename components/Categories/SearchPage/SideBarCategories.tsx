@@ -6,6 +6,7 @@ import { Filter } from "lucide-react";
 import { CategoryModel } from "@/types/category";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type SubcategoryItem = CategoryModel & { count?: number };
 
@@ -15,12 +16,16 @@ type ProductFiltersProps = {
 };
 
 function SidebarContent({ categorys, buildSubHref }: ProductFiltersProps) {
+  
+  const dict = useDictionary();
+  const t = dict.filters;
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="font-heading text-lg font-bold mb-4 text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
           <span className="font-primary w-1 h-5 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
-          კატეგორიები
+          {t.categories}
         </h2>
         <div className="space-y-1.5">
           {categorys.map((sub) => (
@@ -48,6 +53,9 @@ function SidebarContent({ categorys, buildSubHref }: ProductFiltersProps) {
 }
 
 export default function SideBarCategories(props: ProductFiltersProps) {
+   const dict = useDictionary();
+  const t = dict.filters;
+
   return (
     <>
       {/* Desktop sidebar */}
@@ -70,7 +78,7 @@ export default function SideBarCategories(props: ProductFiltersProps) {
             variant="outline"
           >
             <Filter className="h-4 w-4 mr-2" />
-            კატეგორიები
+            {t.categories}
           </Button>
         </SheetTrigger>
 

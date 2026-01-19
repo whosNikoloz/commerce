@@ -29,8 +29,8 @@ export default function OrderSummary({
   const cart = useCartStore((s) => s.cart);
   const subtotal = useCartStore((s) => s.getSubtotal());
 
-  const shipping = subtotal > 50 ? 0 : 9.99;
-  const tax = subtotal * 0.08;
+  const shipping: number = 0.00 //subtotal > 50 ? 0 : 9.99;
+  const tax: number = 0.00 //subtotal * 0.08;
   const total = typeof totalOverride === "number" ? totalOverride : subtotal + shipping + tax;
 
   return (

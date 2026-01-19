@@ -47,7 +47,7 @@ export default function CartPage() {
       if (merchantType !== "FINA") {
         setAvailability({});
         setLoading(false);
-
+        
         return;
       }
 

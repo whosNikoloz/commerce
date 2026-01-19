@@ -188,7 +188,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
     return (
       <div key={category.id} className="relative">
         <div
-          className="group flex items-center gap-2 sm:gap-3 py-2 sm:py-3 px-2 sm:px-4 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-950/20 dark:hover:to-teal-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
+          className="group flex items-center gap-2 sm:gap-3 py-2 sm:py-3 px-2 sm:px-4 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/20 dark:hover:to-indigo-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
           style={{ paddingLeft: `${level * 24 + 8}px` }}
         >
           {/* Expand/Collapse Toggle */}
@@ -219,12 +219,12 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           <div className="flex-shrink-0 hidden sm:block">
             {hasChildCategories ? (
               isExpanded ? (
-                <FolderOpen className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 dark:text-amber-400" />
+                <FolderOpen className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 dark:text-blue-400" />
               ) : (
-                <Folder className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-500" />
+                <Folder className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-500" />
               )
             ) : (
-              <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 dark:text-emerald-400" />
+              <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
             )}
           </div>
 
@@ -251,7 +251,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                 {category.name}
               </div>
               {childrenCount > 0 && (
-                <Badge className="text-[10px] sm:text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-semibold px-1 sm:px-1.5" variant="secondary">
+                <Badge className="text-[10px] sm:text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-semibold px-1 sm:px-1.5" variant="secondary">
                   {childrenCount}
                 </Badge>
               )}
@@ -271,13 +271,13 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <Switch
               checked={isActive}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
+              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
               onCheckedChange={(val) => toggleCategoryVisibility(category.id, val)}
             />
             {isActive ? (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 ring-1 ring-emerald-200 dark:ring-emerald-800">
-                <Eye className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
-                <span className="font-primary text-xs font-bold text-emerald-700 dark:text-emerald-400">Active</span>
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 ring-1 ring-blue-200 dark:ring-blue-800">
+                <Eye className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                <span className="font-primary text-xs font-bold text-blue-700 dark:text-blue-400">Active</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
@@ -290,7 +290,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           {/* Status Badge - Mobile/Tablet */}
           <div className="lg:hidden flex-shrink-0">
             {isActive ? (
-              <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs">
+              <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs">
                 <Eye className="h-3 w-3" />
               </Badge>
             ) : (
@@ -426,7 +426,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
 
   return (
     <Card className="bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none rounded-lg" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none rounded-lg" />
 
       <CardHeader className="relative p-3 sm:p-6">
         <div className="flex flex-col gap-3 sm:gap-4">

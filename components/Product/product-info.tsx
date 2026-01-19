@@ -56,13 +56,13 @@ export function ProductInfo({
   const getConditionLabel = (condition?: Condition) => {
     switch (condition) {
       case Condition.New:
-        return dict?.common?.new || "ახალი";
+        return dict?.common?.new;
       case Condition.Used:
-        return dict?.common?.used || "მეორადი";
+        return dict?.common?.used;
       case Condition.LikeNew:
-        return dict?.common?.likeNew || "როგორც ახალი";
+        return dict?.common?.likeNew;
       default:
-        return dict?.common?.unknownCondition || "უცნობი მდგომარეობა";
+        return dict?.common?.unknownCondition;
     }
   };
 
@@ -71,16 +71,16 @@ export function ProductInfo({
     comingSoon?: boolean,
     opts?: { loading?: boolean; error?: boolean }
   ) => {
-    if (opts?.loading) return dict?.cart?.checkingStock || "მარაგი იტვირთება…";
-    if (opts?.error) return dict?.common?.loadError || "მარაგი ვერ ჩაიტვირთა";
-    if (comingSoon) return dict?.common?.comingSoon || "მალე";
+    if (opts?.loading) return dict?.cart?.checkingStock;
+    if (opts?.error) return dict?.common?.loadError;
+    if (comingSoon) return dict?.common?.comingSoon;
     switch (status) {
       case StockStatus.InStock:
-        return dict?.common?.inStock || "მარაგშია";
+        return dict?.common?.inStock;
       case StockStatus.OutOfStock:
-        return dict?.cart?.outOfStock || "არ არის მარაგში";
+        return dict?.cart?.outOfStock;
       default:
-        return dict?.common?.unknownStatus || "უცნობი სტატუსი";
+        return dict?.common?.unknownStatus;
     }
   };
   const computedDiscount =
@@ -188,14 +188,14 @@ export function ProductInfo({
           {!isStockKnown && (
             <Badge className={stockError ? "bg-red-600 text-white" : "bg-slate-500 text-white"}>
               {stockLoading
-                ? dict?.cart?.checkingStock || "მარაგი იტვირთება…"
-                : dict?.common?.loadError || "მარაგი ვერ ჩაიტვირთა"}
+                ? dict?.cart?.checkingStock
+                : dict?.common?.loadError}
             </Badge>
           )}
 
           {isLiquidated && (
             <Badge className="bg-blue-700 text-white">
-              <Tag className="h-3.5 w-3.5 mr-1" /> {dict?.common?.liquidation || "ლიკვიდაცია"}
+              <Tag className="h-3.5 w-3.5 mr-1" /> {dict?.common?.liquidation}
             </Badge>
           )}
           {condition != null && (
@@ -212,7 +212,7 @@ export function ProductInfo({
               <Truck className="h-4 w-4" />
             </span>
             <span className="font-primary text-foreground font-medium">
-              {dict?.common?.freeShipping || "სწრაფი მიწოდება მთელ საქართველოში TEST"}
+              {dict?.common?.freeShipping}
             </span>
           </div>
         )}
@@ -229,14 +229,14 @@ export function ProductInfo({
             <ShoppingCart className="h-5 w-5" />
             <span>
               {stockLoading
-                ? dict?.common?.loading || "იტვირთება…"
+                ? dict?.common?.loading
                 : stockError
-                  ? dict?.common?.loadError || "ვერ ჩაიტვირთა"
+                  ? dict?.common?.loadError
                   : isComingSoon
-                    ? dict?.common?.comingSoon || "მალე"
+                    ? dict?.common?.comingSoon
                     : !inStockByStatus || !hasPositiveQty
-                      ? dict?.common?.soldOut || "ამოიწურა"
-                      : dict?.common?.addToCart || "კალათაში დამატება"}
+                      ? dict?.common?.soldOut
+                      : dict?.common?.addToCart}
             </span>
           </Button>
 
@@ -247,10 +247,10 @@ export function ProductInfo({
             onClick={onBuyNow}
           >
             {stockLoading
-              ? dict?.common?.loading || "იტვირთება…"
+              ? dict?.common?.loading
               : stockError
-                ? dict?.common?.loadError || "ვერ ჩაიტვირთა"
-                : dict?.cart?.buy || "ყიდვა"}
+                ? dict?.common?.loadError
+                : dict?.cart?.buy}
           </Button>
         </div>
 
@@ -266,14 +266,14 @@ export function ProductInfo({
             <ShoppingCart className="h-5 w-5" />
             <span>
               {stockLoading
-                ? dict?.common?.loading || "იტვირთება…"
+                ? dict?.common?.loading
                 : stockError
-                  ? dict?.common?.loadError || "ვერ ჩაიტვირთა"
+                  ? dict?.common?.loadError
                   : isComingSoon
-                    ? dict?.common?.comingSoon || "მალე"
+                    ? dict?.common?.comingSoon
                     : !inStockByStatus || !hasPositiveQty
-                      ? dict?.common?.soldOut || "ამოიწურა"
-                      : dict?.common?.addToCartShort || "დამატება"}
+                      ? dict?.common?.soldOut
+                      : dict?.common?.addToCartShort}
             </span>
           </Button>
 
@@ -284,10 +284,10 @@ export function ProductInfo({
             onClick={onBuyNow}
           >
             {stockLoading
-              ? dict?.common?.loading || "იტვირთება…"
+              ? dict?.common?.loading
               : stockError
-                ? dict?.common?.loadError || "ვერ ჩაიტვირთა"
-                : dict?.cart?.buy || "ყიდვა"}
+                ? dict?.common?.loadError
+                : dict?.cart?.buy}
           </Button>
         </div>
       </div>

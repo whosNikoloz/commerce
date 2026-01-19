@@ -98,7 +98,7 @@ export default function AddCategoryModal({
   return (
     <>
       <Button
-        className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+        className="gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:translate-y-[1px] hover:shadow-xl hover:shadow-blue-500/35"
         size="sm"
         onClick={handleOpen}
       >
@@ -146,69 +146,90 @@ export default function AddCategoryModal({
                 </ModalHeader>
               )}
 
-              <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3 space-y-4">
-                {/* Category Name */}
-                <Input
-                  required
-                  label="Category Name"
-                  labelPlacement="outside"
-                  placeholder="e.g., Smartphones"
-                  value={formData.name}
-                  variant="bordered"
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
+              <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3 space-y-4 md:space-y-6">
+                <section className="space-y-3">
 
-                {/* Description */}
-                <Textarea
-                  label="Description"
-                  labelPlacement="outside"
-                  minRows={3}
-                  placeholder="Category description..."
-                  value={formData.description}
-                  variant="bordered"
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                />
+                  <Input
+                    required
+                    classNames={{
+                      inputWrapper:
+                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                    }}
+                    label="Category Name"
+                    labelPlacement="outside"
+                    placeholder="e.g., Smartphones"
+                    value={formData.name}
+                    variant="bordered"
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
 
-                {/* Parent Category */}
-                <Select
-                  label="Parent Category (Optional)"
-                  labelPlacement="outside"
-                  placeholder="None (Top Level)"
-                  selectedKeys={formData.parentId ? [formData.parentId] : []}
-                  variant="bordered"
-                  onSelectionChange={(keys) => {
-                    const selected = Array.from(keys)[0] as string;
+                  <Textarea
+                    classNames={{
+                      inputWrapper:
+                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                    }}
+                    label="Description"
+                    labelPlacement="outside"
+                    minRows={3}
+                    placeholder="Category description..."
+                    value={formData.description}
+                    variant="bordered"
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  />
+                </section>
 
-                    setFormData({ ...formData, parentId: selected || "" });
-                  }}
-                >
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} textValue={cat.name}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </Select>
+                <section className="space-y-3">
+                  <Select
+                    classNames={{
+                      trigger:
+                        "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                    }}
+                    label="Parent Category (Optional)"
+                    labelPlacement="outside"
+                    placeholder="None (Top Level)"
+                    selectedKeys={formData.parentId ? [formData.parentId] : []}
+                    variant="bordered"
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+
+                      setFormData({ ...formData, parentId: selected || "" });
+                    }}
+                  >
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} textValue={cat.name}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </section>
               </ModalBody>
 
               <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
-                <div className="flex w-full items-center justify-end gap-2">
-                  <Button
-                    disabled={loading}
-                    size={isMobile ? "sm" : "default"}
-                    type="button"
-                    variant="outline"
-                    onClick={handleClose}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold"
-                    disabled={loading}
-                    size={isMobile ? "sm" : "default"}
-                    type="submit"
-                  >
-                    {loading ? "Creating..." : "Create Category"}
-                  </Button>
+                <div className="flex w-full items-center justify-between gap-3">
+                  <p className="font-primary hidden text-xs text-slate-500 dark:text-slate-400 md:block">
+                    You can edit these details later and add facets to this category.
+                  </p>
+
+                  <div className="ml-auto flex items-center gap-2">
+                    <Button
+                      className="rounded-lg border-slate-200 bg-white text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                      disabled={loading}
+                      size={isMobile ? "sm" : "default"}
+                      type="button"
+                      variant="outline"
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-700"
+                      disabled={loading}
+                      size={isMobile ? "sm" : "default"}
+                      type="submit"
+                    >
+                      {loading ? "Creating..." : "Create Category"}
+                    </Button>
+                  </div>
                 </div>
               </ModalFooter>
             </form>

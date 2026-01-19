@@ -8,6 +8,8 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
+
+import { useDictionary } from "@/app/context/dictionary-provider";
 import {
   Eye,
   EyeOff,
@@ -92,6 +94,9 @@ function useDebounced<T>(value: T, delay = 250): T {
 export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const { config } = useTenant();
   const isCustomMerchant = config?.merchantType === "CUSTOM";
+  const dictionary = useDictionary();
+  const t = dictionary?.admin?.products?.table || {};
+  const tCommon = dictionary?.common || {};
 
   const [products, setProducts] = useState<ProductRequestModel[]>([]);
   const [brands, setBrands] = useState<BrandModel[]>([]);
@@ -306,7 +311,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       : "bg-slate-50 text-slate-600 dark:bg-slate-800/50 dark:text-slate-400";
 
   const getStatusLabel = (status: StockStatus) =>
-    status === StockStatus.InStock ? "მარაგშია" : "არ არის მარაგში";
+    status === StockStatus.InStock ? tCommon?.inStock : tCommon?.soldOut;
 
   const getConditionClass = (condition: Condition) =>
     condition === Condition.New
@@ -317,10 +322,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
   const getConditionLabel = (condition: Condition) =>
     condition === Condition.New
-      ? "ახალი"
+      ? tCommon?.new
       : condition === Condition.Used
-        ? "მეორადი"
-        : "როგორც ახალი";
+        ? tCommon?.used
+        : tCommon?.likeNew;
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
     <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700">
@@ -364,17 +369,17 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             </Badge>
             {product.isLiquidated && (
               <Badge className="bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 text-xs">
-                Liquidated
+                {tCommon?.liquidation}
               </Badge>
             )}
             {product.isComingSoon && (
               <Badge className="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 text-xs">
-                Coming Soon
+                {tCommon?.comingSoon}
               </Badge>
             )}
             {product.isNewArrival && (
               <Badge className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 text-xs">
-                New Arrival
+                {tCommon?.new}
               </Badge>
             )}
           </div>
@@ -471,7 +476,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                         variant="outline"
                       >
                         <Layers className="mr-2 h-4 w-4" />
-                        Categories
+                        {t?.categories}
                       </Button>
                     </SheetTrigger>
                     <SheetContent
@@ -480,7 +485,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                     >
                       <SheetHeader className="px-6 pt-6 mb-6">
                         <SheetTitle className="text-slate-900 dark:text-slate-100">
-                          Categories
+                          {t?.categories}
                         </SheetTitle>
                       </SheetHeader>
                       <div className="px-4 pb-4">
@@ -498,9 +503,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500 dark:text-cyan-400 h-4 w-4" />
                     <Input
-                      aria-label="Search products"
+                      aria-label={t?.searchProducts}
                       className="pl-10 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 focus:border-cyan-500 dark:focus:border-cyan-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
-                      placeholder="Search products..."
+                      placeholder={t?.searchProducts}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -731,17 +736,17 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                               <div className="flex flex-wrap gap-1">
                                 {product.isLiquidated && (
                                   <Badge className="bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 text-xs">
-                                    Liquidated
+                                    {tCommon.liquidation || "Liquidation"}
                                   </Badge>
                                 )}
                                 {product.isComingSoon && (
                                   <Badge className="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 text-xs">
-                                    Coming Soon
+                                    {tCommon.comingSoon || "Coming soon"}
                                   </Badge>
                                 )}
                                 {product.isNewArrival && (
                                   <Badge className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 text-xs">
-                                    New Arrival
+                                    {tCommon.new || "New"}
                                   </Badge>
                                 )}
                               </div>

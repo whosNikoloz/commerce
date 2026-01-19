@@ -175,10 +175,10 @@ export default function AdminDashboard() {
                   <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
                     <BarChart3 className="h-5 w-5 text-white" />
                   </div>
-                  {dict.pages?.admin?.dashboard?.recentOrders || "Recent Orders"}
+                  {dict.pages?.admin?.dashboard?.recentOrders}
                 </CardTitle>
                 <CardDescription className="text-slate-600 dark:text-slate-400 mt-2 font-medium">
-                  {dict.pages?.admin?.dashboard?.manageYourStoreEfficiently || "Latest customer orders and transactions"}
+                  {dict.pages?.admin?.dashboard?.manageYourStoreEfficiently}
                 </CardDescription>
               </div>
               <Button

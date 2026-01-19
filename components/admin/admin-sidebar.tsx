@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { IconArrowLeft, IconHome, IconBox, IconTags, IconBook, IconLetterB } from "@tabler/icons-react";
 import { useRouter, useParams, usePathname } from "next/navigation"; // ⬅️ add usePathname
 import { Button } from "@heroui/button";
@@ -10,11 +10,14 @@ import { ProfileIcon } from "../icons";
 import { Sidebar, SidebarBody, SidebarLink, SidebarGroup } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
+  const dictionary = useDictionary();
+  const t = dictionary?.admin?.sidebar || {};
 
   const router = useRouter();
   const pathname = usePathname();
@@ -28,49 +31,49 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]); // whenever the route changes
 
-  const allLinks = [
+  const allLinks = useMemo(() => [
     {
-      label: "Dashboard",
+      label: t?.dashboard,
       href: `/${currentLang}/admin`,
       icon: (
         <IconHome className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       ),
     },
     {
-      label: "Catalog",
+      label: t?.catalog,
       href: "#",
       icon: <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
       items: [
         {
-          label: "Products",
+          label: t?.products,
           href: `/${currentLang}/admin/products`,
           icon: (
             <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
-          label: "Product Groups",
+          label: t?.productGroups,
           href: `/${currentLang}/admin/product-groups`,
           icon: (
             <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
-          label: "Categories",
+          label: t?.categories,
           href: `/${currentLang}/admin/categories`,
           icon: (
             <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
-          label: "Facets",
+          label: t?.facets,
           href: `/${currentLang}/admin/facets`,
           icon: (
             <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
-          label: "Brands",
+          label: t?.brands,
           href: `/${currentLang}/admin/brands`,
           icon: (
             <IconLetterB className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -79,26 +82,26 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      label: "Sales",
+      label: t?.sales,
       href: "#",
       icon: <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
       items: [
         {
-          label: "Orders",
+          label: t?.orders,
           href: `/${currentLang}/admin/orders`,
           icon: (
             <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
-          label: "Customers",
+          label: t?.customers,
           href: `/${currentLang}/admin/customers`,
           icon: (
             <ProfileIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
-          label: "Transactions",
+          label: t?.transactions,
           href: `/${currentLang}/admin/payments`,
           icon: (
             <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -107,12 +110,12 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      label: "Content",
+      label: t?.content,
       href: "#",
       icon: <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
       items: [
         {
-          label: "FAQs",
+          label: t?.faqs,
           href: `/${currentLang}/admin/faqs`,
           icon: (
             <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -121,13 +124,13 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      label: "Analytics",
+      label: t?.analytics,
       href: `/${currentLang}/admin/analytics`,
       icon: (
         <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       ),
     },
-  ];
+  ], [t, currentLang]);
 
 
   const links = allLinks;
@@ -192,7 +195,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                     open ? "opacity-100" : "opacity-0 w-0 overflow-hidden absolute pointer-events-none"
                   )}
                 >
-                  Site Config
+                  {t?.siteConfig}
                 </span>
               </a>
             </div>

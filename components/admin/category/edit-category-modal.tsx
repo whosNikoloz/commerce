@@ -139,66 +139,90 @@ export function EditCategoryModal({
               </ModalHeader>
             )}
 
-            <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3 space-y-4">
-              <Input
-                required
-                label="Category Name"
-                labelPlacement="outside"
-                placeholder="Category name"
-                value={formData.name}
-                variant="bordered"
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-              />
+            <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3 space-y-4 md:space-y-6">
+              <section className="space-y-3">
 
-              <Textarea
-                label="Description"
-                labelPlacement="outside"
-                minRows={3}
-                placeholder="Add a short description"
-                value={formData.description}
-                variant="bordered"
-                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-              />
+                <Input
+                  required
+                  classNames={{
+                    inputWrapper:
+                      "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                  }}
+                  label="Category Name"
+                  labelPlacement="outside"
+                  placeholder="Category name"
+                  value={formData.name}
+                  variant="bordered"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                />
 
-              <Select
-                items={parentOptions}
-                label="Parent Category"
-                labelPlacement="outside"
-                placeholder="Select parent (optional)"
-                selectedKeys={formData.parentId ? [formData.parentId] : []}
-                variant="bordered"
-                onSelectionChange={(keys) => {
-                  const selected = Array.from(keys)[0] as string;
+                <Textarea
+                  classNames={{
+                    inputWrapper:
+                      "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                  }}
+                  label="Description"
+                  labelPlacement="outside"
+                  minRows={3}
+                  placeholder="Add a short description"
+                  value={formData.description}
+                  variant="bordered"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                />
+              </section>
 
-                  setFormData((prev) => ({ ...prev, parentId: selected || "" }));
-                }}
-              >
-                {(item) => (
-                  <SelectItem key={item.id} textValue={item.label}>
-                    {item.label}
-                  </SelectItem>
-                )}
-              </Select>
+              <section className="space-y-3">
+                <Select
+                  classNames={{
+                    trigger:
+                      "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                  }}
+                  items={parentOptions}
+                  label="Parent Category"
+                  labelPlacement="outside"
+                  placeholder="Select parent (optional)"
+                  selectedKeys={formData.parentId ? [formData.parentId] : []}
+                  variant="bordered"
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+
+                    setFormData((prev) => ({ ...prev, parentId: selected || "" }));
+                  }}
+                >
+                  {(item) => (
+                    <SelectItem key={item.id} textValue={item.label}>
+                      {item.label}
+                    </SelectItem>
+                  )}
+                </Select>
+              </section>
             </ModalBody>
 
             <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
-              <div className="flex w-full items-center justify-end gap-2">
-                <Button
-                  disabled={saving}
-                  size={isMobile ? "sm" : "default"}
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                  disabled={saving}
-                  size={isMobile ? "sm" : "default"}
-                  onClick={handleSave}
-                >
-                  {saving ? "Saving..." : "Save changes"}
-                </Button>
+              <div className="flex w-full items-center justify-between gap-3">
+                <p className="font-primary hidden text-xs text-slate-500 dark:text-slate-400 md:block">
+                  You can edit facets and images from the categories list.
+                </p>
+
+                <div className="ml-auto flex items-center gap-2">
+                  <Button
+                    className="rounded-lg border-slate-200 bg-white text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                    disabled={saving}
+                    size={isMobile ? "sm" : "default"}
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-700"
+                    disabled={saving}
+                    size={isMobile ? "sm" : "default"}
+                    onClick={handleSave}
+                  >
+                    {saving ? "Saving..." : "Save changes"}
+                  </Button>
+                </div>
               </div>
             </ModalFooter>
           </>

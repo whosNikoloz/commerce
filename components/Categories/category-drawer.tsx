@@ -147,7 +147,7 @@ export default function CategoryDrawer() {
 
           {hasChildren ? (
             <button
-              aria-label={dictionary.categories?.viewCategories ?? "View subcategories"}
+              aria-label={dictionary.categories?.viewCategories}
               className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0"
               type="button"
               onClick={() => navigateToCategory(id)}
@@ -166,7 +166,7 @@ export default function CategoryDrawer() {
     <>
       <Button
         isIconOnly
-        aria-label={dictionary.categories?.viewCategories ?? "Browse categories"}
+        aria-label={dictionary.categories?.viewCategories}
         className="relative rounded-full bg-transparent h-6 w-6"
         variant="solid"
         onPress={openDrawer}

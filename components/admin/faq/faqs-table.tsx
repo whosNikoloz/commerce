@@ -85,10 +85,6 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   const dict = useDictionary();
   const t = dict?.admin?.faqs?.table;
 
-  if (!t) {
-    console.warn("FAQ dictionary keys missing", dict?.admin);
-    return <div>Loading translations...</div>;
-  }
   const [faqs, setFaqs] = useState<FAQModel[]>([]);
   const [loading, setLoading] = useState(!(initialFaqs && initialFaqs.length > 0));
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +133,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
-        if (!isCancelled) setError(t.toasts.updateError);
+        if (!isCancelled) setError(t?.toasts?.updateError || "Failed to load");
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -149,6 +145,25 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
   }, [initialFaqs]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+
+    return faqs
+      .filter((f) =>
+        q
+          ? (f.question ?? "").toLowerCase().includes(q) ||
+          (f.answer ?? "").toLowerCase().includes(q)
+          : true,
+      )
+      .filter((f) => (onlyActive ? !!f.isActive : true))
+      .filter((f) => (onlyFeatured ? !!f.isFeatured : true));
+  }, [faqs, search, onlyActive, onlyFeatured]);
+
+  // Early return after all hooks
+  if (!t) {
+    return <div>Loading translations...</div>;
+  }
 
   function onDragEnd(e: DragEndEvent) {
     setDraggingId(null);
@@ -203,20 +218,6 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       toast.error(t.orderSaveFailed);
     }
   }
-
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase().trim();
-
-    return faqs
-      .filter((f) =>
-        q
-          ? (f.question ?? "").toLowerCase().includes(q) ||
-          (f.answer ?? "").toLowerCase().includes(q)
-          : true,
-      )
-      .filter((f) => (onlyActive ? !!f.isActive : true))
-      .filter((f) => (onlyFeatured ? !!f.isFeatured : true));
-  }, [faqs, search, onlyActive, onlyFeatured]);
 
   const handleCreate = async (q: string, a: string, isActive: boolean, isFeatured: boolean) => {
     const tempId = `temp-${Date.now()}`;

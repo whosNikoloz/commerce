@@ -32,53 +32,53 @@ export async function generateMetadata(): Promise<Metadata> {
     const site = tenant.siteConfig;
     const seo = site.seo || {};
 
-  const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
+    const base = site.url ? site.url.replace(/\/$/, "") : `http://${host}`;
 
-  // Use ogImage if available, otherwise fallback to logo
-  const ogImagePath = site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo;
-  const ogImageAbs = ogImagePath.startsWith("http") ? ogImagePath : `${base}${ogImagePath}`;
+    // Use ogImage if available, otherwise fallback to logo
+    const ogImagePath = site.ogImage && site.ogImage.trim() ? site.ogImage : site.logo;
+    const ogImageAbs = ogImagePath.startsWith("http") ? ogImagePath : `${base}${ogImagePath}`;
 
-  // Build verification object
-  const verification: Record<string, string> = {};
+    // Build verification object
+    const verification: Record<string, string> = {};
 
-  if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
-  if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
-  if (seo.yandexVerification) verification.yandex = seo.yandexVerification;
-  if (seo.pinterestVerification) verification.pinterest = seo.pinterestVerification;
+    if (seo.googleSiteVerification) verification.google = seo.googleSiteVerification;
+    if (seo.bingSiteVerification) verification.bing = seo.bingSiteVerification;
+    if (seo.yandexVerification) verification.yandex = seo.yandexVerification;
+    if (seo.pinterestVerification) verification.pinterest = seo.pinterestVerification;
 
-  return {
-    metadataBase: new URL(base),
-    title: { default: site.name, template: `%s • ${site.shortName || site.name}` },
-    description: site.description,
-    keywords: seo.keywords?.ka || seo.keywords?.en,
-    authors: seo.author ? [{ name: seo.author }] : undefined,
-    creator: seo.author,
-    publisher: site.name,
-    verification: Object.keys(verification).length > 0 ? verification : undefined,
-    openGraph: {
-      type: (seo.ogType as any) || "website",
-      url: base,
-      title: site.name,
+    return {
+      metadataBase: new URL(base),
+      title: { default: site.name, template: `%s • ${site.shortName || site.name}` },
       description: site.description,
-      siteName: seo.ogSiteName?.ka || seo.ogSiteName?.en || site.name,
-      images: [{ url: ogImageAbs, width: 1200, height: 630 }],
-      locale: seo.ogLocale || "ka_GE",
-    },
-    twitter: {
-      card: seo.twitterCard || "summary_large_image",
-      title: site.name,
-      description: site.description,
-      images: [ogImageAbs],
-      site: seo.twitterSite,
-      creator: seo.twitterCreator,
-    },
-    icons: { icon: site.favicon },
-  };
+      keywords: seo.keywords?.ka || seo.keywords?.en,
+      authors: seo.author ? [{ name: seo.author }] : undefined,
+      creator: seo.author,
+      publisher: site.name,
+      verification: Object.keys(verification).length > 0 ? verification : undefined,
+      openGraph: {
+        type: (seo.ogType as any) || "website",
+        url: base,
+        title: site.name,
+        description: site.description,
+        siteName: seo.ogSiteName?.ka || seo.ogSiteName?.en || site.name,
+        images: [{ url: ogImageAbs, width: 1200, height: 630 }],
+        locale: seo.ogLocale || "ka_GE",
+      },
+      twitter: {
+        card: seo.twitterCard || "summary_large_image",
+        title: site.name,
+        description: site.description,
+        images: [ogImageAbs],
+        site: seo.twitterSite,
+        creator: seo.twitterCreator,
+      },
+      icons: { icon: site.favicon },
+    };
   } catch (error) {
     // Fallback metadata if tenant config fails to load
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Failed to generate metadata:", errorMessage);
-    
+
     // Return minimal metadata to prevent complete failure
     return {
       title: "E-commerce Store",
@@ -109,7 +109,7 @@ export default async function RootLayout({
 
   const h = await headers();
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
-  
+
   let tenant;
   try {
     tenant = await getTenantByHost(host);
@@ -122,7 +122,7 @@ export default async function RootLayout({
       stack: error instanceof Error ? error.stack : undefined,
       apiUrl: process.env.NEXT_PUBLIC_API_URL ? "Set" : "Missing",
     });
-    
+
     // Re-throw to let Next.js error boundary handle it
     // This ensures the error is properly displayed
     throw error;
@@ -163,7 +163,7 @@ export default async function RootLayout({
     : tenantDefaultLocale;
 
   // Use tenant config dictionaries if available, fallback to static files
-  const dictionary = await getDictionary(safeLang, tenant);
+  const dictionary = await getDictionary(safeLang, tenant, "storefront");
   const site = tenant.siteConfig;
   const seo = site.seo || {};
   const style = themeToStyle(tenant.theme);

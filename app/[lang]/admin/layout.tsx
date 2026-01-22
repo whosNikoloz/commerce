@@ -32,37 +32,47 @@ import { ThemeToggle } from "@/components/admin/theme-toggle";
 import { LanguageToggle } from "@/components/admin/language-toggle";
 import { AdminAuthGuard } from "@/components/admin/admin-auth-guard";
 
-export default function AdminLayout({
+import { getDictionary } from "@/lib/dictionaries";
+import { DictionaryProvider } from "@/app/context/dictionary-provider";
+
+export default async function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
 }) {
+  const { lang: raw } = await params;
+  const lang = raw === "ka" || raw === "en" ? raw : "en";
+  const dictionary = await getDictionary(lang, null, "admin");
+
   return (
-    <AdminAuthGuard>
-      <AdminSidebar>
-        <div className="flex flex-1 overflow-hidden">
-          <div
-            className="flex h-full w-full flex-1 flex-col gap-6  p-4 md:p-8 lg:p-10
-                          bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30
-                          dark:from-slate-950 dark:via-slate-900 dark:to-slate-900
-                          border-l border-t
-                          border-slate-200/60 dark:border-slate-800/60
-                          shadow-xl
-                          overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent"
-            style={{ WebkitOverflowScrolling: "touch" }}
-          >
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
-            <div className="relative z-10">
-              <div className="absolute top-0 right-0 z-50 flex gap-2">
-                <LanguageToggle />
-                <ThemeToggle />
+    <DictionaryProvider dictionary={dictionary}>
+      <AdminAuthGuard>
+        <AdminSidebar>
+          <div className="flex flex-1 overflow-hidden">
+            <div
+              className="flex h-full w-full flex-1 flex-col gap-6  p-4 md:p-8 lg:p-10
+                            bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30
+                            dark:from-slate-950 dark:via-slate-900 dark:to-slate-900
+                            border-l border-t
+                            border-slate-200/60 dark:border-slate-800/60
+                            shadow-xl
+                            overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
+              <div className="relative z-10">
+                <div className="absolute top-0 right-0 z-50 flex gap-2">
+                  <LanguageToggle />
+                  <ThemeToggle />
+                </div>
+                {children}
               </div>
-              {children}
             </div>
           </div>
-        </div>
-      </AdminSidebar>
-    </AdminAuthGuard>
+        </AdminSidebar>
+      </AdminAuthGuard>
+    </DictionaryProvider>
   );
 }

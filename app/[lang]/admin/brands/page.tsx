@@ -12,7 +12,7 @@ export async function generateMetadata(
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'ka';
 
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang, null, 'admin');
 
   return i18nPageMetadataAsync({
     title: dict.pages.admin.brands.title,          // Admin • Brands
@@ -28,7 +28,7 @@ export default async function BrandsPage(
 ) {
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'ka';
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang, null, 'admin');
   const brands = await getAllBrands();
 
   return (

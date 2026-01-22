@@ -8,7 +8,7 @@ import { getDictionary } from "@/lib/dictionaries";
 export default async function Loading({ params }: { params: Promise<{ lang: Locale }> }) {
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'ka';
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang, null, 'admin');
 
   return (
     <div className="space-y-6">

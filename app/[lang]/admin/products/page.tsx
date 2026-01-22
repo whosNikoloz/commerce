@@ -14,7 +14,7 @@ export async function generateMetadata(
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'ka';
 
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang, null, 'admin');
 
   return i18nPageMetadataAsync({
     title: dict.pages.admin.products.title,
@@ -30,8 +30,9 @@ export default async function ProductsPage(
 ) {
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'ka';
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang, null, 'admin');
   const categories = await getAllCategories();
+
 
   return (
     <div className="space-y-8">

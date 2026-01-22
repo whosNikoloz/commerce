@@ -13,7 +13,7 @@ export async function generateMetadata({
   const { lang } = await params;
 
   // Load translations
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang, null, 'admin');
 
   return i18nPageMetadataAsync({
     title: dict.pages.admin.analytics.title,

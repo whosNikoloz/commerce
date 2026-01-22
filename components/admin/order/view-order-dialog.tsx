@@ -20,6 +20,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useDictionary } from "@/app/context/dictionary-provider";
+import { currencyFmt } from "@/lib/utils";
 import { GoBackButton } from "@/components/go-back-button";
 import { OrderDetail, OrderStatus } from "@/types/orderTypes";
 
@@ -67,8 +69,9 @@ function getStatusColor(status: OrderStatus) {
 function statusKey(s: OrderStatus): string {
   return typeof s === "number" ? OrderStatus[s] : String(s);
 }
-function statusLabel(s: OrderStatus): string {
-  return typeof s === "number" ? OrderStatus[s] : String(s);
+function statusLabel(s: OrderStatus, dict: any): string {
+  const key = (typeof s === "number" ? OrderStatus[s] : String(s)).toLowerCase();
+  return dict.admin.orders.statuses[key] || key;
 }
 function keyToStatus(key: string): OrderStatus {
   const numeric = Number(key);
@@ -96,16 +99,6 @@ function safe(v?: string | null) {
   return (v ?? "").trim() || "-";
 }
 
-function currencyFmt(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency,
-    }).format(amount);
-  } catch {
-    return `${amount.toFixed(2)} ${currency}`;
-  }
-}
 function parseDateSafe(iso?: string | null): Date | null {
   if (!iso) return null;
   const d = new Date(iso);
@@ -180,6 +173,8 @@ export default function OrderDetailsModal({
   onClose,
   onUpdateStatus,
 }: Props) {
+  const dict = useDictionary();
+  const t = dict.admin.orders.detailsModal;
   // ---------------- memoized order ----------------
   const normalizedDetail = useMemo(
     () =>
@@ -223,8 +218,8 @@ export default function OrderDetailsModal({
       trackingNumber: normalizedDetail.trackingNumber ?? "",
       estimatedDelivery: d
         ? new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 10)
+          .toISOString()
+          .slice(0, 10)
         : "",
     });
     lastInitRef.current = key;
@@ -240,9 +235,9 @@ export default function OrderDetailsModal({
     () =>
       normalizedDetail
         ? normalizedDetail.orderItems.reduce(
-            (s, it) => s + it.price * it.quantity,
-            0
-          )
+          (s, it) => s + it.price * it.quantity,
+          0
+        )
         : 0,
     [normalizedDetail]
   );
@@ -281,12 +276,12 @@ export default function OrderDetailsModal({
             <ModalHeader className="flex justify-between items-center ">
               <div className="flex items-center gap-2 ">
                 {isMobile && <GoBackButton onClick={onClose} />}
-                <h2 className="font-heading text-xl font-bold">Order Details</h2>
+                <h2 className="font-heading text-xl font-bold">{t.title}</h2>
               </div>
               {normalizedDetail && (
                 <Badge className={getStatusColor(normalizedDetail.status)}>
                   {getStatusIcon(normalizedDetail.status)}
-                  <span className="font-primary ml-1">{statusLabel(normalizedDetail.status)}</span>
+                  <span className="font-primary ml-1">{statusLabel(normalizedDetail.status, dict)}</span>
                 </Badge>
               )}
             </ModalHeader>
@@ -294,7 +289,7 @@ export default function OrderDetailsModal({
             <ModalBody className="overflow-y-auto max-h-[80vh] px-5 py-4">
               {detailLoading && (
                 <div className="py-6 text-center text-muted-foreground">
-                  Loading…
+                  {t.labels.loading}
                 </div>
               )}
               {detailError && (
@@ -305,20 +300,20 @@ export default function OrderDetailsModal({
                 <div className="space-y-5">
                   {/* --------- ORDER INFO --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-heading font-bold text-lg mb-2">Order Information</h3>
+                    <h3 className="font-heading font-bold text-lg mb-2">{t.sections.info}</h3>
                     <div className="grid grid-cols-2 gap-y-2 text-sm">
-                      <div>Date: {formatDateTimeLocal(normalizedDetail.date)}</div>
+                      <div>{t.labels.date}: {formatDateTimeLocal(normalizedDetail.date)}</div>
                       <div>
-                        Total:{" "}
+                        {t.labels.total}:{" "}
                         {currencyFmt(
                           normalizedDetail.total,
                           normalizedDetail.currency
                         )}
                       </div>
-                      <div>Lines: {normalizedDetail.items}</div>
-                      <div>Units: {totalUnits}</div>
+                      <div>{t.labels.lines}: {normalizedDetail.items}</div>
+                      <div>{t.labels.units}: {totalUnits}</div>
                       <div className="col-span-2">
-                        Subtotal:{" "}
+                        {t.labels.subtotal}:{" "}
                         {currencyFmt(itemsSubtotal, normalizedDetail.currency)}
                       </div>
                     </div>
@@ -326,21 +321,21 @@ export default function OrderDetailsModal({
 
                   {/* --------- CUSTOMER --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-heading font-bold text-lg mb-2">Customer</h3>
+                    <h3 className="font-heading font-bold text-lg mb-2">{t.sections.customer}</h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
                       <div>
-                        <div className="text-slate-500">Name</div>
+                        <div className="text-slate-500">{t.labels.name}</div>
                         <div className="font-medium">{fullName(normalizedDetail?.user)}</div>
                       </div>
 
                       <div>
-                        <div className="text-slate-500">Username</div>
+                        <div className="text-slate-500">{t.labels.username}</div>
                         <div className="font-medium">{safe(normalizedDetail?.user?.userName)}</div>
                       </div>
 
                       <div>
-                        <div className="text-slate-500">Email</div>
+                        <div className="text-slate-500">{t.labels.email}</div>
                         {normalizedDetail?.user?.email ? (
                           <a className="font-primary font-medium text-blue-600 hover:underline"
                             href={`mailto:${normalizedDetail.user.email}`}
@@ -353,7 +348,7 @@ export default function OrderDetailsModal({
                       </div>
 
                       <div>
-                        <div className="text-slate-500">Phone</div>
+                        <div className="text-slate-500">{t.labels.phone}</div>
                         {normalizedDetail?.user?.phoneNumber ? (
                           <a className="font-primary font-medium text-blue-600 hover:underline"
                             href={`tel:${normalizedDetail.user.phoneNumber}`}
@@ -366,7 +361,7 @@ export default function OrderDetailsModal({
                       </div>
 
                       <div className="sm:col-span-2">
-                        <div className="text-slate-500">User ID</div>
+                        <div className="text-slate-500">{t.labels.userId}</div>
                         <div className="font-mono text-xs break-all">
                           {safe(normalizedDetail?.user?.id)}
                         </div>
@@ -377,10 +372,10 @@ export default function OrderDetailsModal({
 
                   {/* --------- QUICK UPDATE --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-heading font-bold text-lg mb-3">Quick Update</h3>
+                    <h3 className="font-heading font-bold text-lg mb-3">{t.sections.update}</h3>
 
                     <label className="font-primary text-xs" htmlFor={statusId}>
-                      Status
+                      {t.labels.status}
                     </label>
                     <select
                       className="w-full border rounded-md px-2 py-1 text-sm mb-2"
@@ -395,13 +390,13 @@ export default function OrderDetailsModal({
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={statusKey(s)}>
-                          {statusLabel(s)}
+                          {statusLabel(s, dict)}
                         </option>
                       ))}
                     </select>
 
                     <label className="font-primary text-xs" htmlFor={trackingId}>
-                      Tracking Number
+                      {t.labels.trackingLabel}
                     </label>
                     <input
                       className="w-full border rounded-md px-2 py-1 text-sm mb-2"
@@ -416,7 +411,7 @@ export default function OrderDetailsModal({
                     />
 
                     <label className="font-primary text-xs" htmlFor={etdId}>
-                      Estimated Delivery
+                      {t.labels.etdLabel}
                     </label>
                     <input
                       className="w-full border rounded-md px-2 py-1 text-sm mb-2"
@@ -432,12 +427,12 @@ export default function OrderDetailsModal({
                     />
 
                     <label className="font-primary text-xs" htmlFor={descId}>
-                      Description
+                      {t.labels.description}
                     </label>
                     <textarea
                       className="w-full border rounded-md px-2 py-1 text-sm mb-3 resize-y"
                       id={descId}
-                      placeholder="Optional note..."
+                      placeholder={t.labels.descriptionPlaceholder}
                       rows={3}
                       value={quickModel.description}
                       onChange={(e) =>
@@ -466,7 +461,7 @@ export default function OrderDetailsModal({
                           );
                         }}
                       >
-                        Save
+                        {t.labels.save}
                       </Button>
                       <Button
                         className="flex-1"
@@ -485,24 +480,24 @@ export default function OrderDetailsModal({
                               normalizedDetail.trackingNumber ?? "",
                             estimatedDelivery: d
                               ? new Date(
-                                  d.getTime() - d.getTimezoneOffset() * 60000
-                                )
-                                  .toISOString()
-                                  .slice(0, 10)
+                                d.getTime() - d.getTimezoneOffset() * 60000
+                              )
+                                .toISOString()
+                                .slice(0, 10)
                               : "",
                           });
                         }}
                       >
-                        Reset
+                        {t.labels.reset}
                       </Button>
                     </div>
                   </div>
 
-                  
+
 
                   {/* --------- PRODUCTS --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-heading font-bold text-lg mb-3">Products</h3>
+                    <h3 className="font-heading font-bold text-lg mb-3">{t.sections.products}</h3>
                     {normalizedDetail.orderItems.map((it) => (
                       <div
                         key={it.id}
@@ -519,10 +514,10 @@ export default function OrderDetailsModal({
                         <div className="flex-1">
                           <div className="font-medium">{it.name}</div>
                           <div className="text-xs text-slate-500">
-                            SKU: {it.sku || "-"}
+                            {t.labels.sku}: {it.sku || "-"}
                           </div>
                           <div className="text-xs text-slate-500">
-                            Qty: {it.quantity}
+                            {t.labels.qty}: {it.quantity}
                           </div>
                         </div>
                         <div className="text-right">
@@ -530,7 +525,7 @@ export default function OrderDetailsModal({
                             {currencyFmt(it.price * it.quantity, normalizedDetail.currency)}
                           </div>
                           <div className="text-xs text-slate-500">
-                            Unit: {currencyFmt(it.price, normalizedDetail.currency)}
+                            {t.labels.unit}: {currencyFmt(it.price, normalizedDetail.currency)}
                           </div>
                         </div>
                       </div>
@@ -540,7 +535,7 @@ export default function OrderDetailsModal({
                   {/* --------- TRACKING HISTORY --------- */}
                   {normalizedDetail.trackingSteps?.length > 0 && (
                     <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                      <h3 className="font-heading font-bold text-lg mb-3">Tracking History</h3>
+                      <h3 className="font-heading font-bold text-lg mb-3">{t.sections.history}</h3>
                       <div className="space-y-2">
                         {normalizedDetail.trackingSteps.map((t, i) => {
                           // Convert numeric status to readable label
@@ -554,12 +549,11 @@ export default function OrderDetailsModal({
                           return (
                             <div key={i} className="flex gap-3 items-start">
                               <div
-                                className={`w-2 h-2 mt-1 rounded-full ${
-                                  t.completed ? "bg-emerald-500" : "bg-slate-400"
-                                }`}
+                                className={`w-2 h-2 mt-1 rounded-full ${t.completed ? "bg-emerald-500" : "bg-slate-400"
+                                  }`}
                               />
                               <div>
-                                <div className="font-medium text-sm">{readableStatus}</div>
+                                <div className="font-medium text-sm">{statusLabel(statusValue as OrderStatus, dict)}</div>
                                 {t.description && (
                                   <div className="text-xs text-slate-500">
                                     {t.description}
@@ -578,19 +572,19 @@ export default function OrderDetailsModal({
 
                   {/* --------- SHIPPING --------- */}
                   <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-heading font-bold text-lg mb-3">Shipping</h3>
+                    <h3 className="font-heading font-bold text-lg mb-3">{t.sections.shipping}</h3>
                     <p className="font-primary text-sm whitespace-pre-wrap mb-2">
                       {normalizedDetail.shippingAddress}
                     </p>
                     {normalizedDetail.trackingNumber && (
                       <p className="font-primary text-sm">
-                        <strong>Tracking:</strong>{" "}
+                        <strong>{t.labels.trackingLabel}:</strong>{" "}
                         {normalizedDetail.trackingNumber}
                       </p>
                     )}
                     {normalizedDetail.estimatedDelivery && (
                       <p className="font-primary text-sm">
-                        <strong>Estimated Delivery:</strong>{" "}
+                        <strong>{t.labels.etdLabel}:</strong>{" "}
                         {formatDateLocal(normalizedDetail.estimatedDelivery)}
                       </p>
                     )}
@@ -601,7 +595,7 @@ export default function OrderDetailsModal({
 
             <ModalFooter>
               <Button variant="outline" onClick={onClose}>
-                Close
+                {t.labels.close}
               </Button>
             </ModalFooter>
           </>

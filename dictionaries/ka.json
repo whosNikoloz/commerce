@@ -116,7 +116,57 @@
         "addProduct": "პროდუქტის დამატება",
         "allCategories": "ყველა კატეგორია",
         "searchCategories": "კატეგორიების ძიება...",
-        "searchProducts": "პროდუქტების ძიება..."
+        "searchProducts": "პროდუქტების ძიება...",
+        "headers": {
+          "image": "სურათი",
+          "product": "პროდუქტი",
+          "price": "ფასი",
+          "status": "სტატუსი",
+          "condition": "მდგომარეობა",
+          "flags": "ფლაგები",
+          "visible": "ხილვადი",
+          "actions": "მოქმედებები"
+        },
+        "sort": {
+          "placeholder": "სორტირება",
+          "name": "სახელი",
+          "price": "ფასი",
+          "status": "სტატუსი"
+        },
+        "filter": {
+          "placeholder": "სტატუსი",
+          "allStatus": "ყველა სტატუსი",
+          "active": "აქტიური",
+          "inactive": "არააქტიური"
+        },
+        "empty": {
+          "selectCategory": "აირჩიეთ კატეგორია",
+          "selectCategoryDescription": "აირჩიეთ კატეგორია გვერდითი პანელიდან (ან ღილაკიდან მობილურზე) პროდუქტების სანახავად და სამართავად.",
+          "noProductsFound": "პროდუქტები ვერ მოიძებნა",
+          "adjustSearchTerms": "სცადეთ ძიების პირობების შეცვლა",
+          "noProductsInCategory": "ამ კატეგორიაში პროდუქტები არ არის"
+        },
+        "loading": "პროდუქტები იტვირთება...",
+        "updating": "ნახლდება...",
+        "productsFound": "ნაპოვნია {count} პროდუქტი",
+        "tryAgain": "თავიდან სცადეთ",
+        "delete": "წაშლა",
+        "deleteDialog": {
+          "title": "პროდუქტის წაშლა?",
+          "confirmation": "დარწმუნებული ხართ, რომ გსურთ წაშალოთ",
+          "warning": "? ეს მოქმედება ვერ გაუქმდება და პროდუქტი სამუდამოდ წაიშლება.",
+          "fallbackWarning": "ეს მოქმედება ვერ გაუქმდება.",
+          "cancel": "გაუქმება",
+          "deleteProduct": "პროდუქტის წაშლა"
+        },
+        "toast": {
+          "productDeleted": "პროდუქტი წარმატებით წაიშალა",
+          "productDeleteFailed": "პროდუქტის წაშლა ვერ მოხერხდა",
+          "productUpdated": "პროდუქტი წარმატებით განახლდა",
+          "productUpdateFailed": "პროდუქტის განახლება ვერ მოხერხდა",
+          "visibilityChanged": "პროდუქტის ხილვადობა შეიცვალა",
+          "failedToLoadBrands": "ბრენდების ჩატვირთვა ვერ მოხერხდა"
+        }
       },
       "addModal": {
         "title": "ახალი პროდუქტის დამატება",
@@ -173,6 +223,546 @@
         "liquidation": "ლიკვიდაცია",
         "comingSoon": "მალე მოდის",
         "productFacets": "პროდუქტის ატრიბუტები"
+      },
+      "imagesModal": {
+        "title": "პროდუქტის სურათების მართვა",
+        "subtitle": "ატვირთეთ მაქსიმუმ {maxFiles} სურათი • მაქს {maxSize}MB თითოეული",
+        "triggerButton": "სურათები",
+        "triggerTitle": "სურათების მართვა",
+        "dropzoneTitle": "გადმოიტანეთ სურათები აქ",
+        "dropzoneSubtitle": "ან დააწკაპუნეთ ასარჩევად - ასევე შეგიძლიათ ჩასვით სურათები",
+        "slotsLeft": "დარჩა {count} ადგილი - მაქს {maxSize}MB თითოეული",
+        "willDelete": "წაიშლება",
+        "existing": "არსებული",
+        "new": "ახალი",
+        "undoDelete": "წაშლის გაუქმება",
+        "delete": "წაშლა",
+        "noImages": "სურათები ჯერ არ არის.",
+        "clearPending": "მომლოდინეების გასუფთავება",
+        "cancel": "გაუქმება",
+        "saving": "ინახება...",
+        "savePhotos": "ფოტოების შენახვა"
+      }
+    },
+    "categories": {
+      "treeView": {
+        "addCategory": "კატეგორიის დამატება",
+        "expandAll": "ყველას გაშლა",
+        "expand": "გაშლა",
+        "collapseAll": "ყველას დაკეცვა",
+        "collapse": "დაკეცვა",
+        "searchPlaceholder": "კატეგორიების ძიება...",
+        "root": "ძირეული",
+        "total": "სულ",
+        "facets": "ატრიბუტი",
+        "active": "აქტიური",
+        "hidden": "დამალული",
+        "edit": "რედაქტირება",
+        "images": "სურათები",
+        "hideCategory": "კატეგორიის დამალვა",
+        "showCategory": "კატეგორიის ჩვენება",
+        "manageImages": "სურათების მართვა",
+        "delete": "წაშლა",
+        "noCategoriesFound": "კატეგორიები ვერ მოიძებნა",
+        "tryAdjustingSearch": "სცადეთ ძიების შეცვლა",
+        "addFirstCategory": "დაამატეთ პირველი კატეგორია დასაწყებად",
+        "deleteDialogTitle": "კატეგორიის წაშლა?",
+        "deleteConfirmation": "დარწმუნებული ხართ, რომ გსურთ წაშალოთ",
+        "deleteWarning": "? ეს მოქმედება შეუქცევადია და სამუდამოდ წაშლის კატეგორიას.",
+        "actionCannotBeUndone": "ეს მოქმედება შეუქცევადია.",
+        "cancel": "გაუქმება",
+        "deleteCategory": "კატეგორიის წაშლა"
+      },
+      "addModal": {
+        "title": "ახალი კატეგორიის დამატება",
+        "subtitle": "შექმენით კატეგორია პროდუქტების ორგანიზებისთვის",
+        "categoryName": "კატეგორიის სახელი",
+        "categoryNamePlaceholder": "მაგ., სმარტფონები",
+        "description": "აღწერა",
+        "descriptionPlaceholder": "კატეგორიის აღწერა...",
+        "parentCategory": "მშობელი კატეგორია (არასავალდებულო)",
+        "parentPlaceholder": "არცერთი (ზედა დონე)",
+        "footerNote": "შეგიძლიათ ამ დეტალების რედაქტირება მოგვიანებით და ატრიბუტების დამატება.",
+        "cancel": "გაუქმება",
+        "creating": "იქმნება...",
+        "createCategory": "კატეგორიის შექმნა"
+      },
+      "editModal": {
+        "title": "კატეგორიის რედაქტირება",
+        "subtitle": "გადარქმევა, აღწერის განახლება ან მშობელი კატეგორიის არჩევა.",
+        "subtitleMobile": "დეტალების განახლება ან მშობლის ქვეშ გადატანა",
+        "categoryName": "კატეგორიის სახელი",
+        "categoryNamePlaceholder": "კატეგორიის სახელი",
+        "description": "აღწერა",
+        "descriptionPlaceholder": "დაამატეთ მოკლე აღწერა",
+        "parentCategory": "მშობელი კატეგორია",
+        "parentPlaceholder": "აირჩიეთ მშობელი (არასავალდებულო)",
+        "noParent": "მშობლის გარეშე (ზედა დონე)",
+        "footerNote": "ატრიბუტების და სურათების რედაქტირება შესაძლებელია კატეგორიების სიიდან.",
+        "cancel": "გაუქმება",
+        "saving": "ინახება...",
+        "saveChanges": "ცვლილებების შენახვა"
+      },
+      "imagesModal": {
+        "title": "კატეგორიის სურათების მართვა",
+        "subtitle": "ატვირთეთ მაქსიმუმ {maxFiles} სურათი • მაქს. {maxSize}MB თითოეული",
+        "dragAndDrop": "გადმოიტანეთ სურათები აქ",
+        "orClickToBrowse": "ან დააწკაპუნეთ ასარჩევად • ასევე შეგიძლიათ ჩასვათ სურათები",
+        "willDelete": "წაიშლება",
+        "existing": "არსებული",
+        "new": "ახალი",
+        "noImagesYet": "სურათები ჯერ არ არის.",
+        "clearPending": "მოლოდინის გასუფთავება",
+        "cancel": "გაუქმება",
+        "saving": "ინახება...",
+        "savePhotos": "ფოტოების შენახვა"
+      },
+      "toast": {
+        "enterCategoryName": "გთხოვთ შეიყვანოთ კატეგორიის სახელი",
+        "categoryCreated": "კატეგორია წარმატებით შეიქმნა",
+        "categoryCreateFailed": "კატეგორიის შექმნა ვერ მოხერხდა",
+        "categoryUpdated": "კატეგორია წარმატებით განახლდა",
+        "categoryUpdateFailed": "კატეგორიის განახლება ვერ მოხერხდა",
+        "categoryDeleted": "კატეგორია წარმატებით წაიშალა",
+        "categoryDeleteFailed": "კატეგორიის წაშლა ვერ მოხერხდა",
+        "cannotDeleteWithChildren": "ქვეკატეგორიების მქონე კატეგორიის წაშლა შეუძლებელია. გთხოვთ ჯერ წაშალოთ შვილობილი კატეგორიები."
+      }
+    },
+    "brands": {
+      "table": {
+        "searchPlaceholder": "ძიება სახელით ან წარმოშობით...",
+        "addBrand": "ბრენდის დამატება",
+        "image": "სურათი",
+        "name": "სახელი",
+        "origin": "წარმოშობა",
+        "description": "აღწერა",
+        "actions": "მოქმედებები",
+        "loading": "იტვირთება ბრენდები...",
+        "noBrands": "ბრენდები ვერ მოიძებნა",
+        "adjustSearch": "სცადეთ ძიების შეცვლა",
+        "delete": "წაშლა",
+        "deleting": "იშლება...",
+        "deleteDialogTitle": "ბრენდის წაშლა?",
+        "deleteConfirmation": "თქვენ აპირებთ სამუდამოდ წაშალოთ",
+        "deleteWarning": ". ეს მოქმედება შეუქცევადია.",
+        "actionCannotBeUndone": "ეს მოქმედება შეუქცევადია.",
+        "cancel": "გაუქმება",
+        "deleteBrand": "ბრენდის წაშლა"
+      },
+      "addModal": {
+        "title": "ბრენდის დამატება",
+        "subtitle": "ახალი ბრენდის შექმნა",
+        "subtitleDesktop": "შექმენით ახალი ბრენდი აღწერით და წარმოშობით",
+        "name": "ბრენდის სახელი",
+        "namePlaceholder": "შეიყვანეთ ბრენდის სახელი",
+        "origin": "წარმოშობა",
+        "originPlaceholder": "საქართველო / ევროკავშირი",
+        "description": "აღწერა",
+        "cancel": "გაუქმება",
+        "save": "შენახვა"
+      },
+      "editModal": {
+        "title": "ბრენდის განახლება",
+        "subtitle": "ბრენდის ინფორმაციის განახლება",
+        "subtitleDesktop": "განაახლეთ ბრენდის აღწერა და წარმოშობა",
+        "name": "ბრენდის სახელი",
+        "namePlaceholder": "შეიყვანეთ ბრენდის სახელი",
+        "origin": "წარმოშობა",
+        "originPlaceholder": "საქართველო / ევროკავშირი",
+        "description": "აღწერა",
+        "cancel": "გაუქმება",
+        "save": "შენახვა"
+      },
+      "imagesModal": {
+        "title": "ბრენდის სურათების მართვა",
+        "subtitle": "ატვირთეთ მაქსიმუმ {maxFiles} სურათი • მაქს. {maxSize}MB თითოეული",
+        "dropzoneTitle": "გადმოიტანეთ სურათები აქ",
+        "dropzoneSubtitle": "ან დააწკაპუნეთ ასარჩევად • ასევე შეგიძლიათ ჩასვათ სურათები",
+        "willDelete": "წაიშლება",
+        "existing": "არსებული",
+        "new": "ახალი",
+        "noImages": "სურათები ჯერ არ არის.",
+        "clearPending": "მოლოდინის გასუფთავება",
+        "cancel": "გაუქმება",
+        "saving": "ინახება...",
+        "savePhotos": "ფოტოების შენახვა"
+      },
+      "toast": {
+        "updated": "ბრენდი წარმატებით განახლდა.",
+        "updateFailed": "ბრენდის განახლება ვერ მოხერხდა.",
+        "created": "ბრენდი წარმატებით დაემატა.",
+        "createFailed": "ბრენდის დამატება ვერ მოხერხდა.",
+        "deleted": "ბრენდი წაიშალა.",
+        "deleteFailed": "ბრენდის წაშლა ვერ მოხერხდა."
+      }
+    },
+    "customers": {
+      "stats": {
+        "total": "მომხმარებლების რაოდენობა",
+        "active": "აქტიური მომხმარებელი",
+        "revenue": "ჯამური შემოსავალი",
+        "revenueLabel": "ყველა მომხმარებლისგან",
+        "avgValue": "შეკვეთის საშუალო ღირებულება",
+        "perOrder": "საშუალო ერთ შეკვეთაზე"
+      },
+      "table": {
+        "title": "მომხმარებლები",
+        "subtitle": "მართეთ თქვენი მომხმარებელთა ბაზა და ურთიერთობები",
+        "searchPlaceholder": "ძებნა მომხმარებლებში...",
+        "headers": {
+          "customer": "მომხმარებელი",
+          "contact": "კონტაქტი",
+          "orders": "შეკვეთები",
+          "totalSpent": "ჯამში დახარჯული",
+          "joinDate": "რეგისტრაციის თარიღი",
+          "status": "სტატუსი",
+          "actions": "მოქმედებები"
+        },
+        "loading": "იტვირთება მომხმარებლები...",
+        "empty": "მომხმარებლები ვერ მოიძებნა",
+        "ordersCount": "შეკვეთა",
+        "active": "აქტიური",
+        "inactive": "არააქტიური"
+      },
+      "detailsModal": {
+        "title": "{name}",
+        "subtitle": "მომხმარებლის ინფორმაცია და შეკვეთების ისტორია",
+        "fullTitle": "მომხმარებლის დეტალები - {name}",
+        "fullSubtitle": "მომხმარებლის სრული ინფორმაცია და შეკვეთების ისტორია",
+        "tabs": {
+          "profile": "პროფილი",
+          "orders": "შეკვეთები",
+          "address": "მისამართი"
+        },
+        "infoTitle": "მომხმარებლის ინფორმაცია",
+        "statsTitle": "ანგარიშის სტატისტიკა",
+        "historyTitle": "შეკვეთების ისტორია",
+        "shippingTitle": "მიწოდების მისამართი",
+        "labels": {
+          "email": "ელ.ფოსტა",
+          "phone": "ტელეფონი",
+          "since": "წევრია",
+          "ordersCount": "ჯამური შეკვეთები",
+          "ltv": "ჯამური ღირებულება",
+          "n_a": "ა/მ",
+          "status": "სტატუსი",
+          "close": "დახურვა",
+          "orderPrefix": "შეკვეთა #",
+          "item": "პროდუქტი",
+          "items": "პროდუქტი",
+          "noStreet": "ქუჩის მისამართი არ არის",
+          "noCountry": "ქვეყანა არ არის მითითებული",
+          "sku": "SKU",
+          "qty": "რაოდ.",
+          "total": "ჯამი",
+          "loadFailed": "შეკვეთის დეტალების ჩატვირთვა ვერ მოხერხდა",
+          "loadingOrders": "შეკვეთების ჩატვირთვა...",
+          "noOrders": "შეკვეთები ვერ მოიძებნა",
+          "id": "ID",
+          "nameLabel": "სახელი",
+          "usernameLabel": "მომხმარებლის სახელი"
+        }
+      },
+      "editModal": {
+        "title": "მომხმარებლის რედაქტირება",
+        "subtitle": "მომხმარებლის ინფორმაციის განახლება",
+        "firstName": "სახელი",
+        "lastName": "გვარი",
+        "email": "ელ.ფოსტა",
+        "phone": "ტელეფონი",
+        "cancel": "გაუქმება",
+        "save": "შენახვა",
+        "saving": "ინახება...",
+        "placeholders": {
+          "firstName": "სახელი",
+          "lastName": "გვარი",
+          "email": "email@example.com",
+          "phone": "+995 555 123 456"
+        }
+      },
+      "toasts": {
+        "updateSuccess": "მომხმარებელი წარმატებით განახლდა",
+        "updateError": "მომხმარებლის განახლება ვერ მოხერხდა. გთხოვთ სცადოთ თავიდან."
+      }
+    },
+    "payments": {
+      "stats": {
+        "totalRevenue": "ჯამური შემოსავალი",
+        "pendingPayments": "მოლოდინშია",
+        "completedPayments": "დასრულებულია",
+        "failedPayments": "წარუმატებელი",
+        "fees": "ტვირთის საკომისიო",
+        "successful": "წარმატებული",
+        "failed": "წარუმატებელი",
+        "successRate": "{rate}% წარმატების დონე",
+        "failureRate": "{rate}% წარუმატებლობის დონე",
+        "trend": "{value}% წინა თვესთან შედარებით"
+      },
+      "table": {
+        "title": "ტრანზაქციების ისტორია",
+        "subtitle": "გადახდების ტრანზაქციების ნახვა და მართვა",
+        "searchPlaceholder": "მოძებნეთ ID-ით, შეკვეთით ან მომხმარებლით...",
+        "filterStatus": "სტატუსით ფილტრი",
+        "allStatuses": "ყველა სტატუსი",
+        "export": "ექსპორტი",
+        "noTransactions": "ტრანზაქციები არ მოიძებნა.",
+        "headers": {
+          "id": "ტრანზაქციის ID",
+          "order": "შეკვეთა",
+          "customer": "მომხმარებელი",
+          "amount": "თანხა",
+          "method": "მეთოდი",
+          "status": "სტატუსი",
+          "date": "თარიღი",
+          "fee": "საკომისიო",
+          "actions": "მოქმედებები"
+        },
+        "statuses": {
+          "completed": "დასრულებული",
+          "pending": "მოლოდინში",
+          "failed": "წარუმატებელი",
+          "refunded": "დაბრუნებული"
+        }
+      },
+      "detailsModal": {
+        "title": "ტრანზაქციის დეტალები",
+        "sections": {
+          "info": "ტრანზაქციის ინფორმაცია",
+          "customer": "მომხმარებლის ინფორმაცია",
+          "details": "გადახდის დეტალები"
+        },
+        "labels": {
+          "id": "ტრანზაქციის ID",
+          "amount": "თანხა",
+          "method": "გადახდის მეთოდი",
+          "status": "სტატუსი",
+          "date": "თარიღი",
+          "fee": "ტრანზაქციის საკომისიო",
+          "net": "წმინდა თანხა",
+          "transactionId": "პროცესორის ID",
+          "email": "ელ.ფოსტა",
+          "phone": "ტელეფონი",
+          "close": "დახურვა"
+        }
+      }
+    },
+    "orders": {
+      "statuses": {
+        "pending": "მოლოდინში",
+        "paid": "გადახდილია",
+        "processing": "მუშავდება",
+        "shipped": "გაგზავნილია",
+        "delivered": "ჩაბარებულია",
+        "cancelled": "გაუქმებულია",
+        "refunded": "დაბრუნებულია"
+      },
+      "stats": {
+        "total": "ჯამური შეკვეთები",
+        "pending": "მოლოდინში",
+        "processing": "მუშავდება",
+        "shipped": "გაგზავნილია",
+        "delivered": "ჩაბარებულია"
+      },
+      "table": {
+        "title": "შეკვეთები",
+        "subtitle": "მართეთ და თვალყური ადევნეთ მომხმარებლის შეკვეთებს",
+        "searchPlaceholder": "ID / სტატუსი / თარიღი...",
+        "filterAll": "ყველა სტატუსი",
+        "headers": {
+          "id": "შეკვეთის ID",
+          "date": "თარიღი",
+          "items": "პროდუქტები",
+          "total": "ჯამი",
+          "status": "სტატუსი",
+          "actions": "მოქმედებები"
+        },
+        "loading": "იტვირთება...",
+        "empty": "შეკვეთები ვერ მოიძებნა",
+        "prev": "წინა",
+        "next": "შემდეგი",
+        "pageInfo": "გვერდი {page} / {totalPages}-დან • სულ {total}"
+      },
+      "detailsModal": {
+        "title": "შეკვეთის დეტალები",
+        "subtitle": "შეკვეთის სრული ინფორმაცია და პროდუქტები",
+        "sections": {
+          "info": "შეკვეთის ინფორმაცია",
+          "customer": "მომხმარებელი",
+          "update": "სწრაფი განახლება",
+          "products": "პროდუქტები",
+          "history": "ტრეკინგის ისტორია",
+          "shipping": "მიწოდება"
+        },
+        "labels": {
+          "date": "თარიღი",
+          "total": "ჯამი",
+          "lines": "ხაზები",
+          "units": "ერთეულები",
+          "subtotal": "ჯამი",
+          "name": "სახელი",
+          "username": "მომხმარებლის სახელი",
+          "email": "ელ.ფოსტა",
+          "phone": "ტელეფონი",
+          "userId": "მომხმარებლის ID",
+          "status": "სტატუსი",
+          "tracking": "ტრეკინგი",
+          "etd": "მიწოდების სავარაუდო თარიღი",
+          "description": "აღწერა",
+          "sku": "SKU",
+          "qty": "რაოდ.",
+          "unit": "ერთეული",
+          "reset": "გასუფთავება",
+          "save": "შენახვა",
+          "close": "დახურვა",
+          "loading": "იტვირთება...",
+          "etdLabel": "მიწოდების სავარაუდო თარიღი",
+          "trackingLabel": "ტრეკინგ ნომერი"
+        },
+        "placeholders": {
+          "note": "არასავალდებულო შენიშვნა..."
+        }
+      },
+      "toasts": {
+        "statusUpdated": "{id} შეკვეთის სტატუსი განახლდა: {status}",
+        "statusUpdateFailed": "სტატუსის განახლება ვერ მოხერხდა",
+        "orderCancelled": "{id} შეკვეთა გაუქმდა",
+        "orderCancelFailed": "შეკვეთის გაუქმება ვერ მოხერხდა",
+        "cancelReasonPrompt": "გაუქმების მიზეზი?"
+      }
+    },
+    "faqs": {
+      "table": {
+        "headers": {
+          "question": "კითხვა",
+          "answer": "პასუხი",
+          "status": "სტატუსი",
+          "actions": "ქმედებები"
+        },
+        "searchPlaceholder": "ძებნა კითხვით ან პასუხით…",
+        "saveOrder": "რიგის შენახვა",
+        "noChanges": "ცვლილება არ არის შესანახი",
+        "orderSaved": "რიგი შენახულია.",
+        "orderSaveFailed": "რიგის შენახვა ვერ მოხერხდა.",
+        "dragHandle": "გადათრევა",
+        "addFaq": "დაამატე FAQ",
+        "delete": "წაშლა",
+        "deleting": "იშლება...",
+        "loading": "იტვირთება...",
+        "empty": "ჩანაწერები ვერ მოიძებნა.",
+        "deleteConfirmTitle": "წაშლა?",
+        "deleteConfirmDesc": "წაიშლება: {question}. ქმედება შეუქცევადია.",
+        "deleteWarning": "ქმედება შეუქცევადია.",
+        "cancel": "გაუქმება",
+        "active": "აქტიური",
+        "featured": "რჩეული",
+        "toasts": {
+          "updateSuccess": "განახლდა.",
+          "updateError": "განახლება ვერ მოხერხდა.",
+          "createSuccess": "FAQ დაემატა.",
+          "createError": "დამატება ვერ მოხერხდა.",
+          "deleteSuccess": "წაიშალა.",
+          "deleteError": "წაშლა ვერ მოხერხდა.",
+          "toggleError": "ვერ შეიცვალა."
+        }
+      },
+      "modals": {
+        "addTitle": "FAQ-ის დამატება",
+        "addSubtitle": "Add new frequently asked question",
+        "editTitle": "FAQ-ის ჩასწორება",
+        "editSubtitle": "Update FAQ information",
+        "question": "კითხვა",
+        "questionPlaceholder": "შეიყვანეთ კითხვა",
+        "answer": "პასუხი",
+        "answerPlaceholder": "შეიყვანეთ პასუხი",
+        "active": "აქტიური",
+        "featured": "რჩეული",
+        "save": "შენახვა",
+        "saving": "ინახება...",
+        "cancel": "გაუქმება",
+        "fillFields": "შეავსე ველები"
+      }
+    },
+    "facets": {
+      "table": {
+        "addFacet": "ატრიბუტის დამატება",
+        "categories": "კატეგორიები",
+        "searchPlaceholder": "ატრიბუტების ძიება...",
+        "allTypes": "ყველა ტიპი",
+        "custom": "მორგებული",
+        "system": "სისტემური",
+        "name": "სახელი",
+        "type": "ტიპი",
+        "updating": "განახლება...",
+        "facetsFound": "{count} ატრიბუტი მოიძებნა",
+        "selectCategory": "აირჩიეთ კატეგორია",
+        "selectCategoryDescription": "აირჩიეთ კატეგორია გვერდითი პანელიდან ატრიბუტების სამართავად.",
+        "loadingFacets": "იტვირთება ატრიბუტები...",
+        "loadFailed": "ატრიბუტების ჩატვირთვა ვერ მოხერხდა",
+        "tryAgain": "ხელახლა ცდა",
+        "noFacets": "ატრიბუტები არ არის",
+        "noFacetsDescription": "შექმენით პირველი ატრიბუტი ამ კატეგორიისთვის.",
+        "tableHeaderName": "სახელი",
+        "tableHeaderDisplay": "ჩვენება",
+        "tableHeaderCustom": "მორგებული",
+        "tableHeaderValues": "მნიშვნელობები",
+        "tableHeaderActions": "მოქმედებები",
+        "yes": "დიახ",
+        "no": "არა",
+        "deleteDialogTitle": "ატრიბუტის წაშლა?",
+        "deleteConfirmation": "დარწმუნებული ხართ, რომ გსურთ წაშალოთ",
+        "deleteWarning": "? ეს მოქმედება შეუქცევადია და სამუდამოდ წაშლის ატრიბუტს.",
+        "actionCannotBeUndone": "ეს მოქმედება შეუქცევადია.",
+        "cancel": "გაუქმება",
+        "deleteFacet": "ატრიბუტის წაშლა"
+      },
+      "addModal": {
+        "title": "ატრიბუტის დამატება",
+        "subtitle": "შექმენით ახალი ატრიბუტი (მაგ., ზომა, გარჩევადობა)",
+        "name": "სახელი",
+        "namePlaceholder": "ზომა",
+        "displayType": "ჩვენების ტიპი",
+        "preview": "გადახედვა",
+        "custom": "მორგებული",
+        "customDescription": "მონიშნეთ როგორც მორგებული ატრიბუტი",
+        "category": "კატეგორია",
+        "selectCategory": "აირჩიეთ კატეგორია",
+        "facetValues": "ატრიბუტის მნიშვნელობები",
+        "cancel": "გაუქმება",
+        "creating": "იქმნება...",
+        "create": "შექმნა"
+      },
+      "editModal": {
+        "title": "ატრიბუტის რედაქტირება",
+        "subtitle": "განაახლეთ ატრიბუტის პარამეტრები და მნიშვნელობები",
+        "name": "სახელი",
+        "namePlaceholder": "ატრიბუტის სახელი",
+        "displayType": "ჩვენების ტიპი",
+        "preview": "გადახედვა",
+        "custom": "მორგებული",
+        "customDescription": "მონიშნეთ როგორც მორგებული ატრიბუტი",
+        "category": "კატეგორია",
+        "categoryDescription": "შეცვალეთ კატეგორიის არჩევანი ხიდან (ატრიბუტების პარამეტრების მსგავსად).",
+        "selectCategory": "აირჩიეთ კატეგორია",
+        "noCategoriesAvailable": "კატეგორიები მიუწვდომელია.",
+        "facetValues": "ატრიბუტის მნიშვნელობები",
+        "cancel": "გაუქმება",
+        "saving": "ინახება...",
+        "save": "შენახვა"
+      },
+      "valuesEditor": {
+        "addValue": "მნიშვნელობის დამატება",
+        "tip": "რჩევა: შეგიძლიათ მნიშვნელობების ჩადგმა (მაგ., გარჩევადობა → 4K → 3840×2160)",
+        "valuePlaceholder": "მნიშვნელობა",
+        "subValuePlaceholder": "ქვე-მნიშვნელობა"
+      },
+      "toast": {
+        "requiredFields": "გთხოვთ შეავსოთ სავალდებულო ველები",
+        "facetCreated": "ატრიბუტი წარმატებით შეიქმნა",
+        "facetCreateFailed": "ატრიბუტის შექმნა ვერ მოხერხდა",
+        "facetUpdated": "ატრიბუტი წარმატებით განახლდა",
+        "facetUpdateFailed": "ატრიბუტის განახლება ვერ მოხერხდა",
+        "facetDeleted": "ატრიბუტი წარმატებით წაიშალა",
+        "facetDeleteFailed": "ატრიბუტის წაშლა ვერ მოხერხდა"
       }
     }
   },

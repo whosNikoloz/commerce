@@ -37,6 +37,7 @@ import {
   createBrand,
   deleteBrand,
 } from "@/app/api/services/brandService";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
 
@@ -45,6 +46,10 @@ interface Props {
 }
 
 export function BrandsTable({ Brands: initialBrands }: Props) {
+  const dict = useDictionary();
+  const t = dict.admin.brands.table;
+  const tToast = dict.admin.brands.toast;
+
   const [brands, setBrands] = useState<BrandModel[]>(initialBrands || []);
   const [loading, setLoading] = useState(!(initialBrands && initialBrands.length > 0));
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +79,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error("Error fetching brands:", err);
-        if (!cancelled) setError("Failed to load brands.");
+        if (!cancelled) setError(t.loadingError || "Failed to load brands.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -111,12 +116,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     setBrands((list) => list.map((p) => (p.id === brandId ? patched : p)));
     try {
       await updateBrand(patched);
-      toast.success("ბრენდი წარმატებით განახლდა.");
+      toast.success(tToast.updated);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to update brand", err);
       setBrands(prev);
-      toast.error("ბრენდის განახლება ვერ მოხერხდა.");
+      toast.error(tToast.updateFailed);
     }
   };
 
@@ -130,12 +135,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       const createdId: string = await createBrand(name, origin, description, []);
 
       setBrands((list) => list.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
-      toast.success("ბრენდი წარმატებით დაემატა.");
+      toast.success(tToast.created);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to create brand", err);
       setBrands(prev);
-      toast.error("ბრენდის დამატება ვერ მოხერხდა.");
+      toast.error(tToast.createFailed);
     }
   };
 
@@ -146,12 +151,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     setBrands((list) => list.filter((b) => b.id !== brandId));
     try {
       await deleteBrand(brandId);
-      toast.success("ბრენდი წაიშალა.");
+      toast.success(tToast.deleted);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to delete brand", err);
       setBrands(prev);
-      toast.error("ბრენდის წაშლა ვერ მოხერხდა.");
+      toast.error(tToast.deleteFailed);
     } finally {
       setDeleting(false);
       setDeleteOpen(false);
@@ -177,12 +182,12 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="relative flex-1 max-w-md">
               <input
-                aria-label="Search brands"
+                aria-label={t.searchPlaceholder}
                 className="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2.5 text-sm
                            text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400
                            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 dark:focus:border-blue-600
                            shadow-sm hover:shadow-md transition-all duration-300 font-medium"
-                placeholder="Search by name or origin..."
+                placeholder={t.searchPlaceholder}
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -197,7 +202,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="font-primary text-slate-600 dark:text-slate-400 font-medium">Loading brands...</p>
+                <p className="font-primary text-slate-600 dark:text-slate-400 font-medium">{t.loading}</p>
               </div>
             </div>
           )}
@@ -218,19 +223,19 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                   <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
                     <TableRow className="border-b-2 border-slate-200 dark:border-slate-700">
                       <TableHead className="w-[72px] sm:w-[80px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        Image
+                        {t.image}
                       </TableHead>
                       <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        Name
+                        {t.name}
                       </TableHead>
                       <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        Origin
+                        {t.origin}
                       </TableHead>
                       <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        Description
+                        {t.description}
                       </TableHead>
                       <TableHead className="text-right text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        Actions
+                        {t.actions}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -292,7 +297,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                             <ReviewImagesModal
                               brandId={brand.id}
                               existing={(brand.images ?? []).map((url, idx) => ({
-                                key: idx.toString(),
+                                key: (idx + 1).toString(),
                                 url,
                               }))}
                               maxFiles={8}
@@ -308,7 +313,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                                 setDeleteOpen(true);
                               }}
                             >
-                              Delete
+                              {t.delete}
                             </Button>
                           </div>
                         </TableCell>
@@ -322,8 +327,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                             <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                               <TriangleAlert className="h-8 w-8 text-slate-400" />
                             </div>
-                            <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
-                            <p className="font-primary text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
+                            <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">{t.noBrands}</p>
+                            <p className="font-primary text-sm text-slate-400 dark:text-slate-500">{t.adjustSearch}</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -374,7 +379,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                     <div className="p-4 space-y-3">
                       <div>
                         <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
-                          Origin
+                          {t.origin}
                         </div>
                         <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                           {brand.origin}
@@ -382,7 +387,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                       </div>
                       <div>
                         <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
-                          Description
+                          {t.description}
                         </div>
                         <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
                           {brand.description}
@@ -402,7 +407,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                       <ReviewImagesModal
                         brandId={brand.id}
                         existing={(brand.images ?? []).map((url, idx) => ({
-                          key: idx.toString(),
+                          key: (idx + 1).toString(),
                           url,
                         }))}
                         maxFiles={8}
@@ -419,7 +424,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                         }}
                       >
                         <Trash2 className="h-4 w-4" />
-                        Delete
+                        {t.delete}
                       </Button>
                     </div>
                   </div>
@@ -430,8 +435,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                     <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                       <TriangleAlert className="h-8 w-8 text-slate-400" />
                     </div>
-                    <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">No brands found</p>
-                    <p className="font-primary text-sm text-slate-400 dark:text-slate-500">Try adjusting your search</p>
+                    <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">{t.noBrands}</p>
+                    <p className="font-primary text-sm text-slate-400 dark:text-slate-500">{t.adjustSearch}</p>
                   </div>
                 )}
               </div>
@@ -448,19 +453,19 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
               <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
                 <TriangleAlert className="h-5 w-5 text-white" />
               </div>
-              Delete Brand?
+              {t.deleteDialogTitle}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-600 dark:text-slate-400 text-base font-medium mt-2">
               {deleteTarget ? (
                 <>
-                  You are about to permanently delete{" "}
+                  {t.deleteConfirmation}{" "}
                   <span className="font-primary font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                     {deleteTarget.name}
                   </span>
-                  . This action cannot be undone.
+                  {t.deleteWarning}
                 </>
               ) : (
-                "This action cannot be undone."
+                t.actionCannotBeUndone
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -473,7 +478,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                 setDeleteTarget(null);
               }}
             >
-              Cancel
+              {t.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
@@ -483,10 +488,10 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
               {deleting ? (
                 <span className="font-primary flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Deleting...
+                  {t.deleting}
                 </span>
               ) : (
-                "Delete Brand"
+                t.deleteBrand
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -17,6 +17,7 @@ import { GoBackButton } from "../../go-back-button";
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface AddBrandModalProps {
   defaultName?: string;
@@ -31,6 +32,9 @@ export default function AddBrandModal({
   defaultDescription = "",
   onCreate,
 }: AddBrandModalProps) {
+  const dict = useDictionary();
+  const t = dict.admin.brands.addModal;
+
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
 
@@ -74,7 +78,7 @@ export default function AddBrandModal({
         onClick={handleOpen}
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        დაამატე ბრენდი
+        {t.title}
       </Button>
 
       <Modal
@@ -97,10 +101,10 @@ export default function AddBrandModal({
                   <GoBackButton onClick={handleClose} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      ბრენდის დამატება
+                      {t.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Create a new brand
+                      {t.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -108,10 +112,10 @@ export default function AddBrandModal({
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      ბრენდის დამატება
+                      {t.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Create a new brand with description and origin
+                      {t.subtitleDesktop}
                     </p>
                   </div>
                 </ModalHeader>
@@ -128,8 +132,8 @@ export default function AddBrandModal({
                     input:
                       "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                   }}
-                  label="ბრენდის სახელი"
-                  placeholder="შეიყვანეთ ბრენდის სახელი"
+                  label={t.name}
+                  placeholder={t.namePlaceholder}
                   size="lg"
                   value={name}
                   variant="bordered"
@@ -145,8 +149,8 @@ export default function AddBrandModal({
                     input:
                       "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                   }}
-                  label="წარმოშობა"
-                  placeholder="საქართველო / ევროკავშირი"
+                  label={t.origin}
+                  placeholder={t.originPlaceholder}
                   size="lg"
                   value={origin}
                   variant="bordered"
@@ -158,7 +162,7 @@ export default function AddBrandModal({
                   <label className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300 block"
                     htmlFor="description-editor"
                   >
-                    აღწერა
+                    {t.description}
                   </label>
                   <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                     <CustomEditor value={description} onChange={setDescription} />
@@ -173,7 +177,7 @@ export default function AddBrandModal({
                     variant="outline"
                     onClick={handleClose}
                   >
-                    გაუქმება
+                    {t.cancel}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold"
@@ -181,7 +185,7 @@ export default function AddBrandModal({
                     size={isMobile ? "sm" : "default"}
                     onClick={handleCreate}
                   >
-                    შენახვა
+                    {t.save}
                   </Button>
                 </div>
               </ModalFooter>

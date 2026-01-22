@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { FacetValueNode } from "@/types/facet-ui";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 
 export default function FacetValuesEditor({
@@ -18,6 +19,8 @@ export default function FacetValuesEditor({
   values: FacetValueNode[];
   onChange: (v: FacetValueNode[]) => void;
 }) {
+  const dict = useDictionary();
+  const t = dict.admin.facets.valuesEditor;
   const [local, setLocal] = useState<FacetValueNode[]>(values);
 
   // sync prop -> state როცა მოდალი იხსნება/იცვლება
@@ -64,16 +67,18 @@ export default function FacetValuesEditor({
           key={node.id}
           depth={0}
           node={node}
+          valuePlaceholder={t.valuePlaceholder}
+          subValuePlaceholder={t.subValuePlaceholder}
           onAddChild={addChild}
           onChangeValue={updateValue}
           onRemove={removeValue}
         />
       ))}
       <Button type="button" variant="outline" onClick={addRoot}>
-        <Plus className="h-4 w-4" /> Add value
+        <Plus className="h-4 w-4" /> {t.addValue}
       </Button>
       <Card className="p-3 text-xs text-slate-500">
-        Tip: you can nest values (e.g., Resolution → 4K → 3840×2160)
+        {t.tip}
       </Card>
     </div>
   );
@@ -82,12 +87,16 @@ export default function FacetValuesEditor({
 function NodeRow({
   node,
   depth,
+  valuePlaceholder,
+  subValuePlaceholder,
   onChangeValue,
   onAddChild,
   onRemove,
 }: {
   node: FacetValueNode;
   depth: number;
+  valuePlaceholder: string;
+  subValuePlaceholder: string;
   onChangeValue: (id: string, value: string) => void;
   onAddChild: (id: string) => void;
   onRemove: (id: string) => void;
@@ -96,7 +105,7 @@ function NodeRow({
     <div className="space-y-2">
       <div className="flex items-center gap-2" style={{ paddingLeft: depth * 16 }}>
         <Input
-          placeholder={depth ? "Sub-value" : "Value"}
+          placeholder={depth ? subValuePlaceholder : valuePlaceholder}
           value={node.value ?? ""}
           onChange={(e) => onChangeValue(node.id, e.target.value)}
         />
@@ -113,6 +122,8 @@ function NodeRow({
           key={ch.id}
           depth={depth + 1}
           node={ch}
+          valuePlaceholder={valuePlaceholder}
+          subValuePlaceholder={subValuePlaceholder}
           onAddChild={onAddChild}
           onChangeValue={onChangeValue}
           onRemove={onRemove}

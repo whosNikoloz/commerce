@@ -25,6 +25,13 @@ export function DictionaryProvider({
     dictionary: Dictionary;
     children: React.ReactNode;
 }) {
+    React.useEffect(() => {
+        // console.log("🌐 DictionaryProvider updated:", {
+        //    lang: dictionary?.common?.home === "მთავარი" ? "ka" : "en",
+        //    keys: Object.keys(dictionary || {}).length
+        // });
+    }, [dictionary]);
+
     return (
         <DictionaryContext.Provider value={dictionary}>
             {children}

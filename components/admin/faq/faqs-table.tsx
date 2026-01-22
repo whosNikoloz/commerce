@@ -36,6 +36,9 @@ import {
 import { getAllFaqs, createFaq, updateFaq, deleteFaq } from "@/app/api/services/faqService";
 import { Switch } from "@/components/ui/switch";
 
+import { useDictionary } from "@/app/context/dictionary-provider";
+
+
 function RowDraggable({
   faq,
   children,
@@ -79,6 +82,13 @@ function RowDraggable({
 }
 
 export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
+  const dict = useDictionary();
+  const t = dict?.admin?.faqs?.table;
+
+  if (!t) {
+    console.warn("FAQ dictionary keys missing", dict?.admin);
+    return <div>Loading translations...</div>;
+  }
   const [faqs, setFaqs] = useState<FAQModel[]>([]);
   const [loading, setLoading] = useState(!(initialFaqs && initialFaqs.length > 0));
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +137,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
-        if (!isCancelled) setError("ჩატვირთვა ვერ მოხერხდა.");
+        if (!isCancelled) setError(t.toasts.updateError);
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -168,7 +178,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
       if (changed.length === 0) {
         setOrderDirty(false);
-        toast.message("ცვლილება არ არის შესანახი.");
+        toast.message(t.noChanges);
 
         return;
       }
@@ -185,12 +195,12 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       lastSavedOrderRef.current = newMap;
 
       setOrderDirty(false);
-      toast.success("რიგი შენახულია.");
+      toast.success(t.orderSaved);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       setOrderDirty(true);
-      toast.error("რიგის შენახვა ვერ მოხერხდა.");
+      toast.error(t.orderSaveFailed);
     }
   }
 
@@ -201,7 +211,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       .filter((f) =>
         q
           ? (f.question ?? "").toLowerCase().includes(q) ||
-            (f.answer ?? "").toLowerCase().includes(q)
+          (f.answer ?? "").toLowerCase().includes(q)
           : true,
       )
       .filter((f) => (onlyActive ? !!f.isActive : true))
@@ -227,12 +237,12 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       const id = await createFaq(q, a, isActive, isFeatured);
 
       setFaqs((list) => list.map((x) => (x.id === tempId ? { ...x, id } : x)));
-      toast.success("FAQ დაემატა.");
+      toast.success(t.toasts.createSuccess);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
-      toast.error("დამატება ვერ მოხერხდა.");
+      toast.error(t.toasts.createError);
     }
   };
 
@@ -254,12 +264,12 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
     try {
       await updateFaq(patched);
-      toast.success("განახლდა.");
+      toast.success(t.toasts.updateSuccess);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
-      toast.error("განახლება ვერ მოხერხდა.");
+      toast.error(t.toasts.updateError);
     }
   };
 
@@ -279,7 +289,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
       // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
-      toast.error("ვერ შეიცვალა.");
+      toast.error(t.toasts.toggleError);
     }
   };
 
@@ -290,14 +300,14 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
     setFaqs((list) => list.filter((f) => f.id !== id));
     try {
       await deleteFaq(id);
-      toast.success("წაიშალა.");
+      toast.success(t.toasts.deleteSuccess);
       setFaqs((list) => list.map((f, idx) => ({ ...f, orderNum: idx + 1 })));
       setOrderDirty(true);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       setFaqs(prev);
-      toast.error("წაშლა ვერ მოხერხდა.");
+      toast.error(t.toasts.deleteError);
     } finally {
       setDeleting(false);
       setDeleteOpen(false);
@@ -328,7 +338,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                placeholder="ძებნა კითხვით ან პასუხით…"
+                placeholder={t.searchPlaceholder}
                 size="lg"
                 startContent={
                   <svg className="text-slate-400" height="16" viewBox="0 0 24 24" width="16">
@@ -338,8 +348,6 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     />
                   </svg>
                 }
-                value={search}
-                variant="bordered"
                 onChange={(e) => setSearch(e.target.value)}
               />
 
@@ -362,9 +370,8 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     onCheckedChange={setOnlyFeatured}
                   />
                   <Star
-                    className={`h-3.5 w-3.5 ${
-                      onlyFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"
-                    }`}
+                    className={`h-3.5 w-3.5 ${onlyFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"
+                      }`}
                   />
                 </div>
               </div>
@@ -374,17 +381,17 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
               <Button
                 className="gap-2 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-600 font-semibold shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-50"
                 disabled={!orderDirty}
-                title={orderDirty ? "შეინახე ახალი რიგი" : "ცვლილება არაა"}
+                title={orderDirty ? t.saveOrder : t.noChanges}
                 variant="secondary"
                 onClick={saveOrder}
               >
                 <RefreshCw className="h-4 w-4" />
-                რიგის შენახვა
+                {t.saveOrder}
               </Button>
 
               <AddFaqModal onCreate={handleCreate}>
                 <Plus className="h-4 w-4" />
-                დაამატე FAQ
+                {t.addFaq}
               </AddFaqModal>
             </div>
           </div>
@@ -413,7 +420,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
         </CardHeader>
 
         <CardContent className="overflow-auto max-h-[calc(100lvh-210px)]">
-          {loading && <p className="font-primary p-4 text-text-subtle">იტვირთება…</p>}
+          {loading && <p className="font-primary p-4 text-text-subtle">{t.loading}</p>}
           {error && <p className="font-primary p-4 text-red-500">{error}</p>}
 
           {!loading && !error && (
@@ -430,97 +437,97 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     strategy={verticalListSortingStrategy}
                   >
                     <Table>
-                  <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
-                    <TableRow className="border-b-2 border-slate-200 dark:border-slate-700">
-                      <TableHead className="w-10" />
-                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        კითხვა
-                      </TableHead>
-                      <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        პასუხი
-                      </TableHead>
-                      <TableHead className="min-w-[220px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        სტატუსი
-                      </TableHead>
-                      <TableHead className="text-right min-w-[180px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
-                        ქმედებები
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
+                      <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
+                        <TableRow className="border-b-2 border-slate-200 dark:border-slate-700">
+                          <TableHead className="w-10" />
+                          <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                            {t.headers.question}
+                          </TableHead>
+                          <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                            {t.headers.answer}
+                          </TableHead>
+                          <TableHead className="min-w-[220px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                            {t.headers.status}
+                          </TableHead>
+                          <TableHead className="text-right min-w-[180px] text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wide">
+                            {t.headers.actions}
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
 
-                  <TableBody>
-                    {filtered.map((faq, idx) => (
-                      <RowDraggable key={faq.id} faq={faq} isDragging={draggingId === faq.id}>
-                        <TableCell className="align-top font-bold text-slate-900 dark:text-slate-100 max-w-[420px]">
-                          <div className="line-clamp-2">{faq.question}</div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
-                            #{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")} • ID: {faq.id}
-                          </div>
-                        </TableCell>
+                      <TableBody>
+                        {filtered.map((faq, idx) => (
+                          <RowDraggable key={faq.id} faq={faq} isDragging={draggingId === faq.id}>
+                            <TableCell className="align-top font-bold text-slate-900 dark:text-slate-100 max-w-[420px]">
+                              <div className="line-clamp-2">{faq.question}</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded inline-block mt-1">
+                                #{(faq.orderNum ?? idx + 1).toString().padStart(2, "0")} • ID: {faq.id}
+                              </div>
+                            </TableCell>
 
-                        <TableCell className="align-top max-w-[560px]">
-                          <div className="line-clamp-2 text-slate-600 dark:text-slate-400 font-medium">
-                            {faq.answer}
-                          </div>
-                        </TableCell>
+                            <TableCell className="align-top max-w-[560px]">
+                              <div className="line-clamp-2 text-slate-600 dark:text-slate-400 font-medium">
+                                {faq.answer}
+                              </div>
+                            </TableCell>
 
-                        <TableCell className="align-top">
-                          <div className="flex items-center gap-4">
-                            <Switch
-                              checked={!!faq.isActive}
-                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
-                              onCheckedChange={(v) => handleToggle(faq.id, "isActive", v)}
-                            />
-                            {!!faq.isActive ? (
-                              <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                            ) : (
-                              <EyeOff className="h-4 w-4 text-slate-400" />
-                            )}
-                            <Switch
-                              checked={!!faq.isFeatured}
-                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
-                              onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
-                            />
-                            <Star
-                              className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
-                            />
-                          </div>
-                        </TableCell>
+                            <TableCell className="align-top">
+                              <div className="flex items-center gap-4">
+                                <Switch
+                                  checked={!!faq.isActive}
+                                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
+                                  onCheckedChange={(v) => handleToggle(faq.id, "isActive", v)}
+                                />
+                                {!!faq.isActive ? (
+                                  <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                ) : (
+                                  <EyeOff className="h-4 w-4 text-slate-400" />
+                                )}
+                                <Switch
+                                  checked={!!faq.isFeatured}
+                                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600"
+                                  onCheckedChange={(v) => handleToggle(faq.id, "isFeatured", v)}
+                                />
+                                <Star
+                                  className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
+                                />
+                              </div>
+                            </TableCell>
 
-                        <TableCell className="align-top text-right">
-                          <div className="flex justify-end gap-2">
-                            <UpdateFaqModal
-                              faqId={faq.id}
-                              initialActive={faq.isActive}
-                              initialAnswer={faq.answer}
-                              initialFeatured={faq.isFeatured}
-                              initialQuestion={faq.question}
-                              onSave={handleUpdate}
-                            />
-                            <Button
-                              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => {
-                                setDeleteTarget(faq);
-                                setDeleteOpen(true);
-                              }}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </RowDraggable>
-                    ))}
+                            <TableCell className="align-top text-right">
+                              <div className="flex justify-end gap-2">
+                                <UpdateFaqModal
+                                  faqId={faq.id}
+                                  initialActive={faq.isActive}
+                                  initialAnswer={faq.answer}
+                                  initialFeatured={faq.isFeatured}
+                                  initialQuestion={faq.question}
+                                  onSave={handleUpdate}
+                                />
+                                <Button
+                                  className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => {
+                                    setDeleteTarget(faq);
+                                    setDeleteOpen(true);
+                                  }}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </RowDraggable>
+                        ))}
 
-                    {filtered.length === 0 && (
-                      <TableRow>
-                        <TableCell className="text-center py-8 text-text-subtle" colSpan={5}>
-                          ჩანაწერები ვერ მოიძებნა.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
+                        {filtered.length === 0 && (
+                          <TableRow>
+                            <TableCell className="text-center py-8 text-text-subtle" colSpan={5}>
+                              ჩანაწერები ვერ მოიძებნა.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
                     </Table>
                   </SortableContext>
                 </DndContext>
@@ -551,7 +558,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                     {/* Card Body */}
                     <div className="p-4 space-y-3">
                       <div>
-                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">პასუხი</div>
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{t.headers.answer}</div>
                         <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">{faq.answer}</div>
                       </div>
 
@@ -579,7 +586,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                           <Star
                             className={`h-3.5 w-3.5 ${!!faq.isFeatured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
                           />
-                          <span className="font-primary text-xs font-semibold text-slate-700 dark:text-slate-300">Featured</span>
+                          <span className="font-primary text-xs font-semibold text-slate-700 dark:text-slate-300">{t.featured}</span>
                         </div>
                       </div>
                     </div>
@@ -604,7 +611,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                         }}
                       >
                         <Trash2 className="h-4 w-4" />
-                        Delete
+                        {t.delete}
                       </Button>
                     </div>
                   </div>
@@ -612,7 +619,7 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
 
                 {filtered.length === 0 && (
                   <div className="flex flex-col items-center gap-3 py-12">
-                    <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">ჩანაწერები ვერ მოიძებნა.</p>
+                    <p className="font-primary text-slate-500 dark:text-slate-400 font-semibold">{t.empty}</p>
                   </div>
                 )}
               </div>
@@ -626,19 +633,13 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-text-light dark:text-text-lightdark">
               <TriangleAlert className="h-5 w-5 text-red-600" />
-              წაშლა?
+              {t.deleteConfirmTitle}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-text-subtle dark:text-text-subtledark">
               {deleteTarget ? (
-                <>
-                  წაიშლება:{" "}
-                  <span className="font-primary font-semibold text-text-light dark:text-text-lightdark">
-                    {deleteTarget.question}
-                  </span>
-                  . ქმედება შეუქცევადია.
-                </>
+                t.deleteConfirmDesc.replace("{question}", deleteTarget.question)
               ) : (
-                "ქმედება შეუქცევადია."
+                t.deleteWarning
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -651,14 +652,14 @@ export function FaqsTable({ initialFaqs }: { initialFaqs: FAQModel[] }) {
                 setDeleteTarget(null);
               }}
             >
-              გაუქმება
+              {t.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               disabled={deleting}
               onClick={() => deleteTarget && handleDelete(deleteTarget.id)}
             >
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? t.deleting : t.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

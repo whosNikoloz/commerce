@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Eye, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
 import { toast } from "sonner";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 import OrderDetailsModal from "./view-order-dialog";
 
@@ -20,6 +21,7 @@ import {
   updateOrderStatus as updateOrderStatusApi,
   cancelOrder as cancelOrderApi,
 } from "@/app/api/services/orderService";
+import { currencyFmt } from "@/lib/utils";
 
 const STATUS_OPTIONS: OrderStatus[] = [
   OrderStatus.Pending,
@@ -58,11 +60,19 @@ function getStatusColor(status: OrderStatus) {
 function statusKey(s: OrderStatus): string {
   return typeof s === "number" ? OrderStatus[s] : String(s);
 }
-function statusLabel(s: OrderStatus): string {
-  return typeof s === "number" ? OrderStatus[s] : String(s);
+function statusLabel(s: OrderStatus, dict: any): string {
+  const key = (typeof s === "number" ? OrderStatus[s] : String(s)).toLowerCase();
+  return dict.admin.orders.statuses[key] || key;
 }
 
-export default function OrdersTable() {
+
+interface OrdersTableProps {
+  lang?: string;
+}
+
+export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
+  const dict = useDictionary();
+  const t = dict.admin.orders;
   const isMobile = useIsMobile();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -194,14 +204,14 @@ export default function OrdersTable() {
       if (openId === orderId) {
         setDetail(d => (d ? { ...d, status: newStatus, trackingNumber, estimatedDelivery } : d));
       }
-      toast.success(`${orderId} order status updated to ${statusLabel(newStatus)}`);
+      toast.success(t.toasts.statusUpdated.replace("{id}", orderId).replace("{status}", statusLabel(newStatus, dict)));
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to update status");
+      toast.error(e?.message ?? t.toasts.statusUpdateFailed);
     }
   }
 
   async function onCancel(orderId: string) {
-    const reason = typeof window !== "undefined" ? (prompt("Cancellation reason?") ?? "") : "";
+    const reason = typeof window !== "undefined" ? (prompt(t.toasts.cancelReasonPrompt) ?? "") : "";
 
     setUpdating(true);
     try {
@@ -211,9 +221,9 @@ export default function OrdersTable() {
         data: prev.data.map(o => (o.id === orderId ? { ...o, status: OrderStatus.Cancelled } : o))
       }));
       if (openId === orderId) setDetail(d => (d ? { ...d, status: OrderStatus.Cancelled } : d));
-      toast.success(`${orderId} order has been cancelled`);
+      toast.success(t.toasts.orderCancelled.replace("{id}", orderId));
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to cancel order");
+      toast.error(e?.message ?? t.toasts.orderCancelFailed);
     } finally {
       setUpdating(false);
     }
@@ -224,35 +234,35 @@ export default function OrdersTable() {
       <div className="grid gap-4 md:grid-cols-5">
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.total}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{stats.total}</div></CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.pending}</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{stats.pending}</div></CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Processing</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.processing}</CardTitle>
             <RefreshCw className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{stats.processing}</div></CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Shipped</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.shipped}</CardTitle>
             <Truck className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{stats.shipped}</div></CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Delivered</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.delivered}</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{stats.delivered}</div></CardContent>
@@ -263,14 +273,14 @@ export default function OrdersTable() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Orders</CardTitle>
-              <CardDescription>Manage and track customer orders</CardDescription>
+              <CardTitle>{t.table.title}</CardTitle>
+              <CardDescription>{t.table.subtitle}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Input
-                aria-label="Search orders"
+                aria-label={t.table.searchPlaceholder}
                 className="w-64"
-                placeholder="Search by ID / status / date…"
+                placeholder={t.table.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -279,11 +289,11 @@ export default function OrdersTable() {
                 value={statusFilterKey}
                 onChange={(e) => setStatusFilterKey(e.target.value)}
               >
-                <option value="all">All Status</option>
+                <option value="all">{t.table.filterAll}</option>
                 {STATUS_OPTIONS.map(s => {
                   const key = statusKey(s);
 
-                  return <option key={key} value={key}>{statusLabel(s)}</option>;
+                  return <option key={key} value={key}>{statusLabel(s, dict)}</option>;
                 })}
               </select>
             </div>
@@ -294,33 +304,33 @@ export default function OrdersTable() {
           {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
 
           {loading ? (
-            <div className="py-10 text-center text-muted-foreground">Loading…</div>
+            <div className="py-10 text-center text-muted-foreground">{t.table.loading}</div>
           ) : (
             <>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t.table.headers.id}</TableHead>
+                    <TableHead>{t.table.headers.date}</TableHead>
+                    <TableHead>{t.table.headers.items}</TableHead>
+                    <TableHead>{t.table.headers.total}</TableHead>
+                    <TableHead>{t.table.headers.status}</TableHead>
+                    <TableHead className="text-right">{t.table.headers.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((o) => (
                     <TableRow key={o.id} className="border-slate-200 dark:border-slate-700">
                       <TableCell className="font-medium">{o.id}</TableCell>
-                      <TableCell>{new Date(o.date).toLocaleString()}</TableCell>
+                      <TableCell>{new Date(o.date).toLocaleDateString(lang)}</TableCell>
                       <TableCell>{o.items}</TableCell>
                       <TableCell>
-                        {o.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {currencyFmt(o.total)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {getStatusIcon(o.status)}
-                          <Badge className={getStatusColor(o.status)}>{statusLabel(o.status)}</Badge>
+                          <Badge className={getStatusColor(o.status)}>{statusLabel(o.status, dict)}</Badge>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
@@ -340,7 +350,7 @@ export default function OrdersTable() {
                   {!filtered.length && (
                     <TableRow>
                       <TableCell className="text-center text-muted-foreground py-10" colSpan={6}>
-                        No orders found
+                        {t.table.empty}
                       </TableCell>
                     </TableRow>
                   )}
@@ -349,7 +359,10 @@ export default function OrdersTable() {
 
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  Page {data.page} of {totalPages} • {data.total} total
+                  {t.table.pageInfo
+                    .replace("{page}", data.page.toString())
+                    .replace("{totalPages}", totalPages.toString())
+                    .replace("{total}", data.total.toString())}
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -359,7 +372,7 @@ export default function OrdersTable() {
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    Prev
+                    {t.table.prev}
                   </Button>
                   <Button
                     disabled={page >= totalPages || loading}
@@ -367,7 +380,7 @@ export default function OrdersTable() {
                     variant="outline"
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   >
-                    Next
+                    {t.table.next}
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>

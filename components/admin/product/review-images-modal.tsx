@@ -21,6 +21,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
 import { GoBackButton } from "@/components/go-back-button";
 import { compressImages } from "@/lib/image-compression";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -49,6 +50,8 @@ export default function ReviewImagesModal({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const dict = useDictionary();
+  const t = dict?.admin?.products?.imagesModal;
 
   const normalizedExisting = useMemo<ExistingImage[]>(() => {
     if (Array.isArray(existing)) return existing;
@@ -224,10 +227,10 @@ export default function ReviewImagesModal({
         <Button
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300"
           size="sm"
-          title="Manage images"
+          title={t?.triggerTitle || "Manage images"}
           onClick={onOpen}
         >
-          Images
+          {t?.triggerButton || "Images"}
         </Button>
       )}
 
@@ -284,10 +287,10 @@ export default function ReviewImagesModal({
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
                       <h2 className="font-heading text-2xl font-black text-slate-900 dark:text-slate-100">
-                        Manage Product Images
+                        {t?.title || "Manage Product Images"}
                       </h2>
                       <p className="font-primary text-sm text-slate-600 dark:text-slate-400 font-medium">
-                        Upload up to {maxFiles} images  Max {maxSizeMB}MB each
+                        {t?.subtitle?.replace("{maxFiles}", String(maxFiles)).replace("{maxSize}", String(maxSizeMB)) || `Upload up to ${maxFiles} images • Max ${maxSizeMB}MB each`}
                       </p>
                     </div>
                   </div>
@@ -327,13 +330,13 @@ export default function ReviewImagesModal({
                       </div>
                       <div className="space-y-1">
                         <p className="font-primary text-sm font-semibold text-slate-900 dark:text-slate-100">
-                          Drag & drop images here
+                          {t?.dropzoneTitle || "Drag & drop images here"}
                         </p>
                         <p className="font-primary text-xs text-slate-600 dark:text-slate-400">
-                          or click to browse - you can also paste images
+                          {t?.dropzoneSubtitle || "or click to browse - you can also paste images"}
                         </p>
                         <p className="font-primary text-xs text-slate-500">
-                          {remainingSlots} slots left - Max {maxSizeMB}MB each
+                          {t?.slotsLeft?.replace("{count}", String(remainingSlots)).replace("{maxSize}", String(maxSizeMB)) || `${remainingSlots} slots left - Max ${maxSizeMB}MB each`}
                         </p>
                       </div>
                       <Input
@@ -374,11 +377,11 @@ export default function ReviewImagesModal({
                                     : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
                                 )}
                               >
-                                {img.toDelete ? "Will delete" : "Existing"}
+                                {img.toDelete ? (t?.willDelete || "Will delete") : (t?.existing || "Existing")}
                               </Badge>
                             </div>
                             <button className="font-primary absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                              title={img.toDelete ? "Undo delete" : "Delete"}
+                              title={img.toDelete ? (t?.undoDelete || "Undo delete") : (t?.delete || "Delete")}
                               type="button"
                               onClick={() =>
                                 setServerImages((prev) =>
@@ -416,7 +419,7 @@ export default function ReviewImagesModal({
                             </div>
                             <div className="absolute left-2 top-2">
                               <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                                New
+                                {t?.new || "New"}
                               </Badge>
                             </div>
                             <button
@@ -436,7 +439,7 @@ export default function ReviewImagesModal({
                       <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                         <Images className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                       </div>
-                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">No images yet.</p>
+                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">{t?.noImages || "No images yet."}</p>
                     </div>
                   )}
                 </div>
@@ -446,7 +449,7 @@ export default function ReviewImagesModal({
                 {images.length > 0 && (
                   <Button className="mr-auto" type="button" variant="ghost" onClick={clearAllPending}>
                     <X className="h-4 w-4 mr-2" />
-                    Clear pending
+                    {t?.clearPending || "Clear pending"}
                   </Button>
                 )}
                 <Button
@@ -455,7 +458,7 @@ export default function ReviewImagesModal({
                   variant="outline"
                   onClick={handleCloseModal}
                 >
-                  Cancel
+                  {t?.cancel || "Cancel"}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
@@ -465,10 +468,10 @@ export default function ReviewImagesModal({
                   {saving ? (
                     <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving...
+                      {t?.saving || "Saving..."}
                     </span>
                   ) : (
-                    "Save photos"
+                    t?.savePhotos || "Save photos"
                   )}
                 </Button>
               </ModalFooter>

@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { createFacet, type CreateFacetRequest } from "@/app/api/services/facetService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GoBackButton } from "@/components/go-back-button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function AddFacetModal({
   categories,
@@ -41,6 +42,10 @@ export default function AddFacetModal({
 }) {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
+  const dict = useDictionary();
+  const t = dict.admin.facets.addModal;
+  const tTable = dict.admin.facets.table;
+  const tToast = dict.admin.facets.toast;
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
@@ -99,7 +104,7 @@ export default function AddFacetModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) {
-      toast.error("სავალდებულო ველები");
+      toast.error(tToast.requiredFields);
 
       return;
     }
@@ -108,13 +113,13 @@ export default function AddFacetModal({
       // eslint-disable-next-line no-console
       console.log("Creating facet with payload:", JSON.stringify(payload, null, 2));
       await createFacet(payload);
-      toast.success("Facet created");
+      toast.success(tToast.facetCreated);
       handleClose();
       onCreated?.();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Failed to create facet:", e);
-      toast.error("შექმნა ვერ მოხერხდა - Check console for details");
+      toast.error(tToast.facetCreateFailed);
     } finally {
       setLoading(false);
     }
@@ -127,7 +132,7 @@ export default function AddFacetModal({
         disabled={disabled}
         onClick={handleOpen}
       >
-        <Plus className="h-4 w-4" /> Add Facet
+        <Plus className="h-4 w-4" /> {tTable.addFacet}
       </Button>
 
       <Modal
@@ -150,10 +155,10 @@ export default function AddFacetModal({
                   <GoBackButton onClick={handleClose} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Add Facet
+                      {t.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Create a new attribute (e.g., Size, Resolution)
+                      {t.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -161,10 +166,10 @@ export default function AddFacetModal({
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Add Facet
+                      {t.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Create a new attribute (e.g., Size, Resolution)
+                      {t.subtitle}
                     </p>
                   </div>
                 </ModalHeader>
@@ -174,9 +179,9 @@ export default function AddFacetModal({
                 {/* Name */}
                 <Input
                   required
-                  label="Name"
+                  label={t.name}
                   labelPlacement="outside"
-                  placeholder="Size"
+                  placeholder={t.namePlaceholder}
                   value={name}
                   variant="bordered"
                   onChange={(e) => setName(e.target.value)}
@@ -185,11 +190,11 @@ export default function AddFacetModal({
                 {/* Display Type */}
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Display Type
+                    {t.displayType}
                   </div>
                   <DisplayTypePicker value={displayType} onChange={setDisplayType} />
                   <div className="mt-3 rounded-lg border p-4 bg-muted/30">
-                    <div className="text-xs font-semibold mb-2">Preview</div>
+                    <div className="text-xs font-semibold mb-2">{t.preview}</div>
                     <DisplayTypePreview displayType={displayType} values={values} />
                   </div>
                 </div>
@@ -198,10 +203,10 @@ export default function AddFacetModal({
                 <div className="flex items-center justify-between p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700">
                   <div>
                     <p className="font-primary text-sm font-medium text-slate-900 dark:text-slate-100">
-                      Custom
+                      {t.custom}
                     </p>
                     <p className="font-primary text-xs text-slate-600 dark:text-slate-400">
-                      Mark as custom facet
+                      {t.customDescription}
                     </p>
                   </div>
                   <Switch
@@ -214,9 +219,9 @@ export default function AddFacetModal({
                 {!presetCategoryId && (
                   <Select
                     isRequired
-                    label="Category"
+                    label={t.category}
                     labelPlacement="outside"
-                    placeholder="Select category"
+                    placeholder={t.selectCategory}
                     selectedKeys={selectedCategories[0] ? [selectedCategories[0]] : []}
                     variant="bordered"
                     onSelectionChange={(keys) => {
@@ -236,7 +241,7 @@ export default function AddFacetModal({
                 {/* Facet Values */}
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Facet Values
+                    {t.facetValues}
                   </div>
                   <FacetValuesEditor values={values} onChange={setValues} />
                 </div>
@@ -251,7 +256,7 @@ export default function AddFacetModal({
                     variant="outline"
                     onClick={handleClose}
                   >
-                    Cancel
+                    {t.cancel}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold"
@@ -259,7 +264,7 @@ export default function AddFacetModal({
                     size={isMobile ? "sm" : "default"}
                     type="submit"
                   >
-                    {loading ? "Creating..." : "Create"}
+                    {loading ? t.creating : t.create}
                   </Button>
                 </div>
               </ModalFooter>

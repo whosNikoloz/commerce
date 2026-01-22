@@ -21,6 +21,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { deleteImage, uploadBrandImages } from "@/app/api/services/brandService";
 import { GoBackButton } from "@/components/go-back-button";
 import { compressImages } from "@/lib/image-compression";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -46,6 +47,8 @@ export default function ReviewImagesModal({
   onChanged,
   trigger,
 }: ReviewImagesModalProps) {
+  const dict = useDictionary();
+  const t = dict.admin.brands.imagesModal;
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -222,7 +225,7 @@ export default function ReviewImagesModal({
           title="Manage images"
           onClick={onOpen}
         >
-          Images
+          {dict.admin.brands.table.image}
         </Button>
       )}
 
@@ -279,10 +282,12 @@ export default function ReviewImagesModal({
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
                       <h2 className="font-heading text-2xl font-black text-slate-900 dark:text-slate-100">
-                        Manage Brand Images
+                        {t.title}
                       </h2>
                       <p className="font-primary text-sm text-slate-600 dark:text-slate-400 font-medium">
-                        Upload up to {maxFiles} images • Max {maxSizeMB}MB each
+                        {t.subtitle
+                          .replace("{maxFiles}", maxFiles.toString())
+                          .replace("{maxSize}", maxSizeMB.toString())}
                       </p>
                     </div>
                   </div>
@@ -322,10 +327,10 @@ export default function ReviewImagesModal({
                       </div>
                       <div className="space-y-1">
                         <p className="font-primary text-sm font-semibold text-slate-900 dark:text-slate-100">
-                          Drag & drop images here
+                          {t.dropzoneTitle}
                         </p>
                         <p className="font-primary text-xs text-slate-600 dark:text-slate-400">
-                          or click to browse • you can also paste images
+                          {t.dropzoneSubtitle}
                         </p>
                       </div>
                       <Input
@@ -365,11 +370,11 @@ export default function ReviewImagesModal({
                                     : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
                                 )}
                               >
-                                {img.toDelete ? "Will delete" : "Existing"}
+                                {img.toDelete ? t.willDelete : t.existing}
                               </Badge>
                             </div>
                             <button className="font-primary absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                              title={img.toDelete ? "Undo delete" : "Delete"}
+                              title={img.toDelete ? (t.undoDelete || "Undo delete") : (dict.admin.brands.table.delete || "Delete")}
                               type="button"
                               onClick={() =>
                                 setServerImages((prev) =>
@@ -406,7 +411,7 @@ export default function ReviewImagesModal({
                             />
                             <div className="absolute left-2 top-2">
                               <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                                New
+                                {t.new}
                               </Badge>
                             </div>
                             <button
@@ -426,7 +431,7 @@ export default function ReviewImagesModal({
                       <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                         <Images className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                       </div>
-                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">No images yet.</p>
+                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">{t.noImages}</p>
                     </div>
                   )}
                 </div>
@@ -436,7 +441,7 @@ export default function ReviewImagesModal({
                 {images.length > 0 && (
                   <Button className="mr-auto" type="button" variant="ghost" onClick={clearAllPending}>
                     <X className="h-4 w-4 mr-2" />
-                    Clear pending
+                    {t.clearPending}
                   </Button>
                 )}
                 <Button
@@ -445,7 +450,7 @@ export default function ReviewImagesModal({
                   variant="outline"
                   onClick={handleCloseModal}
                 >
-                  Cancel
+                  {t.cancel}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
@@ -455,10 +460,10 @@ export default function ReviewImagesModal({
                   {saving ? (
                     <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving...
+                      {t.saving}
                     </span>
                   ) : (
-                    "Save photos"
+                    t.savePhotos
                   )}
                 </Button>
               </ModalFooter>

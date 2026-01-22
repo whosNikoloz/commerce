@@ -8,31 +8,25 @@
     "failed": "Failed",
     "back": "Back",
     "profile": "Profile",
-
     "new": "New",
     "used": "Used",
     "likeNew": "Like new",
     "unknownCondition": "Unknown condition",
-
     "inStock": "In stock",
     "comingSoon": "Coming soon",
     "unknownStatus": "Unknown status",
     "soldOut": "Sold out",
-
     "loadError": "Failed to load",
     "lastStock": "Last {count} items",
     "remainingStock": "{count} items remaining",
-
     "addToCart": "Add to cart",
     "addToCartShort": "Add",
     "liquidation": "Liquidation",
-
     "freeShipping": "Fast delivery across Georgia",
     "backToBrands": "Back to brands",
     "products": "Products",
     "browseBrands": "Browse other brands"
   },
-
   "auth": {
     "login": {
       "title": "Login",
@@ -57,7 +51,6 @@
       "verificationCode": "Verification code",
       "button": "Register",
       "confirm": "Confirm registration",
-
       "fillUsername": "Please enter a username",
       "fillEmail": "Please enter your email",
       "invalidEmail": "Please enter a valid email address",
@@ -70,7 +63,6 @@
       "codeSent": "A verification code has been sent to your email",
       "or": "or",
       "switchMode": "Already have an account? Login",
-
       "passwordRequirements": {
         "minChars": "6+ characters",
         "digit": "1 digit",
@@ -92,7 +84,6 @@
       "goHome": "Back to home"
     }
   },
-
   "admin": {
     "login": {
       "title": "Login",
@@ -100,28 +91,23 @@
       "password": "Password",
       "button": "Login"
     },
-
-     "sidebar": {
+    "sidebar": {
       "dashboard": "Dashboard",
-
       "catalog": "Catalog",
       "products": "Products",
       "productGroups": "Product Groups",
       "categories": "Categories",
       "facets": "Facets",
       "brands": "Brands",
-
       "sales": "Sales",
       "orders": "Orders",
       "customers": "Customers",
       "transactions": "Transactions",
-
       "content": "Content",
       "faqs": "FAQs",
       "analytics": "Analytics",
       "siteConfig": "Site Config"
     },
-
     "products": {
       "table": {
         "title": "Products",
@@ -130,111 +116,677 @@
         "addProduct": "Add product",
         "allCategories": "All categories",
         "searchCategories": "Search categories...",
-        "searchProducts": "Search products..."
+        "searchProducts": "Search products...",
+        "headers": {
+          "image": "Image",
+          "product": "Product",
+          "price": "Price",
+          "status": "Status",
+          "condition": "Condition",
+          "flags": "Flags",
+          "visible": "Visible",
+          "actions": "Actions"
+        },
+        "sort": {
+          "placeholder": "Sort",
+          "name": "Name",
+          "price": "Price",
+          "status": "Status"
+        },
+        "filter": {
+          "placeholder": "Status",
+          "allStatus": "All Status",
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "empty": {
+          "selectCategory": "Select a Category",
+          "selectCategoryDescription": "Choose a category from the sidebar (or button on mobile) to view and manage products.",
+          "noProductsFound": "No Products Found",
+          "adjustSearchTerms": "Try adjusting your search terms",
+          "noProductsInCategory": "No products available in this category"
+        },
+        "loading": "Loading products...",
+        "updating": "Updating...",
+        "productsFound": "{count} products found",
+        "tryAgain": "Try Again",
+        "delete": "Delete",
+        "deleteDialog": {
+          "title": "Delete Product?",
+          "confirmation": "Are you sure you want to delete",
+          "warning": "? This action cannot be undone and will permanently delete the product.",
+          "fallbackWarning": "This action cannot be undone.",
+          "cancel": "Cancel",
+          "deleteProduct": "Delete Product"
+        },
+        "toast": {
+          "productDeleted": "Product deleted successfully",
+          "productDeleteFailed": "Failed to delete product",
+          "productUpdated": "Product updated successfully",
+          "productUpdateFailed": "Failed to update product",
+          "visibilityChanged": "Product visibility changed",
+          "failedToLoadBrands": "Failed to load brands"
+        }
       },
-
       "addModal": {
         "title": "Add new product",
         "subtitle": "Manage product inventory, pricing, and attributes.",
-
         "basicInformation": "Basic information",
         "productName": "Product name",
         "productNamePlaceholder": "e.g., iPhone 15 Pro",
         "description": "Description",
         "descriptionPlaceholder": "Product description...",
-
         "pricing": "Pricing",
         "pricingDescription": "Set regular and discounted prices.",
         "price": "Price (₾)",
         "discountPrice": "Discount price (₾)",
-
         "classification": "Classification",
         "classificationDescription": "Assign the product to a category, brand, and variant group.",
         "categoryTree": "Category tree",
         "pickCategory": "Select a category for this product.",
         "searchCategories": "Search categories...",
         "allCategories": "All categories",
-
         "brand": "Brand",
         "selectBrand": "Select brand",
-
         "productGroup": "Product group (variants)",
         "selectProductGroup": "Select product group (optional)",
         "selectCategoryOrBrandFirst": "Select a category or brand first to view product groups.",
-
         "inventoryCondition": "Inventory and condition",
         "inventoryConditionDescription": "Define how this product appears in stock and condition filters.",
         "stockStatus": "Stock status",
         "inStock": "In stock",
-
         "condition": "Condition",
         "new": "New",
-
         "attributesFilters": "Attributes and filters",
         "attachFacetValues": "Attach attribute values (size, color, material, etc.) for customer filtering.",
         "selectCategoryFirstForFacets": "Please select a category first to view attributes",
         "editDetailsLater": "All details can be edited later from the product page.",
-
         "cancel": "Cancel",
         "create": "Create"
       },
-
       "editModal": {
         "title": "Update product description",
         "subtitle": "Update product information and description",
-
         "settingsTab": "Settings",
         "descriptionTab": "Description",
-
         "category": "Category",
         "editCategoryDescription": "Change the category selection from the tree (similar to attribute settings).",
-
         "inventory": "Inventory",
         "brand": "Brand",
-
         "productGroup": "Product group (optional)",
         "noneStandalone": "No (standalone product)",
-
         "inventoryCondition": "Inventory and condition",
         "stockStatus": "Stock status",
         "inStock": "In stock",
-
         "condition": "Condition",
         "new": "New",
         "liquidation": "Liquidation",
         "comingSoon": "Coming soon",
-
         "productFacets": "Product attributes"
+      },
+      "imagesModal": {
+        "title": "Manage Product Images",
+        "subtitle": "Upload up to {maxFiles} images • Max {maxSize}MB each",
+        "triggerButton": "Images",
+        "triggerTitle": "Manage images",
+        "dropzoneTitle": "Drag & drop images here",
+        "dropzoneSubtitle": "or click to browse - you can also paste images",
+        "slotsLeft": "{count} slots left - Max {maxSize}MB each",
+        "willDelete": "Will delete",
+        "existing": "Existing",
+        "new": "New",
+        "undoDelete": "Undo delete",
+        "delete": "Delete",
+        "noImages": "No images yet.",
+        "clearPending": "Clear pending",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "savePhotos": "Save photos"
+      }
+    },
+    "categories": {
+      "treeView": {
+        "addCategory": "Add Category",
+        "expandAll": "Expand All",
+        "expand": "Expand",
+        "collapseAll": "Collapse All",
+        "collapse": "Collapse",
+        "searchPlaceholder": "Search categories...",
+        "root": "root",
+        "total": "total",
+        "facets": "facets",
+        "active": "Active",
+        "hidden": "Hidden",
+        "edit": "Edit",
+        "images": "Images",
+        "hideCategory": "Hide Category",
+        "showCategory": "Show Category",
+        "manageImages": "Manage Images",
+        "delete": "Delete",
+        "noCategoriesFound": "No categories found",
+        "tryAdjustingSearch": "Try adjusting your search",
+        "addFirstCategory": "Add your first category to get started",
+        "deleteDialogTitle": "Delete Category?",
+        "deleteConfirmation": "Are you sure you want to delete",
+        "deleteWarning": "? This action cannot be undone and will permanently delete the category.",
+        "actionCannotBeUndone": "This action cannot be undone.",
+        "cancel": "Cancel",
+        "deleteCategory": "Delete Category"
+      },
+      "addModal": {
+        "title": "Add New Category",
+        "subtitle": "Create a category for organizing products",
+        "categoryName": "Category Name",
+        "categoryNamePlaceholder": "e.g., Smartphones",
+        "description": "Description",
+        "descriptionPlaceholder": "Category description...",
+        "parentCategory": "Parent Category (Optional)",
+        "parentPlaceholder": "None (Top Level)",
+        "footerNote": "You can edit these details later and add facets to this category.",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "createCategory": "Create Category"
+      },
+      "editModal": {
+        "title": "Edit Category",
+        "subtitle": "Rename, update description, or choose a parent category.",
+        "subtitleMobile": "Update details or move it under a parent",
+        "categoryName": "Category Name",
+        "categoryNamePlaceholder": "Category name",
+        "description": "Description",
+        "descriptionPlaceholder": "Add a short description",
+        "parentCategory": "Parent Category",
+        "parentPlaceholder": "Select parent (optional)",
+        "noParent": "No parent (top level)",
+        "footerNote": "You can edit facets and images from the categories list.",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveChanges": "Save changes"
+      },
+      "imagesModal": {
+        "title": "Manage Category Images",
+        "subtitle": "Upload up to {maxFiles} images • Max {maxSize}MB each",
+        "dragAndDrop": "Drag & drop images here",
+        "orClickToBrowse": "or click to browse • you can also paste images",
+        "willDelete": "Will delete",
+        "existing": "Existing",
+        "new": "New",
+        "noImagesYet": "No images yet.",
+        "clearPending": "Clear pending",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "savePhotos": "Save photos"
+      },
+      "toast": {
+        "enterCategoryName": "Please enter a category name",
+        "categoryCreated": "Category created successfully",
+        "categoryCreateFailed": "Failed to create category",
+        "categoryUpdated": "Category updated successfully",
+        "categoryUpdateFailed": "Failed to update category",
+        "categoryDeleted": "Category deleted successfully",
+        "categoryDeleteFailed": "Failed to delete category",
+        "cannotDeleteWithChildren": "Cannot delete category with subcategories. Please delete child categories first."
+      }
+    },
+    "brands": {
+      "table": {
+        "searchPlaceholder": "Search by name or origin...",
+        "addBrand": "Add Brand",
+        "image": "Image",
+        "name": "Name",
+        "origin": "Origin",
+        "description": "Description",
+        "actions": "Actions",
+        "loading": "Loading brands...",
+        "noBrands": "No brands found",
+        "adjustSearch": "Try adjusting your search",
+        "delete": "Delete",
+        "deleting": "Deleting...",
+        "deleteDialogTitle": "Delete Brand?",
+        "deleteConfirmation": "You are about to permanently delete",
+        "deleteWarning": ". This action cannot be undone.",
+        "actionCannotBeUndone": "This action cannot be undone.",
+        "cancel": "Cancel",
+        "deleteBrand": "Delete Brand"
+      },
+      "addModal": {
+        "title": "Add Brand",
+        "subtitle": "Create a new brand",
+        "subtitleDesktop": "Create a new brand with description and origin",
+        "name": "Brand Name",
+        "namePlaceholder": "Enter brand name",
+        "origin": "Origin",
+        "originPlaceholder": "Georgia / EU",
+        "description": "Description",
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "editModal": {
+        "title": "Update Brand",
+        "subtitle": "Update brand information",
+        "subtitleDesktop": "Update brand description and origin",
+        "name": "Brand Name",
+        "namePlaceholder": "Enter brand name",
+        "origin": "Origin",
+        "originPlaceholder": "Georgia / EU",
+        "description": "Description",
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "imagesModal": {
+        "title": "Manage Brand Images",
+        "subtitle": "Upload up to {maxFiles} images • Max {maxSize}MB each",
+        "dropzoneTitle": "Drag & drop images here",
+        "dropzoneSubtitle": "or click to browse • you can also paste images",
+        "willDelete": "Will delete",
+        "existing": "Existing",
+        "new": "New",
+        "noImages": "No images yet.",
+        "clearPending": "Clear pending",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "savePhotos": "Save photos"
+      },
+      "toast": {
+        "updated": "Brand updated successfully.",
+        "updateFailed": "Failed to update brand.",
+        "created": "Brand added successfully.",
+        "createFailed": "Failed to create brand.",
+        "deleted": "Brand deleted.",
+        "deleteFailed": "Failed to delete brand."
+      }
+    },
+    "customers": {
+      "stats": {
+        "total": "Total Customers",
+        "active": "active customers",
+        "revenue": "Total Revenue",
+        "revenueLabel": "From all customers",
+        "avgValue": "Avg Order Value",
+        "perOrder": "Per order average"
+      },
+      "table": {
+        "title": "Customers",
+        "subtitle": "Manage your customer base and relationships",
+        "searchPlaceholder": "Search customers...",
+        "headers": {
+          "customer": "Customer",
+          "contact": "Contact",
+          "orders": "Orders",
+          "totalSpent": "Total Spent",
+          "joinDate": "Join Date",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "loading": "Loading customers...",
+        "empty": "No customers found",
+        "ordersCount": "orders",
+        "active": "active",
+        "inactive": "inactive"
+      },
+      "detailsModal": {
+        "title": "{name}",
+        "subtitle": "Customer information and order history",
+        "fullTitle": "Customer Details - {name}",
+        "fullSubtitle": "Complete customer information and order history",
+        "tabs": {
+          "profile": "Profile",
+          "orders": "Orders",
+          "address": "Address"
+        },
+        "infoTitle": "Customer Information",
+        "statsTitle": "Account Stats",
+        "historyTitle": "Order History",
+        "shippingTitle": "Shipping Address",
+        "labels": {
+          "email": "Email",
+          "phone": "Phone",
+          "since": "Customer Since",
+          "ordersCount": "Total Orders",
+          "ltv": "Lifetime Value",
+          "n_a": "N/A",
+          "status": "Status",
+          "close": "Close",
+          "orderPrefix": "Order #",
+          "item": "item",
+          "items": "items",
+          "noStreet": "No street address",
+          "noCountry": "No country specified",
+          "sku": "SKU",
+          "qty": "Qty",
+          "total": "Total",
+          "loadFailed": "Failed to load order details",
+          "loadingOrders": "Loading orders...",
+          "noOrders": "No orders found",
+          "id": "ID",
+          "nameLabel": "Name",
+          "usernameLabel": "Username"
+        }
+      },
+      "editModal": {
+        "title": "Edit Customer",
+        "subtitle": "Update customer details",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving...",
+        "placeholders": {
+          "firstName": "First name",
+          "lastName": "Last name",
+          "email": "email@example.com",
+          "phone": "+1 (555) 123-4567"
+        }
+      },
+      "toasts": {
+        "updateSuccess": "Customer updated successfully",
+        "updateError": "Failed to update customer. Please try again."
+      }
+    },
+    "payments": {
+      "stats": {
+        "totalRevenue": "Total Revenue",
+        "pendingPayments": "Pending Payments",
+        "completedPayments": "Completed Payments",
+        "failedPayments": "Failed Payments",
+        "fees": "Transaction Fees",
+        "successful": "Successful",
+        "failed": "Failed",
+        "successRate": "{rate}% success rate",
+        "failureRate": "{rate}% failure rate",
+        "trend": "{value}% from last month"
+      },
+      "table": {
+        "title": "Transaction History",
+        "subtitle": "View and manage payment transactions",
+        "searchPlaceholder": "Search by ID, order, or customer...",
+        "filterStatus": "Filter by status",
+        "allStatuses": "All Statuses",
+        "export": "Export",
+        "noTransactions": "No transactions found matching your filters.",
+        "headers": {
+          "id": "Transaction ID",
+          "order": "Order",
+          "customer": "Customer",
+          "amount": "Amount",
+          "method": "Method",
+          "status": "Status",
+          "date": "Date",
+          "fee": "Fee",
+          "actions": "Actions"
+        },
+        "statuses": {
+          "completed": "Completed",
+          "pending": "Pending",
+          "failed": "Failed",
+          "refunded": "Refunded"
+        }
+      },
+      "detailsModal": {
+        "title": "Transaction Details",
+        "sections": {
+          "info": "Transaction Information",
+          "customer": "Customer Information",
+          "details": "Payment Details"
+        },
+        "labels": {
+          "id": "Transaction ID",
+          "amount": "Amount",
+          "method": "Payment Method",
+          "status": "Status",
+          "date": "Date",
+          "fee": "Transaction Fee",
+          "net": "Net Amount",
+          "transactionId": "Processor ID",
+          "email": "Email",
+          "phone": "Phone",
+          "close": "Close"
+        }
+      }
+    },
+    "orders": {
+      "statuses": {
+        "pending": "Pending",
+        "paid": "Paid",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+        "refunded": "Refunded"
+      },
+      "stats": {
+        "total": "Total Orders",
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered"
+      },
+      "table": {
+        "title": "Orders",
+        "subtitle": "Manage and track customer orders",
+        "searchPlaceholder": "Search by ID / status / date...",
+        "filterAll": "All Status",
+        "headers": {
+          "id": "Order ID",
+          "date": "Date",
+          "items": "Items",
+          "total": "Total",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "loading": "Loading...",
+        "empty": "No orders found",
+        "prev": "Prev",
+        "next": "Next",
+        "pageInfo": "Page {page} of {totalPages} • {total} total"
+      },
+      "detailsModal": {
+        "title": "Order Details",
+        "subtitle": "Complete order information and items",
+        "sections": {
+          "info": "Order Information",
+          "customer": "Customer",
+          "update": "Quick Update",
+          "products": "Products",
+          "history": "Tracking History",
+          "shipping": "Shipping"
+        },
+        "labels": {
+          "date": "Date",
+          "total": "Total",
+          "lines": "Lines",
+          "units": "Units",
+          "subtotal": "Subtotal",
+          "name": "Name",
+          "username": "Username",
+          "email": "Email",
+          "phone": "Phone",
+          "userId": "User ID",
+          "status": "Status",
+          "tracking": "Tracking",
+          "etd": "Estimated Delivery",
+          "description": "Description",
+          "sku": "SKU",
+          "qty": "Qty",
+          "unit": "Unit",
+          "reset": "Reset",
+          "save": "Save",
+          "close": "Close",
+          "loading": "Loading...",
+          "etdLabel": "Estimated Delivery",
+          "trackingLabel": "Tracking Number"
+        },
+        "placeholders": {
+          "note": "Optional note..."
+        }
+      },
+      "toasts": {
+        "statusUpdated": "{id} order status updated to {status}",
+        "statusUpdateFailed": "Failed to update status",
+        "orderCancelled": "{id} order has been cancelled",
+        "orderCancelFailed": "Failed to cancel order",
+        "cancelReasonPrompt": "Cancellation reason?"
+      }
+    },
+    "faqs": {
+      "table": {
+        "headers": {
+          "question": "Question",
+          "answer": "Answer",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "searchPlaceholder": "Search by question or answer...",
+        "saveOrder": "Save Order",
+        "noChanges": "No changes to save",
+        "orderSaved": "Order saved successfully",
+        "orderSaveFailed": "Failed to save order",
+        "dragHandle": "Drag handle",
+        "addFaq": "Add FAQ",
+        "delete": "Delete",
+        "deleting": "Deleting...",
+        "loading": "Loading...",
+        "empty": "No records found.",
+        "deleteConfirmTitle": "Delete?",
+        "deleteConfirmDesc": "This will delete: {question}. This action cannot be undone.",
+        "deleteWarning": "This action cannot be undone.",
+        "cancel": "Cancel",
+        "active": "Active",
+        "featured": "Featured",
+        "toasts": {
+          "updateSuccess": "Updated.",
+          "updateError": "Failed to update.",
+          "createSuccess": "FAQ added.",
+          "createError": "Failed to add.",
+          "deleteSuccess": "Deleted.",
+          "deleteError": "Failed to delete.",
+          "toggleError": "Failed to change."
+        }
+      },
+      "modals": {
+        "addTitle": "Add FAQ",
+        "addSubtitle": "Add new frequently asked question",
+        "editTitle": "Edit FAQ",
+        "editSubtitle": "Update FAQ information",
+        "question": "Question",
+        "questionPlaceholder": "Enter question",
+        "answer": "Answer",
+        "answerPlaceholder": "Enter answer",
+        "active": "Active",
+        "featured": "Featured",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "fillFields": "Please fill all fields"
+      }
+    },
+    "facets": {
+      "table": {
+        "addFacet": "Add Facet",
+        "categories": "Categories",
+        "searchPlaceholder": "Search facets...",
+        "allTypes": "All Types",
+        "custom": "Custom",
+        "system": "System",
+        "name": "Name",
+        "type": "Type",
+        "updating": "Updating...",
+        "facetsFound": "{count} facets found",
+        "selectCategory": "Select a Category",
+        "selectCategoryDescription": "Choose a category from the sidebar to manage facets.",
+        "loadingFacets": "Loading facets...",
+        "loadFailed": "Failed to load facets",
+        "tryAgain": "Try Again",
+        "noFacets": "No Facets",
+        "noFacetsDescription": "Create your first facet for this category.",
+        "tableHeaderName": "Name",
+        "tableHeaderDisplay": "Display",
+        "tableHeaderCustom": "Custom",
+        "tableHeaderValues": "Values",
+        "tableHeaderActions": "Actions",
+        "yes": "Yes",
+        "no": "No",
+        "deleteDialogTitle": "Delete Facet?",
+        "deleteConfirmation": "Are you sure you want to delete",
+        "deleteWarning": "? This action cannot be undone and will permanently delete the facet.",
+        "actionCannotBeUndone": "This action cannot be undone.",
+        "cancel": "Cancel",
+        "deleteFacet": "Delete Facet"
+      },
+      "addModal": {
+        "title": "Add Facet",
+        "subtitle": "Create a new attribute (e.g., Size, Resolution)",
+        "name": "Name",
+        "namePlaceholder": "Size",
+        "displayType": "Display Type",
+        "preview": "Preview",
+        "custom": "Custom",
+        "customDescription": "Mark as custom facet",
+        "category": "Category",
+        "selectCategory": "Select category",
+        "facetValues": "Facet Values",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "create": "Create"
+      },
+      "editModal": {
+        "title": "Edit Facet",
+        "subtitle": "Update facet settings and values",
+        "name": "Name",
+        "namePlaceholder": "Facet name",
+        "displayType": "Display Type",
+        "preview": "Preview",
+        "custom": "Custom",
+        "customDescription": "Mark as custom facet",
+        "category": "Category",
+        "categoryDescription": "Edit category selection from the tree (similar to facet settings/values).",
+        "selectCategory": "Select category",
+        "noCategoriesAvailable": "No categories available. Check console for errors.",
+        "facetValues": "Facet Values",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "save": "Save"
+      },
+      "valuesEditor": {
+        "addValue": "Add value",
+        "tip": "Tip: you can nest values (e.g., Resolution → 4K → 3840×2160)",
+        "valuePlaceholder": "Value",
+        "subValuePlaceholder": "Sub-value"
+      },
+      "toast": {
+        "requiredFields": "Please fill in required fields",
+        "facetCreated": "Facet created successfully",
+        "facetCreateFailed": "Failed to create facet",
+        "facetUpdated": "Facet updated successfully",
+        "facetUpdateFailed": "Failed to update facet",
+        "facetDeleted": "Facet deleted successfully",
+        "facetDeleteFailed": "Failed to delete facet"
       }
     }
   },
-
   "pages": {
     "admin": {
       "dashboard": {
         "title": "Admin dashboard",
         "description": "Manage your store from the admin panel",
-
         "revenue": "Revenue",
         "orders": "Orders",
         "customers": "Customers",
         "products": "Products",
         "vsLastMonth": "vs last month",
-
         "recentOrders": "Recent orders",
         "recentCustomers": "Recent customers",
         "recentProducts": "Recent products",
-
         "quickActions": "Actions",
         "viewAll": "All",
-
         "manageYourStoreEfficiently": "Manage your store",
         "addNewProduct": "Add new product",
         "addNewCategory": "Add new category",
         "addNewOrder": "Add new order",
         "addNewCustomer": "Add new customer"
       },
-
       "brands": {
         "title": "Brands",
         "description": "Manage your brand catalog and origins",
@@ -301,7 +853,6 @@
         "loadingTitle": "FAQs"
       }
     },
-
     "brands": {
       "title": "Brands",
       "description": "Explore all our brands and discover quality products"
@@ -314,7 +865,6 @@
       "checkBackLater": "Check back later for new products"
     }
   },
-
   "category": {
     "meta": {
       "defaultTitle": "Category",
@@ -347,12 +897,10 @@
       "ariaHideSubcategories": "Hide subcategories"
     }
   },
-
   "searchPage": {
     "resultsFor": "Search results for \"{{query}}\"",
     "noResults": "No products found for \"{{query}}\""
   },
-
   "search": {
     "placeholder": "Search products...",
     "recentSearches": "Recent searches",
@@ -366,7 +914,6 @@
     "unnamedProduct": "Unnamed product",
     "browseCategories": "Browse categories"
   },
-
   "product": {
     "notFound": {
       "title": "Product not found",
@@ -375,7 +922,6 @@
       "goHome": "Go to home"
     }
   },
-
   "compare": {
     "page": {
       "title": "Compare products",
@@ -406,85 +952,67 @@
       "title": "Compare products"
     }
   },
-
   "cart": {
     "title": "Cart",
     "description": "Review your cart and proceed to checkout.",
-
     "empty": "Your cart is empty.",
     "emptyDescription": "Looks like you haven’t added anything to your cart yet. Start shopping now!",
     "emptyDescriptionShort": "Add products to purchase",
-
     "checkout": "Checkout",
-
     "item": "Item",
     "items": "Items",
     "inYourCart": "In your cart",
-
     "continueShopping": "Continue shopping",
     "startShopping": "Start shopping",
     "view": "View",
     "buy": "Buy",
-
     "checkingStock": "Checking stock...",
     "outOfStock": "Out of stock",
     "stock": "In stock: {count}",
     "stockLimitExceeded": "Limited to {count} items in stock",
-
     "orderSummary": "Order summary",
-
     "loginRequired": "Login required",
     "loginRequiredMsg": "Please log in to continue checkout.",
     "loginRequiredToast": "Please log in first",
     "dismiss": "Dismiss",
-
     "subtotal": "Subtotal",
     "discount": "Discount",
     "shipping": "Shipping",
     "free": "Free",
     "tax": "Tax",
     "total": "Total",
-
     "myCart": "My cart",
-
     "addMoreForFreeShipping": "Add {amount} more for free shipping",
     "proceedToCheckout": "Proceed to checkout",
     "loginToCheckout": "Log in to checkout",
-
     "freeShippingOver": "Free shipping on orders over {amount}",
     "returnPolicy": "Easy 30-day returns",
     "secureCheckout": "Secure SSL-encrypted checkout"
   },
-
   "checkout": {
     "title": "Checkout",
     "description": "Review your order and complete payment.",
-
     "completePurchase": "Complete your purchase securely",
     "checkingPayment": "Checking payment…",
     "redirecting": "Redirecting to payment...",
     "paySecurely": "Secure payment",
     "secureHostedCheckout": "Secure hosted checkout",
-
     "chooseProvider": "Choose a payment provider",
     "providers": {
       "bog": "Bank of Georgia",
       "tbc": "TBC Bank"
     },
-
     "status": {
       "loading": "Checking payment status...",
       "success": "Payment successful! Thank you for your purchase.",
       "failed": "Payment failed or was cancelled. Please try again."
     },
-
     "errors": {
       "userNotLoggedIn": "You must be logged in to place an order",
       "invalidProvider": "Invalid payment provider selected",
       "redirectUrlMissing": "Payment URL was not found",
       "paymentFailed": "Payment processing failed"
     },
-
     "processing": {
       "title": "Processing payment",
       "description": "Please wait while we verify your payment.",
@@ -495,7 +1023,6 @@
       "errorChecking": "Error checking payment status",
       "tryAgain": "Try again"
     },
-
     "success": {
       "title": "Payment successful!",
       "message": "Thank you for your purchase. Your order has been confirmed.",
@@ -506,7 +1033,6 @@
       "continueShopping": "Continue shopping",
       "viewOrders": "View my orders"
     },
-
     "failed": {
       "title": "Payment failed",
       "reason": "Reason:",
@@ -521,7 +1047,6 @@
       "backToCart": "Back to cart",
       "contactSupport": "Support"
     },
-
     "summary": {
       "subtotal": "Subtotal",
       "shipping": "Shipping",
@@ -537,21 +1062,18 @@
       "processingLabel": "Processing..."
     }
   },
-
   "userPanel": {
     "meta": {
       "title": "My account",
       "description": "Manage your profile, orders, and settings."
     }
   },
-
   "info": {
     "about": {
       "title": "About us",
       "description": "Learn more about our company, mission, and values."
     }
   },
-
   "notFound": {
     "code": "404",
     "title": "Page not found",
@@ -559,33 +1081,26 @@
     "goHome": "Home",
     "viewCategories": "Browse categories"
   },
-
   "categories": {
     "category": "Categories",
     "allCategories": "All categories"
   },
-
   "filters": {
     "filters": "Filters",
     "clearAllFilters": "Clear all filters",
-
     "categories": "Categories",
     "priceRange": "Price range",
     "brands": "Brands",
     "stock": "Stock",
     "condition": "Condition",
-
     "all": "All",
     "inStock": "In stock",
     "outOfStock": "Out of stock",
-
     "new": "New",
     "used": "Used",
     "likeNew": "Like new",
-
     "to": "From"
   },
-
   "brands": {
     "brands": "Brands",
     "brandsCount": "Brands",
@@ -595,7 +1110,6 @@
     "noBrandsFound": "No brands found",
     "resultsFound": "Brand(s) found"
   },
-
   "footer": {
     "information": "Information",
     "delivery": "Delivery",
@@ -607,10 +1121,8 @@
     "terms": "Terms and conditions",
     "about": "About us",
     "help": "Help & support",
-
     "language": "Language",
     "location": "Location",
-
     "visitStores": "Visit our stores",
     "address": "Address",
     "hours": "Working hours",

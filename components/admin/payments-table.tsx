@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { CreditCard, DollarSign, TrendingUp, TrendingDown, Eye, Download, Filter, Search } from "lucide-react";
+import { useDictionary } from "@/app/context/dictionary-provider";
+import { currencyFmt } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -91,6 +93,8 @@ const transactions: Transaction[] = [
 export function PaymentsTable() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const dict = useDictionary();
+  const t = dict.admin.payments;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -105,6 +109,10 @@ export function PaymentsTable() {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    return t.table.statuses[status as keyof typeof t.table.statuses] || status;
   };
 
   const filteredTransactions = transactions.filter((t) => {
@@ -130,41 +138,41 @@ export function PaymentsTable() {
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100">
-              Total Revenue
+              {t.stats.totalRevenue}
             </CardTitle>
             <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
-              ${totalRevenue.toFixed(2)}
+              {currencyFmt(totalRevenue)}
             </div>
             <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
               <TrendingUp className="inline h-2 w-2 sm:h-3 sm:w-3 mr-1" />
-              +12% from last month
+              {t.stats.trend.replace("{value}", "12")}
             </p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100">
-              Transaction Fees
+              {t.stats.fees}
             </CardTitle>
             <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
-              ${totalFees.toFixed(2)}
+              {currencyFmt(totalFees)}
             </div>
             <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
               <TrendingDown className="inline h-2 w-2 sm:h-3 sm:w-3 mr-1" />
-              -2% from last month
+              {t.stats.trend.replace("{value}", "-2")}
             </p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100">
-              Successful
+              {t.stats.successful}
             </CardTitle>
             <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
@@ -173,19 +181,18 @@ export function PaymentsTable() {
               {transactions.filter((t) => t.status === "completed").length}
             </div>
             <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
-              {(
+              {t.stats.successRate.replace("{rate}", (
                 (transactions.filter((t) => t.status === "completed").length /
                   transactions.length) *
                 100
-              ).toFixed(1)}
-              % success rate
+              ).toFixed(1))}
             </p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100">
-              Failed
+              {t.stats.failed}
             </CardTitle>
             <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
@@ -194,11 +201,10 @@ export function PaymentsTable() {
               {transactions.filter((t) => t.status === "failed").length}
             </div>
             <p className="font-primary text-[10px] sm:text-xs text-muted-foreground text-slate-500 dark:text-slate-400">
-              {(
+              {t.stats.failureRate.replace("{rate}", (
                 (transactions.filter((t) => t.status === "failed").length / transactions.length) *
                 100
-              ).toFixed(1)}
-              % failure rate
+              ).toFixed(1))}
             </p>
           </CardContent>
         </Card>
@@ -210,15 +216,15 @@ export function PaymentsTable() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="text-slate-900 dark:text-slate-100">
-                Transaction History
+                {t.table.title}
               </CardTitle>
               <CardDescription className="text-slate-500 dark:text-slate-400">
-                View and manage payment transactions
+                {t.table.subtitle}
               </CardDescription>
             </div>
             <Button className="w-full sm:w-auto" variant="outline">
               <Download className="mr-2 h-4 w-4" />
-              Export
+              {t.table.export}
             </Button>
           </div>
         </CardHeader>
@@ -228,7 +234,7 @@ export function PaymentsTable() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
-                placeholder="Search by ID, order, or customer..."
+                placeholder={t.table.searchPlaceholder}
                 className="pl-9 bg-white dark:bg-slate-800"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -237,14 +243,14 @@ export function PaymentsTable() {
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-full sm:w-[180px] bg-white dark:bg-slate-800">
                 <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t.table.filterStatus} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="refunded">Refunded</SelectItem>
+                <SelectItem value="all">{t.table.allStatuses}</SelectItem>
+                <SelectItem value="completed">{t.table.statuses.completed}</SelectItem>
+                <SelectItem value="pending">{t.table.statuses.pending}</SelectItem>
+                <SelectItem value="failed">{t.table.statuses.failed}</SelectItem>
+                <SelectItem value="refunded">{t.table.statuses.refunded}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -263,17 +269,17 @@ export function PaymentsTable() {
                         {transaction.customer}
                       </p>
                       <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                        Order: {transaction.orderId}
+                        {t.table.headers.order}: {transaction.orderId}
                       </p>
                     </div>
                     <Badge className={getStatusColor(transaction.status)}>
-                      {transaction.status}
+                      {getStatusLabel(transaction.status)}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
                     <div>
                       <p className="font-primary text-lg font-bold text-slate-900 dark:text-slate-100">
-                        ${transaction.amount.toFixed(2)}
+                        {currencyFmt(transaction.amount)}
                       </p>
                       <p className="font-primary text-xs text-slate-500">
                         {transaction.method} • {transaction.date}
@@ -294,17 +300,17 @@ export function PaymentsTable() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-slate-900 dark:text-slate-100">
-                    Transaction ID
+                    {t.table.headers.id}
                   </TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Order</TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Customer</TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Amount</TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Method</TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Status</TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Date</TableHead>
-                  <TableHead className="text-slate-900 dark:text-slate-100">Fee</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.order}</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.customer}</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.amount}</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.method}</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.status}</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.date}</TableHead>
+                  <TableHead className="text-slate-900 dark:text-slate-100">{t.table.headers.fee}</TableHead>
                   <TableHead className="text-right text-slate-900 dark:text-slate-100">
-                    Actions
+                    {t.table.headers.actions}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -324,14 +330,14 @@ export function PaymentsTable() {
                       {transaction.customer}
                     </TableCell>
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">
-                      ${transaction.amount.toFixed(2)}
+                      {currencyFmt(transaction.amount)}
                     </TableCell>
                     <TableCell className="text-slate-900 dark:text-slate-100">
                       {transaction.method}
                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(transaction.status)}>
-                        {transaction.status}
+                        {getStatusLabel(transaction.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-slate-900 dark:text-slate-100">
@@ -346,7 +352,7 @@ export function PaymentsTable() {
                             : "text-slate-900 dark:text-slate-100"
                       }
                     >
-                      {transaction.fee === 0 ? "-" : `$${Math.abs(transaction.fee).toFixed(2)}`}
+                      {transaction.fee === 0 ? "-" : currencyFmt(transaction.fee)}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button size="sm" variant="outline">
@@ -361,7 +367,7 @@ export function PaymentsTable() {
 
           {filteredTransactions.length === 0 && (
             <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-              No transactions found matching your filters.
+              {t.table.noTransactions}
             </div>
           )}
         </CardContent>

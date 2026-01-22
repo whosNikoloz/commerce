@@ -31,6 +31,8 @@ import { getAllCustomers, getCustomerOrders, updateCustomer } from "@/app/api/se
 import { CustomerModel, UpdateCustomerDto } from "@/types/customer";
 import { OrderSummary, OrderStatus, OrderDetail } from "@/types/orderTypes";
 import { getOrderByIdForAdmin } from "@/app/api/services/orderService";
+import { useDictionary } from "@/app/context/dictionary-provider";
+import { currencyFmt } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -82,19 +84,11 @@ function mapCustomerModelToCustomer(model: CustomerModel): Customer {
 }
 
 // Helper function to convert OrderStatus enum to readable string
-function getOrderStatusLabel(status: OrderStatus): string {
-  const statusLabels: Record<OrderStatus, string> = {
-    [OrderStatus.Pending]: "Pending",
-    [OrderStatus.Paid]: "Paid",
-    [OrderStatus.Processing]: "Processing",
-    [OrderStatus.Shipped]: "Shipped",
-    [OrderStatus.Delivered]: "Delivered",
-    [OrderStatus.Cancelled]: "Cancelled",
-    [OrderStatus.Refunded]: "Refunded",
-  };
-
-  return statusLabels[status] || "Unknown";
+function getOrderStatusLabel(status: OrderStatus, dict: any): string {
+  const key = (typeof status === "number" ? OrderStatus[status] : String(status)).toLowerCase();
+  return dict.admin.orders.statuses[key] || key;
 }
+
 
 // Helper function to get status badge variant
 function getOrderStatusVariant(
@@ -115,6 +109,8 @@ function getOrderStatusVariant(
 }
 
 export function CustomersTable() {
+  const dict = useDictionary();
+  const t = dict.admin.customers;
   const isMobile = useIsMobile();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -229,7 +225,7 @@ export function CustomersTable() {
       setIsEditDialogOpen(false);
     } catch {
       // Failed to update customer
-      alert("Failed to update customer. Please try again.");
+      alert(t.toasts.updateError);
     } finally {
       setIsUpdating(false);
     }
@@ -255,32 +251,32 @@ export function CustomersTable() {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.total}</CardTitle>
             <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{customerStats.total}</div>
-            <p className="font-primary text-xs text-muted-foreground">{customerStats.active} active customers</p>
+            <p className="font-primary text-xs text-muted-foreground">{customerStats.active} {t.stats.active}</p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.revenue}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${customerStats.totalRevenue.toFixed(2)}</div>
-            <p className="font-primary text-xs text-muted-foreground">From all customers</p>
+            <div className="text-2xl font-bold">{currencyFmt(customerStats.totalRevenue)}</div>
+            <p className="font-primary text-xs text-muted-foreground">{t.stats.revenueLabel}</p>
           </CardContent>
         </Card>
         <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Order Value</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stats.avgOrderValue}</CardTitle>
             <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${customerStats.avgOrderValue.toFixed(2)}</div>
-            <p className="font-primary text-xs text-muted-foreground">Per order average</p>
+            <div className="text-2xl font-bold">{currencyFmt(customerStats.avgOrderValue)}</div>
+            <p className="font-primary text-xs text-muted-foreground">{t.stats.perOrder}</p>
           </CardContent>
         </Card>
       </div>
@@ -289,15 +285,15 @@ export function CustomersTable() {
         <CardHeader>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle className="text-slate-900 dark:text-slate-100">Customers</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-slate-100">{t.table.title}</CardTitle>
               <CardDescription className="text-slate-500 dark:text-slate-400">
-                Manage your customer base and relationships
+                {t.table.subtitle}
               </CardDescription>
             </div>
             <Input
-              aria-label="Search customers"
+              aria-label={t.table.searchPlaceholder}
               className="w-full md:w-64"
-              placeholder="Search customers..."
+              placeholder={t.table.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -305,36 +301,36 @@ export function CustomersTable() {
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <div className="min-w-[800px]">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead>Total Spent</TableHead>
-                <TableHead>Join Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell className="py-8 text-center" colSpan={7}>
-                    <div className="flex items-center justify-center">
-                      <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-                      <span className="font-primary ml-2 text-muted-foreground">Loading customers...</span>
-                    </div>
-                  </TableCell>
+                  <TableHead>{t.table.headers.customer}</TableHead>
+                  <TableHead>{t.table.headers.contact}</TableHead>
+                  <TableHead>{t.table.headers.orders}</TableHead>
+                  <TableHead>{t.table.headers.totalSpent}</TableHead>
+                  <TableHead>{t.table.headers.joinDate}</TableHead>
+                  <TableHead>{t.table.headers.status}</TableHead>
+                  <TableHead className="text-right">{t.table.headers.actions}</TableHead>
                 </TableRow>
-              ) : filteredCustomers.length === 0 ? (
-                <TableRow>
-                  <TableCell className="py-8 text-center text-muted-foreground" colSpan={7}>
-                    No customers found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredCustomers.map((customer) => (
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell className="py-8 text-center" colSpan={7}>
+                      <div className="flex items-center justify-center">
+                        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+                        <span className="font-primary ml-2 text-muted-foreground">{t.table.loading}</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : filteredCustomers.length === 0 ? (
+                  <TableRow>
+                    <TableCell className="py-8 text-center text-muted-foreground" colSpan={7}>
+                      {t.table.empty}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCustomers.map((customer) => (
                     <TableRow
                       key={customer.id}
                       className="border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -343,82 +339,82 @@ export function CustomersTable() {
                         setIsDialogOpen(true);
                       }}
                     >
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
-                          <AvatarImage
-                            alt={customer.name}
-                            src={customer.avatar || "/placeholder.png"}
-                          />
-                          <AvatarFallback>
-                            {customer.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium text-slate-900 dark:text-slate-100">
-                            {customer.name}
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
+                            <AvatarImage
+                              alt={customer.name}
+                              src={customer.avatar || "/placeholder.png"}
+                            />
+                            <AvatarFallback>
+                              {customer.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium text-slate-900 dark:text-slate-100">
+                              {customer.name}
+                            </div>
+                            <div className="text-sm text-muted-foreground">{t.detailsModal.labels.id}: {customer.id}</div>
                           </div>
-                          <div className="text-sm text-muted-foreground">ID: {customer.id}</div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm text-slate-900 dark:text-slate-100">
-                          <Mail className="mr-1 h-3 w-3" />
-                          {customer.email}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm text-slate-900 dark:text-slate-100">
+                            <Mail className="mr-1 h-3 w-3" />
+                            {customer.email}
+                          </div>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <Phone className="mr-1 h-3 w-3" />
+                            {customer.phone}
+                          </div>
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Phone className="mr-1 h-3 w-3" />
-                          {customer.phone}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{customer.totalOrders} {t.table.ordersCount}</Badge>
+                      </TableCell>
+                      <TableCell className="font-medium text-slate-900 dark:text-slate-100">
+                        {currencyFmt(customer.totalSpent)}
+                      </TableCell>
+                      <TableCell className="text-slate-500 dark:text-slate-400">
+                        {customer.joinDate}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={customer.status === "active" ? "default" : "secondary"}>
+                          {t.table[customer.status as "active" | "inactive"]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            aria-label="View customer details"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedCustomer(customer);
+                              setIsDialogOpen(true);
+                            }}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            aria-label="Edit customer"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditClick(customer)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{customer.totalOrders} orders</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium text-slate-900 dark:text-slate-100">
-                      ${customer.totalSpent.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-slate-500 dark:text-slate-400">
-                      {customer.joinDate}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={customer.status === "active" ? "default" : "secondary"}>
-                        {customer.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          aria-label="View customer details"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedCustomer(customer);
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          aria-label="Edit customer"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEditClick(customer)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
@@ -443,10 +439,10 @@ export function CustomersTable() {
                   <GoBackButton onClick={() => setIsDialogOpen(false)} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      {selectedCustomer?.name}
+                      {t.detailsModal.title.replace("{name}", selectedCustomer?.name || "")}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Customer information and order history
+                      {t.detailsModal.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -454,10 +450,10 @@ export function CustomersTable() {
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Customer Details - {selectedCustomer?.name}
+                      {t.detailsModal.fullTitle.replace("{name}", selectedCustomer?.name || "")}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Complete customer information and order history
+                      {t.detailsModal.fullSubtitle}
                     </p>
                   </div>
                 </ModalHeader>
@@ -467,14 +463,14 @@ export function CustomersTable() {
                 {selectedCustomer && (
                   <Tabs className="w-full" defaultValue="profile">
                     <TabsList className="grid w-full grid-cols-3 mb-4">
-                      <TabsTrigger value="profile">Profile</TabsTrigger>
-                      <TabsTrigger value="orders">Orders</TabsTrigger>
-                      <TabsTrigger value="address">Address</TabsTrigger>
+                      <TabsTrigger value="profile">{t.detailsModal.tabs.profile}</TabsTrigger>
+                      <TabsTrigger value="orders">{t.detailsModal.tabs.orders}</TabsTrigger>
+                      <TabsTrigger value="address">{t.detailsModal.tabs.address}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent className="space-y-4" value="profile">
                       <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                        <h3 className="font-heading font-bold text-lg mb-3">Customer Information</h3>
+                        <h3 className="font-heading font-bold text-lg mb-3">{t.detailsModal.infoTitle}</h3>
                         <div className="flex items-center space-x-4 mb-4">
                           <Avatar className="h-16 w-16 ring-2 ring-blue-500/20">
                             <AvatarImage
@@ -499,81 +495,81 @@ export function CustomersTable() {
                       </div>
 
                       <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                        <h3 className="font-heading font-bold text-lg mb-3">Account Stats</h3>
+                        <h3 className="font-heading font-bold text-lg mb-3">{t.detailsModal.statsTitle}</h3>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <div>
-                            <div className="text-xs text-slate-500">Customer Since</div>
+                            <div className="text-xs text-slate-500">{t.detailsModal.labels.since}</div>
                             <div className="font-medium">{selectedCustomer.joinDate}</div>
                           </div>
                           <div>
-                            <div className="text-xs text-slate-500">Total Orders</div>
-                            <div className="font-medium">{selectedCustomer.totalOrders} orders</div>
+                            <div className="text-xs text-slate-500">{t.detailsModal.labels.ordersCount}</div>
+                            <div className="font-medium">{selectedCustomer.totalOrders} {t.table.ordersCount}</div>
                           </div>
                           <div>
-                            <div className="text-xs text-slate-500">Lifetime Value</div>
-                            <div className="font-medium">${selectedCustomer.totalSpent.toFixed(2)}</div>
+                            <div className="text-xs text-slate-500">{t.detailsModal.labels.ltv}</div>
+                            <div className="font-medium">{currencyFmt(selectedCustomer.totalSpent)}</div>
                           </div>
                           <div>
-                            <div className="text-xs text-slate-500">Status</div>
+                            <div className="text-xs text-slate-500">{t.detailsModal.labels.status}</div>
                             <Badge variant={selectedCustomer.status === "active" ? "default" : "secondary"}>
-                              {selectedCustomer.status}
+                              {t.table[selectedCustomer.status as "active" | "inactive"]}
                             </Badge>
                           </div>
                         </div>
                       </div>
                     </TabsContent>
-              <TabsContent className="space-y-4 pr-4" value="orders">
-                {isLoadingOrders ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-                    <span className="font-primary ml-2 text-muted-foreground">Loading orders...</span>
-                  </div>
-                ) : customerOrders.length === 0 ? (
-                  <div className="py-8 text-center text-muted-foreground">
-                    No orders found
-                  </div>
-                ) : (
-                  <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
-                    <h3 className="font-heading font-bold text-lg mb-3">Order History</h3>
-                    <div className="space-y-2">
-                    {customerOrders.map((order) => (
-                      <button
-                        key={order.id}
-                        className="flex w-full items-center justify-between rounded border border-slate-200 dark:border-slate-700 p-3 text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
-                        type="button"
-                        onClick={() => handleOrderClick(order.id)}
-                      >
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">Order #{order.id.slice(0, 8)}</div>
-                          <div className="text-xs text-slate-500">
-                            {new Date(order.date).toLocaleDateString()} • {order.items} {order.items === 1 ? 'item' : 'items'}
+                    <TabsContent className="space-y-4 pr-4" value="orders">
+                      {isLoadingOrders ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+                          <span className="font-primary ml-2 text-muted-foreground">{t.detailsModal.labels.loadingOrders}</span>
+                        </div>
+                      ) : customerOrders.length === 0 ? (
+                        <div className="py-8 text-center text-muted-foreground">
+                          {t.detailsModal.labels.noOrders}
+                        </div>
+                      ) : (
+                        <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
+                          <h3 className="font-heading font-bold text-lg mb-3">{t.detailsModal.historyTitle}</h3>
+                          <div className="space-y-2">
+                            {customerOrders.map((order) => (
+                              <button
+                                key={order.id}
+                                className="flex w-full items-center justify-between rounded border border-slate-200 dark:border-slate-700 p-3 text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+                                type="button"
+                                onClick={() => handleOrderClick(order.id)}
+                              >
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">{t.detailsModal.labels.orderPrefix}{order.id.slice(0, 8)}</div>
+                                  <div className="text-xs text-slate-500">
+                                    {new Date(order.date).toLocaleDateString()} • {order.items} {order.items === 1 ? t.detailsModal.labels.item : t.detailsModal.labels.items}
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-semibold text-sm">{currencyFmt(order.total)}</div>
+                                  <Badge className="text-xs mt-1" variant={getOrderStatusVariant(order.status)}>
+                                    {getOrderStatusLabel(order.status, dict)}
+                                  </Badge>
+                                </div>
+                              </button>
+                            ))}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-sm">${order.total.toFixed(2)}</div>
-                          <Badge className="text-xs mt-1" variant={getOrderStatusVariant(order.status)}>
-                            {getOrderStatusLabel(order.status)}
-                          </Badge>
-                        </div>
-                      </button>
-                    ))}
-                    </div>
-                  </div>
-                )}
+                      )}
                     </TabsContent>
                     <TabsContent className="space-y-4" value="address">
                       <div className="border rounded-lg p-4 bg-white/60 dark:bg-slate-800/60">
                         <h3 className="font-heading font-bold text-lg mb-3 flex items-center">
                           <MapPin className="mr-2 h-5 w-5" />
-                          Shipping Address
+                          {t.detailsModal.shippingTitle}
                         </h3>
                         <div className="text-sm text-slate-600 dark:text-slate-400">
-                          <p>{selectedCustomer.address.street || "No street address"}</p>
+                          <p>{selectedCustomer.address.street || t.detailsModal.labels.noStreet}</p>
                           <p>
                             {selectedCustomer.address.city || ""}{selectedCustomer.address.city && ", "}{selectedCustomer.address.state || ""}{" "}
                             {selectedCustomer.address.zip || ""}
                           </p>
-                          <p>{selectedCustomer.address.country || "No country specified"}</p>
+                          <p>{selectedCustomer.address.country || t.detailsModal.labels.noCountry}</p>
                         </div>
                       </div>
                     </TabsContent>
@@ -587,7 +583,7 @@ export function CustomersTable() {
                   variant="outline"
                   onClick={() => setIsDialogOpen(false)}
                 >
-                  Close
+                  {t.detailsModal.labels.close}
                 </Button>
               </ModalFooter>
             </>
@@ -615,10 +611,10 @@ export function CustomersTable() {
                   <GoBackButton onClick={() => setIsOrderDialogOpen(false)} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Order Details
+                      {dict.admin.orders.detailsModal.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Complete order information and items
+                      {dict.admin.orders.detailsModal.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -626,148 +622,148 @@ export function CustomersTable() {
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Order Details
+                      {dict.admin.orders.detailsModal.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Complete order information and items
+                      {dict.admin.orders.detailsModal.subtitle}
                     </p>
                   </div>
                 </ModalHeader>
               )}
 
               <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3">
-            {isLoadingOrderDetail ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-                <span className="font-primary ml-2 text-muted-foreground">Loading order details...</span>
-              </div>
-            ) : selectedOrder ? (
-              <div className="space-y-6">
-              {/* Order Header */}
-              <div className="grid grid-cols-1 gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50 sm:grid-cols-2">
-                <div>
-                  <p className="font-primary text-sm text-muted-foreground">Order ID</p>
-                  <p className="font-primary font-medium">#{selectedOrder.id.slice(0, 8)}</p>
-                </div>
-                <div>
-                  <p className="font-primary text-sm text-muted-foreground">Date</p>
-                  <p className="font-primary font-medium">{new Date(selectedOrder.date).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <p className="font-primary text-sm text-muted-foreground">Status</p>
-                  <Badge variant={getOrderStatusVariant(selectedOrder.status)}>
-                    {getOrderStatusLabel(selectedOrder.status)}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="font-primary text-sm text-muted-foreground">Total</p>
-                  <p className="font-primary text-lg font-bold">${selectedOrder.total.toFixed(2)} {selectedOrder.currency}</p>
-                </div>
-              </div>
-
-              {/* Customer Information */}
-              <div>
-                <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Customer Information</h3>
-                <div className="rounded-lg border p-4">
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                      <p className="font-primary text-sm text-muted-foreground">Name</p>
-                      <p className="font-primary font-medium">{selectedOrder.user.firstName} {selectedOrder.user.lastName}</p>
-                    </div>
-                    <div>
-                      <p className="font-primary text-sm text-muted-foreground">Email</p>
-                      <p className="font-primary font-medium">{selectedOrder.user.email}</p>
-                    </div>
-                    <div>
-                      <p className="font-primary text-sm text-muted-foreground">Phone</p>
-                      <p className="font-primary font-medium">{selectedOrder.user.phoneNumber || 'N/A'}</p>
-                    </div>
+                {isLoadingOrderDetail ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+                    <span className="font-primary ml-2 text-muted-foreground">{dict.admin.orders.detailsModal.labels.loading}</span>
                   </div>
-                </div>
-              </div>
-
-              {/* Shipping Information */}
-              <div>
-                <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Shipping Information</h3>
-                <div className="rounded-lg border p-4">
-                  <p className="font-primary text-sm text-muted-foreground">Address</p>
-                  <p className="font-primary font-medium">{selectedOrder.shippingAddress}</p>
-                  {selectedOrder.trackingNumber && (
-                    <div className="mt-2">
-                      <p className="font-primary text-sm text-muted-foreground">Tracking Number</p>
-                      <p className="font-primary font-mono text-sm font-medium">{selectedOrder.trackingNumber}</p>
+                ) : selectedOrder ? (
+                  <div className="space-y-6">
+                    {/* Order Header */}
+                    <div className="grid grid-cols-1 gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50 sm:grid-cols-2">
+                      <div>
+                        <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.id}</p>
+                        <p className="font-primary font-medium">#{selectedOrder.id.slice(0, 8)}</p>
+                      </div>
+                      <div>
+                        <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.date}</p>
+                        <p className="font-primary font-medium">{new Date(selectedOrder.date).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.status}</p>
+                        <Badge variant={getOrderStatusVariant(selectedOrder.status)}>
+                          {getOrderStatusLabel(selectedOrder.status, dict)}
+                        </Badge>
+                      </div>
+                      <div>
+                        <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.total}</p>
+                        <p className="font-primary text-lg font-bold">{currencyFmt(selectedOrder.total, selectedOrder.currency)}</p>
+                      </div>
                     </div>
-                  )}
-                  {selectedOrder.estimatedDelivery && (
-                    <div className="mt-2">
-                      <p className="font-primary text-sm text-muted-foreground">Estimated Delivery</p>
-                      <p className="font-primary font-medium">{new Date(selectedOrder.estimatedDelivery).toLocaleDateString()}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Order Items */}
-              <div>
-                <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Order Items</h3>
-                <div className="space-y-2">
-                  {selectedOrder.orderItems.map((item) => (
-                    <div key={item.id} className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center space-x-3">
-                        {item.image && (
-                          <Image
-                            alt={item.name}
-                            className="h-12 w-12 rounded object-cover"
-                            height={48}
-                            src={item.image}
-                            width={48}
-                          />
+                    {/* Customer Information */}
+                    <div>
+                      <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">{dict.admin.orders.detailsModal.sections.customer}</h3>
+                      <div className="rounded-lg border p-4">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <div>
+                            <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.name}</p>
+                            <p className="font-primary font-medium">{selectedOrder.user.firstName} {selectedOrder.user.lastName}</p>
+                          </div>
+                          <div>
+                            <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.email}</p>
+                            <p className="font-primary font-medium">{selectedOrder.user.email}</p>
+                          </div>
+                          <div>
+                            <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.phone}</p>
+                            <p className="font-primary font-medium">{selectedOrder.user.phoneNumber || t.detailsModal.labels.n_a}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Shipping Information */}
+                    <div>
+                      <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">{dict.admin.orders.detailsModal.sections.shipping}</h3>
+                      <div className="rounded-lg border p-4">
+                        <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.sections.shipping}</p>
+                        <p className="font-primary font-medium">{selectedOrder.shippingAddress}</p>
+                        {selectedOrder.trackingNumber && (
+                          <div className="mt-2">
+                            <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.trackingLabel}</p>
+                            <p className="font-primary font-mono text-sm font-medium">{selectedOrder.trackingNumber}</p>
+                          </div>
                         )}
-                        <div>
-                          <p className="font-primary font-medium text-slate-900 dark:text-slate-100">{item.name}</p>
-                          {item.sku && <p className="font-primary text-xs text-muted-foreground">SKU: {item.sku}</p>}
-                          <p className="font-primary text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                        </div>
-                      </div>
-                      <div className="text-right sm:text-right">
-                        <p className="font-primary font-medium">${item.price.toFixed(2)}</p>
-                        <p className="font-primary text-sm text-muted-foreground">
-                          Total: ${(item.price * item.quantity).toFixed(2)}
-                        </p>
+                        {selectedOrder.estimatedDelivery && (
+                          <div className="mt-2">
+                            <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.etdLabel}</p>
+                            <p className="font-primary font-medium">{new Date(selectedOrder.estimatedDelivery).toLocaleDateString()}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Tracking Steps */}
-              {selectedOrder.trackingSteps && selectedOrder.trackingSteps.length > 0 && (
-                <div>
-                  <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">Tracking History</h3>
-                  <div className="space-y-2">
-                    {selectedOrder.trackingSteps.map((step, index) => (
-                      <div key={index} className="flex items-start space-x-3 rounded-lg border p-3">
-                        <div className={`mt-1 h-3 w-3 rounded-full ${step.completed ? 'bg-green-500' : 'bg-gray-300'}`} />
-                        <div className="flex-1">
-                          <p className="font-primary font-medium text-slate-900 dark:text-slate-100">{step.status}</p>
-                          {step.description && (
-                            <p className="font-primary text-sm text-muted-foreground">{step.description}</p>
-                          )}
-                          <p className="font-primary text-xs text-muted-foreground">
-                            {new Date(step.date).toLocaleString()}
-                          </p>
+                    {/* Order Items */}
+                    <div>
+                      <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">{dict.admin.orders.detailsModal.sections.products}</h3>
+                      <div className="space-y-2">
+                        {selectedOrder.orderItems.map((item) => (
+                          <div key={item.id} className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center space-x-3">
+                              {item.image && (
+                                <Image
+                                  alt={item.name}
+                                  className="h-12 w-12 rounded object-cover"
+                                  height={48}
+                                  src={item.image}
+                                  width={48}
+                                />
+                              )}
+                              <div>
+                                <p className="font-primary font-medium text-slate-900 dark:text-slate-100">{item.name}</p>
+                                {item.sku && <p className="font-primary text-xs text-muted-foreground">{dict.admin.orders.detailsModal.labels.sku}: {item.sku}</p>}
+                                <p className="font-primary text-sm text-muted-foreground">{dict.admin.orders.detailsModal.labels.qty}: {item.quantity}</p>
+                              </div>
+                            </div>
+                            <div className="text-right sm:text-right">
+                              <p className="font-primary font-medium">{currencyFmt(item.price, selectedOrder.currency)}</p>
+                              <p className="font-primary text-sm text-muted-foreground">
+                                {dict.admin.orders.detailsModal.labels.total}: {currencyFmt(item.price * item.quantity, selectedOrder.currency)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tracking Steps */}
+                    {selectedOrder.trackingSteps && selectedOrder.trackingSteps.length > 0 && (
+                      <div>
+                        <h3 className="font-heading mb-2 font-semibold text-slate-900 dark:text-slate-100">{dict.admin.orders.detailsModal.sections.history}</h3>
+                        <div className="space-y-2">
+                          {selectedOrder.trackingSteps.map((step, index) => (
+                            <div key={index} className="flex items-start space-x-3 rounded-lg border p-3">
+                              <div className={`mt-1 h-3 w-3 rounded-full ${step.completed ? 'bg-green-500' : 'bg-gray-300'}`} />
+                              <div className="flex-1">
+                                <p className="font-primary font-medium text-slate-900 dark:text-slate-100">{step.status}</p>
+                                {step.description && (
+                                  <p className="font-primary text-sm text-muted-foreground">{step.description}</p>
+                                )}
+                                <p className="font-primary text-xs text-muted-foreground">
+                                  {new Date(step.date).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
-                </div>
-              )}
-              </div>
-            ) : (
-              <div className="py-12 text-center text-muted-foreground">
-                Failed to load order details
-              </div>
-            )}
+                ) : (
+                  <div className="py-12 text-center text-muted-foreground">
+                    {dict.admin.customers.detailsModal.labels.loadFailed}
+                  </div>
+                )}
               </ModalBody>
 
               <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
@@ -776,7 +772,7 @@ export function CustomersTable() {
                   variant="outline"
                   onClick={() => setIsOrderDialogOpen(false)}
                 >
-                  Close
+                  {dict.admin.orders.detailsModal.labels.close}
                 </Button>
               </ModalFooter>
             </>
@@ -804,10 +800,10 @@ export function CustomersTable() {
                   <GoBackButton onClick={() => setIsEditDialogOpen(false)} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Edit Customer
+                      {t.editModal.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Update customer information
+                      {t.editModal.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -815,10 +811,10 @@ export function CustomersTable() {
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Edit Customer
+                      {t.editModal.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Update customer information
+                      {t.editModal.subtitle}
                     </p>
                   </div>
                 </ModalHeader>
@@ -829,11 +825,11 @@ export function CustomersTable() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="font-primary mb-1 block text-sm font-medium" htmlFor="firstName">
-                        First Name
+                        {t.editModal.firstName}
                       </label>
                       <Input
                         id="firstName"
-                        placeholder="First name"
+                        placeholder={t.editModal.placeholders.firstName}
                         value={editForm.firstName}
                         onChange={(e) =>
                           setEditForm({ ...editForm, firstName: e.target.value })
@@ -842,11 +838,11 @@ export function CustomersTable() {
                     </div>
                     <div>
                       <label className="font-primary mb-1 block text-sm font-medium" htmlFor="lastName">
-                        Last Name
+                        {t.editModal.lastName}
                       </label>
                       <Input
                         id="lastName"
-                        placeholder="Last name"
+                        placeholder={t.editModal.placeholders.lastName}
                         value={editForm.lastName}
                         onChange={(e) =>
                           setEditForm({ ...editForm, lastName: e.target.value })
@@ -857,11 +853,11 @@ export function CustomersTable() {
 
                   <div>
                     <label className="font-primary mb-1 block text-sm font-medium" htmlFor="email">
-                      Email
+                      {t.editModal.email}
                     </label>
                     <Input
                       id="email"
-                      placeholder="email@example.com"
+                      placeholder={t.editModal.placeholders.email}
                       type="email"
                       value={editForm.email}
                       onChange={(e) =>
@@ -872,11 +868,11 @@ export function CustomersTable() {
 
                   <div>
                     <label className="font-primary mb-1 block text-sm font-medium" htmlFor="phone">
-                      Phone
+                      {t.editModal.phone}
                     </label>
                     <Input
                       id="phone"
-                      placeholder="+1 (555) 123-4567"
+                      placeholder={t.editModal.placeholders.phone}
                       type="tel"
                       value={editForm.phone}
                       onChange={(e) =>
@@ -894,14 +890,14 @@ export function CustomersTable() {
                     variant="outline"
                     onClick={() => setIsEditDialogOpen(false)}
                   >
-                    Cancel
+                    {t.editModal.cancel}
                   </Button>
                   <Button
                     disabled={isUpdating}
                     size={isMobile ? "sm" : "default"}
                     onClick={handleUpdateCustomer}
                   >
-                    {isUpdating ? "Saving..." : "Save Changes"}
+                    {isUpdating ? t.editModal.saving : t.editModal.save}
                   </Button>
                 </div>
               </ModalFooter>

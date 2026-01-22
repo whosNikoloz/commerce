@@ -28,6 +28,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useTenant } from "@/app/context/tenantContext";
+import { useDictionary } from "@/app/context/dictionary-provider";
 import {
   updateCategory,
   deleteCategory,
@@ -63,6 +64,9 @@ interface Props {
 
 export function CategoriesTreeView({ initialCategories }: Props) {
   const { config } = useTenant();
+  const dict = useDictionary();
+  const t = dict.admin.categories.treeView;
+  const tToast = dict.admin.categories.toast;
   const isCustomMerchant = config?.merchantType === "CUSTOM";
 
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
@@ -96,7 +100,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
     const hasChildren = categories.some((c) => c.parentId === categoryToDelete.id);
 
     if (hasChildren) {
-      toast.error("Cannot delete category with subcategories. Please delete child categories first.");
+      toast.error(tToast.cannotDeleteWithChildren);
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
 
@@ -106,11 +110,11 @@ export function CategoriesTreeView({ initialCategories }: Props) {
     try {
       await deleteCategory(categoryToDelete.id);
       setCategories((prev) => prev.filter((c) => c.id !== categoryToDelete.id));
-      toast.success("Category deleted successfully");
+      toast.success(tToast.categoryDeleted);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to delete category", err);
-      toast.error("Failed to delete category");
+      toast.error(tToast.categoryDeleteFailed);
     } finally {
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
@@ -132,12 +136,12 @@ export function CategoriesTreeView({ initialCategories }: Props) {
 
     try {
       await updateCategory(payload);
-      toast.success("Category updated successfully");
+      toast.success(tToast.categoryUpdated);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to update category", err);
       setCategories(prev);
-      toast.error("Failed to update category");
+      toast.error(tToast.categoryUpdateFailed);
     }
   };
 
@@ -256,7 +260,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                 </Badge>
               )}
               <Badge className="text-[10px] sm:text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-1 sm:px-1.5 hidden sm:inline-flex" variant="secondary">
-                {category.facets?.length ?? 0} facets
+                {category.facets?.length ?? 0} {t.facets}
               </Badge>
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 hidden sm:block">
@@ -277,12 +281,12 @@ export function CategoriesTreeView({ initialCategories }: Props) {
             {isActive ? (
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 ring-1 ring-blue-200 dark:ring-blue-800">
                 <Eye className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                <span className="font-primary text-xs font-bold text-blue-700 dark:text-blue-400">Active</span>
+                <span className="font-primary text-xs font-bold text-blue-700 dark:text-blue-400">{t.active}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
                 <EyeOff className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-                <span className="font-primary text-xs font-bold text-slate-600 dark:text-slate-400">Hidden</span>
+                <span className="font-primary text-xs font-bold text-slate-600 dark:text-slate-400">{t.hidden}</span>
               </div>
             )}
           </div>
@@ -312,12 +316,12 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               }}
             >
               <Edit className="h-4 w-4 mr-1" />
-              Edit
+              {t.edit}
             </Button>
             <ReviewImagesModal
               categoryId={category.id}
               existing={(category.images ?? []).map((url, idx) => ({
-                key: idx.toString(),
+                key: (idx + 1).toString(),
                 url,
               }))}
               maxFiles={8}
@@ -353,12 +357,12 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                   {isActive ? (
                     <>
                       <EyeOff className="h-4 w-4 mr-2" />
-                      Hide Category
+                      {t.hideCategory}
                     </>
                   ) : (
                     <>
                       <Eye className="h-4 w-4 mr-2" />
-                      Show Category
+                      {t.showCategory}
                     </>
                   )}
                 </DropdownMenuItem>
@@ -368,7 +372,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                   }}
                 >
                   <Edit className="h-4 w-4 mr-2" />
-                  Edit
+                  {t.edit}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -378,7 +382,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                   }}
                 >
                   <Tag className="h-4 w-4 mr-2" />
-                  Manage Images
+                  {t.manageImages}
                 </DropdownMenuItem>
                 {isCustomMerchant && (
                   <DropdownMenuItem
@@ -389,7 +393,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                     }}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    {t.delete}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -399,7 +403,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               <ReviewImagesModal
                 categoryId={category.id}
                 existing={(category.images ?? []).map((url, idx) => ({
-                  key: idx.toString(),
+                  key: (idx + 1).toString(),
                   url,
                 }))}
                 maxFiles={8}
@@ -443,8 +447,8 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                 onClick={expandAll}
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="font-primary hidden sm:inline">Expand All</span>
-                <span className="font-primary sm:hidden">Expand</span>
+                <span className="font-primary hidden sm:inline">{t.expandAll}</span>
+                <span className="font-primary sm:hidden">{t.expand}</span>
               </Button>
               <Button
                 className="text-xs sm:text-sm font-semibold flex-1 sm:flex-none"
@@ -453,8 +457,8 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                 onClick={collapseAll}
               >
                 <Minus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="font-primary hidden sm:inline">Collapse All</span>
-                <span className="font-primary sm:hidden">Collapse</span>
+                <span className="font-primary hidden sm:inline">{t.collapseAll}</span>
+                <span className="font-primary sm:hidden">{t.collapse}</span>
               </Button>
             </div>
 
@@ -462,9 +466,9 @@ export function CategoriesTreeView({ initialCategories }: Props) {
             <div className="relative flex-1 sm:max-w-md">
               <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <Input
-                aria-label="Search categories"
+                aria-label={t.searchPlaceholder}
                 className="pl-8 sm:pl-9 text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 focus:border-emerald-400 dark:focus:border-emerald-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm h-9"
-                placeholder="Search categories..."
+                placeholder={t.searchPlaceholder}
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -477,14 +481,14 @@ export function CategoriesTreeView({ initialCategories }: Props) {
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800">
               <Folder className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
               <span className="font-primary font-semibold text-slate-700 dark:text-slate-300">
-                <span className="font-primary hidden sm:inline">{rootCategories.length} root</span>
+                <span className="font-primary hidden sm:inline">{rootCategories.length} {t.root}</span>
                 <span className="font-primary sm:hidden">{rootCategories.length}</span>
               </span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800">
               <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
               <span className="font-primary font-semibold text-slate-700 dark:text-slate-300">
-                <span className="font-primary hidden sm:inline">{categories.length} total</span>
+                <span className="font-primary hidden sm:inline">{categories.length} {t.total}</span>
                 <span className="font-primary sm:hidden">{categories.length}</span>
               </span>
             </div>
@@ -499,10 +503,10 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               <Tag className="h-6 w-6 sm:h-8 sm:w-8 text-slate-400" />
             </div>
             <p className="font-primary text-sm sm:text-base text-slate-500 dark:text-slate-400 font-semibold text-center">
-              No categories found
+              {t.noCategoriesFound}
             </p>
             <p className="font-primary text-xs sm:text-sm text-slate-400 dark:text-slate-500 text-center">
-              {searchTerm ? "Try adjusting your search" : "Add your first category to get started"}
+              {searchTerm ? t.tryAdjustingSearch : t.addFirstCategory}
             </p>
           </div>
         ) : (
@@ -517,29 +521,29 @@ export function CategoriesTreeView({ initialCategories }: Props) {
         <AlertDialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-slate-100">
-              Delete Category?
+              {t.deleteDialogTitle}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
               {categoryToDelete ? (
                 <>
-                  Are you sure you want to delete{" "}
+                  {t.deleteConfirmation}{" "}
                   <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {categoryToDelete.name}
                   </span>
-                  ? This action cannot be undone and will permanently delete the category.
+                  {t.deleteWarning}
                 </>
               ) : (
-                "This action cannot be undone."
+                t.actionCannotBeUndone
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={handleDeleteCategory}
             >
-              Delete Category
+              {t.deleteCategory}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

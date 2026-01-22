@@ -41,7 +41,7 @@ export default async function OrdersPage(
         </p>
       </div>
 
-      <OrdersTable />
+      <OrdersTable lang={lang} />
     </div>
   );
 }

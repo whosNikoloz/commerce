@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { createCategory } from "@/app/api/services/categoryService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GoBackButton } from "@/components/go-back-button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface AddCategoryModalProps {
   categories: CategoryModel[];
@@ -33,6 +34,10 @@ export default function AddCategoryModal({
 }: AddCategoryModalProps) {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const isMobile = useIsMobile();
+  const dict = useDictionary();
+  const t = dict.admin.categories.addModal;
+  const tTree = dict.admin.categories.treeView;
+  const tToast = dict.admin.categories.toast;
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -63,7 +68,7 @@ export default function AddCategoryModal({
     e.preventDefault();
 
     if (!formData.name) {
-      toast.error("Please enter a category name");
+      toast.error(tToast.enterCategoryName);
 
       return;
     }
@@ -82,14 +87,14 @@ export default function AddCategoryModal({
       };
 
       await createCategory(categoryData);
-      toast.success("Category created successfully");
+      toast.success(tToast.categoryCreated);
 
       handleClose();
       onCategoryAdded?.();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed to create category:", error);
-      toast.error("Failed to create category");
+      toast.error(tToast.categoryCreateFailed);
     } finally {
       setLoading(false);
     }
@@ -103,7 +108,7 @@ export default function AddCategoryModal({
         onClick={handleOpen}
       >
         <Plus className="h-4 w-4" />
-        Add Category
+        {tTree.addCategory}
       </Button>
 
       <Modal
@@ -126,10 +131,10 @@ export default function AddCategoryModal({
                   <GoBackButton onClick={handleClose} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Add New Category
+                      {t.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Create a category for organizing products
+                      {t.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -137,10 +142,10 @@ export default function AddCategoryModal({
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Add New Category
+                      {t.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Create a category for organizing products
+                      {t.subtitle}
                     </p>
                   </div>
                 </ModalHeader>
@@ -155,9 +160,9 @@ export default function AddCategoryModal({
                       inputWrapper:
                         "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                     }}
-                    label="Category Name"
+                    label={t.categoryName}
                     labelPlacement="outside"
-                    placeholder="e.g., Smartphones"
+                    placeholder={t.categoryNamePlaceholder}
                     value={formData.name}
                     variant="bordered"
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -168,10 +173,10 @@ export default function AddCategoryModal({
                       inputWrapper:
                         "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                     }}
-                    label="Description"
+                    label={t.description}
                     labelPlacement="outside"
                     minRows={3}
-                    placeholder="Category description..."
+                    placeholder={t.descriptionPlaceholder}
                     value={formData.description}
                     variant="bordered"
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -184,9 +189,9 @@ export default function AddCategoryModal({
                       trigger:
                         "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
                     }}
-                    label="Parent Category (Optional)"
+                    label={t.parentCategory}
                     labelPlacement="outside"
-                    placeholder="None (Top Level)"
+                    placeholder={t.parentPlaceholder}
                     selectedKeys={formData.parentId ? [formData.parentId] : []}
                     variant="bordered"
                     onSelectionChange={(keys) => {
@@ -207,7 +212,7 @@ export default function AddCategoryModal({
               <ModalFooter className="shrink-0 border-t rounded-2xl border-slate-200/80 dark:border-slate-700/80 bg-background px-4 md:px-6 py-3">
                 <div className="flex w-full items-center justify-between gap-3">
                   <p className="font-primary hidden text-xs text-slate-500 dark:text-slate-400 md:block">
-                    You can edit these details later and add facets to this category.
+                    {t.footerNote}
                   </p>
 
                   <div className="ml-auto flex items-center gap-2">
@@ -219,7 +224,7 @@ export default function AddCategoryModal({
                       variant="outline"
                       onClick={handleClose}
                     >
-                      Cancel
+                      {t.cancel}
                     </Button>
                     <Button
                       className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-700"
@@ -227,7 +232,7 @@ export default function AddCategoryModal({
                       size={isMobile ? "sm" : "default"}
                       type="submit"
                     >
-                      {loading ? "Creating..." : "Create Category"}
+                      {loading ? t.creating : t.createCategory}
                     </Button>
                   </div>
                 </div>

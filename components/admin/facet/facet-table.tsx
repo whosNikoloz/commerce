@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { getAllFacets, deleteFacet } from "@/app/api/services/facetService";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 const AddFacetModal = dynamic(() => import("./add-facet-modal"), { ssr: false });
 const UpdateFacetModal = dynamic(() => import("./update-facet-modal"), { ssr: false });
@@ -41,6 +42,10 @@ function useDebounced<T>(value: T, delay = 250): T {
 }
 
 export function FacetsTable({ initialCategories }: { initialCategories: CategoryModel[] }) {
+  const dict = useDictionary();
+  const t = dict.admin.facets.table;
+  const tToast = dict.admin.facets.toast;
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [facets, setFacets] = useState<FacetModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,11 +97,11 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
     try {
       await deleteFacet(facetToDelete.id);
       setFacets(prev => prev.filter(f => f.id !== facetToDelete.id));
-      toast.success("ფასეტი წაიშალა");
+      toast.success(tToast.facetDeleted);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      toast.error("წაშლა ვერ მოხერხდა");
+      toast.error(tToast.facetDeleteFailed);
     } finally {
       setDeleteDialogOpen(false);
       setFacetToDelete(null);
@@ -133,11 +138,11 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button className="lg:hidden shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800" size="sm" variant="outline">
-                      <Layers className="mr-2 h-4 w-4" /> Categories
+                      <Layers className="mr-2 h-4 w-4" /> {t.categories}
                     </Button>
                   </SheetTrigger>
                   <SheetContent className="h-[85vh] p-0 bg-white dark:bg-slate-900" side="bottom">
-                    <SheetHeader className="px-6 pt-6 mb-6"><SheetTitle>Categories</SheetTitle></SheetHeader>
+                    <SheetHeader className="px-6 pt-6 mb-6"><SheetTitle>{t.categories}</SheetTitle></SheetHeader>
                     <div className="px-4 pb-4">
                       <CategoryTree Categories={initialCategories} onSelectCategory={(id) => startTransition(() => setSelectedCategoryId(id))} />
                     </div>
@@ -147,25 +152,25 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                 {/* Search */}
                 <div className="relative flex-1">
                   <Tags className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500 dark:text-cyan-400 h-4 w-4" />
-                  <Input aria-label="Search facets" className="pl-10" placeholder="Search facets..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                  <Input aria-label={t.searchPlaceholder} className="pl-10" placeholder={t.searchPlaceholder} value={search} onChange={(e) => setSearch(e.target.value)} />
                 </div>
               </div>
 
               {/* Filters */}
               <div className="flex flex-wrap items-center gap-2">
                 <Select value={typeFilter} onValueChange={(v: typeof typeFilter) => setTypeFilter(v)}>
-                  <SelectTrigger className="w-36"><Filter className="h-4 w-4 mr-2" /><SelectValue placeholder="Type" /></SelectTrigger>
+                  <SelectTrigger className="w-36"><Filter className="h-4 w-4 mr-2" /><SelectValue placeholder={t.type} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="custom">Custom</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="all">{t.allTypes}</SelectItem>
+                    <SelectItem value="custom">{t.custom}</SelectItem>
+                    <SelectItem value="system">{t.system}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={sortBy} onValueChange={(v: typeof sortBy) => setSortBy(v)}>
-                  <SelectTrigger className="w-32"><SortAsc className="h-4 w-4 mr-2" /><SelectValue placeholder="Sort" /></SelectTrigger>
+                  <SelectTrigger className="w-32"><SortAsc className="h-4 w-4 mr-2" /><SelectValue placeholder={t.name} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="name">Name</SelectItem>
-                    <SelectItem value="type">Type</SelectItem>
+                    <SelectItem value="name">{t.name}</SelectItem>
+                    <SelectItem value="type">{t.type}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -173,7 +178,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
 
             {selectedCategoryId && (
               <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                {isPending ? "Updating..." : `${filtered.length} facets found`}
+                {isPending ? t.updating : t.facetsFound.replace("{count}", String(filtered.length))}
               </div>
             )}
           </CardHeader>
@@ -183,31 +188,31 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
               {!selectedCategoryId ? (
                 <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
                   <Plus className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
-                  <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">Select a Category</h3>
-                  <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">Choose a category from the sidebar to manage facets.</p>
+                  <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">{t.selectCategory}</h3>
+                  <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">{t.selectCategoryDescription}</p>
                 </div>
               ) : loading ? (
-                <div className="flex items-center justify-center py-12 px-6">Loading facets...</div>
+                <div className="flex items-center justify-center py-12 px-6">{t.loadingFacets}</div>
               ) : error ? (
                 <div className="text-center py-12 px-6">
-                  <div className="text-red-500 mb-2">{error}</div>
-                  <Button variant="outline" onClick={() => location.reload()}>Try Again</Button>
+                  <div className="text-red-500 mb-2">{t.loadFailed}</div>
+                  <Button variant="outline" onClick={() => location.reload()}>{t.tryAgain}</Button>
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-                  <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">No Facets</h3>
-                  <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">Create your first facet for this category.</p>
+                  <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">{t.noFacets}</h3>
+                  <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">{t.noFacetsDescription}</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto relative">
                   <Table>
                     <TableHeader className="bg-slate-100 dark:bg-slate-800/60 sticky top-0">
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Display</TableHead>
-                        <TableHead>Custom</TableHead>
-                        <TableHead>Values</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>{t.tableHeaderName}</TableHead>
+                        <TableHead>{t.tableHeaderDisplay}</TableHead>
+                        <TableHead>{t.tableHeaderCustom}</TableHead>
+                        <TableHead>{t.tableHeaderValues}</TableHead>
+                        <TableHead className="text-right">{t.tableHeaderActions}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -215,7 +220,7 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
                         <TableRow key={f.id} className="border-b">
                           <TableCell className="font-medium">{f.name}</TableCell>
                           <TableCell>{f.displayType}</TableCell>
-                          <TableCell>{f.isCustom ? "Yes" : "No"}</TableCell>
+                          <TableCell>{f.isCustom ? t.yes : t.no}</TableCell>
                           <TableCell className="max-w-[380px] truncate">
                             {(f.facetValues ?? []).map(v => v.value).slice(0,6).join(", ")}{(f.facetValues?.length ?? 0) > 6 ? "…" : ""}
                           </TableCell>
@@ -254,29 +259,29 @@ export function FacetsTable({ initialCategories }: { initialCategories: Category
         <AlertDialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-slate-100">
-              Delete Facet?
+              {t.deleteDialogTitle}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
               {facetToDelete ? (
                 <>
-                  Are you sure you want to delete{" "}
+                  {t.deleteConfirmation}{" "}
                   <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {facetToDelete.name}
                   </span>
-                  ? This action cannot be undone and will permanently delete the facet.
+                  {t.deleteWarning}
                 </>
               ) : (
-                "This action cannot be undone."
+                t.actionCannotBeUndone
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={handleDelete}
             >
-              Delete Facet
+              {t.deleteFacet}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

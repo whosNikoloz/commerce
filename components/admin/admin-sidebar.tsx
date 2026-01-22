@@ -13,6 +13,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
 
+import { defaultLocale } from "@/i18n.config";
+
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -22,8 +24,15 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { lang } = useParams<{ lang?: string }>();
-  const currentLang = lang || "en";
+  const currentLang = lang || defaultLocale;
 
+  // Helper to generate locale-aware paths
+  const getPath = (path: string) => {
+    if (currentLang === defaultLocale) {
+      return `/admin${path}`;
+    }
+    return `/${currentLang}/admin${path}`;
+  };
 
   // ✅ Auto-close on route change (only on mobile)
   useEffect(() => {
@@ -34,7 +43,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const allLinks = useMemo(() => [
     {
       label: t?.dashboard,
-      href: `/${currentLang}/admin`,
+      href: getPath(""),
       icon: (
         <IconHome className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       ),
@@ -46,35 +55,35 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       items: [
         {
           label: t?.products,
-          href: `/${currentLang}/admin/products`,
+          href: getPath("/products"),
           icon: (
             <IconBox className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
           label: t?.productGroups,
-          href: `/${currentLang}/admin/product-groups`,
+          href: getPath("/product-groups"),
           icon: (
             <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
           label: t?.categories,
-          href: `/${currentLang}/admin/categories`,
+          href: getPath("/categories"),
           icon: (
             <IconTags className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
           label: t?.facets,
-          href: `/${currentLang}/admin/facets`,
+          href: getPath("/facets"),
           icon: (
             <IconBook className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
           label: t?.brands,
-          href: `/${currentLang}/admin/brands`,
+          href: getPath("/brands"),
           icon: (
             <IconLetterB className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
@@ -88,21 +97,21 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       items: [
         {
           label: t?.orders,
-          href: `/${currentLang}/admin/orders`,
+          href: getPath("/orders"),
           icon: (
             <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
           label: t?.customers,
-          href: `/${currentLang}/admin/customers`,
+          href: getPath("/customers"),
           icon: (
             <ProfileIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
         },
         {
           label: t?.transactions,
-          href: `/${currentLang}/admin/payments`,
+          href: getPath("/payments"),
           icon: (
             <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
@@ -116,7 +125,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       items: [
         {
           label: t?.faqs,
-          href: `/${currentLang}/admin/faqs`,
+          href: getPath("/faqs"),
           icon: (
             <FileQuestionIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           ),
@@ -125,7 +134,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     },
     {
       label: t?.analytics,
-      href: `/${currentLang}/admin/analytics`,
+      href: getPath("/analytics"),
       icon: (
         <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       ),

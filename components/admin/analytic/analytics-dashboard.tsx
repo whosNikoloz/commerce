@@ -1,5 +1,7 @@
 'use client'
 
+import { currencyFmt } from '@/lib/utils'
+
 import React, { useState } from 'react'
 import {
   LineChart,
@@ -231,9 +233,8 @@ export function AnalyticsDashboard() {
                 <div className="space-y-1">
                   <p className="font-primary text-xl font-bold text-foreground">{metric.value}</p>
                   <p
-                    className={`text-xs font-medium ${
-                      metric.trend === 'up' ? 'text-chart-2' : 'text-chart-3'
-                    }`}
+                    className={`text-xs font-medium ${metric.trend === 'up' ? 'text-chart-2' : 'text-chart-3'
+                      }`}
                   >
                     {metric.change}
                   </p>
@@ -407,7 +408,7 @@ export function AnalyticsDashboard() {
                     <div
                       className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: item.color }}
-                     />
+                    />
                     <span className="font-primary text-foreground">{item.name}</span>
                   </div>
                   <span className="font-primary font-semibold text-foreground">{item.value}%</span>
@@ -439,7 +440,7 @@ export function AnalyticsDashboard() {
                 </div>
                 <div className="flex items-center gap-8">
                   <div className="text-right">
-                    <p className="font-primary font-semibold text-foreground">${product.revenue.toLocaleString()}</p>
+                    <p className="font-primary font-semibold text-foreground">{currencyFmt(product.revenue)}</p>
                     <p className="font-primary text-xs text-chart-2">⭐ {product.rating}</p>
                   </div>
                 </div>
@@ -466,13 +467,13 @@ export function AnalyticsDashboard() {
                       <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span className="font-primary text-sm font-medium text-foreground">{geo.region}</span>
                     </div>
-                    <span className="font-primary font-semibold text-foreground">${geo.sales.toLocaleString()}</span>
+                    <span className="font-primary font-semibold text-foreground">{currencyFmt(geo.sales)}</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-muted">
                     <div
                       className="h-full rounded-full bg-primary"
                       style={{ width: `${geo.percentage}%` }}
-                     />
+                    />
                   </div>
                 </div>
               ))}
@@ -501,7 +502,7 @@ export function AnalyticsDashboard() {
                     <div
                       className="h-full rounded-full bg-chart-2"
                       style={{ width: `${device.value}%` }}
-                     />
+                    />
                   </div>
                 </div>
               ))}

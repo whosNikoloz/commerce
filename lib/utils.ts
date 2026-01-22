@@ -27,6 +27,17 @@ export function formatPrice(price: number, currency: string = "GEL"): string {
   return `${symbol}${formatted}`;
 }
 
+export function currencyFmt(amount: number, currency: string = "USD") {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency}`;
+  }
+}
+
 /**
  * Checks if a URL is from S3 storage
  * Returns true for amazonaws.com URLs to prevent server-side optimization

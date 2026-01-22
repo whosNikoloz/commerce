@@ -139,7 +139,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       .catch((err) => {
         // eslint-disable-next-line no-console
         console.error("❌ Failed to load brands:", err);
-        toast.error("Failed to load brands");
+        toast.error(t?.toast?.failedToLoadBrands || "Failed to load brands");
       })
       .finally(() => {
         setBrandsLoading(false);
@@ -187,11 +187,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     try {
       await deleteProductById(productToDelete.id);
       setProducts((prev) => prev.filter((p) => p.id !== productToDelete.id));
-      toast.success("პროდუქტი წარმატებით წაიშალა");
+      toast.success(t?.toast?.productDeleted || "Product deleted successfully");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to delete product", err);
-      toast.error("პროდუქტის წაშლა ვერ მოხერხდა");
+      toast.error(t?.toast?.productDeleteFailed || "Failed to delete product");
     } finally {
       setDeleteDialogOpen(false);
       setProductToDelete(null);
@@ -234,11 +234,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
     try {
       await updateProduct(patched);
-      toast.success("პროდუქტი წარმატებით განახლდა");
+      toast.success(t?.toast?.productUpdated || "Product updated successfully");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to update product", err);
-      toast.error("პროდუქტის განახლება ვერ მოხერხდა");
+      toast.error(t?.toast?.productUpdateFailed || "Failed to update product");
       setProducts(prev);
     }
   };
@@ -267,11 +267,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
     try {
       await updateProduct(payload);
-      toast.success("პროდუქტის ხილვადობა შეიცვალა");
+      toast.success(t?.toast?.visibilityChanged || "Product visibility changed");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to update product", err);
-      toast.error("პროდუქტის განახლება ვერ მოხერხდა");
+      toast.error(t?.toast?.productUpdateFailed || "Failed to update product");
       setProducts(prev);
     }
   };
@@ -420,7 +420,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 onSave={handleUpdateProduct}
               />
               <ReviewImagesModal
-                existing={(product.images ?? []).map((url, idx) => ({ key: idx.toString(), url }))}
+                existing={(product.images ?? []).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
                 maxFiles={8}
                 maxSizeMB={5}
                 productId={product.id}
@@ -520,24 +520,24 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   >
                     <SelectTrigger className="w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
                       <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Status" />
+                      <SelectValue placeholder={t?.filter?.placeholder || "Status"} />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800">
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="all">{t?.filter?.allStatus || "All Status"}</SelectItem>
+                      <SelectItem value="active">{t?.filter?.active || "Active"}</SelectItem>
+                      <SelectItem value="inactive">{t?.filter?.inactive || "Inactive"}</SelectItem>
                     </SelectContent>
                   </Select>
 
                   <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
                     <SelectTrigger className="w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
                       <SortAsc className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Sort" />
+                      <SelectValue placeholder={t?.sort?.placeholder || "Sort"} />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800">
-                      <SelectItem value="name">Name</SelectItem>
-                      <SelectItem value="price">Price</SelectItem>
-                      <SelectItem value="status">Status</SelectItem>
+                      <SelectItem value="name">{t?.sort?.name || "Name"}</SelectItem>
+                      <SelectItem value="price">{t?.sort?.price || "Price"}</SelectItem>
+                      <SelectItem value="status">{t?.sort?.status || "Status"}</SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -574,8 +574,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   <Package className="h-4 w-4" />
                   <span>
                     {isPending
-                      ? "Updating..."
-                      : `${filteredAndSortedProducts.length} products found`}
+                      ? (t?.updating || "Updating...")
+                      : (t?.productsFound?.replace("{count}", String(filteredAndSortedProducts.length)) || `${filteredAndSortedProducts.length} products found`)}
                   </span>
                 </div>
               )}
@@ -587,18 +587,17 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
                     <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
                     <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
-                      Select a Category
+                      {t?.empty?.selectCategory || "Select a Category"}
                     </h3>
                     <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">
-                      Choose a category from the sidebar (or button on mobile) to view and manage
-                      products.
+                      {t?.empty?.selectCategoryDescription || "Choose a category from the sidebar (or button on mobile) to view and manage products."}
                     </p>
                   </div>
                 ) : loading ? (
                   <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
                       <RefreshCw className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
-                      <span className="font-primary text-slate-600 dark:text-slate-400">Loading products...</span>
+                      <span className="font-primary text-slate-600 dark:text-slate-400">{t?.loading || "Loading products..."}</span>
                     </div>
                   </div>
                 ) : error ? (
@@ -609,19 +608,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       variant="outline"
                       onClick={() => location.reload()}
                     >
-                      Try Again
+                      {t?.tryAgain || "Try Again"}
                     </Button>
                   </div>
                 ) : filteredAndSortedProducts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center px-6">
                     <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
                     <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
-                      No Products Found
+                      {t?.empty?.noProductsFound || "No Products Found"}
                     </h3>
                     <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">
                       {debouncedSearch
-                        ? "Try adjusting your search terms"
-                        : "No products available in this category"}
+                        ? (t?.empty?.adjustSearchTerms || "Try adjusting your search terms")
+                        : (t?.empty?.noProductsInCategory || "No products available in this category")}
                     </p>
                   </div>
                 ) : viewMode === "grid" ? (
@@ -638,25 +637,25 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                       <TableHeader className="bg-slate-100 dark:bg-slate-800/60 sticky top-0">
                         <TableRow className="border-b-2 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800/60">
                           <TableHead className="w-[72px] sm:w-[80px] text-slate-700 dark:text-slate-300 font-bold">
-                            Image
+                            {t?.headers?.image || "Image"}
                           </TableHead>
-                          <TableHead className="text-slate-700 dark:text-slate-300 font-bold">Product</TableHead>
+                          <TableHead className="text-slate-700 dark:text-slate-300 font-bold">{t?.headers?.product || "Product"}</TableHead>
                           <TableHead className="whitespace-nowrap text-slate-700 dark:text-slate-300 font-bold">
-                            Price
+                            {t?.headers?.price || "Price"}
                           </TableHead>
                           <TableHead className="hidden md:table-cell text-slate-700 dark:text-slate-300 font-bold">
-                            Status
+                            {t?.headers?.status || "Status"}
                           </TableHead>
                           <TableHead className="hidden lg:table-cell text-slate-700 dark:text-slate-300 font-bold">
-                            Condition
+                            {t?.headers?.condition || "Condition"}
                           </TableHead>
                           <TableHead className="hidden xl:table-cell text-slate-700 dark:text-slate-300 font-bold">
-                            Flags
+                            {t?.headers?.flags || "Flags"}
                           </TableHead>
                           <TableHead className="hidden sm:table-cell text-slate-700 dark:text-slate-300 font-bold">
-                            Visible
+                            {t?.headers?.visible || "Visible"}
                           </TableHead>
-                          <TableHead className="text-right text-slate-700 dark:text-slate-300 font-bold">Actions</TableHead>
+                          <TableHead className="text-right text-slate-700 dark:text-slate-300 font-bold">{t?.headers?.actions || "Actions"}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -784,7 +783,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                 />
                                 <ReviewImagesModal
                                   existing={(product.images ?? []).map((url, idx) => ({
-                                    key: idx.toString(),
+                                    key: (idx + 1).toString(),
                                     url,
                                   }))}
                                   maxFiles={8}
@@ -800,7 +799,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                     setDeleteDialogOpen(true);
                                   }}
                                 >
-                                  Delete
+                                  {t?.delete || "Delete"}
                                 </Button>
                               </div>
                             </TableCell>
@@ -821,29 +820,29 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         <AlertDialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-slate-100">
-              Delete Product?
+              {t?.deleteDialog?.title || "Delete Product?"}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
               {productToDelete ? (
                 <>
-                  Are you sure you want to delete{" "}
+                  {t?.deleteDialog?.confirmation || "Are you sure you want to delete"}{" "}
                   <span className="font-primary font-bold text-slate-900 dark:text-slate-100">
                     {productToDelete.name}
                   </span>
-                  ? This action cannot be undone and will permanently delete the product.
+                  {t?.deleteDialog?.warning || "? This action cannot be undone and will permanently delete the product."}
                 </>
               ) : (
-                "This action cannot be undone."
+                t?.deleteDialog?.fallbackWarning || "This action cannot be undone."
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t?.deleteDialog?.cancel || "Cancel"}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={handleDeleteProduct}
             >
-              Delete Product
+              {t?.deleteDialog?.deleteProduct || "Delete Product"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

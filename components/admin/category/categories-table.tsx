@@ -303,7 +303,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                         <ReviewImagesModal
                           categoryId={category.id}
                           existing={(category.images ?? []).map((url, idx) => ({
-                            key: idx.toString(),
+                            key: (idx + 1).toString(),
                             url,
                           }))}
                           maxFiles={8}
@@ -484,7 +484,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                         <ReviewImagesModal
                           categoryId={category.id}
                           existing={(category.images ?? []).map((url, idx) => ({
-                            key: idx.toString(),
+                            key: (idx + 1).toString(),
                             url,
                           }))}
                           maxFiles={8}

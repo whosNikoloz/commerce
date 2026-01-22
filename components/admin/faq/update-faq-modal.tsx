@@ -17,6 +17,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { GoBackButton } from "@/components/go-back-button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function UpdateFaqModal({
   faqId,
@@ -43,6 +44,8 @@ export default function UpdateFaqModal({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useIsMobile();
+  const dict = useDictionary();
+  const t = dict.admin.faqs;
 
   const [q, setQ] = useState(initialQuestion ?? "");
   const [a, setA] = useState(initialAnswer ?? "");
@@ -62,17 +65,17 @@ export default function UpdateFaqModal({
 
   const handleSave = async () => {
     if (!q.trim() || !a.trim()) {
-      toast.error("შეავსე ველები");
+      toast.error(t.modals.fillFields);
 
       return;
     }
     setLoading(true);
     try {
       await onSave(faqId, q.trim(), a.trim(), active, featured);
-      toast.success("განახლდა");
+      toast.success(t.table.toasts.updateSuccess);
       onClose();
     } catch {
-      toast.error("ვერ განახლდა");
+      toast.error(t.table.toasts.updateError);
     } finally {
       setLoading(false);
     }
@@ -115,10 +118,10 @@ export default function UpdateFaqModal({
                 <GoBackButton onClick={onClose} />
                 <div className="flex flex-col min-w-0">
                   <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                    FAQ-ის ჩასწორება
+                    {t.modals.editTitle}
                   </span>
                   <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                    Update FAQ information
+                    {t.modals.editSubtitle}
                   </span>
                 </div>
               </ModalHeader>
@@ -126,10 +129,10 @@ export default function UpdateFaqModal({
               <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                 <div className="flex flex-col min-w-0">
                   <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                    FAQ-ის ჩასწორება
+                    {t.modals.editTitle}
                   </h2>
                   <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                    Update FAQ information
+                    {t.modals.editSubtitle}
                   </p>
                 </div>
               </ModalHeader>
@@ -146,8 +149,8 @@ export default function UpdateFaqModal({
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                label="კითხვა"
-                placeholder="შეიყვანეთ კითხვა"
+                label={t.modals.question}
+                placeholder={t.modals.questionPlaceholder}
                 size="lg"
                 value={q}
                 variant="bordered"
@@ -163,8 +166,8 @@ export default function UpdateFaqModal({
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                label="პასუხი"
-                placeholder="შეიყვანეთ პასუხი"
+                label={t.modals.answer}
+                placeholder={t.modals.answerPlaceholder}
                 size="lg"
                 value={a}
                 variant="bordered"
@@ -179,13 +182,13 @@ export default function UpdateFaqModal({
                     className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600"
                     onCheckedChange={setActive}
                   />
-                {active ? (
+                  {active ? (
                     <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   ) : (
                     <EyeOff className="h-4 w-4 text-slate-400" />
                   )}
                   <span className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Active
+                    {t.modals.active}
                   </span>
                 </div>
                 <div className="flex justify-center items-center gap-2">
@@ -195,14 +198,13 @@ export default function UpdateFaqModal({
                     onCheckedChange={setFeatured}
                   />
                   <Star
-                    className={`h-3.5 w-3.5 ${
-                      featured
-                        ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400"
-                        : "text-slate-400"
-                    }`}
+                    className={`h-3.5 w-3.5 ${featured
+                      ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400"
+                      : "text-slate-400"
+                      }`}
                   />
                   <span className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Featured
+                    {t.modals.featured}
                   </span>
                 </div>
               </div>
@@ -216,7 +218,7 @@ export default function UpdateFaqModal({
                   variant="outline"
                   onClick={onClose}
                 >
-                  გაუქმება
+                  {t.modals.cancel}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold"
@@ -227,10 +229,10 @@ export default function UpdateFaqModal({
                   {loading ? (
                     <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving...
+                      {t.modals.saving}
                     </span>
                   ) : (
-                    "შენახვა"
+                    t.modals.save
                   )}
                 </Button>
               </div>

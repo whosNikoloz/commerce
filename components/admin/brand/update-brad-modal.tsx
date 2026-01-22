@@ -17,6 +17,7 @@ import { GoBackButton } from "../../go-back-button";
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface UpdateBrandModalProps {
   brandId: string;
@@ -33,6 +34,9 @@ export default function UpdateBrandModal({
   initialName = "",
   onSave,
 }: UpdateBrandModalProps) {
+  const dict = useDictionary();
+  const t = dict.admin.brands.editModal;
+
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [description, setDescription] = useState(initialDescription);
   const [origin, setOrigin] = useState(initialOrigin);
@@ -79,10 +83,10 @@ export default function UpdateBrandModal({
                   <GoBackButton onClick={onClose} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      ბრენდის განახლება
+                      {t.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Update brand information
+                      {t.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -90,10 +94,10 @@ export default function UpdateBrandModal({
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      ბრენდის განახლება
+                      {t.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Update brand description and origin
+                      {t.subtitleDesktop}
                     </p>
                   </div>
                 </ModalHeader>
@@ -109,8 +113,8 @@ export default function UpdateBrandModal({
                     input:
                       "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                   }}
-                  label="ბრენდის სახელი"
-                  placeholder="შეიყვანეთ ბრენდის სახელი"
+                  label={t.name}
+                  placeholder={t.namePlaceholder}
                   size="lg"
                   value={name}
                   variant="bordered"
@@ -126,8 +130,8 @@ export default function UpdateBrandModal({
                     input:
                       "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                   }}
-                  label="წარმოშობა"
-                  placeholder="საქართველო / ევროკავშირი"
+                  label={t.origin}
+                  placeholder={t.originPlaceholder}
                   size="lg"
                   value={origin}
                   variant="bordered"
@@ -139,7 +143,7 @@ export default function UpdateBrandModal({
                   <label className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300 block"
                     htmlFor="description-editor"
                   >
-                    აღწერა
+                    {t.description}
                   </label>
                   <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                     <CustomEditor value={description} onChange={setDescription} />
@@ -154,14 +158,14 @@ export default function UpdateBrandModal({
                     variant="outline"
                     onClick={onClose}
                   >
-                    გაუქმება
+                    {t.cancel}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold"
                     size={isMobile ? "sm" : "default"}
                     onClick={handleSave}
                   >
-                    შენახვა
+                    {t.save}
                   </Button>
                 </div>
               </ModalFooter>

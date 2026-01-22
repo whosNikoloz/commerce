@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Switch } from "@/components/ui/switch";
 import { GoBackButton } from "@/components/go-back-button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function AddFaqModal({
   onCreate,
@@ -27,6 +28,8 @@ export default function AddFaqModal({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useIsMobile();
+  const dict = useDictionary();
+  const t = dict.admin.faqs;
 
   const [q, setQ] = useState("");
   const [a, setA] = useState("");
@@ -45,17 +48,17 @@ export default function AddFaqModal({
 
   const handleSave = async () => {
     if (!q.trim() || !a.trim()) {
-      toast.error("შეავსე ველები");
+      toast.error(t.modals.fillFields);
 
       return;
     }
     setLoading(true);
     try {
       await onCreate(q.trim(), a.trim(), active, featured);
-      toast.success("დაემატა");
+      toast.success(t.table.toasts.createSuccess);
       onClose();
     } catch {
-      toast.error("ვერ დაემატა");
+      toast.error(t.table.toasts.createError);
     } finally {
       setLoading(false);
     }
@@ -73,7 +76,7 @@ export default function AddFaqModal({
           size="sm"
           onClick={onOpen}
         >
-          + Add FAQ
+          {t.modals.addTitle}
         </Button>
       )}
 
@@ -95,10 +98,10 @@ export default function AddFaqModal({
                 <GoBackButton onClick={onClose} />
                 <div className="flex flex-col min-w-0">
                   <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                    FAQ-ის დამატება
+                    {t.modals.addTitle}
                   </span>
                   <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                    Add new frequently asked question
+                    {t.modals.addSubtitle}
                   </span>
                 </div>
               </ModalHeader>
@@ -106,10 +109,10 @@ export default function AddFaqModal({
               <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                 <div className="flex flex-col min-w-0">
                   <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                    FAQ-ის დამატება
+                    {t.modals.addTitle}
                   </h2>
                   <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                    Add new frequently asked question
+                    {t.modals.addSubtitle}
                   </p>
                 </div>
               </ModalHeader>
@@ -125,8 +128,8 @@ export default function AddFaqModal({
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                label="კითხვა"
-                placeholder="შეიყვანეთ კითხვა"
+                label={t.modals.question}
+                placeholder={t.modals.questionPlaceholder}
                 size="lg"
                 value={q}
                 variant="bordered"
@@ -141,8 +144,8 @@ export default function AddFaqModal({
                   input:
                     "text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium",
                 }}
-                label="პასუხი"
-                placeholder="შეიყვანეთ პასუხი"
+                label={t.modals.answer}
+                placeholder={t.modals.answerPlaceholder}
                 size="lg"
                 value={a}
                 variant="bordered"
@@ -160,7 +163,7 @@ export default function AddFaqModal({
                   ) : (
                     <EyeOff className="h-4 w-4 text-slate-400" />
                   )}
-                  <span className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300">Active</span>
+                  <span className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300">{t.modals.active}</span>
                 </div>
                 <div className="flex justify-center items-center gap-2">
                   <Switch
@@ -171,7 +174,7 @@ export default function AddFaqModal({
                   <Star
                     className={`h-3.5 w-3.5 ${featured ? "fill-blue-500 text-blue-500 dark:fill-blue-400 dark:text-blue-400" : "text-slate-400"}`}
                   />
-                  <span className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300">Featured</span>
+                  <span className="font-primary text-sm font-semibold text-slate-700 dark:text-slate-300">{t.modals.featured}</span>
                 </div>
               </div>
             </ModalBody>
@@ -184,7 +187,7 @@ export default function AddFaqModal({
                   variant="outline"
                   onClick={onClose}
                 >
-                  გაუქმება
+                  {t.modals.cancel}
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold"
@@ -195,10 +198,10 @@ export default function AddFaqModal({
                   {loading ? (
                     <span className="font-primary flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving...
+                      {t.modals.saving}
                     </span>
                   ) : (
-                    "შენახვა"
+                    t.modals.save
                   )}
                 </Button>
               </div>

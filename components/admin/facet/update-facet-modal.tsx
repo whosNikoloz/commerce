@@ -26,6 +26,7 @@ import { updateFacet } from "@/app/api/services/facetService";
 import { FacetValueNode } from "@/types/facet-ui";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GoBackButton } from "@/components/go-back-button";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 function toTree(list: FacetValueModel[]): FacetValueNode[] {
   const map = new Map<string, FacetValueNode>();
@@ -76,6 +77,9 @@ export default function UpdateFacetModal({
 }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
+  const dict = useDictionary();
+  const t = dict.admin.facets.editModal;
+  const tToast = dict.admin.facets.toast;
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState(facet.name ?? "");
@@ -236,13 +240,13 @@ export default function UpdateFacetModal({
     setLoading(true);
     try {
       await updateFacet({ ...model, facetValues: toFlat(values) });
-      toast.success("Facet updated");
+      toast.success(tToast.facetUpdated);
       onUpdated?.(model);
       setOpen(false);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      toast.error("განახლება ვერ მოხერხდა");
+      toast.error(tToast.facetUpdateFailed);
     } finally {
       setLoading(false);
     }
@@ -277,10 +281,10 @@ export default function UpdateFacetModal({
                   <GoBackButton onClick={() => setOpen(false)} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-primary truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Edit Facet
+                      {t.title}
                     </span>
                     <span className="font-primary line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                      Update facet settings and values
+                      {t.subtitle}
                     </span>
                   </div>
                 </ModalHeader>
@@ -288,10 +292,10 @@ export default function UpdateFacetModal({
                 <ModalHeader className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <div className="flex flex-col min-w-0">
                     <h2 className="font-heading text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                      Edit Facet
+                      {t.title}
                     </h2>
                     <p className="font-primary text-xs text-slate-500 dark:text-slate-400">
-                      Update facet settings and values
+                      {t.subtitle}
                     </p>
                   </div>
                 </ModalHeader>
@@ -300,9 +304,9 @@ export default function UpdateFacetModal({
               <ModalBody className="flex-1 overflow-y-auto px-4 md:px-6 pt-2 pb-3 space-y-4">
                 {/* Name */}
                 <Input
-                  label="Name"
+                  label={t.name}
                   labelPlacement="outside"
-                  placeholder="Facet name"
+                  placeholder={t.namePlaceholder}
                   value={name}
                   variant="bordered"
                   onChange={(e) => setName(e.target.value)}
@@ -311,11 +315,11 @@ export default function UpdateFacetModal({
                 {/* Display Type */}
                 <div className="space-y-2">
                   <label className="font-primary text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Display Type
+                    {t.displayType}
                   </label>
                   <DisplayTypePicker value={displayType} onChange={setDisplayType} />
                   <div className="mt-3 rounded-lg border p-4 bg-muted/30">
-                    <div className="text-xs font-semibold mb-2">Preview</div>
+                    <div className="text-xs font-semibold mb-2">{t.preview}</div>
                     <DisplayTypePreview displayType={displayType} values={toFlat(values)} />
                   </div>
                 </div>
@@ -324,10 +328,10 @@ export default function UpdateFacetModal({
                 <div className="flex items-center justify-between p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700">
                   <div>
                     <p className="font-primary text-sm font-medium text-slate-900 dark:text-slate-100">
-                      Custom
+                      {t.custom}
                     </p>
                     <p className="font-primary text-xs text-slate-600 dark:text-slate-400">
-                      Mark as custom facet
+                      {t.customDescription}
                     </p>
                   </div>
                   <Switch
@@ -339,9 +343,9 @@ export default function UpdateFacetModal({
                 {/* Categories */}
                 <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                   <div className="mb-2">
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Category</p>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{t.category}</p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Edit category selection from the tree (similar to facet settings/values).
+                      {t.categoryDescription}
                     </p>
                   </div>
 
@@ -356,7 +360,7 @@ export default function UpdateFacetModal({
                         <span className="truncate text-left">
                           {selectedCategories[0] && categoriesById[selectedCategories[0]]
                             ? categoriesById[selectedCategories[0]].name
-                            : "Select category"}
+                            : t.selectCategory}
                         </span>
                         <ChevronDown
                           className={`h-4 w-4 opacity-60 transition-transform ${showCategoryTree ? "rotate-180" : ""}`}
@@ -371,7 +375,7 @@ export default function UpdateFacetModal({
                     </div>
                   ) : (
                     <div className="text-sm text-slate-600 dark:text-slate-400 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                      No categories available. Check console for errors.
+                      {t.noCategoriesAvailable}
                     </div>
                   )}
                 </div>
@@ -379,7 +383,7 @@ export default function UpdateFacetModal({
                 {/* Facet Values */}
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Facet Values
+                    {t.facetValues}
                   </div>
                   <FacetValuesEditor values={values} onChange={setValues} />
                 </div>
@@ -392,7 +396,7 @@ export default function UpdateFacetModal({
                     variant="outline"
                     onClick={() => setOpen(false)}
                   >
-                    Cancel
+                    {t.cancel}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold"
@@ -400,7 +404,7 @@ export default function UpdateFacetModal({
                     size={isMobile ? "sm" : "default"}
                     onClick={handleSave}
                   >
-                    {loading ? "Saving..." : "Save"}
+                    {loading ? t.saving : t.save}
                   </Button>
                 </div>
               </ModalFooter>

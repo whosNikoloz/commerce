@@ -26,6 +26,7 @@ import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { StockStatus, Condition } from "@/types/enums";
 import { useDictionary } from "@/app/context/dictionary-provider";
@@ -33,6 +34,7 @@ import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface UpdateProductModalProps {
   productId: string;
+  initialName?: string;
   initialDescription?: string;
   initialBrandId?: string;
   initialCategoryId?: string;
@@ -47,6 +49,7 @@ interface UpdateProductModalProps {
   categories?: CategoryModel[];
   onSave: (
     id: string,
+    name: string,
     newDescription: string,
     brandId: string,
     categoryId: string,
@@ -60,6 +63,7 @@ interface UpdateProductModalProps {
 
 export default function UpdateProductModal({
   productId,
+  initialName = "",
   initialDescription = "",
   initialBrandId = "",
   initialCategoryId = "",
@@ -75,6 +79,7 @@ export default function UpdateProductModal({
   onSave,
 }: UpdateProductModalProps) {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
   const [brandId, setBrandId] = useState(initialBrandId);
   const [categoryId, setCategoryId] = useState(initialCategoryId);
@@ -99,6 +104,7 @@ export default function UpdateProductModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    setName(initialName);
     setDescription(initialDescription);
     setBrandId(initialBrandId);
     setCategoryId(initialCategoryId);
@@ -111,6 +117,7 @@ export default function UpdateProductModal({
     setSelectedFacetValues(initialFacetValues);
   }, [
     isOpen,
+    initialName,
     initialDescription,
     initialBrandId,
     initialCategoryId,
@@ -159,6 +166,10 @@ export default function UpdateProductModal({
   };
 
   const handleSave = async () => {
+    if (!name.trim()) {
+      alert(t.nameRequired || "Please enter a product name");
+      return;
+    }
     if (!brandId || !categoryId) {
       alert("Please select a brand and category");
 
@@ -170,6 +181,7 @@ export default function UpdateProductModal({
       await Promise.resolve(
         onSave(
           productId,
+          name,
           description,
           brandId,
           categoryId,
@@ -463,6 +475,19 @@ export default function UpdateProductModal({
                       scrollbarWidth: 'thin',
                       scrollbarColor: '#cbd5e1 transparent'
                     }}>
+                    {/* Product Name */}
+                    <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                        {t.productName || "Product Name"}
+                      </Label>
+                      <Input
+                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                        placeholder={t.productNamePlaceholder || "Enter product name"}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+
                     {/* Category Selection */}
                     <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <div className="mb-2">
@@ -687,10 +712,8 @@ export default function UpdateProductModal({
                 )}
 
                 {activeTab === "description" && (
-                  <div className={`flex flex-col ${isMobile ? "h-[calc(100vh-12rem)]" : "h-[calc(100vh-16rem)]"}`}>
-                    <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/80 shadow-sm overflow-hidden">
-                      <CustomEditor value={description} onChange={setDescription} />
-                    </div>
+                  <div className={`${isMobile ? "h-[calc(100vh-14rem)]" : "h-[400px]"}`}>
+                    <CustomEditor value={description} onChange={setDescription} />
                   </div>
                 )}
               </ModalBody>

@@ -80,7 +80,7 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
       attributes: {
         class: [
           "prose prose-sm dark:prose-invert max-w-none",
-          "focus:outline-none min-h-[300px] px-2 py-2",
+          "focus:outline-none min-h-[150px] px-2 py-2",
           "whitespace-pre-wrap break-words",
           "prose-p:my-2 prose-li:my-1",
         ].join(" "),
@@ -99,14 +99,14 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
   }, [value, editor]);
 
   return (
-    <div className="space-y-2">
+    <div className="h-full flex flex-col space-y-2">
       {label && <Label className="text-base font-medium">{label}</Label>}
 
-      <Card className="bg-background border shadow-sm">
-        <CardContent className="p-4 space-y-4">
+      <Card className="bg-background border shadow-sm flex-1 flex flex-col overflow-hidden">
+        <CardContent className="p-2 space-y-2 flex-1 flex flex-col overflow-hidden">
           {editor && (
-            <div className="overflow-x-auto w-full">
-              <div className="flex flex-wrap items-center gap-3 rounded-md border bg-muted/30 p-3">
+            <div className="overflow-x-auto w-full shrink-0">
+              <div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/30 p-2">
                 <div className="flex items-center gap-2">
                   <Button
                     size="icon"
@@ -222,7 +222,9 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
             </div>
           )}
 
-          <EditorContent editor={editor} />
+          <div className="flex-1 overflow-auto border rounded-md bg-white dark:bg-slate-950">
+            <EditorContent editor={editor} />
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,20 @@
 {
+  "common": {
+    "inStock": "In Stock",
+    "soldOut": "Sold Out",
+    "new": "New",
+    "used": "Used",
+    "likeNew": "Like New",
+    "liquidation": "Liquidation",
+    "comingSoon": "Coming Soon",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "success": "Success",
+    "error": "Error"
+  },
   "admin": {
     "login": {
       "title": "Login",
@@ -80,8 +96,10 @@
           "productUpdated": "Product updated successfully",
           "productUpdateFailed": "Failed to update product",
           "visibilityChanged": "Product visibility changed",
-          "failedToLoadBrands": "Failed to load brands"
-        }
+          "failedToLoadBrands": "Failed to load brands",
+          "idCopied": "ID copied!"
+        },
+        "copyId": "Click to copy ID"
       },
       "addModal": {
         "title": "Add new product",
@@ -124,6 +142,9 @@
         "subtitle": "Update product information and description",
         "settingsTab": "Settings",
         "descriptionTab": "Description",
+        "productName": "Product Name",
+        "productNamePlaceholder": "Enter product name",
+        "nameRequired": "Please enter a product name",
         "category": "Category",
         "editCategoryDescription": "Change the category selection from the tree (similar to attribute settings).",
         "inventory": "Inventory",

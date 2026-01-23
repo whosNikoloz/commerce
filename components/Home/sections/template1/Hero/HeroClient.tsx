@@ -78,7 +78,7 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1200px"
                   src={banner.imageUrl}
                 />
-                {banner.badge && (
+                {banner.badge?.en?.trim() && (
                   <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-10">
                     {t(banner.badge, locale)}
                   </div>

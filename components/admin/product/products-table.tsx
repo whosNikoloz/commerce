@@ -200,6 +200,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
   const handleUpdateProduct = async (
     productId: string,
+    name: string,
     description: string,
     brandId: string,
     categoryId: string,
@@ -216,6 +217,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     const prev = products;
     const patched: ProductRequestModel = {
       ...current,
+      name,
       description,
       brandId,
       categoryId,
@@ -356,7 +358,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         </div>
 
         <div className="space-y-2">
-          <h3 className="font-heading font-semibold text-sm line-clamp-2 text-slate-900 dark:text-slate-100">
+          <h3 className="font-heading font-semibold text-sm  text-slate-900 dark:text-slate-100">
             {product.name}
           </h3>
 
@@ -415,6 +417,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
                 initialIsNewArrival={product.isNewArrival}
+                initialName={product.name}
                 initialStockStatus={product.status}
                 productId={product.id}
                 onSave={handleUpdateProduct}
@@ -639,7 +642,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                           <TableHead className="w-[72px] sm:w-[80px] text-slate-700 dark:text-slate-300 font-bold">
                             {t?.headers?.image || "Image"}
                           </TableHead>
-                          <TableHead className="text-slate-700 dark:text-slate-300 font-bold">{t?.headers?.product || "Product"}</TableHead>
+                          <TableHead className="min-w-[120px] text-slate-700 dark:text-slate-300 font-bold">{t?.headers?.product || "Product"}</TableHead>
                           <TableHead className="whitespace-nowrap text-slate-700 dark:text-slate-300 font-bold">
                             {t?.headers?.price || "Price"}
                           </TableHead>
@@ -665,27 +668,39 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/20 dark:hover:to-indigo-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
                           >
                             <TableCell>
-                              <div className="relative w-16 h-16">
-                                <Image
-                                  alt={product.name ?? "Product"}
-                                  className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
-                                  height={64}
-                                  src={product.images?.[0] || "/placeholder.png"}
-                                  width={64}
-                                />
-                                {product.images && product.images.length > 1 && (
-                                  <span className="font-primary absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
-                                    +{product.images.length}
-                                  </span>
-                                )}
+                              <div className="flex flex-col items-center gap-1">
+                                <div className="relative w-16 h-16">
+                                  <Image
+                                    alt={product.name ?? "Product"}
+                                    className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
+                                    height={64}
+                                    src={product.images?.[0] || "/placeholder.png"}
+                                    width={64}
+                                  />
+                                  {product.images && product.images.length > 1 && (
+                                    <span className="font-primary absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                      +{product.images.length}
+                                    </span>
+                                  )}
+                                </div>
+                                <button
+                                  className="text-[10px] text-slate-400 dark:text-slate-500 truncate max-w-[64px] hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                                  title={t?.copyId || "Click to copy ID"}
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(product.id);
+                                    toast.success(t?.toast?.idCopied || "ID copied!");
+                                  }}
+                                >
+                                  {product.id}
+                                </button>
                               </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[120px] max-w-[200px]">
                               <div className="space-y-1">
-                                <div className="font-medium text-slate-900 dark:text-slate-100 line-clamp-2">
+                                <div className="font-medium text-slate-900 dark:text-slate-100 overflow-hidden break-words">
                                   {product.name}
                                 </div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400">ID: {product.id}</div>
                                 <div className="mt-2 flex flex-wrap gap-1 md:hidden">
                                   <Badge
                                     className={getStatusClass(product.status)}
@@ -777,6 +792,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}
                                   initialIsNewArrival={product.isNewArrival}
+                                  initialName={product.name}
                                   initialStockStatus={product.status}
                                   productId={product.id}
                                   onSave={handleUpdateProduct}

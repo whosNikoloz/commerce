@@ -35,6 +35,11 @@ const nextConfig = {
         hostname: "storage.resorter360.ge",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "img.janishop.ge",
+        pathname: "/**",
+      }
     ],
     dangerouslyAllowSVG: true,
     formats: ["image/avif", "image/webp"],
@@ -113,7 +118,8 @@ const nextConfig = {
     const connectSrcParts = [
       "'self'",
       "https://*.amazonaws.com",
-      "https://storage.resorter360.ge", // ✅ NEW
+      "https://storage.resorter360.ge",
+      "https://img.janishop.ge",
       apiDomain,
       "https://vercel.live",
       "wss://ws-us3.pusher.com",
@@ -148,7 +154,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://*.amazonaws.com https://storage.resorter360.ge https://picsum.photos https://placehold.co https://via.placeholder.com https://maps.googleapis.com https://maps.gstatic.com",
+              "img-src 'self' data: blob: https://*.amazonaws.com https://storage.resorter360.ge https://img.janishop.ge https://picsum.photos https://placehold.co https://via.placeholder.com https://maps.googleapis.com https://maps.gstatic.com",
               "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
               `connect-src ${connectSrcParts.join(" ")}`,
               "worker-src 'self' blob:",

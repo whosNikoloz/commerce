@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { Moon, Sun, Globe, Phone, MapPin, ChevronDown } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 import { useTenant } from "@/app/context/tenantContext"
 import { useDictionary } from "@/app/context/dictionary-provider"
@@ -29,8 +30,11 @@ export default function Footer() {
   const [mounted, setMounted] = useState(false)
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
 
-  // Extract current locale from pathname
-  const currentLocale = pathname.split("/")[1] || config?.siteConfig?.localeDefault || "en"
+  // Extract current locale from pathname - validate it's actually a locale code
+  const availableLocales = config?.siteConfig?.locales || ["en", "ka"]
+  const pathSegment = pathname.split("/")[1] || ""
+  const isValidLocale = pathSegment && /^[a-z]{2,3}$/.test(pathSegment) && availableLocales.includes(pathSegment)
+  const currentLocale = isValidLocale ? pathSegment : (config?.siteConfig?.localeDefault || "ka")
 
   useEffect(() => {
     setMounted(true)
@@ -116,7 +120,6 @@ export default function Footer() {
   const business = siteConfig.business || {}
   const stores = business.stores || []
   const currentStore = stores.find((s) => s.id === selectedStore)
-  const availableLocales = siteConfig.locales || ["en"]
   const socialLinks = siteConfig.links || {}
 
   // Get company info with fallbacks
@@ -370,19 +373,19 @@ export default function Footer() {
               <h4 className="font-heading mb-4 font-semibold text-foreground">{t.information}</h4>
               <ul className="space-y-3">
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/delivery`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/delivery`}>
                     {t.delivery}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/stores`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/stores`}>
                     {t.stores}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/about`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/about`}>
                     {t.about}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -392,19 +395,19 @@ export default function Footer() {
               <h4 className="font-heading mb-4 font-semibold text-foreground">{t.help}</h4>
               <ul className="space-y-3">
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/faq`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/faq`}>
                     {t.faq}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/return-policy`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/return-policy`}>
                     {t.returns}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/guarantee`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/guarantee`}>
                     {t.guarantee}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -414,19 +417,19 @@ export default function Footer() {
               <h4 className="font-heading mb-4 font-semibold text-foreground">Legal</h4>
               <ul className="space-y-3">
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/privacy-policy`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/privacy-policy`}>
                     {t.privacy}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/terms-and-conditions`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/info/terms-and-conditions`}>
                     {t.terms}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/cookie-policy`}>
+                  <Link className="font-primary text-sm text-muted-foreground hover:text-foreground transition-colors" href={`/${currentLocale}/cookie-policy`}>
                     {t.cookiePolicy}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

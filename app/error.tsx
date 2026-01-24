@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Error({
   error,
@@ -9,9 +9,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   useEffect(() => {
-    // Log the error to an error reporting service if needed
-    // console.error(error); // Removed for production
+    console.error('Error caught by boundary:', error);
   }, [error]);
 
   return (
@@ -35,7 +36,7 @@ export default function Error({
         >
           <div
             style={{
-              maxWidth: "480px",
+              maxWidth: "640px",
               width: "100%",
               textAlign: "center",
               backgroundColor: "#ffffff",
@@ -50,7 +51,10 @@ export default function Error({
                 fontSize: "24px",
                 fontWeight: 700,
                 color: "#111827",
+                cursor: "pointer",
               }}
+              onDoubleClick={() => setShowDetails(!showDetails)}
+              title="Double-click to toggle error details"
             >
               Something went wrong!
             </h2>
@@ -66,25 +70,94 @@ export default function Error({
               We apologize for the inconvenience. Please try again.
             </p>
 
-            <button
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "10px 24px",
-                borderRadius: "9999px",
-                border: "none",
-                fontSize: "14px",
-                fontWeight: 600,
-                backgroundColor: "#2563eb",
-                color: "#ffffff",
-                cursor: "pointer",
-              }}
-              type="button"
-              onClick={() => reset()}
-            >
-              Try again
-            </button>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginBottom: "16px" }}>
+              <button
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 24px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  backgroundColor: "#2563eb",
+                  color: "#ffffff",
+                  cursor: "pointer",
+                }}
+                type="button"
+                onClick={() => reset()}
+              >
+                Try again
+              </button>
+
+              <button
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 16px",
+                  borderRadius: "9999px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  backgroundColor: "#ffffff",
+                  color: "#4b5563",
+                  cursor: "pointer",
+                }}
+                type="button"
+                onClick={() => setShowDetails(!showDetails)}
+              >
+                {showDetails ? 'Hide' : 'Show'} Details
+              </button>
+            </div>
+
+            {showDetails && (
+              <div
+                style={{
+                  marginTop: "16px",
+                  textAlign: "left",
+                  backgroundColor: "#0f172a",
+                  borderRadius: "8px",
+                  padding: "16px",
+                  maxHeight: "300px",
+                  overflow: "auto",
+                }}
+              >
+                <div style={{ fontFamily: "monospace", fontSize: "13px" }}>
+                  {error.digest && (
+                    <div style={{ marginBottom: "8px" }}>
+                      <span style={{ color: "#94a3b8" }}>Digest: </span>
+                      <span style={{ color: "#fbbf24" }}>{error.digest}</span>
+                    </div>
+                  )}
+                  <div style={{ marginBottom: "8px" }}>
+                    <span style={{ color: "#94a3b8" }}>Message: </span>
+                    <span style={{ color: "#f87171" }}>{error.message || 'No message available'}</span>
+                  </div>
+                  {error.name && (
+                    <div style={{ marginBottom: "8px" }}>
+                      <span style={{ color: "#94a3b8" }}>Type: </span>
+                      <span style={{ color: "#22d3ee" }}>{error.name}</span>
+                    </div>
+                  )}
+                  {error.stack && (
+                    <div>
+                      <span style={{ color: "#94a3b8", display: "block", marginBottom: "4px" }}>Stack trace:</span>
+                      <pre style={{ fontSize: "11px", color: "#cbd5e1", whiteSpace: "pre-wrap", margin: 0, overflowX: "auto" }}>
+                        {error.stack}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!showDetails && error.digest && (
+              <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "8px" }}>
+                Error ID: {error.digest}
+              </p>
+            )}
           </div>
         </div>
       </body>

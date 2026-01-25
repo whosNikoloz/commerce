@@ -204,11 +204,13 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     description: string,
     brandId: string,
     categoryId: string,
-    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
+    flags: { isActive: boolean; isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
     facetValues: import("@/types/facet").ProductFacetValueModel[],
     productGroupId?: string | null,
     stockStatus?: StockStatus,
     condition?: Condition,
+    price?: number,
+    discountPrice?: number,
   ) => {
     const current = products.find((p) => p.id === productId);
 
@@ -221,12 +223,14 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       description,
       brandId,
       categoryId,
+      price: price ?? current.price,
+      discountPrice: discountPrice ?? current.discountPrice ?? undefined,
+      isActive: flags.isActive,
       isLiquidated: flags.isLiquidated,
       isComingSoon: flags.isComingSoon,
       isNewArrival: flags.isNewArrival,
       status: stockStatus ?? current.status,
       condition: condition ?? current.condition,
-      discountPrice: current.discountPrice ?? undefined,
       images: current.images ?? [],
       productFacetValues: facetValues,
       productGroupId: productGroupId || undefined,
@@ -413,11 +417,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 initialCategoryId={product.categoryId}
                 initialCondition={product.condition}
                 initialDescription={product.description}
+                initialDiscountPrice={product.discountPrice}
                 initialFacetValues={product.productFacetValues ?? []}
+                initialIsActive={product.isActive}
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
                 initialIsNewArrival={product.isNewArrival}
                 initialName={product.name}
+                initialPrice={product.price}
+                initialProductGroupId={product.productGroupId}
                 initialStockStatus={product.status}
                 productId={product.id}
                 onSave={handleUpdateProduct}
@@ -788,11 +796,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   initialCategoryId={product.categoryId}
                                   initialCondition={product.condition}
                                   initialDescription={product.description}
+                                  initialDiscountPrice={product.discountPrice}
                                   initialFacetValues={product.productFacetValues ?? []}
+                                  initialIsActive={product.isActive}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}
                                   initialIsNewArrival={product.isNewArrival}
                                   initialName={product.name}
+                                  initialPrice={product.price}
+                                  initialProductGroupId={product.productGroupId}
                                   initialStockStatus={product.status}
                                   productId={product.id}
                                   onSave={handleUpdateProduct}

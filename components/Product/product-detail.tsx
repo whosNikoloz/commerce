@@ -370,7 +370,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
-        <div className="flex-1 max-w-[800px] order-1 lg:order-1">
+        <div className="flex-1 max-w-[800px] lg:min-w-[400px] xl:min-w-[500px] order-1 lg:order-1">
           <ImageReview ref={imageReviewRef} images={galleryImages} productName={product.name ?? ""} />
         </div>
 
@@ -378,7 +378,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           {product.name}
         </h1>
 
-        <div className="order-3 lg:order-3 lg:min-w-[320px] lg:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit">
+        <div className="order-3 lg:order-3 lg:min-w-[280px] lg:max-w-[300px] xl:min-w-[320px] xl:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit lg:shrink-0">
           <ProductInfo
               brand={product.brand?.name ?? ""}
               condition={product.condition}
@@ -401,11 +401,12 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             />
         </div>
 
-        <div className="order-4 lg:order-2 flex md:items-start place-items-start">
+        <div className="order-4 lg:order-2 flex md:items-start place-items-start lg:shrink-0">
           <div
             dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
             className={[
-              "rich-content max-w-xs mx-auto md:ml-5",
+              "rich-content mx-auto md:ml-5",
+              "w-full max-w-xs lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-xs",
               "prose prose-sm dark:prose-invert",
               "prose-ul:list-disc prose-ol:list-decimal",
               "prose-li:my-1 prose-p:my-2",

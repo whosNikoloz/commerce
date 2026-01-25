@@ -5,7 +5,7 @@ import type { CategoryModel } from "@/types/category";
 import type { ProductFacetValueModel } from "@/types/facet";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Clock3, Edit, Sparkles, Layers, X, ChevronRight, ChevronDown } from "lucide-react";
+import { Box, Clock3, Edit, Sparkles, Layers, X, ChevronRight, ChevronDown, Power } from "lucide-react";
 import { toast } from "sonner";
 import {
   Modal,
@@ -36,9 +36,12 @@ interface UpdateProductModalProps {
   productId: string;
   initialName?: string;
   initialDescription?: string;
+  initialPrice?: number;
+  initialDiscountPrice?: number;
   initialBrandId?: string;
   initialCategoryId?: string;
   initialProductGroupId?: string;
+  initialIsActive?: boolean;
   initialIsLiquidated?: boolean;
   initialIsComingSoon?: boolean;
   initialIsNewArrival?: boolean;
@@ -53,11 +56,13 @@ interface UpdateProductModalProps {
     newDescription: string,
     brandId: string,
     categoryId: string,
-    flags: { isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
+    flags: { isActive: boolean; isLiquidated: boolean; isComingSoon: boolean; isNewArrival: boolean },
     facetValues: ProductFacetValueModel[],
     productGroupId?: string | null,
     stockStatus?: StockStatus,
     condition?: Condition,
+    price?: number,
+    discountPrice?: number,
   ) => void | Promise<void>;
 }
 
@@ -65,9 +70,12 @@ export default function UpdateProductModal({
   productId,
   initialName = "",
   initialDescription = "",
+  initialPrice = 0,
+  initialDiscountPrice = 0,
   initialBrandId = "",
   initialCategoryId = "",
   initialProductGroupId = "",
+  initialIsActive = true,
   initialIsLiquidated = false,
   initialIsComingSoon = false,
   initialIsNewArrival = false,
@@ -81,11 +89,14 @@ export default function UpdateProductModal({
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
+  const [price, setPrice] = useState(initialPrice.toString());
+  const [discountPrice, setDiscountPrice] = useState(initialDiscountPrice?.toString() || "");
   const [brandId, setBrandId] = useState(initialBrandId);
   const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [productGroupId, setProductGroupId] = useState(initialProductGroupId);
   const [productGroups, setProductGroups] = useState<ProductGroupModel[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
+  const [isActive, setIsActive] = useState(initialIsActive);
   const [isLiquidated, setIsLiquidated] = useState(initialIsLiquidated);
   const [isComingSoon, setIsComingSoon] = useState(initialIsComingSoon);
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
@@ -106,9 +117,12 @@ export default function UpdateProductModal({
 
     setName(initialName);
     setDescription(initialDescription);
+    setPrice(initialPrice.toString());
+    setDiscountPrice(initialDiscountPrice?.toString() || "");
     setBrandId(initialBrandId);
     setCategoryId(initialCategoryId);
     setProductGroupId(initialProductGroupId);
+    setIsActive(initialIsActive);
     setIsLiquidated(initialIsLiquidated);
     setIsComingSoon(initialIsComingSoon);
     setIsNewArrival(initialIsNewArrival);
@@ -119,9 +133,12 @@ export default function UpdateProductModal({
     isOpen,
     initialName,
     initialDescription,
+    initialPrice,
+    initialDiscountPrice,
     initialBrandId,
     initialCategoryId,
     initialProductGroupId,
+    initialIsActive,
     initialIsLiquidated,
     initialIsComingSoon,
     initialIsNewArrival,
@@ -175,6 +192,10 @@ export default function UpdateProductModal({
 
       return;
     }
+    if (!price || parseFloat(price) <= 0) {
+      alert(t.priceRequired || "Please enter a valid price");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -185,11 +206,13 @@ export default function UpdateProductModal({
           description,
           brandId,
           categoryId,
-          { isLiquidated, isComingSoon, isNewArrival },
+          { isActive, isLiquidated, isComingSoon, isNewArrival },
           selectedFacetValues,
           productGroupId || null,
           stockStatus,
-          condition
+          condition,
+          parseFloat(price),
+          discountPrice ? parseFloat(discountPrice) : undefined
         ),
       );
       onClose();
@@ -488,6 +511,47 @@ export default function UpdateProductModal({
                       />
                     </div>
 
+                    {/* Pricing */}
+                    <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                      <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
+                        {t.pricing || "Pricing"}
+                      </Label>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                        {t.pricingDescription || "Set the product price and optional discount price."}
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-[11px] text-slate-600 dark:text-slate-400 mb-1 block">
+                            {t.price || "Price"} *
+                          </Label>
+                          <Input
+                            required
+                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                            min="0"
+                            placeholder="0.00"
+                            step="0.01"
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-[11px] text-slate-600 dark:text-slate-400 mb-1 block">
+                            {t.discountPrice || "Discount Price"}
+                          </Label>
+                          <Input
+                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                            min="0"
+                            placeholder="0.00"
+                            step="0.01"
+                            type="number"
+                            value={discountPrice}
+                            onChange={(e) => setDiscountPrice(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Category Selection */}
                     <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                       <div className="mb-2">
@@ -563,11 +627,24 @@ export default function UpdateProductModal({
                     </div>
 
                     {/* Flag switches */}
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-2">
+                      <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                        <Switch
+                          checked={isActive}
+                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-green-500 data-[state=checked]:to-green-600 scale-75"
+                          id="is-active"
+                          onCheckedChange={setIsActive}
+                        />
+                        <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
+                          <Power className="w-3 h-3 mb-0.5" />
+                          {t.active || tCommon.active || "Active"}
+                        </span>
+                      </div>
+
                       <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
                         <Switch
                           checked={isLiquidated}
-                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-rose-500 data-[state=checked]:to-rose-600"
+                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-rose-500 data-[state=checked]:to-rose-600 scale-75"
                           id="is-liquidated"
                           onCheckedChange={setIsLiquidated}
                         />

@@ -174,7 +174,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
   }
 
   const ImageIndicator = () => (
-    <div className="absolute bottom-3 md:mb-20 mb-0 left-3 bg-black/60 text-white text-xs font-medium px-2 py-1 rounded-full z-20">
+    <div className="absolute bottom-4 left-4 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-full z-20 backdrop-blur-sm">
       {selectedImage + 1} / {images.length}
     </div>
   );
@@ -182,54 +182,93 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
   if (isMobile) {
     return (
       <div className="space-y-4">
-        <div className="relative">
-          <div ref={emblaRef} className="w-full overflow-hidden">
-            <div className="flex gap-4">
-              {images.map((image, index) => (
-                <div key={index} className="flex-[0_0_100%]">
-                  <Card
-                    ref={index === selectedImage ? imageContainerRef : null}
-                    className="relative rounded-lg overflow-hidden aspect-square max-h-[400px] cursor-pointer bg-white dark:bg-neutral-900"
-                  >
-                    <Image
-                      ref={index === selectedImage ? currentImageRef as any : null}
-                      fill
-                      alt={`${productName} view ${index + 1}`}
-                      className="object-contain p-4"
-                      loading={index === 0 ? "eager" : "lazy"}
-                      priority={index === 0}
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      src={image || placeholder}
-                      onClick={handleProductClick}
-                    />
-                  </Card>
-                </div>
-              ))}
+        <div className="flex justify-center px-2">
+          <div className="relative w-full max-w-[400px]">
+            <div ref={emblaRef} className="w-full overflow-hidden rounded-lg">
+              <div className="flex">
+                {images.map((image, index) => (
+                  <div key={index} className="flex-[0_0_100%]">
+                    <Card
+                      ref={index === selectedImage ? imageContainerRef : null}
+                      className="relative rounded-lg overflow-hidden aspect-square cursor-pointer bg-white dark:bg-neutral-900"
+                    >
+                      <Image
+                        ref={index === selectedImage ? currentImageRef as any : null}
+                        fill
+                        alt={`${productName} view ${index + 1}`}
+                        className="object-contain p-4"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        priority={index === 0}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        src={image || placeholder}
+                        onClick={handleProductClick}
+                      />
+                    </Card>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Image indicator - on the image */}
+            <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-full z-20 backdrop-blur-sm">
+              {selectedImage + 1} / {images.length}
+            </div>
+
+            {/* Navigation buttons - on the image */}
+            <button
+              aria-label="Previous image"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full shadow-lg z-20 transition-all h-10 w-10 flex items-center justify-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+            >
+              <ChevronLeft className="h-5 w-5 text-white" />
+            </button>
+            <button
+              aria-label="Next image"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full shadow-lg z-20 transition-all h-10 w-10 flex items-center justify-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+            >
+              <ChevronRight className="h-5 w-5 text-white" />
+            </button>
           </div>
-          <ImageIndicator />
-          {/* Navigation buttons */}
-          <button
-            aria-label="Previous image"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full shadow-lg z-20 transition-all h-12 w-12 flex items-center justify-center"
-            onClick={(e) => {
-              e.stopPropagation();
-              prevImage();
-            }}
-          >
-            <ChevronLeft className="h-5 w-5 text-white" />
-          </button>
-          <button
-            aria-label="Next image"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 rounded-full shadow-lg z-20 transition-all h-12 w-12 flex items-center justify-center"
-            onClick={(e) => {
-              e.stopPropagation();
-              nextImage();
-            }}
-          >
-            <ChevronRight className="h-5 w-5 text-white" />
-          </button>
         </div>
+
+        {/* Thumbnail list */}
+        {images.length > 1 && (
+          <div className="flex justify-center gap-2 px-4 overflow-x-auto pb-2">
+            {images.map((image, index) => (
+              <button
+                key={index}
+                aria-label={`View image ${index + 1}`}
+                className={cn(
+                  "flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all",
+                  selectedImage === index
+                    ? "border-primary ring-2 ring-primary/30 shadow-md"
+                    : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                )}
+                onClick={() => {
+                  setSelectedImage(index);
+                  if (emblaApi) emblaApi.scrollTo(index);
+                }}
+              >
+                <div className="relative w-full h-full">
+                  <Image
+                    fill
+                    alt={`Thumbnail ${index + 1}`}
+                    className="object-cover"
+                    sizes="64px"
+                    src={image || placeholder}
+                  />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Image Modal */}
         <ImageModal
@@ -246,7 +285,7 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
   return (
     <div className="space-y-4">
       <div className="flex gap-4">
-        <div className="w-24 h-[480px] flex-shrink-0">
+        <div className="w-24 h-[350px] md:h-[380px] lg:h-[380px] xl:h-[450px] 2xl:h-[480px] flex-shrink-0">
           <div
             ref={thumbnailsContainerRef}
             className="h-full flex flex-col space-y-3 overflow-y-auto scrollbar-thin pr-2
@@ -286,13 +325,13 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
         </div>
 
         <div className="relative flex-1">
-          <div ref={emblaRef} className="overflow-hidden">
-            <div className="flex gap-4">
+          <div ref={emblaRef} className="overflow-hidden h-[350px] md:h-[380px] lg:h-[380px] xl:h-[450px] 2xl:h-[480px]">
+            <div className="flex gap-4 h-full">
               {images.map((image, index) => (
-                <div key={index} className="flex-[0_0_100%]">
+                <div key={index} className="flex-[0_0_100%] h-full">
                   <Card
                     ref={index === selectedImage ? imageContainerRef : null}
-                    className="relative rounded-lg overflow-hidden aspect-square cursor-crosshair"
+                    className="relative rounded-lg overflow-hidden h-full cursor-crosshair"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     onMouseMove={handleMouseMove}
@@ -323,8 +362,9 @@ export const ImageReview = forwardRef<ImageReviewHandle, ImageReviewProps>(({ im
                 </div>
               ))}
             </div>
-            <ImageIndicator />
           </div>
+
+          <ImageIndicator />
 
           <button
             aria-label="Previous image"

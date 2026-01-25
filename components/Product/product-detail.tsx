@@ -8,6 +8,8 @@ import { ProductInfo } from "./product-info";
 import { ProductInfoBottom } from "./product-info-bottom";
 import { Specifications } from "./specifications";
 import { ImageReview, ImageReviewHandle } from "./image-review";
+import { CollapsibleDescription } from "./collapsible-description";
+import { RelatedBrandProducts } from "./related-brand-products";
 
 import { ProductResponseModel } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
@@ -19,10 +21,13 @@ import ProductNotFound from "@/app/[lang]/product/[id]/not-found";
 import { useFlyToCart } from "@/hooks/use-fly-to-cart";
 import { locales, defaultLocale } from "@/i18n.config";
 import { useGA4 } from "@/hooks/useGA4";
+import { useDictionary } from "@/app/context/dictionary-provider";
+import { stripInlineColors } from "@/lib/utils";
 
 type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
 
 export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
+  const dict = useDictionary();
   const { user } = useUser();
   const router = useRouter();
   const [product, setProduct] = useState(initialProduct);
@@ -70,20 +75,20 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     if (!targetFacetValueId) {
       // eslint-disable-next-line no-console
       console.log("Available product facet values:", product.productFacetValues);
-      toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა - facetValueId არ არის");
+      toast.error(dict.product.errors.variantIdMissing);
 
       return;
     }
 
     try {
       const targetProduct = await getProductById(
-        product.id, 
+        product.id,
         product.id,
         targetFacetValueId
       );
 
       if (!targetProduct || !targetProduct.id) {
-        toast.error("პროდუქტის ვარიანტი არ მოიძებნა");
+        toast.error(dict.product.errors.variantNotFound);
 
         return;
       }
@@ -111,7 +116,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error fetching product variant:", error);
-      toast.error("ვერ მოხერხდა ვარიანტის ჩატვირთვა");
+      toast.error(dict.product.errors.variantLoadFailed);
     }
   };
 
@@ -170,7 +175,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           // Only set error if not silent update
           if (!silent) {
             setStockQuantity(undefined); // "unknown"
-            setStockError("ვერ მოხერხდა მარაგის შემოწმება");
+            setStockError(dict.product.errors.stockCheckFailed);
           }
           setStockLoading(false);
           setIsInitialLoad(false);
@@ -233,17 +238,17 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
     if (merchantType === "FINA") {
       if (isInitialLoad && stockLoading) {
-        toast.error("იტვირთება მარაგი… გთხოვთ მოითმინოთ");
+        toast.error(dict.product.errors.loadingStock);
 
         return;
       }
       if (stockError && stockQuantity === undefined) {
-        toast.error("ვერ მოხერხდა მარაგის შემოწმება. სცადეთ თავიდან.");
+        toast.error(dict.product.errors.stockCheckFailed);
 
         return;
       }
       if (stockQuantity !== undefined && stockQuantity <= 0) {
-        toast.error("პროდუქტი მარაგში არ არის");
+        toast.error(dict.cart.outOfStock || "პროდუქტი მარაგში არ არის");
 
         return;
       }
@@ -251,7 +256,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
     const item: CartItem = {
       id: product.id,
-      name: product.name ?? "Unnamed Product",
+      name: product.name ?? dict.product.unnamedProduct,
       price: product.discountPrice ?? product.price,
       image: product.images?.[0] ?? "/placeholder.png",
       quantity: 1,
@@ -273,7 +278,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
   const handleBuyNow = () => {
     if (!user) {
-      toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
+      toast.error(dict.product.errors.authRequired);
 
       return;
     }
@@ -352,7 +357,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
     return [
       {
-        headline: "Specifications",
+        headline: dict.product.specifications,
         specifications: enrichedSpecs,
       },
     ];
@@ -366,7 +371,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   return (
     <div className="container mx-auto text-text-light dark:text-text-lightdark relative">
       <h1 className="font-heading text-3xl font-bold mb-2 md:block hidden p-4">
-        {product.name ?? "პროდუქტი"}
+        {product.name ?? dict.product.defaultName}
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-12 mb-16">
@@ -380,48 +385,55 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
 
         <div className="order-3 lg:order-3 lg:min-w-[280px] lg:max-w-[300px] xl:min-w-[320px] xl:max-w-sm lg:sticky lg:top-24 lg:self-start lg:h-fit lg:shrink-0">
           <ProductInfo
-              brand={product.brand?.name ?? ""}
-              condition={product.condition}
-              discount={
-                originalPrice
-                  ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
-                  : 0
-              }
-              isComingSoon={product.isComingSoon}
-              isLiquidated={product.isLiquidated}
-              isNewArrival={product.isNewArrival}
-              originalPrice={originalPrice ?? null}
-              price={price}
-              status={product.status}
-              stock={stockQuantity}
-              stockError={stockError ?? undefined}
-              stockLoading={isInitialLoad && stockLoading}
-              onAddToCart={handleAddToCart}
-              onBuyNow={handleBuyNow}
-            />
+            brand={product.brand?.name ?? ""}
+            condition={product.condition}
+            discount={
+              originalPrice
+                ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
+                : 0
+            }
+            isComingSoon={product.isComingSoon}
+            isLiquidated={product.isLiquidated}
+            isNewArrival={product.isNewArrival}
+            originalPrice={originalPrice ?? null}
+            price={price}
+            status={product.status}
+            stock={stockQuantity}
+            stockError={stockError ?? undefined}
+            stockLoading={isInitialLoad && stockLoading}
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+          />
         </div>
 
-        <div className="order-4 lg:order-2 flex md:items-start place-items-start lg:shrink-0">
-          <div
-            dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
-            className={[
-              "rich-content mx-auto md:ml-5",
-              "w-full max-w-xs lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-xs",
-              "prose prose-sm dark:prose-invert",
-              "prose-ul:list-disc prose-ol:list-decimal",
-              "prose-li:my-1 prose-p:my-2",
-              "whitespace-pre-wrap break-words",
-              "text-text-light dark:text-text-lightdark",
-            ].join(" ")}
+        <div className="order-4 lg:order-2 flex flex-col items-start lg:shrink-0">
+          <CollapsibleDescription
+            className="w-full lg:max-w-[220px] xl:max-w-[280px] 2xl:max-w-sm"
+            htmlContent={product.description ?? ""}
+            maxHeight={isMobile ? 350 : 500}
           />
         </div>
       </div>
+
+      {/* Brand Description */}
+      {product.brand?.description && (
+        <div className="my-12 relative max-w-4xl">
+          <h2 className="font-heading text-xl md:text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+            <span className="w-1.5 h-7 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
+            {dict.product.aboutBrand?.replace("{brand}", product.brand.name ?? "") ?? `About ${product.brand.name}`}
+          </h2>
+          <div
+            dangerouslySetInnerHTML={{ __html: stripInlineColors(product.brand.description) }}
+            className="rich-content prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
+          />
+        </div>
+      )}
 
       {specs.map((g, i) => (
         <div key={i} className="my-12 relative">
           <h2 className="font-heading text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
             <span className="font-primary w-1.5 h-8 bg-gradient-to-b from-brand-primary to-brand-primary/50 rounded-full" />
-            Specifications
+            {dict.product.specifications}
           </h2>
           <Specifications
             specs={g.specifications}
@@ -430,6 +442,15 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
           />
         </div>
       ))}
+
+      {/* Related products from same brand */}
+      {product.brand?.id && (
+        <RelatedBrandProducts
+          brandId={product.brand.id}
+          brandName={product.brand.name ?? ""}
+          currentProductId={product.id}
+        />
+      )}
 
       <ProductInfoBottom
         brand={product.brand?.name ?? ""}

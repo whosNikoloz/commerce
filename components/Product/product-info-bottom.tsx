@@ -7,6 +7,7 @@ import { Button } from "@heroui/button";
 
 import { StockStatus, Condition } from "@/types/enums";
 import { useCartUI } from "@/app/context/cart-ui";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 type Currency = "₾" | "$" | "€";
 
@@ -49,6 +50,7 @@ export function ProductInfoBottom({
   onAddToCart,
   onBuyNow,
 }: ProductInfoBottomProps) {
+  const dict = useDictionary();
   const [isAnimating, setIsAnimating] = useState(false);
   const { footerCartRef } = useCartUI();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -107,18 +109,18 @@ export function ProductInfoBottom({
               {isNewArrival && (
                 <span className="font-primary inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
                   <Sparkles className="h-3 w-3" />
-                  ახალი
+                  {dict.common.new}
                 </span>
               )}
               {isLiquidated && (
                 <span className="font-primary inline-flex items-center gap-0.5 text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
                   <Tag className="h-3 w-3" />
-                  ლიკვიდაცია
+                  {dict.common.liquidation}
                 </span>
               )}
               {typeof stock === "number" && stock <= 3 && stock > 0 && (
                 <span className="font-primary text-[10px] text-amber-600 dark:text-amber-400">
-                  ბოლო {stock} ცალი
+                  {dict.common.lastStock.replace("{count}", stock.toString())}
                 </span>
               )}
             </div>
@@ -159,7 +161,7 @@ export function ProductInfoBottom({
           >
             <ShoppingCart className="h-4 w-4" />
             <span className="font-primary hidden xs:inline">
-              {isComingSoon ? "მალე" : !inStock ? "ამოიწურა" : "კალათაში"}
+              {isComingSoon ? dict.common.comingSoonShort : !inStock ? dict.common.soldOutShort : dict.common.inCart}
             </span>
           </Button>
 
@@ -174,7 +176,7 @@ export function ProductInfoBottom({
             disabled={ctaDisabled}
             onPress={onBuyNow}
           >
-            ყიდვა
+            {dict.cart.buy}
           </Button>
         </div>
       </div>

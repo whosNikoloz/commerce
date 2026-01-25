@@ -74,3 +74,23 @@ export function resolveImageUrl(imagePath: string | null | undefined): string {
   // Otherwise return as is (likely a local Next.js public asset)
   return imagePath;
 }
+
+/**
+ * Strips inline color styles from HTML content for proper dark/light mode support.
+ * This removes color and background-color from inline styles so CSS can handle theming.
+ */
+export function stripInlineColors(html: string): string {
+  if (!html) return "";
+
+  // Remove color: and background-color: from style attributes
+  // This regex matches style attributes and removes color-related properties
+  return html
+    // Remove color property (handles color:#xxx, color: #xxx, color:rgb(...), etc.)
+    .replace(/\bcolor\s*:\s*[^;}"']+;?/gi, "")
+    // Remove background-color property
+    .replace(/\bbackground-color\s*:\s*[^;}"']+;?/gi, "")
+    // Clean up empty style attributes
+    .replace(/style\s*=\s*["']\s*["']/gi, "")
+    // Clean up style attributes with only whitespace/semicolons
+    .replace(/style\s*=\s*["']\s*;?\s*["']/gi, "");
+}

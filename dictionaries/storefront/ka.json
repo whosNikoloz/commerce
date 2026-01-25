@@ -25,7 +25,14 @@
     "freeShipping": "სწრაფი მიწოდება საქართველოს მასშტაბით",
     "backToBrands": "უკან ბრენდებზე",
     "products": "პროდუქტები",
-    "browseBrands": "სხვა ბრენდების დათვალიერება"
+    "browseBrands": "სხვა ბრენდების დათვალიერება",
+    "inCart": "კალათაში",
+    "comingSoonShort": "მალე",
+    "soldOutShort": "ამოიწურა",
+    "viewAll": "ყველას ნახვა",
+    "all": "ყველა",
+    "readMore": "მეტის ნახვა",
+    "readLess": "ნაკლები"
   },
   "auth": {
     "login": {
@@ -147,11 +154,24 @@
     "browseCategories": "კატეგორიების დათვალიერება"
   },
   "product": {
+    "specifications": "მახასიათებლები",
+    "unnamedProduct": "უსახელო პროდუქტი",
+    "defaultName": "პროდუქტი",
+    "moreBrand": "მეტი {brand}-სგან",
+    "aboutBrand": "{brand}-ის შესახებ",
     "notFound": {
       "title": "პროდუქტი ვერ მოიძებნა",
       "description": "პროდუქტი, რომელსაც ეძებთ, არ არსებობს ან წაშლილია.",
       "browseCategories": "კატეგორიების დათვალიერება",
       "goHome": "მთავარ გვერდზე"
+    },
+    "errors": {
+      "variantNotFound": "პროდუქტის ვარიანტი არ მოიძებნა",
+      "variantLoadFailed": "ვერ მოხერხდა ვარიანტის ჩატვირთვა",
+      "variantIdMissing": "ვერ მოხერხდა ვარიანტის ჩატვირთვა - facetValueId არ არის",
+      "stockCheckFailed": "ვერ მოხერხდა მარაგის შემოწმება",
+      "authRequired": "გთხოვთ, ჯერ გაიაროთ ავტორიზაცია",
+      "loadingStock": "იტვირთება მარაგი… გთხოვთ მოითმინოთ"
     }
   },
   "compare": {

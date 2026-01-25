@@ -25,7 +25,14 @@
     "freeShipping": "Fast delivery across Georgia",
     "backToBrands": "Back to brands",
     "products": "Products",
-    "browseBrands": "Browse other brands"
+    "browseBrands": "Browse other brands",
+    "inCart": "In Cart",
+    "comingSoonShort": "Soon",
+    "soldOutShort": "Sold Out",
+    "viewAll": "View All",
+    "all": "All",
+    "readMore": "Read More",
+    "readLess": "Read Less"
   },
   "auth": {
     "login": {
@@ -147,11 +154,24 @@
     "browseCategories": "Browse categories"
   },
   "product": {
+    "specifications": "Specifications",
+    "unnamedProduct": "Unnamed Product",
+    "defaultName": "Product",
+    "moreBrand": "More from {brand}",
+    "aboutBrand": "About {brand}",
     "notFound": {
       "title": "Product not found",
       "description": "The product you're looking for does not exist or has been removed.",
       "browseCategories": "Browse categories",
       "goHome": "Go to home"
+    },
+    "errors": {
+      "variantNotFound": "Product variant not found",
+      "variantLoadFailed": "Failed to load variant",
+      "variantIdMissing": "Failed to load variant - facetValueId missing",
+      "stockCheckFailed": "Failed to check stock",
+      "authRequired": "Please log in first",
+      "loadingStock": "Loading stock… please wait"
     }
   },
   "compare": {

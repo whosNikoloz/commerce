@@ -88,6 +88,53 @@ html {
   text-align: right;
 }
 
+/* Theme-aware colors for WYSIWYG content (after inline colors are stripped) */
+.rich-content {
+  color: rgb(51 65 85); /* slate-700 for light mode */
+}
+
+.dark .rich-content {
+  color: rgb(226 232 240); /* slate-200 for dark mode */
+}
+
+/* Link colors */
+.rich-content a {
+  color: rgb(37 99 235); /* blue-600 for light mode */
+}
+
+.rich-content a:hover {
+  color: rgb(29 78 216); /* blue-700 for light mode */
+}
+
+.dark .rich-content a {
+  color: rgb(96 165 250); /* blue-400 for dark mode */
+}
+
+.dark .rich-content a:hover {
+  color: rgb(147 197 253); /* blue-300 for dark mode */
+}
+
+/* TipTap WYSIWYG Editor - Force visible text colors in dark mode */
+/* This ensures text is always visible while editing, regardless of inline color styles */
+.dark .ProseMirror,
+.dark .ProseMirror *,
+.dark .ProseMirror p,
+.dark .ProseMirror span,
+.dark .ProseMirror div,
+.dark .ProseMirror li,
+.dark .ProseMirror h1,
+.dark .ProseMirror h2,
+.dark .ProseMirror h3,
+.dark .ProseMirror h4,
+.dark .ProseMirror h5,
+.dark .ProseMirror h6 {
+  color: rgb(226 232 240) !important; /* slate-200 - always visible on dark bg */
+}
+
+.dark .ProseMirror a {
+  color: rgb(96 165 250) !important; /* blue-400 */
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

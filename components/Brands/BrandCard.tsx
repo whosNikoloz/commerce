@@ -11,9 +11,10 @@ interface BrandCardProps {
     brand: BrandModel;
     locale: Locale;
     viewMode: "grid" | "list";
+    dict?: any;
 }
 
-export default function BrandCard({ brand, locale, viewMode }: BrandCardProps) {
+export default function BrandCard({ brand, locale, viewMode, dict }: BrandCardProps) {
     const brandLogo = brand.images?.[0];
     const brandName = brand.name || "Unknown Brand";
     const brandOrigin = brand.origin;
@@ -109,8 +110,8 @@ export default function BrandCard({ brand, locale, viewMode }: BrandCardProps) {
 
                 {/* View Products Link */}
                 <div className="mt-3 pt-3 border-t border-border/50">
-                    <span className="text-xs font-medium text-primary group-hover:gap-2 flex items-center gap-1 transition-all">
-                        View Products
+                    <span className="text-xs font-medium text-brand-primary group-hover:gap-2 flex items-center gap-1 transition-all">
+                        {dict?.brands?.viewProducts || "View Products"}
                         <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                 </div>

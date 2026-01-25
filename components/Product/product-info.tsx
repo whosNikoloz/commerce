@@ -1,15 +1,20 @@
 "use client";
 
-import { ShoppingCart, Truck, Tag } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShoppingCart, Truck, Tag, Heart, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Condition, StockStatus } from "@/types/enums";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { useUser } from "@/app/context/userContext";
+import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
 
 type Currency = "₾" | "$" | "€";
 
 interface ProductInfoProps {
+  productId: string;
   price: number;
   originalPrice: number | null;
   brand?: string;
@@ -33,6 +38,7 @@ function formatPrice(v: number, currency: Currency) {
 }
 
 export function ProductInfo({
+  productId,
   price,
   originalPrice,
   discount,
@@ -51,6 +57,44 @@ export function ProductInfo({
   onBuyNow,
 }: ProductInfoProps) {
   const dict = useDictionary();
+  const { user } = useUser();
+  const [inWishlist, setInWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+
+  // Check wishlist status on mount
+  useEffect(() => {
+    if (user && productId) {
+      isInWishlist(productId)
+        .then(setInWishlist)
+        .catch(() => setInWishlist(false));
+    }
+  }, [user, productId]);
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      toast.error(dict?.product?.errors?.authRequired || "Please log in first");
+
+      return;
+    }
+    if (!productId) return;
+
+    setWishlistLoading(true);
+    try {
+      if (inWishlist) {
+        await removeFromWishlist(productId);
+        setInWishlist(false);
+        toast.success(dict?.wishlist?.removed || "Removed from wishlist");
+      } else {
+        await addToWishlist(productId);
+        setInWishlist(true);
+        toast.success(dict?.wishlist?.added || "Added to wishlist");
+      }
+    } catch (error) {
+      toast.error(dict?.wishlist?.error || "Failed to update wishlist");
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   /* ---------- helpers ---------- */
   const getConditionLabel = (condition?: Condition) => {
@@ -240,18 +284,38 @@ export function ProductInfo({
             </span>
           </Button>
 
-          <Button
-            aria-disabled={isBuyingDisabled}
-            className="w-full h-12 justify-center rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
-            disabled={isBuyingDisabled}
-            onClick={onBuyNow}
-          >
-            {stockLoading
-              ? dict?.common?.loading
-              : stockError
-                ? dict?.common?.loadError
-                : dict?.cart?.buy}
-          </Button>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              aria-disabled={isBuyingDisabled}
+              className="w-full h-12 justify-center rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
+              disabled={isBuyingDisabled}
+              onClick={onBuyNow}
+            >
+              {stockLoading
+                ? dict?.common?.loading
+                : stockError
+                  ? dict?.common?.loadError
+                  : dict?.cart?.buy}
+            </Button>
+
+            <Button
+              className={`w-full h-12 justify-center gap-2 rounded-lg font-semibold text-base shadow-lg transition-all ${inWishlist
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-muted text-foreground hover:bg-muted/80 border border-border"
+                }`}
+              disabled={wishlistLoading}
+              onClick={handleWishlistToggle}
+            >
+              {wishlistLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Heart className={`h-5 w-5 ${inWishlist ? "fill-current" : ""}`} />
+              )}
+              <span className="sr-only md:not-sr-only">
+                {inWishlist ? dict?.wishlist?.remove : dict?.wishlist?.add}
+              </span>
+            </Button>
+          </div>
         </div>
 
         {/* Actions — DESKTOP */}
@@ -276,19 +340,33 @@ export function ProductInfo({
                       : dict?.common?.addToCartShort}
             </span>
           </Button>
-
           <Button
-            aria-disabled={isBuyingDisabled}
-            className="w-full h-12 justify-center rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
-            disabled={isBuyingDisabled}
-            onClick={onBuyNow}
-          >
-            {stockLoading
-              ? dict?.common?.loading
-              : stockError
-                ? dict?.common?.loadError
-                : dict?.cart?.buy}
-          </Button>
+              aria-disabled={isBuyingDisabled}
+              className="w-full h-12 justify-center rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base shadow-lg"
+              disabled={isBuyingDisabled}
+              onClick={onBuyNow}
+            >
+              {stockLoading
+                ? dict?.common?.loading
+                : stockError
+                  ? dict?.common?.loadError
+                  : dict?.cart?.buy}
+            </Button>
+            <Button
+              className={`w-full h-12 justify-center gap-2 rounded-lg font-semibold text-base shadow-lg transition-all ${inWishlist
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-muted text-foreground hover:bg-muted/80 border border-border"
+                }`}
+              disabled={wishlistLoading}
+              onClick={handleWishlistToggle}
+            >
+              {wishlistLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Heart className={`h-5 w-5 ${inWishlist ? "fill-current" : ""}`} />
+              )}
+              <span>{inWishlist ? (dict?.wishlist?.remove || "Remove") : (dict?.wishlist?.add || "Wishlist")}</span>
+            </Button>
         </div>
       </div>
     </div>

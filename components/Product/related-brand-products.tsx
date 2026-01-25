@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import CarouselRail from "@/components/Home/sections/ui/CarouselRail";
-import { ProductCardSkeleton } from "@/components/Home/sections/ui/ProductCard";
 import { Button } from "@/components/ui/button";
 import { searchProductsByFilter } from "@/app/api/services/productService";
 import { useDictionary } from "@/app/context/dictionary-provider";
@@ -65,8 +64,8 @@ export function RelatedBrandProducts({
         fetchProducts();
     }, [brandId, currentProductId, limit]);
 
-    // Don't render if no brand or no products found
-    if (!brandId || (!loading && products.length === 0)) {
+    // Don't render if no brand, still loading, error, or no products found
+    if (!brandId || loading || error || products.length === 0) {
         return null;
     }
 
@@ -92,19 +91,7 @@ export function RelatedBrandProducts({
                 </Button>
             </div>
 
-            {loading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-                    {Array.from({ length: 5 }).map((_, idx) => (
-                        <ProductCardSkeleton key={idx} />
-                    ))}
-                </div>
-            ) : error ? (
-                <div className="text-center py-8 text-muted-foreground">
-                    {error}
-                </div>
-            ) : (
-                <CarouselRail products={products} />
-            )}
+            <CarouselRail products={products} />
         </section>
     );
 }

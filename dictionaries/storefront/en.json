@@ -32,7 +32,16 @@
     "viewAll": "View All",
     "all": "All",
     "readMore": "Read More",
-    "readLess": "Read Less"
+    "readLess": "Read Less",
+    "grid": "Grid",
+    "list": "List"
+  },
+  "wishlist": {
+    "add": "Add to wishlist",
+    "remove": "Remove from wishlist",
+    "added": "Added to wishlist",
+    "removed": "Removed from wishlist",
+    "error": "Failed to update wishlist"
   },
   "auth": {
     "login": {
@@ -94,13 +103,18 @@
   "pages": {
     "brands": {
       "title": "Brands",
-      "description": "Explore all our brands and discover quality products"
+      "description": "Explore all our brands and discover quality products",
+      "heading": "Our Brands",
+      "subtitle": "Discover trusted brands and quality products from around the world"
     },
     "brand": {
+      "title": "{brand} - Products",
+      "description": "Explore products from {brand}",
       "notFound": "Brand not found",
-      "productsFrom": "Products",
+      "productsFrom": "Products from {brand}",
+      "productsTitle": "Products",
       "exploreProducts": "Explore the full product range",
-      "noProducts": "Products are unavailable",
+      "noProducts": "No products available",
       "checkBackLater": "Check back later for new products"
     }
   },
@@ -360,7 +374,8 @@
     "noResults": "No brands found",
     "tryDifferentSearch": "Try a different search",
     "noBrandsFound": "No brands found",
-    "resultsFound": "Brand(s) found"
+    "resultsFound": "Brand(s) found",
+    "viewProducts": "View Products"
   },
   "footer": {
     "information": "Information",

@@ -397,6 +397,7 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
             isNewArrival={product.isNewArrival}
             originalPrice={originalPrice ?? null}
             price={price}
+            productId={product.id}
             status={product.status}
             stock={stockQuantity}
             stockError={stockError ?? undefined}

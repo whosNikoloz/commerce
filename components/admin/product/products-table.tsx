@@ -60,6 +60,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   deleteProductById,
+  getAllProducts,
   getProductsByCategory,
   updateProduct,
 } from "@/app/api/services/productService";
@@ -151,18 +152,16 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   };
 
   useEffect(() => {
-    if (!selectedCategoryId) {
-      setProducts([]);
-
-      return;
-    }
     let aborted = false;
 
     (async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await getProductsByCategory(selectedCategoryId);
+        // If no category selected, fetch all products
+        const response = selectedCategoryId
+          ? await getProductsByCategory(selectedCategoryId)
+          : await getAllProducts();
 
         if (!aborted) setProducts(response);
       } catch (err) {
@@ -580,31 +579,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 </div>
               </div>
 
-              {selectedCategoryId && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                  <Package className="h-4 w-4" />
-                  <span>
-                    {isPending
-                      ? (t?.updating || "Updating...")
-                      : (t?.productsFound?.replace("{count}", String(filteredAndSortedProducts.length)) || `${filteredAndSortedProducts.length} products found`)}
-                  </span>
-                </div>
-              )}
+              <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                <Package className="h-4 w-4" />
+                <span>
+                  {isPending
+                    ? (t?.updating || "Updating...")
+                    : (t?.productsFound?.replace("{count}", String(filteredAndSortedProducts.length)) || `${filteredAndSortedProducts.length} products found`)}
+                </span>
+              </div>
             </CardHeader>
 
             <CardContent className="p-0">
               <div className="max-h-[calc(100vh-280px)] overflow-auto">
-                {!selectedCategoryId ? (
-                  <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
-                    <Package className="h-14 w-14 text-slate-400 dark:text-slate-500 mb-4" />
-                    <h3 className="font-heading text-base md:text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
-                      {t?.empty?.selectCategory || "Select a Category"}
-                    </h3>
-                    <p className="font-primary text-slate-500 dark:text-slate-400 max-w-sm">
-                      {t?.empty?.selectCategoryDescription || "Choose a category from the sidebar (or button on mobile) to view and manage products."}
-                    </p>
-                  </div>
-                ) : loading ? (
+                {loading ? (
                   <div className="flex items-center justify-center py-12 px-6">
                     <div className="flex items-center gap-3">
                       <RefreshCw className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
@@ -676,23 +663,23 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                             className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/20 dark:hover:to-indigo-950/20 transition-all duration-300 border-b border-slate-200/50 dark:border-slate-700/50"
                           >
                             <TableCell>
-                              <div className="flex flex-col items-center gap-1">
-                                <div className="relative w-16 h-16">
+                              <div className="flex flex-col items-center gap-1.5">
+                                <div className="relative w-12 h-12 flex-shrink-0">
                                   <Image
+                                    fill
                                     alt={product.name ?? "Product"}
                                     className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
-                                    height={64}
+                                    sizes="48px"
                                     src={product.images?.[0] || "/placeholder.png"}
-                                    width={64}
                                   />
                                   {product.images && product.images.length > 1 && (
-                                    <span className="font-primary absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                    <span className="font-primary absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[10px] px-1 py-0.5 rounded-full font-medium">
                                       +{product.images.length}
                                     </span>
                                   )}
                                 </div>
                                 <button
-                                  className="text-[10px] text-slate-400 dark:text-slate-500 truncate max-w-[64px] hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                                  className="text-[9px] text-slate-400 dark:text-slate-500 truncate max-w-[48px] hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
                                   title={t?.copyId || "Click to copy ID"}
                                   type="button"
                                   onClick={() => {

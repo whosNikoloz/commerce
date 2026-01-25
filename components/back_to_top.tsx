@@ -60,7 +60,7 @@ export default function BackToTopShadcn({
 
   // Adjust position on product pages to avoid overlapping with product footer
   const positionClass = isProductPage
-    ? "bottom-28 left-4 md:bottom-8 md:left-8"
+    ? "bottom-28 right-4 md:bottom-8 md:right-8"
     : offsetClass;
 
   const button = (

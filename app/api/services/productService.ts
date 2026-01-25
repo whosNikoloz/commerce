@@ -29,8 +29,8 @@ export function mapSort(sortBy: string): {
   }
 }
 
-export async function getAllProducts(): Promise<ProductResponseModel[]> {
-  return apiFetch<ProductResponseModel[]>(`${PRODUCT_API_BASE}/get-all-products`);
+export async function getAllProducts(): Promise<ProductRequestModel[]> {
+  return apiFetch<ProductRequestModel[]>(`${PRODUCT_API_BASE}/get-all-products`);
 }
 
 export async function getProductById(

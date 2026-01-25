@@ -14,8 +14,8 @@ export async function generateMetadata(
   const dict = await getDictionary(lang);
 
   return i18nPageMetadataAsync({
-    title: dict.checkout.page.title,
-    description: dict.checkout.page.description,
+    title: dict.checkout?.title ?? "Checkout",
+    description: dict.checkout?.description ?? "Review your order and complete payment.",
     lang,
     path: "/checkout",
     images: ["/og/checkout-og.jpg"],

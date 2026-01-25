@@ -394,13 +394,14 @@ export default function UpdateProductModal({
       <Modal
         classNames={{
           backdrop: "bg-black/60 backdrop-blur-lg",
-          base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl",
+          base: "rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-2xl max-h-[90vh]",
+          wrapper: "overflow-hidden",
         }}
         hideCloseButton={true}
         isOpen={isOpen}
         placement="center"
         scrollBehavior="inside"
-        size={isMobile ? "full" : "4xl"}
+        size={isMobile ? "full" : "5xl"}
         onClose={onClose}
         onOpenChange={onOpenChange}
       >
@@ -789,7 +790,7 @@ export default function UpdateProductModal({
                 )}
 
                 {activeTab === "description" && (
-                  <div className={`${isMobile ? "h-[calc(100vh-14rem)]" : "h-[400px]"}`}>
+                  <div className={`${isMobile ? "h-[calc(100vh-12rem)]" : "h-[60vh] min-h-[400px]"}`}>
                     <CustomEditor value={description} onChange={setDescription} />
                   </div>
                 )}

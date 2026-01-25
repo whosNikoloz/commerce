@@ -80,7 +80,7 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
       attributes: {
         class: [
           "prose prose-sm dark:prose-invert max-w-none",
-          "focus:outline-none min-h-[150px] px-2 py-2",
+          "focus:outline-none h-full min-h-[150px] px-3 py-3",
           "whitespace-pre-wrap break-words",
           "prose-p:my-2 prose-li:my-1",
         ].join(" "),
@@ -222,8 +222,11 @@ export function CustomEditor({ value, onChange, label }: CustomEditorProps) {
             </div>
           )}
 
-          <div className="flex-1 overflow-auto border rounded-md bg-white dark:bg-slate-950">
-            <EditorContent editor={editor} />
+          <div className="flex-1 overflow-hidden border rounded-md bg-white dark:bg-slate-950 min-h-0 flex flex-col">
+            <EditorContent
+              className="h-full flex-1 overflow-y-auto [&_.tiptap]:h-full [&_.tiptap]:min-h-full [&_.ProseMirror]:h-full [&_.ProseMirror]:min-h-full"
+              editor={editor}
+            />
           </div>
         </CardContent>
       </Card>

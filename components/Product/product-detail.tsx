@@ -9,7 +9,7 @@ import { ProductInfoBottom } from "./product-info-bottom";
 import { Specifications } from "./specifications";
 import { ImageReview, ImageReviewHandle } from "./image-review";
 import { CollapsibleDescription } from "./collapsible-description";
-import { RelatedBrandProducts } from "./related-brand-products";
+import { DynamicProductRails } from "./DynamicProductRails";
 
 import { ProductResponseModel } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
@@ -24,9 +24,9 @@ import { useGA4 } from "@/hooks/useGA4";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { stripInlineColors } from "@/lib/utils";
 
-type Props = { initialProduct: ProductResponseModel; initialSimilar: ProductResponseModel[] };
+type Props = { initialProduct: ProductResponseModel };
 
-export default function ProductDetail({ initialProduct, initialSimilar }: Props) {
+export default function ProductDetail({ initialProduct }: Props) {
   const dict = useDictionary();
   const { user } = useUser();
   const router = useRouter();
@@ -120,8 +120,6 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_similar] = useState(initialSimilar);
   const [isPriceVisible, setIsPriceVisible] = useState(true);
 
   // Fetch real-time stock quantity
@@ -366,6 +364,28 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
   const price = product.discountPrice ?? product.price;
   const originalPrice = product.discountPrice ? product.price : undefined;
 
+  // Memoize rail sections to prevent unnecessary re-fetches
+  const railSections = useMemo(() => {
+    if (product.productRailSections?.length) {
+      return product.productRailSections;
+    }
+    // Default to brand products if no sections configured
+    return [
+      {
+        id: "default-brand-products",
+        title: { en: `More from ${product.brand?.name || "this brand"}`, ka: `მეტი ${product.brand?.name || "ამ ბრენდისგან"}` },
+        layout: "carousel" as const,
+        limit: 12,
+        enabled: true,
+        order: 1,
+        filterBy: {
+          useCurrentProductBrand: true,
+        },
+        sortBy: "newest" as const,
+      },
+    ];
+  }, [product.productRailSections, product.brand?.name]);
+
   if (notFound) return <ProductNotFound />;
 
   return (
@@ -444,14 +464,12 @@ export default function ProductDetail({ initialProduct, initialSimilar }: Props)
         </div>
       ))}
 
-      {/* Related products from same brand */}
-      {product.brand?.id && (
-        <RelatedBrandProducts
-          brandId={product.brand.id}
-          brandName={product.brand.name ?? ""}
-          currentProductId={product.id}
-        />
-      )}
+
+      {/* Dynamic Product Rails - show configured sections or default to brand products */}
+      <DynamicProductRails
+        product={product}
+        sections={railSections}
+      />
 
       <ProductInfoBottom
         brand={product.brand?.name ?? ""}

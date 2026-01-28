@@ -55,6 +55,14 @@ export async function getProductsByCategory(id: string): Promise<ProductRequestM
   return apiFetch<ProductRequestModel[]>(`${PRODUCT_API_BASE}/get-products-by-category?id=${id}`);
 }
 
+export async function getProductsByIds(ids: string[]): Promise<ProductResponseModel[]> {
+  if (!ids || ids.length === 0) return [];
+
+  // This is a temporary implementation until the backend supports batch fetching
+  const promises = ids.map(id => getProductById(id));
+  return Promise.all(promises);
+}
+
 export async function getProductRestsByIds(
   data: FinaProductRestArrayModel
 ): Promise<FinaProductRestResponse> {
@@ -172,6 +180,6 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
   return apiFetch<string[]>(`${PRODUCT_API_BASE}/images`, {
     method: "POST",
     body: formData,
-    requireAuth: true , failIfUnauthenticated : true 
+    requireAuth: true, failIfUnauthenticated: true
   });
 }

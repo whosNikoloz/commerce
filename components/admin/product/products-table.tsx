@@ -210,6 +210,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     condition?: Condition,
     price?: number,
     discountPrice?: number,
+    productRailSections?: import("@/types/product").ProductRailSectionData[],
   ) => {
     const current = products.find((p) => p.id === productId);
 
@@ -233,6 +234,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       images: current.images ?? [],
       productFacetValues: facetValues,
       productGroupId: productGroupId || undefined,
+      productRailSections,
     };
 
     setProducts((prevList) => prevList.map((p) => (p.id === productId ? patched : p)));
@@ -418,6 +420,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 initialDescription={product.description}
                 initialDiscountPrice={product.discountPrice}
                 initialFacetValues={product.productFacetValues ?? []}
+                initialProductRailSections={product.productRailSections ?? []}
                 initialIsActive={product.isActive}
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
@@ -785,6 +788,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   initialDescription={product.description}
                                   initialDiscountPrice={product.discountPrice}
                                   initialFacetValues={product.productFacetValues ?? []}
+                                  initialProductRailSections={product.productRailSections ?? []}
                                   initialIsActive={product.isActive}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}

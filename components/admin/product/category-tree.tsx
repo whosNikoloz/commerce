@@ -24,9 +24,10 @@ import { useDictionary } from "@/app/context/dictionary-provider";
 interface CategoryTreeProps {
   Categories: CategoryModel[];
   onSelectCategory: (id: string | null) => void;
+  showCard?: boolean;
 }
 
-export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps) {
+export function CategoryTree({ Categories, onSelectCategory, showCard = true }: CategoryTreeProps) {
   const [categories] = useState<CategoryModel[]>(Categories);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -215,6 +216,59 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
 
   const rootCategories = categories.filter((c) => c.parentId === null);
 
+  const TreeContent = (
+    <div className="space-y-4">
+      <div className="flex flex-col gap-2">
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 dark:text-blue-400 h-4 w-4" />
+          <Input
+            aria-label="Search categories"
+            className="pl-9 h-9 text-sm bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
+            placeholder="Search categories..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <ScrollArea className={`${showCard ? "lg:h-[calc(100vh-320px)]" : "h-[350px]"} pr-3`}>
+          {categories.length === 0 ? (
+            <div className="text-center py-8">
+              <Folder className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+              <p className="font-primary text-slate-600 dark:text-slate-400 text-sm font-medium">No categories found</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {/* All Categories */}
+              <div
+                className={[
+                  "flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-300 border-2",
+                  selectedCategory === null
+                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-300 dark:border-blue-700 shadow-md"
+                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
+                ].join(" ")}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleCategorySelect(null)}
+              >
+                <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
+                <span className={`text-sm font-semibold ${selectedCategory === null ? "text-blue-900 dark:text-blue-300" : "text-slate-900 dark:text-slate-100"}`}>
+                  {t.allCategories}
+                </span>
+              </div>
+
+              {renderTree(categories, null)}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    </div>
+  );
+
+  if (!showCard) {
+    return TreeContent;
+  }
+
   return (
     <Card className=" lg:sticky lg:top-4 bg-white/70 dark:bg-slate-900/70 border-2 border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl shadow-xl relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
@@ -247,63 +301,10 @@ export function CategoryTree({ Categories, onSelectCategory }: CategoryTreeProps
             </Button>
           )}
         </div>
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 dark:text-blue-400 h-4 w-4" />
-          <Input
-            aria-label="Search categories"
-            className="pl-9 h-9 text-sm bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium shadow-sm"
-            placeholder="Search categories..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
       </CardHeader>
 
       <CardContent className="pt-0 relative">
-        <ScrollArea className="lg:h-[calc(100vh-320px)] pr-3">
-          {categories.length === 0 ? (
-            <div className="text-center py-8">
-              <Folder className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-              <p className="font-primary text-slate-600 dark:text-slate-400 text-sm font-medium">No categories found</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {/* All Categories */}
-              <div
-                className={[
-                  "flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-300 border-2",
-                  selectedCategory === null
-                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-300 dark:border-blue-700 shadow-md"
-                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700",
-                ].join(" ")}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleCategorySelect(null)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleCategorySelect(null);
-                  }
-                }}
-              >
-                <Folder className={`h-4 w-4 ${selectedCategory === null ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
-                <span className={`text-sm font-semibold ${selectedCategory === null ? "text-blue-900 dark:text-blue-300" : "text-slate-900 dark:text-slate-100"}`}>
-                  {t.allCategories}
-                </span>
-                <Badge
-                  className={`text-xs px-2 py-0.5 h-5 font-bold ml-auto ${selectedCategory === null ? "bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}
-                  variant="secondary"
-                >
-                  {rootCategories.length}
-                </Badge>
-              </div>
-
-              {renderTree(categories, null)}
-            </div>
-          )}
-        </ScrollArea>
+        {TreeContent}
       </CardContent>
     </Card>
   );

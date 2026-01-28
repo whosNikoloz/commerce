@@ -140,7 +140,7 @@ export default async function ProductPage({ params }: DetailPageProps) {
         id="ld-product"
         type="application/ld+json"
       />
-      <ProductDetail initialProduct={product} initialSimilar={[]} />
+      <ProductDetail initialProduct={product} />
     </>
   );
 }

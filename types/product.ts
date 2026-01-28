@@ -6,6 +6,42 @@ import { ProductFacetValueModel, ProductFacetValueResponseModel } from "./facet"
 import { getCategoryById } from "@/app/api/services/categoryService";
 import { getBrandById } from "@/app/api/services/brandService";
 
+// Localized text for multi-language support
+export type LocalizedText = Record<string, string> & {
+  en: string;
+  ka?: string;
+};
+
+// Product Rail Section configuration for product detail page
+export interface ProductRailSectionFilterBy {
+  categoryIds?: string[];
+  brandIds?: string[];
+  isNewArrival?: boolean;
+  isLiquidated?: boolean;
+  isComingSoon?: boolean;
+  hasDiscount?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  // Special filters that use current product's data
+  useCurrentProductCategory?: boolean;
+  useCurrentProductBrand?: boolean;
+}
+
+export interface ProductRailSectionData {
+  id: string;
+  customName?: string;
+  title: LocalizedText;
+  subtitle?: LocalizedText;
+  layout: "carousel" | "grid";
+  columns?: 2 | 3 | 4 | 5 | 6;
+  limit: number;
+  viewAllHref?: string;
+  enabled: boolean;
+  order: number;
+  filterBy?: ProductRailSectionFilterBy;
+  sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
+}
+
 export interface ProductResponseModel {
   id: string;
   name?: string;
@@ -23,6 +59,7 @@ export interface ProductResponseModel {
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueResponseModel[];
   productGroupId?: string;
+  productRailSections?: ProductRailSectionData[];
 }
 
 export interface ProductRequestModel {
@@ -42,6 +79,7 @@ export interface ProductRequestModel {
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueModel[];
   productGroupId?: string;
+  productRailSections?: ProductRailSectionData[];
 }
 
 export async function mapProducts(

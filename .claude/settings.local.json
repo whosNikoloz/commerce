@@ -35,7 +35,8 @@
       "Bash(done)",
       "Bash(del \"D:\\MyProjects\\nextjs\\commerce\\components\\Home\\sections\\ui\\ProductCardHoverExample.tsx\")",
       "Bash(git push:*)",
-      "Bash(vercel --version:*)"
+      "Bash(vercel --version:*)",
+      "Bash(yarn list:*)"
     ],
     "deny": [],
     "ask": []

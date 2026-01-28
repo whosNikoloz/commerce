@@ -3,9 +3,10 @@
 import type { BrandModel } from "@/types/brand";
 import type { CategoryModel } from "@/types/category";
 import type { ProductFacetValueModel } from "@/types/facet";
+import type { ProductRailSectionData } from "@/types/product";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Clock3, Edit, Sparkles, Layers, X, ChevronRight, ChevronDown, Power } from "lucide-react";
+import { Box, Clock3, Edit, Layers, X, ChevronRight, ChevronDown, Power, Settings, FileText, Link2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import {
   Modal,
@@ -17,13 +18,14 @@ import {
 } from "@heroui/modal";
 import { Select as HSelect, SelectItem as HSelectItem } from "@heroui/select";
 
+
 import { CustomEditor } from "../../wysiwyg-text-custom";
 import { GoBackButton } from "../../go-back-button";
 
+import { ProductRailSectionsManager } from "./ProductRailSectionsManager";
 import { FacetSelector } from "./facet-selector";
 
 import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productGroupService";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -31,6 +33,41 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { StockStatus, Condition } from "@/types/enums";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
+// Simple toggle switch that avoids Radix UI ref composition issues
+function SimpleSwitch({
+  checked,
+  onCheckedChange,
+  className = ""
+}: {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  className?: string;
+}) {
+  return (
+    <button
+      aria-checked={checked}
+      className={`
+        relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full
+        border-2 border-transparent transition-colors duration-200 ease-in-out
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+        disabled:cursor-not-allowed disabled:opacity-50
+        ${checked ? 'bg-primary' : 'bg-input'}
+        ${className}
+      `}
+      role="switch"
+      type="button"
+      onClick={() => onCheckedChange(!checked)}
+    >
+      <span
+        className={`
+          pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0
+          transition-transform duration-200 ease-in-out
+          ${checked ? 'translate-x-4' : 'translate-x-0'}
+        `}
+      />
+    </button>
+  );
+}
 
 interface UpdateProductModalProps {
   productId: string;
@@ -48,6 +85,7 @@ interface UpdateProductModalProps {
   initialStockStatus?: StockStatus;
   initialCondition?: Condition;
   initialFacetValues?: ProductFacetValueModel[];
+  initialProductRailSections?: ProductRailSectionData[];
   brands?: BrandModel[];
   categories?: CategoryModel[];
   onSave: (
@@ -63,6 +101,7 @@ interface UpdateProductModalProps {
     condition?: Condition,
     price?: number,
     discountPrice?: number,
+    productRailSections?: ProductRailSectionData[]
   ) => void | Promise<void>;
 }
 
@@ -82,6 +121,7 @@ export default function UpdateProductModal({
   initialStockStatus = StockStatus.InStock,
   initialCondition = Condition.New,
   initialFacetValues = [],
+  initialProductRailSections = [],
   brands = [],
   categories = [],
   onSave,
@@ -103,8 +143,9 @@ export default function UpdateProductModal({
   const [stockStatus, setStockStatus] = useState(initialStockStatus);
   const [condition, setCondition] = useState(initialCondition);
   const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>(initialFacetValues);
+  const [productRailSections, setProductRailSections] = useState<ProductRailSectionData[]>(initialProductRailSections || []);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "description">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "description" | "relations">("settings");
 
   const isMobile = useIsMobile();
   const dictionary = useDictionary();
@@ -119,8 +160,17 @@ export default function UpdateProductModal({
     setDescription(initialDescription);
     setPrice(initialPrice.toString());
     setDiscountPrice(initialDiscountPrice?.toString() || "");
-    setBrandId(initialBrandId);
-    setCategoryId(initialCategoryId);
+
+    // Set brand with fallback to first available brand if initialBrandId is invalid
+    const validInitialBrand = brands.some(b => b.id === initialBrandId);
+
+    setBrandId(validInitialBrand ? initialBrandId : (brands.length > 0 ? brands[0].id : ""));
+
+    // Set category with fallback to first available category if initialCategoryId is invalid
+    const validInitialCategory = categories.some(c => c.id === initialCategoryId);
+
+    setCategoryId(validInitialCategory ? initialCategoryId : (categories.length > 0 ? categories[0].id : ""));
+
     setProductGroupId(initialProductGroupId);
     setIsActive(initialIsActive);
     setIsLiquidated(initialIsLiquidated);
@@ -129,23 +179,9 @@ export default function UpdateProductModal({
     setStockStatus(initialStockStatus);
     setCondition(initialCondition);
     setSelectedFacetValues(initialFacetValues);
-  }, [
-    isOpen,
-    initialName,
-    initialDescription,
-    initialPrice,
-    initialDiscountPrice,
-    initialBrandId,
-    initialCategoryId,
-    initialProductGroupId,
-    initialIsActive,
-    initialIsLiquidated,
-    initialIsComingSoon,
-    initialIsNewArrival,
-    initialStockStatus,
-    initialCondition,
-    initialFacetValues,
-  ]);
+    setProductRailSections(initialProductRailSections || []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // Only run when modal opens/closes - initial values are captured at that moment
 
   // Fetch product groups when modal opens
   useEffect(() => {
@@ -185,6 +221,7 @@ export default function UpdateProductModal({
   const handleSave = async () => {
     if (!name.trim()) {
       alert(t.nameRequired || "Please enter a product name");
+
       return;
     }
     if (!brandId || !categoryId) {
@@ -194,6 +231,7 @@ export default function UpdateProductModal({
     }
     if (!price || parseFloat(price) <= 0) {
       alert(t.priceRequired || "Please enter a valid price");
+
       return;
     }
 
@@ -212,7 +250,8 @@ export default function UpdateProductModal({
           stockStatus,
           condition,
           parseFloat(price),
-          discountPrice ? parseFloat(discountPrice) : undefined
+          discountPrice ? parseFloat(discountPrice) : undefined,
+          productRailSections
         ),
       );
       onClose();
@@ -250,8 +289,9 @@ export default function UpdateProductModal({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [showCategoryTree, setShowCategoryTree] = useState(false);
 
+  // Expand parent categories when a category is selected
   useEffect(() => {
-    if (!categoryId) return;
+    if (!isOpen || !categoryId) return;
 
     setExpandedCategories((prev) => {
       const next = new Set(prev);
@@ -262,30 +302,42 @@ export default function UpdateProductModal({
         current = categoriesById[current.parentId];
       }
 
+      // Only return new set if something was actually added
+      if (next.size === prev.size) return prev;
+
       return next;
     });
-  }, [categoryId, categoriesById]);
+  }, [isOpen, categoryId, categoriesById]);
 
   // Auto-expand top-level categories that have children so the tree is visible immediately
   useEffect(() => {
+    if (!isOpen) return;
+
     const roots = categoriesByParent["root"] || [];
-    const next = new Set<string>();
+    const toExpand: string[] = [];
 
     roots.forEach((root: CategoryModel) => {
       if ((categoriesByParent[root.id] || []).length > 0) {
-        next.add(root.id);
+        toExpand.push(root.id);
       }
     });
 
+    if (toExpand.length === 0) return;
+
     setExpandedCategories((prev) => {
+      // Check if all items are already in the set
+      const allAlreadyExpanded = toExpand.every(id => prev.has(id));
+
+      if (allAlreadyExpanded) return prev;
+
       // preserve existing expansions, but ensure roots with children are open
       const merged = new Set(prev);
 
-      next.forEach((id) => merged.add(id));
+      toExpand.forEach((id) => merged.add(id));
 
       return merged;
     });
-  }, [categoriesByParent]);
+  }, [isOpen, categoriesByParent]);
 
   const getChildren = (parentId: string | null) =>
     categoriesByParent[parentId ?? "root"] || [];
@@ -368,18 +420,6 @@ export default function UpdateProductModal({
     );
   };
 
-  useEffect(() => {
-    if (!validBrandId && brands.length > 0) {
-      setBrandId(brands[0].id);
-    }
-  }, [brands, validBrandId]);
-
-  useEffect(() => {
-    if (!validCategoryId && categories.length > 0) {
-      setCategoryId(categories[0].id);
-    }
-  }, [categories, validCategoryId]);
-
   return (
     <>
       <Button
@@ -406,7 +446,7 @@ export default function UpdateProductModal({
         onOpenChange={onOpenChange}
       >
         <ModalContent>
-          {() => (
+          {(onClose) => (
             <>
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5 pointer-events-none rounded-2xl" />
 
@@ -424,25 +464,42 @@ export default function UpdateProductModal({
                     </button>
                   </div>
 
-                  {/* Tabs for Mobile */}
                   <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700">
                     <button
                       className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "settings"
-                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                         }`}
                       onClick={() => setActiveTab("settings")}
                     >
-                      ⚙️ {t.settingsTab || "Settings"}
+                      <div className="flex flex-col items-center gap-1">
+                        <Settings className="h-4 w-4" />
+                        <span className="text-[10px]">{t.settingsTab || "Settings"}</span>
+                      </div>
                     </button>
                     <button
                       className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "description"
-                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                         }`}
                       onClick={() => setActiveTab("description")}
                     >
-                      📝 {t.descriptionTab || "Description"}
+                      <div className="flex flex-col items-center gap-1">
+                        <FileText className="h-4 w-4" />
+                        <span className="text-[10px]">{t.descriptionTab || "Description"}</span>
+                      </div>
+                    </button>
+                    <button
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "relations"
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setActiveTab("relations")}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <Link2 className="h-4 w-4" />
+                        <span className="text-[10px]">{t.relationsTab || "Relations"}</span>
+                      </div>
                     </button>
                   </div>
                 </ModalHeader>
@@ -467,25 +524,42 @@ export default function UpdateProductModal({
                     </button>
                   </div>
 
-                  {/* Tabs for Desktop */}
                   <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700 px-6">
                     <button
                       className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "settings"
-                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                         }`}
                       onClick={() => setActiveTab("settings")}
                     >
-                      ⚙️ {t.settingsTab || "Settings"}
+                      <div className="flex items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        {t.settingsTab || "Settings"}
+                      </div>
                     </button>
                     <button
                       className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "description"
-                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                          : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                         }`}
                       onClick={() => setActiveTab("description")}
                     >
-                      📝 {t.descriptionTab || "Description"}
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {t.descriptionTab || "Description"}
+                      </div>
+                    </button>
+                    <button
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${activeTab === "relations"
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        }`}
+                      onClick={() => setActiveTab("relations")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Link2 className="h-4 w-4" />
+                        {t.relationsTab || "Relations"}
+                      </div>
                     </button>
                   </div>
                 </ModalHeader>
@@ -630,10 +704,9 @@ export default function UpdateProductModal({
                     {/* Flag switches */}
                     <div className="grid grid-cols-4 gap-2">
                       <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                        <Switch
+                        <SimpleSwitch
                           checked={isActive}
-                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-green-500 data-[state=checked]:to-green-600 scale-75"
-                          id="is-active"
+                          className={isActive ? "!bg-gradient-to-r !from-green-500 !to-green-600" : ""}
                           onCheckedChange={setIsActive}
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
@@ -643,10 +716,9 @@ export default function UpdateProductModal({
                       </div>
 
                       <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                        <Switch
+                        <SimpleSwitch
                           checked={isLiquidated}
-                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-rose-500 data-[state=checked]:to-rose-600 scale-75"
-                          id="is-liquidated"
+                          className={isLiquidated ? "!bg-gradient-to-r !from-rose-500 !to-rose-600" : ""}
                           onCheckedChange={setIsLiquidated}
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
@@ -656,10 +728,9 @@ export default function UpdateProductModal({
                       </div>
 
                       <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                        <Switch
+                        <SimpleSwitch
                           checked={isComingSoon}
-                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-violet-500 data-[state=checked]:to-indigo-600 scale-75"
-                          id="is-coming-soon"
+                          className={isComingSoon ? "!bg-gradient-to-r !from-violet-500 !to-indigo-600" : ""}
                           onCheckedChange={setIsComingSoon}
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
@@ -669,10 +740,9 @@ export default function UpdateProductModal({
                       </div>
 
                       <div className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                        <Switch
+                        <SimpleSwitch
                           checked={isNewArrival}
-                          className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-emerald-600 scale-75"
-                          id="is-new-arrival"
+                          className={isNewArrival ? "!bg-gradient-to-r !from-emerald-500 !to-emerald-600" : ""}
                           onCheckedChange={setIsNewArrival}
                         />
                         <span className="font-primary text-xs flex flex-col text-slate-800 dark:text-slate-200">
@@ -738,6 +808,7 @@ export default function UpdateProductModal({
                           variant="bordered"
                           onSelectionChange={(keys) => {
                             const k = Array.from(keys)[0] as string | undefined;
+
                             setStockStatus(k ? parseInt(k) as StockStatus : StockStatus.InStock);
                           }}
                         >
@@ -756,6 +827,7 @@ export default function UpdateProductModal({
                           variant="bordered"
                           onSelectionChange={(keys) => {
                             const k = Array.from(keys)[0] as string | undefined;
+
                             setCondition(k ? parseInt(k) as Condition : Condition.New);
                           }}
                         >
@@ -794,6 +866,22 @@ export default function UpdateProductModal({
                     <CustomEditor value={description} onChange={setDescription} />
                   </div>
                 )}
+
+                {activeTab === "relations" && (
+                  <div className={`overflow-y-auto ${isMobile ? "h-[calc(100vh-12rem)]" : "h-[calc(100vh-16rem)]"}`}
+                    style={{
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: '#cbd5e1 transparent'
+                    }}>
+                    <ProductRailSectionsManager
+                      brands={brands}
+                      categories={categories}
+                      locales={["ka", "en"]}
+                      sections={productRailSections}
+                      onChange={setProductRailSections}
+                    />
+                  </div>
+                )}
               </ModalBody>
 
               <ModalFooter className="gap-3 rounded-2xl px-6 py-5    relative">
@@ -822,8 +910,8 @@ export default function UpdateProductModal({
               </ModalFooter>
             </>
           )}
-        </ModalContent>
-      </Modal>
+        </ModalContent >
+      </Modal >
     </>
   );
 }

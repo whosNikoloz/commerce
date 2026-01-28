@@ -2,10 +2,12 @@
 
 import { LocalizedTextInput } from "./LocalizedTextInput";
 import { CategoryTreeSelectMulti } from "./CategoryTreeSelectMulti";
-import type { ProductRailSectionData, LocalizedText } from "@/types/product";
+import type { ProductRailSectionData, LocalizedText, ProductResponseModel } from "@/types/product";
 import type { CategoryModel } from "@/types/category";
 import type { BrandModel } from "@/types/brand";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { useState, useEffect } from "react";
+import { searchProducts } from "@/app/api/services/productService";
 
 interface ProductRailSectionEditorProps {
   data: ProductRailSectionData;
@@ -33,7 +35,6 @@ export function ProductRailSectionEditor({
     subtitle: data?.subtitle,
     layout: data?.layout || "carousel",
     columns: data?.columns,
-    limit: data?.limit || 12,
     viewAllHref: data?.viewAllHref || "",
     enabled: data?.enabled ?? true,
     order: data?.order || 0,
@@ -60,24 +61,47 @@ export function ProductRailSectionEditor({
 
   const currentCategoryIds = safeData.filterBy?.categoryIds || [];
   const currentBrandIds = safeData.filterBy?.brandIds || [];
+  const currentProductIds = safeData.filterBy?.productIds || [];
 
-  const addBrandId = (id: string) => {
-    if (currentBrandIds.includes(id)) return;
-    updateFilterField("brandIds", [...currentBrandIds, id]);
-  };
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<ProductResponseModel[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const removeBrandId = (id: string) => {
-    updateFilterField(
-      "brandIds",
-      currentBrandIds.filter((x) => x !== id)
-    );
+  // Debounced search for products
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (!searchTerm.trim()) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const result = await searchProducts(searchTerm, "name", "asc", 1, 20);
+        setSearchResults(result.items || []);
+      } catch (err) {
+        console.error("Product search failed", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  const toggleProductId = (productId: string) => {
+    const nextIds = currentProductIds.includes(productId)
+      ? currentProductIds.filter((id) => id !== productId)
+      : [...currentProductIds, productId];
+
+    updateFilterField("productIds", nextIds.length > 0 ? nextIds : undefined);
   };
 
   return (
     <div className="space-y-5">
       {/* Basic Info */}
-      <div className="space-y-4">
-        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+      <div className="space-y-4 shadow-sm border border-slate-200 dark:border-slate-800 p-4 rounded-xl bg-slate-50/50 dark:bg-slate-900/30">
+        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-4">
           <span className="w-1 h-4 bg-blue-500 rounded-full" />
           {t.basicInfo || "Basic Information"}
         </h4>
@@ -140,31 +164,17 @@ export function ProductRailSectionEditor({
                 }
                 className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
               >
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
+                <option value="2">2 Columns</option>
+                <option value="3">3 Columns</option>
+                <option value="4">4 Columns</option>
+                <option value="5">5 Columns</option>
+                <option value="6">6 Columns</option>
               </select>
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
-              {t.limit || "Number of Products"} <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={safeData.limit}
-              onChange={(e) => updateField("limit", parseInt(e.target.value) || 12)}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
-              min="1"
-              max="50"
-            />
-          </div>
-
           <div>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
               {t.viewAllLink || "View All Link"}
@@ -177,137 +187,178 @@ export function ProductRailSectionEditor({
               placeholder="/products"
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
-            {t.sortBy || "Sort By"}
-          </label>
-          <select
-            value={safeData.sortBy || "featured"}
-            onChange={(e) => updateField("sortBy", e.target.value as ProductRailSectionData["sortBy"])}
-            className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
-          >
-            <option value="featured">{t.sortFeatured || "Featured"}</option>
-            <option value="newest">{t.sortNewest || "Newest"}</option>
-            <option value="price-low">{t.sortPriceLow || "Price: Low to High"}</option>
-            <option value="price-high">{t.sortPriceHigh || "Price: High to Low"}</option>
-            <option value="rating">{t.sortRating || "Rating"}</option>
-            <option value="name">{t.sortName || "Name"}</option>
-          </select>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+              {t.sortBy || "Sort By"}
+            </label>
+            <select
+              value={safeData.sortBy || "featured"}
+              onChange={(e) => updateField("sortBy", e.target.value as ProductRailSectionData["sortBy"])}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
+            >
+              <option value="featured">{t.sortFeatured || "Featured"}</option>
+              <option value="newest">{t.sortNewest || "Newest"}</option>
+              <option value="price-low">{t.sortPriceLow || "Price: Low to High"}</option>
+              <option value="price-high">{t.sortPriceHigh || "Price: High to Low"}</option>
+              <option value="rating">{t.sortRating || "Rating"}</option>
+              <option value="name">{t.sortName || "Name"}</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Quick Filters (Use Current Product) */}
-      <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+      <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
           <span className="w-1 h-4 bg-emerald-500 rounded-full" />
           {t.quickFilters || "Quick Filters"}
         </h4>
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-emerald-50/10 dark:bg-emerald-900/10 cursor-pointer hover:bg-emerald-50/20 dark:hover:bg-emerald-900/20 transition-all group">
             <input
               type="checkbox"
               checked={safeData.filterBy?.useCurrentProductCategory || false}
               onChange={(e) => updateFilterField("useCurrentProductCategory", e.target.checked || undefined)}
-              className="rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 dark:bg-slate-800"
+              className="rounded-full border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 dark:bg-slate-800 w-4 h-4"
             />
-            <span className="text-xs text-slate-700 dark:text-slate-300">
+            <span className="text-xs text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               {t.useCurrentCategory || "Same category as this product"}
             </span>
           </label>
 
-          <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-emerald-50/10 dark:bg-emerald-900/10 cursor-pointer hover:bg-emerald-50/20 dark:hover:bg-emerald-900/20 transition-all group">
             <input
               type="checkbox"
               checked={safeData.filterBy?.useCurrentProductBrand || false}
               onChange={(e) => updateFilterField("useCurrentProductBrand", e.target.checked || undefined)}
-              className="rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 dark:bg-slate-800"
+              className="rounded-full border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 dark:bg-slate-800 w-4 h-4"
             />
-            <span className="text-xs text-slate-700 dark:text-slate-300">
+            <span className="text-xs text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               {t.useCurrentBrand || "Same brand as this product"}
             </span>
           </label>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-          <span className="w-1 h-4 bg-violet-500 rounded-full" />
-          {t.filters || "Product Filters"}
+      {/* Detailed Filters (Same as Category Page) */}
+      <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
+        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+          <span className="w-1 h-4 bg-amber-500 rounded-full" />
+          {t.detailedFilters || "Detailed Filters"}
         </h4>
 
-        <div className="space-y-4">
-          {/* Categories */}
-          <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
-              {t.categories || "Categories"}
-            </label>
-            <CategoryTreeSelectMulti
-              categories={categories}
-              selectedIds={currentCategoryIds}
-              onSelectionChange={(ids) => updateFilterField("categoryIds", ids)}
-              emptyState={t.noCategoriesLoaded || "No categories loaded."}
-            />
-          </div>
-
-          {/* Brands */}
-          <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
-              {t.brands || "Brands"}
+        <div className="space-y-5">
+          {/* PRODUCT SELECTION */}
+          <div className="space-y-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+              {t.filterProducts || "Select Products Manually"}
             </label>
 
-            {brands.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5 max-h-40 overflow-auto border border-dashed border-slate-200 dark:border-slate-700 rounded-md p-2 bg-white/50 dark:bg-slate-900/30">
-                {brands.map((brand) => {
-                  const selected = currentBrandIds.includes(brand.id);
-                  const thumbnail = brand.images?.[0];
+            <div className="relative">
+              <input
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm pl-9"
+                placeholder={t.searchPlaceholder || "Search products to add..."}
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <div className="absolute left-3 top-2.5 text-slate-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                </svg>
+              </div>
+              {isSearching && (
+                <div className="absolute right-3 top-2.5">
+                  <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+                </div>
+              )}
+            </div>
+
+            {searchResults.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 max-h-60 overflow-y-auto p-2 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                {searchResults.map((p) => {
+                  const isSelected = currentProductIds.includes(p.id);
 
                   return (
                     <button
-                      key={brand.id}
+                      key={p.id}
+                      className={`flex items-center gap-3 p-2 rounded-lg border text-left transition-all ${isSelected
+                        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 ring-1 ring-blue-500"
+                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-blue-400"
+                        }`}
                       type="button"
-                      onClick={() => (selected ? removeBrandId(brand.id) : addBrandId(brand.id))}
-                      className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border transition-colors ${
-                        selected
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border-slate-300 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                      }`}
+                      onClick={() => toggleProductId(p.id)}
                     >
-                      {thumbnail && (
-                        <img
-                          src={thumbnail}
-                          alt={brand.name || brand.id}
-                          className="w-5 h-5 rounded object-cover border border-white/50 shadow-sm"
-                        />
-                      )}
-                      <span>{brand.name || brand.id}</span>
+                      <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded flex-shrink-0 relative overflow-hidden">
+                        {p.images?.[0] ? (
+                          <img alt="" className="w-full h-full object-cover" src={p.images[0]} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 text-[10px]">?</div>
+                        )}
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                            <span className="text-blue-600 text-lg font-bold">✓</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] font-bold text-slate-900 dark:text-slate-100 truncate">{p.name}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate opacity-60">ID: {p.id}</div>
+                      </div>
                     </button>
                   );
                 })}
               </div>
-            ) : (
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t.noBrandsLoaded || "No brands loaded."}
-              </p>
             )}
 
-            {/* Selected badges */}
-            {currentBrandIds.length > 0 && (
+            {currentProductIds.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {currentBrandIds.map((id) => {
-                  const brand = brands.find((b) => b.id === id);
+                {currentProductIds.map((id) => (
+                  <span key={id} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800 font-medium">
+                    {id}
+                    <button
+                      className="text-blue-500 hover:text-red-500 transition-colors"
+                      type="button"
+                      onClick={() => toggleProductId(id)}
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+              {t.filterCategories || "Filter by Categories"}
+            </label>
+            <CategoryTreeSelectMulti
+              categories={categories}
+              selectedIds={currentCategoryIds}
+              onSelectionChange={(ids) => updateFilterField("categoryIds", ids.length > 0 ? ids : undefined)}
+              emptyState={t.noCategoriesLoaded || "No categories loaded."}
+            />
+
+            {/* Selected category badges */}
+            {currentCategoryIds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {currentCategoryIds.map((id) => {
+                  const cat = categories.find((c) => c.id === id);
                   return (
                     <span
                       key={id}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100"
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800 font-medium"
                     >
-                      {brand?.name || id}
+                      {cat?.name || id}
                       <button
                         type="button"
-                        onClick={() => removeBrandId(id)}
-                        className="text-blue-500 hover:text-red-500"
+                        onClick={() => {
+                          const newIds = currentCategoryIds.filter((cid) => cid !== id);
+                          updateFilterField("categoryIds", newIds.length > 0 ? newIds : undefined);
+                        }}
+                        className="text-blue-500 hover:text-red-500 transition-colors ml-0.5"
                       >
                         &times;
                       </button>
@@ -318,8 +369,74 @@ export function ProductRailSectionEditor({
             )}
           </div>
 
-          {/* Price Range */}
-          <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+              {t.filterBrands || "Filter by Brands"}
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900">
+              {brands.map((brand) => (
+                <label key={brand.id} className="flex items-center gap-2 cursor-pointer group p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors text-[11px] font-medium text-slate-600 dark:text-slate-400 group-hover:text-blue-500 transition-colors truncate">
+                  <input
+                    type="checkbox"
+                    checked={currentBrandIds.includes(brand.id)}
+                    onChange={(e) => {
+                      const newIds = e.target.checked
+                        ? [...currentBrandIds, brand.id]
+                        : currentBrandIds.filter((id) => id !== brand.id);
+                      updateFilterField("brandIds", newIds.length > 0 ? newIds : undefined);
+                    }}
+                    className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 h-3.5 w-3.5"
+                  />
+                  {brand.images?.[0] && (
+                    <img
+                      src={brand.images[0]}
+                      alt={brand.name || brand.id}
+                      className="w-4 h-4 rounded object-cover border border-slate-200 dark:border-slate-700"
+                    />
+                  )}
+                  <span className="truncate">
+                    {brand.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            {/* Brand Badges */}
+            {currentBrandIds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {currentBrandIds.map((id) => {
+                  const brand = brands.find((b) => b.id === id);
+                  return (
+                    <span
+                      key={id}
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800 font-medium"
+                    >
+                      {brand?.images?.[0] && (
+                        <img
+                          src={brand.images[0]}
+                          alt={brand?.name || id}
+                          className="w-4 h-4 rounded-full object-cover border border-white/50 shadow-sm"
+                        />
+                      )}
+                      <span className="truncate max-w-[100px]">{brand?.name || id}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newIds = currentBrandIds.filter((bid) => bid !== id);
+                          updateFilterField("brandIds", newIds.length > 0 ? newIds : undefined);
+                        }}
+                        className="text-blue-500 hover:text-red-500 transition-colors ml-0.5"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                 {t.minPrice || "Min Price"}
@@ -330,12 +447,10 @@ export function ProductRailSectionEditor({
                 onChange={(e) =>
                   updateFilterField("minPrice", e.target.value ? parseFloat(e.target.value) : undefined)
                 }
-                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
                 placeholder="0"
-                min="0"
               />
             </div>
-
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                 {t.maxPrice || "Max Price"}
@@ -346,62 +461,63 @@ export function ProductRailSectionEditor({
                 onChange={(e) =>
                   updateFilterField("maxPrice", e.target.value ? parseFloat(e.target.value) : undefined)
                 }
-                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
-                placeholder="1000"
-                min="0"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
+                placeholder="Any"
               />
             </div>
           </div>
 
-          {/* Boolean Filters */}
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={safeData.filterBy?.isNewArrival || false}
-                onChange={(e) => updateFilterField("isNewArrival", e.target.checked || undefined)}
-                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800"
-              />
-              <span className="text-xs text-slate-700 dark:text-slate-300">
-                {t.isNewArrival || "New Arrivals Only"}
-              </span>
-            </label>
+            {[
+              { field: "isNewArrival", label: t.isNewArrival || "New Arrivals" },
+              { field: "isLiquidated", label: t.isLiquidated || "On Liquidation" },
+              { field: "isComingSoon", label: t.isComingSoon || "Coming Soon" },
+              { field: "hasDiscount", label: t.hasDiscount || "With Discount" },
+            ].map((item) => (
+              <label key={item.field} className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group">
+                <input
+                  type="checkbox"
+                  checked={!!(safeData.filterBy as any)?.[item.field]}
+                  onChange={(e) => updateFilterField(item.field as any, e.target.checked || undefined)}
+                  className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 w-4 h-4"
+                />
+                <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {item.label}
+                </span>
+              </label>
+            ))}
+          </div>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={safeData.filterBy?.isLiquidated || false}
-                onChange={(e) => updateFilterField("isLiquidated", e.target.checked || undefined)}
-                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800"
-              />
-              <span className="text-xs text-slate-700 dark:text-slate-300">
-                {t.isLiquidated || "Liquidated Items Only"}
-              </span>
-            </label>
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="grid grid-cols-2 gap-4">
+              <label className="flex items-center gap-2 p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/30 dark:bg-blue-900/10 cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all group">
+                <input
+                  type="checkbox"
+                  checked={safeData.filterBy?.isRandom || false}
+                  onChange={(e) => updateFilterField("isRandom", e.target.checked || undefined)}
+                  className="rounded-full border-blue-300 dark:border-blue-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 w-4 h-4"
+                />
+                <span className="text-[11px] font-bold text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300 transition-colors">
+                  {t.randomOrder || "Show in Random Order"}
+                </span>
+              </label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={safeData.filterBy?.isComingSoon || false}
-                onChange={(e) => updateFilterField("isComingSoon", e.target.checked || undefined)}
-                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800"
-              />
-              <span className="text-xs text-slate-700 dark:text-slate-300">
-                {t.isComingSoon || "Coming Soon Only"}
-              </span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={safeData.filterBy?.hasDiscount || false}
-                onChange={(e) => updateFilterField("hasDiscount", e.target.checked || undefined)}
-                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800"
-              />
-              <span className="text-xs text-slate-700 dark:text-slate-300">
-                {t.hasDiscount || "Discounted Items Only"}
-              </span>
-            </label>
+              <div className="bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 mb-1 uppercase tracking-wider px-1">
+                  {t.productCount || "Product Count"}
+                </label>
+                <input
+                  type="number"
+                  value={safeData.filterBy?.productCount || "12"}
+                  onChange={(e) =>
+                    updateFilterField("productCount", e.target.value ? parseInt(e.target.value) : undefined)
+                  }
+                  className="w-full px-2 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs text-center font-bold"
+                  placeholder="Count"
+                  min="1"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

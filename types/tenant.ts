@@ -51,7 +51,6 @@ export type ProductRailData = {
   subtitle?: LocalizedText;
   layout: "carousel" | "grid";
   columns?: 2 | 3 | 4 | 5 | 6;
-  limit: number;
   viewAllHref: string;
   filterBy?: {
     categoryIds?: string[];
@@ -64,6 +63,10 @@ export type ProductRailData = {
     hasDiscount?: boolean;
     minPrice?: number;
     maxPrice?: number;
+    isRandom?: boolean;
+    productCount?: number;
+    productIds?: string[];
+    facetFilters?: any[]; // For now to avoid circular dependency or complex type mapping
   };
   sortBy?: "featured" | "newest" | "price-low" | "price-high" | "rating" | "name";
 };
@@ -283,6 +286,12 @@ export type DynamicPageSectionInstance =
     enabled: boolean;
     order: number;
     data: CategoryCarouselData;
+  }
+  | {
+    type: "BrandCarousel";
+    enabled: boolean;
+    order: number;
+    data: BrandCarouselData;
   };
 
 export type DynamicPageMetadata = {
@@ -486,26 +495,26 @@ export type Dictionary = Record<string, any>;
 
 export type TenantConfig =
   | {
-      templateId: 1;
-      themeColor: string;
-      theme: ThemeVars;
-      homepage: Template1Homepage;
-      infoPages?: InfoPagesConfig;
-      dynamicPages?: DynamicPagesConfig;
-      merchantType?: MerchantType;
-      siteConfig: SiteConfig;
-      ui?: UIConfig;
-      dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
-    }
+    templateId: 1;
+    themeColor: string;
+    theme: ThemeVars;
+    homepage: Template1Homepage;
+    infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
+    merchantType?: MerchantType;
+    siteConfig: SiteConfig;
+    ui?: UIConfig;
+    dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
+  }
   | {
-      templateId: 2;
-      themeColor: string;
-      theme: ThemeVars;
-      homepage: Template2Homepage;
-      infoPages?: InfoPagesConfig;
-      dynamicPages?: DynamicPagesConfig;
-      merchantType?: MerchantType;
-      siteConfig: SiteConfig;
-      ui?: UIConfig;
-      dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
-    };
+    templateId: 2;
+    themeColor: string;
+    theme: ThemeVars;
+    homepage: Template2Homepage;
+    infoPages?: InfoPagesConfig;
+    dynamicPages?: DynamicPagesConfig;
+    merchantType?: MerchantType;
+    siteConfig: SiteConfig;
+    ui?: UIConfig;
+    dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
+  };

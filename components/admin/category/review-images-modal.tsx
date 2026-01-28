@@ -23,6 +23,24 @@ import { GoBackButton } from "@/components/go-back-button";
 import { compressImages } from "@/lib/image-compression";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, RefreshCw } from "lucide-react";
+
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
 type UploadReply = string[] | UploadReplyItem[];
@@ -36,8 +54,51 @@ type ReviewImagesModalProps = {
   trigger?: React.ReactNode;
 };
 
-type SelectedImage = { id: string; file: File; url: string };
-const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
+type UnifiedImage = {
+  id: string;
+  url: string;
+  type: "server" | "pending";
+  toDelete?: boolean;
+  serverKey?: string;
+  file?: File;
+};
+
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+function SortableItem({ id, children }: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 2 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={cn("relative group", isDragging && "opacity-50 z-50")}>
+      {children}
+      <button
+        {...attributes}
+        {...listeners}
+        className="absolute top-2 left-2 p-1 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-20"
+        title="Drag to reorder"
+        type="button"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 export default function ReviewImagesModal({
   categoryId,
@@ -55,43 +116,54 @@ export default function ReviewImagesModal({
   const t = dict.admin.categories.imagesModal;
   const tTree = dict.admin.categories.treeView;
 
-  const [serverImages, setServerImages] = useState<(ExistingImage & { toDelete?: boolean })[]>(() =>
-    (existing ?? []).map((i) => ({ ...i, toDelete: false })),
-  );
-  const [images, setImages] = useState<SelectedImage[]>([]);
+  const [unifiedImages, setUnifiedImages] = useState<UnifiedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+  );
+
   useEffect(() => {
     if (!isOpen) return;
-    setServerImages((existing ?? []).map((i) => ({ ...i, toDelete: false })));
-    setImages((prev) => {
-      prev.forEach((p) => URL.revokeObjectURL(p.url));
 
-      return [];
-    });
+    // Initialize unifiedImages from existing
+    const existingMapped: UnifiedImage[] = (existing ?? []).map((i) => ({
+      id: i.key, // Use server key as id for existing
+      url: i.url,
+      type: "server",
+      toDelete: false,
+      serverKey: i.key,
+    }));
+
+    setUnifiedImages(existingMapped);
   }, [isOpen, existing]);
 
   useEffect(() => {
     return () => {
-      images.forEach((img) => URL.revokeObjectURL(img.url));
+      unifiedImages.forEach((img) => {
+        if (img.type === "pending") URL.revokeObjectURL(img.url);
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const remainingSlots = useMemo(
-    () => Math.max(0, maxFiles - (serverImages.filter((s) => !s.toDelete).length + images.length)),
-    [serverImages, images.length, maxFiles],
+    () => Math.max(0, maxFiles - unifiedImages.filter((s) => !s.toDelete).length),
+    [unifiedImages, maxFiles],
   );
 
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files?.length) return;
-      const imgsOnly = files.filter((f) => f.type.startsWith("image/"));
+      if (remainingSlots <= 0) return;
 
-      const existingKeys = new Set(images.map((i) => fileKey(i.file)));
-      const dedup = imgsOnly.filter((f) => !existingKeys.has(fileKey(f)));
-      const toAdd = dedup.slice(0, remainingSlots);
+      const imgsOnly = files.filter((f) => f.type.startsWith("image/"));
+      const toAdd = imgsOnly.slice(0, remainingSlots);
 
       if (toAdd.length === 0) return;
 
@@ -103,18 +175,22 @@ export default function ReviewImagesModal({
           quality: 0.85,
         });
 
-        const newItems = compressed.map((file) => ({
-          id: crypto.randomUUID(),
-          file,
-          url: URL.createObjectURL(file),
-        }));
+        const newImages: UnifiedImage[] = compressed.map((file) => {
+          const id = crypto.randomUUID();
+          return {
+            id,
+            url: URL.createObjectURL(file),
+            type: "pending",
+            file,
+          };
+        });
 
-        if (newItems.length > 0) setImages((prev) => [...prev, ...newItems]);
+        setUnifiedImages((prev) => [...prev, ...newImages]);
       } catch (err) {
         console.error("Failed to compress images:", err);
       }
     },
-    [images, remainingSlots],
+    [remainingSlots],
   );
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,54 +230,82 @@ export default function ReviewImagesModal({
     if (files.length) addFiles(files);
   };
 
-  const removePending = (id: string) => {
-    setImages((prev) => {
+  const removeImage = (id: string) => {
+    setUnifiedImages((prev) => {
       const img = prev.find((p) => p.id === id);
-
-      if (img) URL.revokeObjectURL(img.url);
-
-      return prev.filter((p) => p.id !== id);
+      if (img?.type === "pending") {
+        URL.revokeObjectURL(img.url);
+        return prev.filter((p) => p.id !== id);
+      }
+      // For server images, we just toggle toDelete
+      return prev.map((s) => (s.id === id ? { ...s, toDelete: !s.toDelete } : s));
     });
   };
-  const clearAllPending = () => {
-    setImages((prev) => {
-      prev.forEach((p) => URL.revokeObjectURL(p.url));
 
-      return [];
+  const clearAllPending = () => {
+    setUnifiedImages((prev) => {
+      prev.forEach((p) => {
+        if (p.type === "pending") URL.revokeObjectURL(p.url);
+      });
+
+      return prev.filter((p) => p.type === "server");
     });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setUnifiedImages((items) => {
+        const oldIndex = items.findIndex((i) => i.id === active.id);
+        const newIndex = items.findIndex((i) => i.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const handleSave = async () => {
     try {
       setSaving(true);
-      const toDelete = serverImages
-        .filter((s) => s.toDelete)
-        .map((s) => Number.parseInt(s.key as unknown as string, 10))
-        .filter((n) => Number.isFinite(n))
+
+      const toDelete = unifiedImages
+        .filter((s) => s.type === "server" && s.toDelete)
+        .map((s) => Number.parseInt(s.serverKey as string, 10))
         .sort((a, b) => b - a);
 
       for (const pos of toDelete) {
         await deleteImage(categoryId, String(pos));
       }
 
-      const newFiles = images.map((i) => i.file);
+      const pendingFiles = unifiedImages.filter((i) => i.type === "pending").map((i) => i.file!);
       let uploaded: UploadReply = [];
+      if (pendingFiles.length) {
+        uploaded = await uploadCategoryImages(categoryId, pendingFiles);
+      }
 
-      if (newFiles.length) uploaded = await uploadCategoryImages(categoryId, newFiles);
-
-      const uploadedItems: UploadReplyItem[] = Array.isArray(uploaded)
+      const uploadedUrls: string[] = Array.isArray(uploaded)
         ? typeof uploaded[0] === "string"
-          ? (uploaded as string[]).map((url, idx) => ({ key: `temp-${Date.now()}-${idx}`, url }))
-          : (uploaded as UploadReplyItem[])
+          ? (uploaded as string[])
+          : (uploaded as UploadReplyItem[]).map(x => x.url)
         : [];
 
-      const kept = serverImages.filter((s) => !s.toDelete).map((k) => ({ ...k, toDelete: false }));
-      const next = [...kept, ...uploadedItems];
+      let uploadIdx = 0;
+      const finalUrls: string[] = unifiedImages
+        .filter(img => !img.toDelete)
+        .map(img => {
+          if (img.type === "pending") {
+            return uploadedUrls[uploadIdx++];
+          }
+          return img.url;
+        })
+        .filter(url => !!url);
 
-      setServerImages(next);
-      images.forEach((p) => URL.revokeObjectURL(p.url));
-      setImages([]);
-      await onChanged?.(next.map((x) => x.url));
+      await onChanged?.(finalUrls);
+
+      unifiedImages.forEach(img => {
+        if (img.type === "pending") URL.revokeObjectURL(img.url);
+      });
       onClose();
     } finally {
       setSaving(false);
@@ -274,7 +378,7 @@ export default function ReviewImagesModal({
                 <ModalHeader className="flex items-center gap-2 px-4 pt-6 pb-4 z-50 relative">
                   <GoBackButton onClick={handleCloseModal} />
                   <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                    {unifiedImages.filter((s) => !s.toDelete).length} / {maxFiles}
                   </Badge>
                 </ModalHeader>
               ) : (
@@ -291,7 +395,7 @@ export default function ReviewImagesModal({
                   </div>
 
                   <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                    {unifiedImages.filter((s) => !s.toDelete).length} / {maxFiles}
                   </Badge>
                 </ModalHeader>
               )}
@@ -343,100 +447,96 @@ export default function ReviewImagesModal({
                     </div>
                   </div>
 
-                  {serverImages.length > 0 || images.length > 0 ? (
-                    <ScrollArea className="max-h-[360px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {/* Existing images */}
-                        {serverImages.map((img) => (
-                          <figure
-                            key={img.key}
-                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
-                          >
-                            <Image
-                              alt="Existing category image"
-                              className="h-36 w-full object-cover"
-                              height={200}
-                              src={img.url}
-                              width={200}
-                            />
-                            <div className="absolute left-2 top-2">
-                              <Badge
-                                className={cn(
-                                  "border",
-                                  img.toDelete
-                                    ? "bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30"
-                                    : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
-                                )}
-                              >
-                                {img.toDelete ? t.willDelete : t.existing}
-                              </Badge>
-                            </div>
-                            <button className="font-primary absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                              title={img.toDelete ? "Undo delete" : "Delete"}
-                              type="button"
-                              onClick={() =>
-                                setServerImages((prev) =>
-                                  prev.map((s) =>
-                                    s.key === img.key ? { ...s, toDelete: !s.toDelete } : s,
-                                  ),
-                                )
-                              }
-                            >
-                              {img.toDelete ? (
-                                <X className="h-4 w-4" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </button>
-                            {img.toDelete && (
-                              <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[1px]" />
-                            )}
-                          </figure>
-                        ))}
+                  {unifiedImages.length > 0 ? (
+                    <DndContext
+                      collisionDetection={closestCenter}
+                      sensors={sensors}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <ScrollArea className="max-h-[460px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                        <SortableContext
+                          items={unifiedImages.map((i) => i.id)}
+                          strategy={rectSortingStrategy}
+                        >
+                          <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {unifiedImages.map((img, index) => (
+                              <SortableItem key={img.id} id={img.id}>
+                                <figure
+                                  className={cn(
+                                    "relative rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 aspect-square group",
+                                    img.toDelete && "opacity-50"
+                                  )}
+                                >
+                                  <Image
+                                    fill
+                                    alt="Category image"
+                                    className="object-cover"
+                                    src={img.url}
+                                  />
 
-                        {/* Pending images */}
-                        {images.map((img) => (
-                          <figure
-                            key={img.id}
-                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
-                          >
-                            <Image
-                              alt="Category image pending upload"
-                              className="h-36 w-full object-cover"
-                              height={200}
-                              src={img.url || "/placeholder.png"}
-                              width={200}
-                            />
-                            <div className="absolute left-2 top-2">
-                              <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                                {t.new}
-                              </Badge>
-                            </div>
-                            <button
-                              aria-label="Remove image"
-                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                              type="button"
-                              onClick={() => removePending(img.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </figure>
-                        ))}
-                      </div>
-                    </ScrollArea>
+                                  {/* Status Badges */}
+                                  <div className="absolute left-2 bottom-2 flex flex-col gap-1 z-10">
+                                    {index === 0 && !img.toDelete && (
+                                      <Badge className="bg-amber-500 text-white border-amber-600 shadow-sm text-[10px] px-1.5 py-0">
+                                        {dict.common.main || "Main"}
+                                      </Badge>
+                                    )}
+                                    {img.type === "server" ? (
+                                      <Badge
+                                        className={cn(
+                                          "text-[10px] px-1.5 py-0",
+                                          img.toDelete
+                                            ? "bg-rose-500/80 text-white"
+                                            : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
+                                        )}
+                                      >
+                                        {img.toDelete ? t.willDelete : t.existing}
+                                      </Badge>
+                                    ) : (
+                                      <Badge className="bg-emerald-500/80 text-white text-[10px] px-1.5 py-0">
+                                        {t.new}
+                                      </Badge>
+                                    )}
+                                  </div>
+
+                                  <button
+                                    className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                                    title={img.toDelete ? (t.undoDelete || "Undo") : (t.delete || "Remove")}
+                                    type="button"
+                                    onClick={() => removeImage(img.id)}
+                                  >
+                                    {img.toDelete ? (
+                                      <RefreshCw className="h-4 w-4" />
+                                    ) : (
+                                      <Trash2 className="h-4 w-4" />
+                                    )}
+                                  </button>
+
+                                  {img.toDelete && (
+                                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[1px] flex items-center justify-center">
+                                      <Trash2 className="h-8 w-8 text-white/50" />
+                                    </div>
+                                  )}
+                                </figure>
+                              </SortableItem>
+                            ))}
+                          </div>
+                        </SortableContext>
+                      </ScrollArea>
+                    </DndContext>
                   ) : (
                     <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-6 text-center bg-white/70 dark:bg-slate-800/60">
                       <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                         <Images className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                       </div>
-                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">{t.noImagesYet}</p>
+                      <p className="font-primary text-sm text-slate-700 dark:text-slate-300">{t.noImagesYet || "No images yet."}</p>
                     </div>
                   )}
                 </div>
               </ModalBody>
 
               <ModalFooter className="gap-3 px-6 py-5 bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 relative">
-                {images.length > 0 && (
+                {unifiedImages.some(i => i.type === "pending") && (
                   <Button className="mr-auto" type="button" variant="ghost" onClick={clearAllPending}>
                     <X className="h-4 w-4 mr-2" />
                     {t.clearPending}
@@ -451,8 +551,7 @@ export default function ReviewImagesModal({
                   {t.cancel}
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
-                  disabled={saving || (serverImages.every((s) => !s.toDelete) && images.length === 0)}
+                  disabled={saving}
                   onClick={handleSave}
                 >
                   {saving ? (

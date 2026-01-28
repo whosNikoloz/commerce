@@ -11,7 +11,7 @@ import { ImageReview, ImageReviewHandle } from "./image-review";
 import { CollapsibleDescription } from "./collapsible-description";
 import { DynamicProductRails } from "./DynamicProductRails";
 
-import { ProductResponseModel } from "@/types/product";
+import { ProductResponseModel, parseProductRailSections } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { getCachedMerchantType } from "@/app/context/tenantContext";
@@ -366,9 +366,12 @@ export default function ProductDetail({ initialProduct }: Props) {
 
   // Memoize rail sections to prevent unnecessary re-fetches
   const railSections = useMemo(() => {
-    if (product.productRailSections?.length) {
-      return product.productRailSections;
+    const parsedSections = parseProductRailSections(product.productAdditionalJson);
+
+    if (parsedSections.length > 0) {
+      return parsedSections;
     }
+
     // Default to brand products if no sections configured
     return [
       {
@@ -384,7 +387,7 @@ export default function ProductDetail({ initialProduct }: Props) {
         sortBy: "newest" as const,
       },
     ];
-  }, [product.productRailSections, product.brand?.name]);
+  }, [product.productAdditionalJson, product.brand?.name]);
 
   if (notFound) return <ProductNotFound />;
 

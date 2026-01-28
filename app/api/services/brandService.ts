@@ -23,9 +23,10 @@ export async function createBrand(
   name: string,
   origin: string,
   description: string,
-  images: string[]
+  images: string[],
+  parentId?: string | null
 ): Promise<string> {
-  const data = { name, origin, description, images };
+  const data = { name, origin, description, images, parentId: parentId || null };
 
   return apiFetch<string>(`${API_BASE}/add-brand`, {
     method: "POST",
@@ -36,6 +37,13 @@ export async function createBrand(
     requireAuth: true,
     failIfUnauthenticated: true,
   });
+}
+
+/**
+ * Get a brand and all its descendants (children, grandchildren, etc.) recursively
+ */
+export async function getBrandWithSubBrands(brandId: string): Promise<BrandModel[]> {
+  return apiFetch<BrandModel[]>(`${API_BASE}/get-brand-with-subbrands?id=${brandId}`);
 }
 
 
@@ -51,7 +59,11 @@ export async function deleteImage(id: string, key: string): Promise<string> {
     method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }
-export async function uploadBrandImages(brandId: string, files: File[]): Promise<string[]> {
+export async function uploadBrandImages(
+  brandId: string,
+  files: File[],
+  coverIndex?: number
+): Promise<string[]> {
   if (!brandId) throw new Error("brand is required");
   if (!files || files.length === 0) throw new Error("at least one file is required");
 
@@ -63,8 +75,45 @@ export async function uploadBrandImages(brandId: string, files: File[]): Promise
     formData.append("files", file, file.name);
   });
 
+  // Add coverIndex if specified
+  if (coverIndex !== undefined && coverIndex >= 0) {
+    formData.append("coverIndex", coverIndex.toString());
+  }
+
   return apiFetch<string[]>(`${API_BASE}/images`, {
     method: "POST",
-    body: formData, requireAuth: true , failIfUnauthenticated : true 
+    body: formData,
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
+}
+
+/**
+ * Set a specific image as the cover/main image for a brand
+ */
+export async function setCoverImage(
+  brandId: string,
+  imageKey: string
+): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>(
+    `${API_BASE}/${brandId}/set-cover-image/${encodeURIComponent(imageKey)}`,
+    {
+      method: "PUT",
+      requireAuth: true,
+      failIfUnauthenticated: true,
+    }
+  );
+}
+
+/**
+ * Get all images for a brand with cover information
+ */
+export async function getAllImagesForBrand(brandId: string): Promise<Array<{
+  id: string;
+  brandId: string;
+  imagePath: string;
+  isCover: boolean;
+  displayOrder: number;
+}>> {
+  return apiFetch(`${API_BASE}/get-all-images-by-brand-${brandId}`);
 }

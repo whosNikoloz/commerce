@@ -22,9 +22,14 @@ export interface ProductRailSectionFilterBy {
   hasDiscount?: boolean;
   minPrice?: number;
   maxPrice?: number;
+  isRandom?: boolean;
+  productCount?: number;
+  condition?: number[];
+  stockStatus?: number;
   // Special filters that use current product's data
   useCurrentProductCategory?: boolean;
   useCurrentProductBrand?: boolean;
+  productIds?: string[];
 }
 
 export interface ProductRailSectionData {
@@ -34,7 +39,6 @@ export interface ProductRailSectionData {
   subtitle?: LocalizedText;
   layout: "carousel" | "grid";
   columns?: 2 | 3 | 4 | 5 | 6;
-  limit: number;
   viewAllHref?: string;
   enabled: boolean;
   order: number;
@@ -59,7 +63,8 @@ export interface ProductResponseModel {
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueResponseModel[];
   productGroupId?: string;
-  productRailSections?: ProductRailSectionData[];
+  productAdditionalJson?: string; // JSON string containing ProductRailSectionData[]
+  stockQuantity?: number; // Current stock quantity (if available from server)
 }
 
 export interface ProductRequestModel {
@@ -79,7 +84,33 @@ export interface ProductRequestModel {
   isNewArrival?: boolean;
   productFacetValues: ProductFacetValueModel[];
   productGroupId?: string;
-  productRailSections?: ProductRailSectionData[];
+  productAdditionalJson?: string; // JSON string containing ProductRailSectionData[]
+  // Stock integration fields
+  initialStock?: number; // Used when creating a product
+  stockQuantity?: number; // Used when updating a product
+}
+
+// Helper functions to work with productAdditionalJson
+export function parseProductRailSections(json?: string): ProductRailSectionData[] {
+  if (!json) return [];
+  try {
+    return JSON.parse(json) as ProductRailSectionData[];
+  } catch {
+    return [];
+  }
+}
+
+export function stringifyProductRailSections(sections: ProductRailSectionData[]): string {
+  return JSON.stringify(sections);
+}
+
+// Product Image model with cover support
+export interface ProductImageModel {
+  id: string;
+  productId: string;
+  imagePath: string;
+  isCover: boolean;
+  displayOrder: number;
 }
 
 export async function mapProducts(

@@ -8,5 +8,7 @@ export interface FilterModel {
   stockStatus?: StockStatus;
   minPrice?: number;
   maxPrice?: number;
+  isRandom?: boolean;
+  productCount?: number;
   facetFilters?: FacetFilterModel[];
 }

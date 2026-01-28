@@ -1,6 +1,6 @@
 import { apiFetch } from "../client/fetcher";
 
-import { ProductResponseModel, ProductRequestModel } from "@/types/product";
+import { ProductResponseModel, ProductRequestModel, ProductImageModel } from "@/types/product";
 import { FilterModel } from "@/types/filter";
 import { PagedList } from "@/types/pagination";
 import { FinaProductRestArrayModel, FinaProductRestResponse } from "@/types/product-rest";
@@ -58,9 +58,11 @@ export async function getProductsByCategory(id: string): Promise<ProductRequestM
 export async function getProductsByIds(ids: string[]): Promise<ProductResponseModel[]> {
   if (!ids || ids.length === 0) return [];
 
-  // This is a temporary implementation until the backend supports batch fetching
-  const promises = ids.map(id => getProductById(id));
-  return Promise.all(promises);
+  const params = new URLSearchParams();
+
+  ids.forEach(id => params.append('ids', id));
+
+  return apiFetch<ProductResponseModel[]>(`${PRODUCT_API_BASE}/get-products-by-ids?${params.toString()}`);
 }
 
 export async function getProductRestsByIds(
@@ -165,7 +167,11 @@ export async function deleteImage(id: string, key: string): Promise<string> {
     method: "DELETE",
   });
 }
-export async function uploadProductImages(productId: string, files: File[]): Promise<string[]> {
+export async function uploadProductImages(
+  productId: string,
+  files: File[],
+  coverIndex?: number
+): Promise<string[]> {
   if (!productId) throw new Error("productId is required");
   if (!files || files.length === 0) throw new Error("at least one file is required");
 
@@ -177,9 +183,41 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
     formData.append("files", file, file.name);
   });
 
+  // Add coverIndex if specified
+  if (coverIndex !== undefined && coverIndex >= 0) {
+    formData.append("coverIndex", coverIndex.toString());
+  }
+
   return apiFetch<string[]>(`${PRODUCT_API_BASE}/images`, {
     method: "POST",
     body: formData,
-    requireAuth: true, failIfUnauthenticated: true
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
+}
+
+/**
+ * Get all images for a product with cover information
+ */
+export async function getAllImagesForProduct(productId: string): Promise<ProductImageModel[]> {
+  return apiFetch<ProductImageModel[]>(
+    `${PRODUCT_API_BASE}/get-all-images-by-product-${productId}`
+  );
+}
+
+/**
+ * Set a specific image as the cover/main image for a product
+ */
+export async function setCoverImage(
+  productId: string,
+  imageKey: string
+): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>(
+    `${PRODUCT_API_BASE}/${productId}/set-cover-image/${encodeURIComponent(imageKey)}`,
+    {
+      method: "PUT",
+      requireAuth: true,
+      failIfUnauthenticated: true,
+    }
+  );
 }

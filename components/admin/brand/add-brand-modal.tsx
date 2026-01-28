@@ -11,6 +11,7 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
 
 import { CustomEditor } from "../../wysiwyg-text-custom";
 import { GoBackButton } from "../../go-back-button";
@@ -18,18 +19,21 @@ import { GoBackButton } from "../../go-back-button";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { BrandModel } from "@/types/brand";
 
 interface AddBrandModalProps {
   defaultName?: string;
   defaultOrigin?: string;
   defaultDescription?: string;
-  onCreate: (name: string, description: string, origin: string) => void;
+  brands?: BrandModel[]; // Available brands for parent selection
+  onCreate: (name: string, description: string, origin: string, parentId?: string | null) => void;
 }
 
 export default function AddBrandModal({
   defaultName = "",
   defaultOrigin = "",
   defaultDescription = "",
+  brands = [],
   onCreate,
 }: AddBrandModalProps) {
   const dict = useDictionary();
@@ -41,6 +45,7 @@ export default function AddBrandModal({
   const [name, setName] = useState(defaultName);
   const [origin, setOrigin] = useState(defaultOrigin);
   const [description, setDescription] = useState(defaultDescription);
+  const [parentId, setParentId] = useState<string | null>(null);
 
   useEffect(() => setName(defaultName), [defaultName]);
   useEffect(() => setOrigin(defaultOrigin), [defaultOrigin]);
@@ -50,6 +55,7 @@ export default function AddBrandModal({
     setName(defaultName || "");
     setOrigin(defaultOrigin || "");
     setDescription(defaultDescription || "");
+    setParentId(null);
   };
 
   const handleOpen = () => {
@@ -63,7 +69,7 @@ export default function AddBrandModal({
   };
 
   const handleCreate = () => {
-    onCreate(name.trim(), description, origin.trim());
+    onCreate(name.trim(), description, origin.trim(), parentId);
     handleClose();
   };
 
@@ -156,6 +162,30 @@ export default function AddBrandModal({
                   variant="bordered"
                   onChange={(e) => setOrigin(e.target.value)}
                 />
+
+                {/* Parent Brand (for sub-brand hierarchy) */}
+                {brands.length > 0 && (
+                  <Select
+                    classNames={{
+                      label: "text-slate-700 dark:text-slate-300 font-semibold text-sm mb-1.5",
+                      trigger:
+                        "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 data-[focus=true]:border-blue-500 dark:data-[focus=true]:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300",
+                    }}
+                    label={t.parentBrand || "Parent Brand"}
+                    placeholder={t.parentBrandPlaceholder || "Select parent brand (optional)"}
+                    selectedKeys={parentId ? [parentId] : []}
+                    size="lg"
+                    variant="bordered"
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      setParentId(selected || null);
+                    }}
+                  >
+                    {brands.map((brand) => (
+                      <SelectItem key={brand.id}>{brand.name}</SelectItem>
+                    ))}
+                  </Select>
+                )}
 
                 {/* Description */}
                 <div className="space-y-2">

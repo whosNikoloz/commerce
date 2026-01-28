@@ -4,6 +4,7 @@ import type { BrandModel } from "@/types/brand";
 import type { CategoryModel } from "@/types/category";
 import type { ProductFacetValueModel } from "@/types/facet";
 import type { ProductRailSectionData } from "@/types/product";
+import { parseProductRailSections, stringifyProductRailSections } from "@/types/product";
 
 import { useEffect, useMemo, useState } from "react";
 import { Box, Clock3, Edit, Layers, X, ChevronRight, ChevronDown, Power, Settings, FileText, Link2, Sparkles } from "lucide-react";
@@ -84,8 +85,9 @@ interface UpdateProductModalProps {
   initialIsNewArrival?: boolean;
   initialStockStatus?: StockStatus;
   initialCondition?: Condition;
+  initialStockQuantity?: number; // Current stock quantity
   initialFacetValues?: ProductFacetValueModel[];
-  initialProductRailSections?: ProductRailSectionData[];
+  initialProductAdditionalJson?: string; // JSON string containing ProductRailSectionData[]
   brands?: BrandModel[];
   categories?: CategoryModel[];
   onSave: (
@@ -101,7 +103,8 @@ interface UpdateProductModalProps {
     condition?: Condition,
     price?: number,
     discountPrice?: number,
-    productRailSections?: ProductRailSectionData[]
+    productAdditionalJson?: string, // JSON string containing ProductRailSectionData[]
+    stockQuantity?: number // Stock quantity to update
   ) => void | Promise<void>;
 }
 
@@ -120,8 +123,9 @@ export default function UpdateProductModal({
   initialIsNewArrival = false,
   initialStockStatus = StockStatus.InStock,
   initialCondition = Condition.New,
+  initialStockQuantity,
   initialFacetValues = [],
-  initialProductRailSections = [],
+  initialProductAdditionalJson = "",
   brands = [],
   categories = [],
   onSave,
@@ -142,8 +146,9 @@ export default function UpdateProductModal({
   const [isNewArrival, setIsNewArrival] = useState(initialIsNewArrival);
   const [stockStatus, setStockStatus] = useState(initialStockStatus);
   const [condition, setCondition] = useState(initialCondition);
+  const [stockQuantity, setStockQuantity] = useState<string>(initialStockQuantity?.toString() ?? "");
   const [selectedFacetValues, setSelectedFacetValues] = useState<ProductFacetValueModel[]>(initialFacetValues);
-  const [productRailSections, setProductRailSections] = useState<ProductRailSectionData[]>(initialProductRailSections || []);
+  const [productRailSections, setProductRailSections] = useState<ProductRailSectionData[]>(parseProductRailSections(initialProductAdditionalJson));
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"settings" | "description" | "relations">("settings");
 
@@ -178,8 +183,9 @@ export default function UpdateProductModal({
     setIsNewArrival(initialIsNewArrival);
     setStockStatus(initialStockStatus);
     setCondition(initialCondition);
+    setStockQuantity(initialStockQuantity?.toString() ?? "");
     setSelectedFacetValues(initialFacetValues);
-    setProductRailSections(initialProductRailSections || []);
+    setProductRailSections(parseProductRailSections(initialProductAdditionalJson));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]); // Only run when modal opens/closes - initial values are captured at that moment
 
@@ -251,7 +257,8 @@ export default function UpdateProductModal({
           condition,
           parseFloat(price),
           discountPrice ? parseFloat(discountPrice) : undefined,
-          productRailSections
+          productRailSections.length > 0 ? stringifyProductRailSections(productRailSections) : undefined,
+          stockQuantity ? parseInt(stockQuantity) : undefined
         ),
       );
       onClose();
@@ -800,7 +807,7 @@ export default function UpdateProductModal({
                       <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">
                         {t.inventoryCondition || "Inventory & Condition"}
                       </Label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-3 gap-3">
                         <HSelect
                           label={t.stockStatus || "Stock Status"}
                           selectedKeys={new Set([stockStatus.toString()])}
@@ -841,6 +848,20 @@ export default function UpdateProductModal({
                             {tCommon.likeNew || "Like New"}
                           </HSelectItem>
                         </HSelect>
+
+                        <div className="flex flex-col">
+                          <Label className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            {t.stockQuantity || "Stock Quantity"}
+                          </Label>
+                          <Input
+                            className="h-10"
+                            min="0"
+                            placeholder="0"
+                            type="number"
+                            value={stockQuantity}
+                            onChange={(e) => setStockQuantity(e.target.value)}
+                          />
+                        </div>
                       </div>
                     </div>
 

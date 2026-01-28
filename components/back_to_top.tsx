@@ -18,7 +18,7 @@ type Props = {
 export default function BackToTopShadcn({
   threshold = 300,
   className,
-  offsetClass = "bottom-16 right-6 md:bottom-8 md:right-8",
+  offsetClass = "bottom-28 right-6 md:bottom-8 md:right-8",
   ariaLabel = "Back to top",
 }: Props) {
   const [visible, setVisible] = useState(false);

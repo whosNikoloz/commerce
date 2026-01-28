@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Images, Trash2, Upload, X } from "lucide-react";
+import { Images, Trash2, Upload, X, RefreshCw, Star } from "lucide-react";
 import {
   Modal,
   ModalContent,
@@ -11,6 +11,22 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import Image from "next/image";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,12 +34,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { deleteImage, uploadProductImages } from "@/app/api/services/productService";
+import { deleteImage, uploadProductImages, setCoverImage } from "@/app/api/services/productService";
 import { GoBackButton } from "@/components/go-back-button";
 import { compressImages } from "@/lib/image-compression";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
-type ExistingImage = { key: string; url: string };
+type ExistingImage = { key: string; url: string; isCover?: boolean };
 type UploadReplyItem = { key: string; url: string };
 type UploadReply = string[] | UploadReplyItem[];
 
@@ -36,7 +52,53 @@ type ReviewImagesModalProps = {
   trigger?: React.ReactNode;
 };
 
-type SelectedImage = { id: string; file: File; url: string };
+
+type UnifiedImage = {
+  id: string;
+  url: string;
+  type: "server" | "pending";
+  toDelete?: boolean;
+  serverKey?: string;
+  file?: File;
+  isCover?: boolean;
+};
+
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+function SortableItem({ id, children }: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 2 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} className={cn("relative group", isDragging && "opacity-50 z-50")} style={style}>
+      {children}
+      <button
+        {...attributes}
+        {...listeners}
+        className="absolute top-2 left-2 p-1 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-20"
+        title="Drag to reorder"
+        type="button"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 export default function ReviewImagesModal({
   productId,
@@ -59,34 +121,46 @@ export default function ReviewImagesModal({
     return [];
   }, [existing]);
 
-  const [serverImages, setServerImages] = useState<(ExistingImage & { toDelete?: boolean })[]>(() =>
-    normalizedExisting.map((i) => ({ ...i, toDelete: false })),
-  );
-  const [images, setImages] = useState<SelectedImage[]>([]);
+  const [unifiedImages, setUnifiedImages] = useState<UnifiedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+  );
 
   useEffect(() => {
     if (!isOpen) return;
-    setServerImages(normalizedExisting.map((i) => ({ ...i, toDelete: false })));
-    setImages((prev) => {
-      prev.forEach((p) => URL.revokeObjectURL(p.url));
 
-      return [];
-    });
+    // Initialize unifiedImages from existing
+    const existingMapped: UnifiedImage[] = normalizedExisting.map((i, idx) => ({
+      id: i.key, // Use server key as id for existing
+      url: i.url,
+      type: "server",
+      toDelete: false,
+      serverKey: i.key,
+      isCover: i.isCover ?? idx === 0, // First image is cover by default
+    }));
+
+    setUnifiedImages(existingMapped);
   }, [isOpen, normalizedExisting]);
 
   useEffect(() => {
     return () => {
-      images.forEach((img) => URL.revokeObjectURL(img.url));
+      unifiedImages.forEach((img) => {
+        if (img.type === "pending") URL.revokeObjectURL(img.url);
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const remainingSlots = useMemo(
-    () => Math.max(0, maxFiles - (serverImages.filter((s) => !s.toDelete).length + images.length)),
-    [serverImages, images.length, maxFiles],
+    () => Math.max(0, maxFiles - unifiedImages.filter((s) => !s.toDelete).length),
+    [unifiedImages, maxFiles],
   );
 
   const addFiles = useCallback(
@@ -107,13 +181,18 @@ export default function ReviewImagesModal({
           quality: 0.85,
         });
 
-        const newImages: SelectedImage[] = compressed.map((file) => ({
-          id: crypto.randomUUID(),
-          file,
-          url: URL.createObjectURL(file),
-        }));
+        const newImages: UnifiedImage[] = compressed.map((file) => {
+          const id = crypto.randomUUID();
 
-        setImages((prev) => [...prev, ...newImages]);
+          return {
+            id,
+            url: URL.createObjectURL(file),
+            type: "pending",
+            file,
+          };
+        });
+
+        setUnifiedImages((prev) => [...prev, ...newImages]);
       } catch (err) {
         console.error("Failed to compress images:", err);
       }
@@ -158,54 +237,119 @@ export default function ReviewImagesModal({
     if (files.length) addFiles(files);
   };
 
-  const removePending = (id: string) => {
-    setImages((prev) => {
+  const removeImage = (id: string) => {
+    setUnifiedImages((prev) => {
       const img = prev.find((p) => p.id === id);
 
-      if (img) URL.revokeObjectURL(img.url);
+      if (img?.type === "pending") {
+        URL.revokeObjectURL(img.url);
 
-      return prev.filter((p) => p.id !== id);
+        return prev.filter((p) => p.id !== id);
+      }
+
+      // For server images, we just toggle toDelete
+      return prev.map((s) => (s.id === id ? { ...s, toDelete: !s.toDelete } : s));
     });
   };
-  const clearAllPending = () => {
-    setImages((prev) => {
-      prev.forEach((p) => URL.revokeObjectURL(p.url));
 
-      return [];
+  const setAsCover = (id: string) => {
+    setUnifiedImages((prev) =>
+      prev.map((img) => ({
+        ...img,
+        isCover: img.id === id,
+      }))
+    );
+  };
+
+  const clearAllPending = () => {
+    setUnifiedImages((prev) => {
+      prev.forEach((p) => {
+        if (p.type === "pending") URL.revokeObjectURL(p.url);
+      });
+
+      return prev.filter((p) => p.type === "server");
     });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setUnifiedImages((items) => {
+        const oldIndex = items.findIndex((i) => i.id === active.id);
+        const newIndex = items.findIndex((i) => i.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const handleSave = async () => {
     try {
       setSaving(true);
-      const toDelete = serverImages
-        .filter((s) => s.toDelete)
-        .map((s) => Number.parseInt(s.key as unknown as string, 10))
-        .filter((n) => Number.isFinite(n))
+
+      // 1. Identify deletions (existing images that are marked toDelete)
+      // Note: We MUST delete from highest index to lowest if the backend shift indices.
+      // But we also need to maintain the new order.
+      // Easiest way: Delete all that need to be deleted, then upload new, then the UI order wins.
+
+      const toDelete = unifiedImages
+        .filter((s) => s.type === "server" && s.toDelete)
+        .map((s) => Number.parseInt(s.serverKey as string, 10))
         .sort((a, b) => b - a);
 
       for (const pos of toDelete) {
         await deleteImage(productId, String(pos));
       }
 
-      const newFiles = images.map((i) => i.file);
-      let uploaded: UploadReply = [];
+      // 2. Upload new images (with cover index if a pending image is marked as cover)
+      const pendingImages = unifiedImages.filter((i) => i.type === "pending");
+      const pendingFiles = pendingImages.map((i) => i.file!);
+      const pendingCoverIndex = pendingImages.findIndex((i) => i.isCover);
 
-      if (newFiles.length) uploaded = await uploadProductImages(productId, newFiles);
+      let uploaded: string[] = [];
 
-      const uploadedItems: UploadReplyItem[] = Array.isArray(uploaded)
-        ? typeof uploaded[0] === "string"
-          ? (uploaded as string[]).map((url, idx) => ({ key: `temp-${Date.now()}-${idx}`, url }))
-          : (uploaded as UploadReplyItem[])
-        : [];
+      if (pendingFiles.length) {
+        uploaded = await uploadProductImages(
+          productId,
+          pendingFiles,
+          pendingCoverIndex >= 0 ? pendingCoverIndex : undefined
+        );
+      }
 
-      const kept = serverImages.filter((s) => !s.toDelete).map((k) => ({ ...k, toDelete: false }));
-      const next = [...kept, ...uploadedItems];
+      // 3. If a server image is set as cover, call setCoverImage API
+      const coverImage = unifiedImages.find((img) => img.isCover && !img.toDelete);
 
-      setServerImages(next);
-      images.forEach((p) => URL.revokeObjectURL(p.url));
-      setImages([]);
-      await onChanged?.(next.map((x) => x.url));
+      if (coverImage?.type === "server" && coverImage.serverKey) {
+        try {
+          await setCoverImage(productId, coverImage.serverKey);
+        } catch (err) {
+          console.error("Failed to set cover image:", err);
+        }
+      }
+
+      // 4. Construct final order
+      // Mapping uploaded back to their corresponding records is hard if we don't know the index.
+      // uploadProductImages returns urls in the same order as files.
+
+      let uploadIdx = 0;
+      const finalUrls: string[] = unifiedImages
+        .filter(img => !img.toDelete)
+        .map(img => {
+          if (img.type === "pending") {
+            return uploaded[uploadIdx++];
+          }
+
+          return img.url;
+        })
+        .filter(url => !!url); // Filter out any that failed
+
+      await onChanged?.(finalUrls);
+
+      // Cleanup locally
+      unifiedImages.forEach(img => {
+        if (img.type === "pending") URL.revokeObjectURL(img.url);
+      });
       onClose();
     } finally {
       setSaving(false);
@@ -279,7 +423,7 @@ export default function ReviewImagesModal({
                 <ModalHeader className="flex items-center gap-2 px-4 pt-6 pb-4 z-50 relative">
                   <GoBackButton onClick={handleCloseModal} />
                   <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                    {unifiedImages.filter((s) => !s.toDelete).length} / {maxFiles}
                   </Badge>
                 </ModalHeader>
               ) : (
@@ -296,7 +440,7 @@ export default function ReviewImagesModal({
                   </div>
 
                   <Badge className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                    {serverImages.filter((s) => !s.toDelete).length + images.length} / {maxFiles}
+                    {unifiedImages.filter((s) => !s.toDelete).length} / {maxFiles}
                   </Badge>
                 </ModalHeader>
               )}
@@ -351,89 +495,97 @@ export default function ReviewImagesModal({
                     </div>
                   </div>
 
-                  {serverImages.length > 0 || images.length > 0 ? (
-                    <ScrollArea className="max-h-[360px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
-                      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {/* Existing images */}
-                        {serverImages.map((img) => (
-                          <figure
-                            key={img.key}
-                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800"
-                          >
-                            <div className="relative w-full aspect-square">
-                              <Image
-                                fill
-                                alt="Existing product image"
-                                className="object-cover"
-                                src={img.url}
-                              />
-                            </div>
-                            <div className="absolute left-2 top-2">
-                              <Badge
-                                className={cn(
-                                  "border",
-                                  img.toDelete
-                                    ? "bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30"
-                                    : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
-                                )}
-                              >
-                                {img.toDelete ? (t?.willDelete || "Will delete") : (t?.existing || "Existing")}
-                              </Badge>
-                            </div>
-                            <button className="font-primary absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                              title={img.toDelete ? (t?.undoDelete || "Undo delete") : (t?.delete || "Delete")}
-                              type="button"
-                              onClick={() =>
-                                setServerImages((prev) =>
-                                  prev.map((s) =>
-                                    s.key === img.key ? { ...s, toDelete: !s.toDelete } : s,
-                                  ),
-                                )
-                              }
-                            >
-                              {img.toDelete ? (
-                                <X className="h-4 w-4" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </button>
-                            {img.toDelete && (
-                              <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[1px]" />
-                            )}
-                          </figure>
-                        ))}
+                  {unifiedImages.length > 0 ? (
+                    <DndContext
+                      collisionDetection={closestCenter}
+                      sensors={sensors}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <ScrollArea className="max-h-[460px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60">
+                        <SortableContext
+                          items={unifiedImages.map((i) => i.id)}
+                          strategy={rectSortingStrategy}
+                        >
+                          <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {unifiedImages.map((img, index) => (
+                              <SortableItem key={img.id} id={img.id}>
+                                <figure
+                                  className={cn(
+                                    "relative rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 aspect-square group",
+                                    img.toDelete && "opacity-50"
+                                  )}
+                                >
+                                  <Image
+                                    fill
+                                    alt="Product image"
+                                    className="object-cover"
+                                    src={img.url}
+                                  />
 
-                        {/* Pending images */}
-                        {images.map((img) => (
-                          <figure
-                            key={img.id}
-                            className="relative group rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
-                          >
-                            <div className="relative w-full aspect-square">
-                              <Image
-                                fill
-                                alt="Product image pending upload"
-                                className="object-cover"
-                                src={img.url || "/placeholder.png"}
-                              />
-                            </div>
-                            <div className="absolute left-2 top-2">
-                              <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                                {t?.new || "New"}
-                              </Badge>
-                            </div>
-                            <button
-                              aria-label="Remove image"
-                              className="absolute top-2 right-2 inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                              type="button"
-                              onClick={() => removePending(img.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </figure>
-                        ))}
-                      </div>
-                    </ScrollArea>
+                                  {/* Status Badges */}
+                                  <div className="absolute left-2 bottom-2 flex flex-col gap-1 z-10">
+                                    {img.isCover && !img.toDelete && (
+                                      <Badge className="bg-amber-500/90 text-white border-amber-600 shadow-sm text-[10px] px-1.5 py-0 flex items-center gap-1">
+                                        <Star className="h-3 w-3 fill-current" />
+                                        {t?.cover || "Cover"}
+                                      </Badge>
+                                    )}
+                                    {img.type === "server" ? (
+                                      <Badge
+                                        className={cn(
+                                          "text-[10px] px-1.5 py-0",
+                                          img.toDelete
+                                            ? "bg-rose-500/80 text-white"
+                                            : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30",
+                                        )}
+                                      >
+                                        {img.toDelete ? (t?.willDelete || "Delete") : (t?.existing || "Saved")}
+                                      </Badge>
+                                    ) : (
+                                      <Badge className="bg-emerald-500/80 text-white text-[10px] px-1.5 py-0">
+                                        {t?.new || "New"}
+                                      </Badge>
+                                    )}
+                                  </div>
+
+                                  {/* Action Buttons */}
+                                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                    {!img.isCover && !img.toDelete && (
+                                      <button
+                                        className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-amber-500/90 hover:bg-amber-600 text-white border border-amber-400"
+                                        title={t?.setAsCover || "Set as cover"}
+                                        type="button"
+                                        onClick={() => setAsCover(img.id)}
+                                      >
+                                        <Star className="h-4 w-4" />
+                                      </button>
+                                    )}
+                                    <button
+                                      className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700"
+                                      title={img.toDelete ? (t?.undoDelete || "Undo") : (t?.delete || "Remove")}
+                                      type="button"
+                                      onClick={() => removeImage(img.id)}
+                                    >
+                                      {img.toDelete ? (
+                                        <RefreshCw className="h-4 w-4" />
+                                      ) : (
+                                        <Trash2 className="h-4 w-4" />
+                                      )}
+                                    </button>
+                                  </div>
+
+                                  {img.toDelete && (
+                                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[1px] flex items-center justify-center">
+                                      <Trash2 className="h-8 w-8 text-white/50" />
+                                    </div>
+                                  )}
+                                </figure>
+                              </SortableItem>
+                            ))}
+                          </div>
+                        </SortableContext>
+                      </ScrollArea>
+                    </DndContext>
                   ) : (
                     <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-6 text-center bg-white/70 dark:bg-slate-800/60">
                       <div className="mx-auto mb-2 h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center">
@@ -446,10 +598,10 @@ export default function ReviewImagesModal({
               </ModalBody>
 
               <ModalFooter className="gap-3 px-6 py-5 bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 relative">
-                {images.length > 0 && (
+                {unifiedImages.some(i => i.type === "pending") && (
                   <Button className="mr-auto" type="button" variant="ghost" onClick={clearAllPending}>
                     <X className="h-4 w-4 mr-2" />
-                    {t?.clearPending || "Clear pending"}
+                    {t?.clearPending || "Clear new"}
                   </Button>
                 )}
                 <Button
@@ -462,7 +614,7 @@ export default function ReviewImagesModal({
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50"
-                  disabled={saving || (serverImages.every((s) => !s.toDelete) && images.length === 0)}
+                  disabled={saving}
                   onClick={handleSave}
                 >
                   {saving ? (

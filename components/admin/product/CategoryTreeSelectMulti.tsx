@@ -130,11 +130,10 @@ export function CategoryTreeSelectMulti({
     return (
       <div key={node.id} className="space-y-0.5">
         <div
-          className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors ${
-            isSelected
+          className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors ${isSelected
               ? "bg-blue-50 dark:bg-blue-900/30"
               : "hover:bg-slate-50 dark:hover:bg-slate-800"
-          }`}
+            }`}
           style={{ paddingLeft: padding + 8 }}
         >
           {hasChildren ? (
@@ -227,9 +226,16 @@ export function CategoryTreeSelectMulti({
             return (
               <span
                 key={id}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800"
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800"
               >
-                {cat?.name || id}
+                {cat?.images?.[0] && (
+                  <img
+                    src={cat.images[0]}
+                    alt={cat.name || id}
+                    className="w-4 h-4 rounded-full object-cover border border-white/50 shadow-sm"
+                  />
+                )}
+                <span className="truncate max-w-[100px]">{cat?.name || id}</span>
                 <button
                   type="button"
                   onClick={() => handleToggleSelection(id)}

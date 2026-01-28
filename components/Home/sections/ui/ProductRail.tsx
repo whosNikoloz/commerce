@@ -9,7 +9,7 @@ import { ProductCard, ProductCardSkeleton } from "./ProductCard";
 import { SectionContainer } from "./SectionContainer";
 
 import { Button } from "@/components/ui/button";
-import { searchProductsByFilter } from "@/app/api/services/productService";
+import { searchProductsByFilter, getProductsByIds } from "@/app/api/services/productService";
 import { t, tOpt } from "@/lib/i18n";
 import CarouselRail from "@/components/Home/sections/ui/CarouselRail";
 
@@ -25,34 +25,45 @@ export default async function ProductRail({
   locale,
   className,
 }: ProductRailProps) {
+  const finalLimit = data.filterBy?.productCount || (data.filterBy?.productIds?.length || 4);
   let products: any[] | null = null;
   let error: Error | null = null;
 
   try {
-    const filter: FilterModel = {};
+    if (data.filterBy?.productIds && data.filterBy.productIds.length > 0) {
+      // If specific IDs are requested, ONLY fetch those
+      const pResult = await getProductsByIds(data.filterBy.productIds);
+      products = pResult.slice(0, finalLimit);
+    } else {
+      // ONLY run search logic if no specific IDs were requested
+      const filter: FilterModel = {};
+      // ... (rest of search logic)
 
-    if (data.filterBy?.categoryIds?.length) filter.categoryIds = data.filterBy.categoryIds;
-    if (data.filterBy?.brandIds?.length) filter.brandIds = data.filterBy.brandIds;
-    if (data.filterBy?.condition?.length) filter.condition = data.filterBy.condition as Condition[];
-    if (data.filterBy?.stockStatus) filter.stockStatus = data.filterBy.stockStatus as StockStatus;
-    if (data.filterBy?.minPrice !== undefined) filter.minPrice = data.filterBy.minPrice;
-    if (data.filterBy?.maxPrice !== undefined) filter.maxPrice = data.filterBy.maxPrice;
+      if (data.filterBy?.categoryIds?.length) filter.categoryIds = data.filterBy.categoryIds;
+      if (data.filterBy?.brandIds?.length) filter.brandIds = data.filterBy.brandIds;
+      if (data.filterBy?.condition?.length) filter.condition = data.filterBy.condition as Condition[];
+      if (data.filterBy?.stockStatus) filter.stockStatus = data.filterBy.stockStatus as StockStatus;
+      if (data.filterBy?.minPrice !== undefined) filter.minPrice = data.filterBy.minPrice;
+      if (data.filterBy?.maxPrice !== undefined) filter.maxPrice = data.filterBy.maxPrice;
+      if (data.filterBy?.isRandom !== undefined) filter.isRandom = data.filterBy.isRandom;
+      if (data.filterBy?.productCount !== undefined) filter.productCount = data.filterBy.productCount;
 
-    const result = await searchProductsByFilter({
-      filter,
-      pageSize: data.limit * 2,
-      page: 1,
-      sortBy: data.sortBy || "featured",
-    });
+      const result = await searchProductsByFilter({
+        filter,
+        pageSize: finalLimit * 2,
+        page: 1,
+        sortBy: data.sortBy || "featured",
+      });
 
-    let list = result.items || [];
+      let list = result.items || [];
 
-    if (data.filterBy?.isNewArrival) list = list.filter((p: any) => p.isNewArrival);
-    if (data.filterBy?.isLiquidated) list = list.filter((p: any) => p.isLiquidated);
-    if (data.filterBy?.isComingSoon) list = list.filter((p: any) => p.isComingSoon);
-    if (data.filterBy?.hasDiscount) list = list.filter((p: any) => p.discountPrice > 0);
+      if (data.filterBy?.isNewArrival) list = list.filter((p: any) => p.isNewArrival);
+      if (data.filterBy?.isLiquidated) list = list.filter((p: any) => p.isLiquidated);
+      if (data.filterBy?.isComingSoon) list = list.filter((p: any) => p.isComingSoon);
+      if (data.filterBy?.hasDiscount) list = list.filter((p: any) => p.discountPrice > 0);
 
-    products = list.slice(0, data.limit);
+      products = list.slice(0, finalLimit);
+    }
   } catch (e) {
     error = e as Error;
     // eslint-disable-next-line no-console
@@ -84,7 +95,7 @@ export default async function ProductRail({
       <div className="container mx-auto px-4">
         <div className="h-12 bg-muted rounded-lg w-64 mb-10 animate-pulse" />
         <div className={gridClass}>
-          {Array.from({ length: data.limit }).map((_, idx) => (
+          {Array.from({ length: finalLimit }).map((_, idx) => (
             <ProductCardSkeleton key={idx} />
           ))}
         </div>

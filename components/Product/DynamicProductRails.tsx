@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import CarouselRail from "@/components/Home/sections/ui/CarouselRail";
-import { ProductCard } from "@/components/Home/sections/ui/ProductCard";
-import { searchProductsByFilter } from "@/app/api/services/productService";
-import { useDictionary } from "@/app/context/dictionary-provider";
 import type { ProductResponseModel, ProductRailSectionData, LocalizedText } from "@/types/product";
 import type { FilterModel } from "@/types/filter";
+
+import { useState, useEffect, useMemo } from "react";
+
+import CarouselRail from "@/components/Home/sections/ui/CarouselRail";
+import { ProductCard } from "@/components/Home/sections/ui/ProductCard";
+import { searchProductsByFilter, getProductsByIds } from "@/app/api/services/productService";
+import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface DynamicProductRailsProps {
   product: ProductResponseModel;
@@ -16,6 +18,7 @@ interface DynamicProductRailsProps {
 // Helper to get localized text
 function t(text: LocalizedText | undefined, locale: string): string {
   if (!text) return "";
+
   return text[locale] || text.en || text.ka || "";
 }
 
@@ -51,6 +54,7 @@ function ProductRailSection({
     if (fetchedSectionsCache.has(cacheKey)) {
       setProducts(fetchedSectionsCache.get(cacheKey) || []);
       setLoading(false);
+
       return;
     }
 
@@ -59,83 +63,102 @@ function ProductRailSection({
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // Build filter from section config
-        const filter: FilterModel = {};
+        const finalLimit = section.filterBy?.productCount || (section.filterBy?.productIds?.length || 4);
 
-        // Handle useCurrentProductCategory
-        if (section.filterBy?.useCurrentProductCategory && categoryId) {
-          filter.categoryIds = [categoryId];
-        } else if (section.filterBy?.categoryIds?.length) {
-          filter.categoryIds = section.filterBy.categoryIds;
-        }
+        // Filter out current product and limit
+        let filtered: ProductResponseModel[] = [];
 
-        // Handle useCurrentProductBrand
-        if (section.filterBy?.useCurrentProductBrand && brandId) {
-          filter.brandIds = [brandId];
-        } else if (section.filterBy?.brandIds?.length) {
-          filter.brandIds = section.filterBy.brandIds;
-        }
+        if (section.filterBy?.productIds && section.filterBy.productIds.length > 0) {
+          // If specific IDs are requested, ONLY fetch those
+          filtered = await getProductsByIds(section.filterBy.productIds);
+        } else {
+          // ONLY run search logic if no specific IDs were requested
+          const filter: FilterModel = {};
+          // ... (rest of search logic)
 
-        // Price range
-        if (section.filterBy?.minPrice !== undefined) {
-          filter.minPrice = section.filterBy.minPrice;
-        }
-        if (section.filterBy?.maxPrice !== undefined) {
-          filter.maxPrice = section.filterBy.maxPrice;
-        }
-
-        // Only fetch if we have at least some filter criteria
-        const hasFilters =
-          filter.categoryIds?.length ||
-          filter.brandIds?.length ||
-          filter.minPrice !== undefined ||
-          filter.maxPrice !== undefined;
-
-        if (!hasFilters) {
-          // No filters set, skip this section
-          if (!cancelled) {
-            setProducts([]);
-            setLoading(false);
-            fetchedSectionsCache.set(cacheKey, []);
+          // Handle useCurrentProductCategory
+          if (section.filterBy?.useCurrentProductCategory && categoryId) {
+            filter.categoryIds = [categoryId];
+          } else if (section.filterBy?.categoryIds?.length) {
+            filter.categoryIds = section.filterBy.categoryIds;
           }
-          return;
+
+          // Handle useCurrentProductBrand
+          if (section.filterBy?.useCurrentProductBrand && brandId) {
+            filter.brandIds = [brandId];
+          } else if (section.filterBy?.brandIds?.length) {
+            filter.brandIds = section.filterBy.brandIds;
+          }
+
+          // Price range
+          if (section.filterBy?.minPrice !== undefined) {
+            filter.minPrice = section.filterBy.minPrice;
+          }
+          if (section.filterBy?.maxPrice !== undefined) {
+            filter.maxPrice = section.filterBy.maxPrice;
+          }
+
+          // Random and Count
+          if (section.filterBy?.isRandom !== undefined) {
+            filter.isRandom = section.filterBy.isRandom;
+          }
+          if (section.filterBy?.productCount !== undefined) {
+            filter.productCount = section.filterBy.productCount;
+          }
+
+          // Condition and Stock Status
+          if (section.filterBy?.condition?.length) {
+            filter.condition = section.filterBy.condition as any;
+          }
+          if (section.filterBy?.stockStatus !== undefined) {
+            filter.stockStatus = section.filterBy.stockStatus as any;
+          }
+
+          const result = await searchProductsByFilter({
+            filter,
+            pageSize: finalLimit * 2, // Align with ProductRail.tsx: data.limit * 2
+            page: 1,
+            sortBy: section.sortBy || "featured",
+          });
+
+          if (cancelled) return;
+
+          let items = result.items || [];
+
+          // Client-side filtering for boolean flags (Align with ProductRail.tsx)
+          if (section.filterBy?.isNewArrival) {
+            items = items.filter((p) => p.isNewArrival);
+          }
+          if (section.filterBy?.isLiquidated) {
+            items = items.filter((p) => p.isLiquidated);
+          }
+          if (section.filterBy?.isComingSoon) {
+            items = items.filter((p) => p.isComingSoon);
+          }
+          if (section.filterBy?.hasDiscount) {
+            items = items.filter((p) => p.discountPrice && p.discountPrice < p.price);
+          }
+
+          filtered = items;
         }
 
-        const result = await searchProductsByFilter({
-          filter,
-          pageSize: section.limit + 1, // Fetch extra in case we need to filter out current product
-          page: 1,
-          sortBy: section.sortBy || "featured",
-        });
+        // Filter out current product (unless manually selected by ID) and limit
+        const finalProducts = filtered
+          .filter((p) => {
+            // If IDs are manually selected, don't filter out the current product automatically
+            if (section.filterBy?.productIds?.length) return true;
+
+            return p.id !== productId;
+          })
+          .slice(0, finalLimit);
 
         if (cancelled) return;
 
-        let items = result.items || [];
-
-        // Client-side filtering for boolean flags (if API doesn't support them)
-        if (section.filterBy?.isNewArrival) {
-          items = items.filter((p) => p.isNewArrival);
-        }
-        if (section.filterBy?.isLiquidated) {
-          items = items.filter((p) => p.isLiquidated);
-        }
-        if (section.filterBy?.isComingSoon) {
-          items = items.filter((p) => p.isComingSoon);
-        }
-        if (section.filterBy?.hasDiscount) {
-          items = items.filter((p) => p.discountPrice && p.discountPrice < p.price);
-        }
-
-        // Filter out current product and limit
-        const filtered = items
-          .filter((p) => p.id !== productId)
-          .slice(0, section.limit);
-
         // Cache the result
-        fetchedSectionsCache.set(cacheKey, filtered);
-        setProducts(filtered);
+        fetchedSectionsCache.set(cacheKey, finalProducts);
+        setProducts(finalProducts);
       } catch (error) {
-        console.error("Failed to fetch products for section:", section.customName || sectionId, error);
+        console.error("Failed to fetch products for section:", sectionId, error);
         if (!cancelled) {
           setProducts([]);
           fetchedSectionsCache.set(cacheKey, []);
@@ -152,7 +175,7 @@ function ProductRailSection({
     return () => {
       cancelled = true;
     };
-  }, [cacheKey, sectionId, productId, brandId, categoryId, section.filterBy, section.limit, section.sortBy, section.customName]);
+  }, [cacheKey, sectionId, productId, brandId, categoryId, section.filterBy, section.sortBy, section.customName]);
 
   if (loading) {
     return (
@@ -188,8 +211,8 @@ function ProductRailSection({
 
         {section.viewAllHref && (
           <a
-            href={section.viewAllHref}
             className="text-sm font-medium text-brand-primary hover:underline whitespace-nowrap"
+            href={section.viewAllHref}
           >
             View All &rarr;
           </a>
@@ -198,22 +221,21 @@ function ProductRailSection({
 
       {section.layout === "grid" ? (
         <div
-          className={`grid gap-3 md:gap-4 ${
-            section.columns === 2
-              ? "grid-cols-2"
-              : section.columns === 3
-                ? "grid-cols-2 md:grid-cols-3"
-                : section.columns === 4
-                  ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                  : section.columns === 5
-                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                    : section.columns === 6
-                      ? "grid-cols-2 md:grid-cols-4 lg:grid-cols-6"
-                      : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-          }`}
+          className={`grid gap-3 md:gap-4 ${section.columns === 2
+            ? "grid-cols-2"
+            : section.columns === 3
+              ? "grid-cols-2 md:grid-cols-3"
+              : section.columns === 4
+                ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                : section.columns === 5
+                  ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+                  : section.columns === 6
+                    ? "grid-cols-2 md:grid-cols-4 lg:grid-cols-6"
+                    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            }`}
         >
           {products.map((p, index) => (
-            <ProductCard key={p.id} priority={index < 4} product={p} showActions size="compact" />
+            <ProductCard key={p.id} showActions priority={index < 4} product={p} size="compact" />
           ))}
         </div>
       ) : (
@@ -225,7 +247,6 @@ function ProductRailSection({
 
 export function DynamicProductRails({ product, sections }: DynamicProductRailsProps) {
   const dictionary = useDictionary();
-
   // Detect current locale from dictionary or default to 'ka'
   const locale = dictionary?._locale || "ka";
 
@@ -246,9 +267,9 @@ export function DynamicProductRails({ product, sections }: DynamicProductRailsPr
       {enabledSections.map((section) => (
         <ProductRailSection
           key={section.id}
-          section={section}
-          product={product}
           locale={locale}
+          product={product}
+          section={section}
         />
       ))}
     </>

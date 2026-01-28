@@ -55,12 +55,12 @@ const ProductRailDataSchema = z.object({
   subtitle: LocalizedTextSchema.optional(),
   layout: z.enum(["carousel", "grid"]),
   columns: z.union([z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]).optional(),
-  limit: z.number(),
   viewAllHref: z.string(),
   filterBy: z
     .object({
       categoryIds: z.array(z.string()).optional(),
       brandIds: z.array(z.string()).optional(),
+      productIds: z.array(z.string()).optional(),
       condition: z.array(z.number()).optional(),
       stockStatus: z.number().optional(),
       isNewArrival: z.boolean().optional(),
@@ -69,6 +69,9 @@ const ProductRailDataSchema = z.object({
       hasDiscount: z.boolean().optional(),
       minPrice: z.number().optional(),
       maxPrice: z.number().optional(),
+      isRandom: z.boolean().optional(),
+      productCount: z.number().optional(),
+      facetFilters: z.array(z.any()).optional(),
     })
     .optional(),
   sortBy: z.enum(["featured", "newest", "price-low", "price-high", "rating", "name"]).optional(),
@@ -97,6 +100,7 @@ const BrandCarouselDataSchema = z.object({
   title: LocalizedTextSchema.optional(),
   subtitle: LocalizedTextSchema.optional(),
   showHeader: z.boolean().optional(),
+  brandIds: z.array(z.string()).optional(),
   slidesPerView: z.number().optional(),
   showArrows: z.boolean().optional(),
   showPagination: z.boolean().optional(),

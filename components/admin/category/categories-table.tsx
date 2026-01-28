@@ -73,10 +73,25 @@ export function CategoriesTable({ initialCategories }: Props) {
     }
   };
 
-  const handleImagesChanged = (categoryId: string, urls: string[]) => {
-    setCategories((prev) =>
-      prev.map((c) => (c.id === categoryId ? { ...c, images: urls } : c)),
-    );
+  const handleImagesChanged = async (categoryId: string, urls: string[]) => {
+    const current = categories.find((c) => c.id === categoryId);
+
+    if (!current) return;
+
+    const prev = categories;
+    const patched: CategoryModel = { ...current, images: urls };
+
+    setCategories((prevList) => prevList.map((c) => (c.id === categoryId ? patched : c)));
+
+    try {
+      await updateCategory(patched);
+      toast.success("კატეგორია წარმატებით განახლდა.");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to persist category image order", err);
+      toast.error("კატეგორიის განახლება ვერ მოხერხდა.");
+      setCategories(prev);
+    }
   };
 
   const handleDeleteCategory = async () => {

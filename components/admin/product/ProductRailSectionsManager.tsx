@@ -41,12 +41,11 @@ function createDefaultSection(order: number): ProductRailSectionData {
     title: { en: "", ka: "" },
     subtitle: { en: "", ka: "" },
     layout: "carousel",
-    limit: 12,
     viewAllHref: "",
     enabled: true,
     order,
     sortBy: "featured",
-    filterBy: {},
+    filterBy: { productCount: 12 },
   };
 }
 
@@ -205,11 +204,10 @@ export function ProductRailSectionsManager({
             return (
               <div
                 key={section.id}
-                className={`border rounded-xl overflow-hidden transition-all duration-200 ${
-                  section.enabled
-                    ? "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
-                    : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 opacity-70"
-                }`}
+                className={`border rounded-xl overflow-hidden transition-all duration-200 ${section.enabled
+                  ? "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                  : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 opacity-70"
+                  }`}
               >
                 {/* Section Header */}
                 <div
@@ -228,22 +226,20 @@ export function ProductRailSectionsManager({
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={`text-sm font-semibold truncate ${
-                        section.enabled
-                          ? "text-slate-900 dark:text-slate-100"
-                          : "text-slate-500 dark:text-slate-500"
-                      }`}>
+                      <span className={`text-sm font-semibold truncate ${section.enabled
+                        ? "text-slate-900 dark:text-slate-100"
+                        : "text-slate-500 dark:text-slate-500"
+                        }`}>
                         {getSectionTitle(section)}
                       </span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                        section.layout === "carousel"
-                          ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300"
-                          : "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300"
-                      }`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${section.layout === "carousel"
+                        ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300"
+                        : "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300"
+                        }`}>
                         {section.layout}
                       </span>
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">
-                        {section.limit} {t.products || "products"}
+                        {section.filterBy?.productCount || 12} {t.products || "products"}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-500 truncate mt-0.5">
@@ -281,11 +277,10 @@ export function ProductRailSectionsManager({
                     <button
                       type="button"
                       onClick={() => toggleEnabled(section.id)}
-                      className={`p-1.5 rounded transition-colors ${
-                        section.enabled
-                          ? "hover:bg-green-50 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400"
-                          : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-600"
-                      }`}
+                      className={`p-1.5 rounded transition-colors ${section.enabled
+                        ? "hover:bg-green-50 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400"
+                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-600"
+                        }`}
                       title={section.enabled ? t.disable || "Disable" : t.enable || "Enable"}
                     >
                       <Power className="h-3.5 w-3.5" />

@@ -49,6 +49,7 @@ type FormState = {
   productGroupId: string;
   status: string;
   condition: string;
+  initialStock: string;
 };
 
 const initialFormState: FormState = {
@@ -61,6 +62,7 @@ const initialFormState: FormState = {
   productGroupId: "",
   status: StockStatus.InStock.toString(),
   condition: Condition.New.toString(),
+  initialStock: "",
 };
 
 export default function AddProductModal({
@@ -194,6 +196,9 @@ export default function AddProductModal({
           formData.productGroupId && formData.productGroupId !== "none"
             ? formData.productGroupId
             : undefined,
+        initialStock: formData.initialStock
+          ? parseInt(formData.initialStock)
+          : undefined,
       };
 
       await createProduct(productData);
@@ -521,7 +526,7 @@ export default function AddProductModal({
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                     <Select
                       classNames={{
                         trigger:
@@ -576,6 +581,27 @@ export default function AddProductModal({
                         {tCommon.likeNew || "Like New"}
                       </SelectItem>
                     </Select>
+
+                    <Input
+                      classNames={{
+                        inputWrapper:
+                          "rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+                      }}
+                      description={t.initialStockDescription || "Creates a stock record for this product"}
+                      label={t.initialStock || "Initial Stock"}
+                      labelPlacement="outside"
+                      min="0"
+                      placeholder="0"
+                      type="number"
+                      value={formData.initialStock}
+                      variant="bordered"
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          initialStock: e.target.value,
+                        }))
+                      }
+                    />
                   </div>
                 </section>
 

@@ -147,8 +147,25 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       });
   }, []);
 
-  const handleImagesChanged = (productId: string, urls: string[]) => {
-    setProducts((prev) => prev.map((p) => (p.id === productId ? { ...p, images: urls } : p)));
+  const handleImagesChanged = async (productId: string, urls: string[]) => {
+    const current = products.find((p) => p.id === productId);
+
+    if (!current) return;
+
+    const prev = products;
+    const patched: ProductRequestModel = { ...current, images: urls };
+
+    setProducts((prevList) => prevList.map((p) => (p.id === productId ? patched : p)));
+
+    try {
+      await updateProduct(patched);
+      toast.success(t?.toast?.productUpdated || "Product updated successfully");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to persist image order", err);
+      toast.error(t?.toast?.productUpdateFailed || "Failed to persist image order");
+      setProducts(prev);
+    }
   };
 
   useEffect(() => {
@@ -210,7 +227,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     condition?: Condition,
     price?: number,
     discountPrice?: number,
-    productRailSections?: import("@/types/product").ProductRailSectionData[],
+    productAdditionalJson?: string,
+    stockQuantity?: number,
   ) => {
     const current = products.find((p) => p.id === productId);
 
@@ -234,7 +252,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       images: current.images ?? [],
       productFacetValues: facetValues,
       productGroupId: productGroupId || undefined,
-      productRailSections,
+      productAdditionalJson,
+      stockQuantity,
     };
 
     setProducts((prevList) => prevList.map((p) => (p.id === productId ? patched : p)));
@@ -420,7 +439,8 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                 initialDescription={product.description}
                 initialDiscountPrice={product.discountPrice}
                 initialFacetValues={product.productFacetValues ?? []}
-                initialProductRailSections={product.productRailSections ?? []}
+                initialProductAdditionalJson={product.productAdditionalJson}
+                initialStockQuantity={product.stockQuantity}
                 initialIsActive={product.isActive}
                 initialIsComingSoon={product.isComingSoon}
                 initialIsLiquidated={product.isLiquidated}
@@ -434,7 +454,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               />
               <ReviewImagesModal
                 existing={(product.images ?? []).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
-                maxFiles={8}
+                maxFiles={12}
                 maxSizeMB={5}
                 productId={product.id}
                 onChanged={(urls) => handleImagesChanged(product.id, urls)}
@@ -788,7 +808,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   initialDescription={product.description}
                                   initialDiscountPrice={product.discountPrice}
                                   initialFacetValues={product.productFacetValues ?? []}
-                                  initialProductRailSections={product.productRailSections ?? []}
+                                  initialProductAdditionalJson={product.productAdditionalJson}
                                   initialIsActive={product.isActive}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}

@@ -41,22 +41,63 @@ export async function deleteImage(id: string, key: string): Promise<string> {
     method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
   });
 }
-export async function uploadCategoryImages(categoryid: string, files: File[]): Promise<string[]> {
-  if (!categoryid) throw new Error("category is required");
+export async function uploadCategoryImages(
+  categoryId: string,
+  files: File[],
+  coverIndex?: number
+): Promise<string[]> {
+  if (!categoryId) throw new Error("category is required");
   if (!files || files.length === 0) throw new Error("at least one file is required");
 
   const formData = new FormData();
 
-  formData.append("id", categoryid);
+  formData.append("id", categoryId);
 
   files.forEach((file) => {
     formData.append("files", file, file.name);
   });
 
+  // Add coverIndex if specified
+  if (coverIndex !== undefined && coverIndex >= 0) {
+    formData.append("coverIndex", coverIndex.toString());
+  }
+
   return apiFetch<string[]>(`${API_BASE}/images`, {
     method: "POST",
-    body: formData, requireAuth: true , failIfUnauthenticated : true 
+    body: formData,
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
+}
+
+/**
+ * Set a specific image as the cover/main image for a category
+ */
+export async function setCoverImage(
+  categoryId: string,
+  imageKey: string
+): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>(
+    `${API_BASE}/${categoryId}/set-cover-image/${encodeURIComponent(imageKey)}`,
+    {
+      method: "PUT",
+      requireAuth: true,
+      failIfUnauthenticated: true,
+    }
+  );
+}
+
+/**
+ * Get all images for a category with cover information
+ */
+export async function getAllImagesForCategory(categoryId: string): Promise<Array<{
+  id: string;
+  categoryId: string;
+  imagePath: string;
+  isCover: boolean;
+  displayOrder: number;
+}>> {
+  return apiFetch(`${API_BASE}/get-all-images-by-category-${categoryId}`);
 }
 
 // export async function getProductsByCategory(id: string): Promise<ProductResponseModel[]> {

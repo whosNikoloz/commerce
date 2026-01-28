@@ -40,7 +40,6 @@ export default function AiChatWidget() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    if (!user) return null;
 
     useEffect(() => {
         const checkMobile = () => {
@@ -64,6 +63,9 @@ export default function AiChatWidget() {
         }
         return () => { document.body.style.overflow = 'unset'; };
     }, [messages, isOpen, isMobile]);
+
+    if (!user) return null;
+
 
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;

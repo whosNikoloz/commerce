@@ -40,6 +40,8 @@ export default function AiChatWidget() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    if (!user) return null;
+
     useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768);

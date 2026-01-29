@@ -37,7 +37,7 @@ function PaymentSuccessContent() {
 
       // Track purchase event (only once)
       if (!purchaseTracked && cart && cart.length > 0) {
-        const shipping = subtotal > 50 ? 0 : 9.99;
+        const shipping = subtotal > 50 ? 0 : 0;
         const tax = subtotal * 0.08;
         const total = subtotal + shipping + tax;
 

@@ -3,7 +3,7 @@
 import type { ProductResponseModel, ProductRailSectionData, LocalizedText } from "@/types/product";
 import type { FilterModel } from "@/types/filter";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 
 import CarouselRail from "@/components/Home/sections/ui/CarouselRail";
 import { ProductCard } from "@/components/Home/sections/ui/ProductCard";
@@ -25,8 +25,8 @@ function t(text: LocalizedText | undefined, locale: string): string {
 // Cache to track fetched sections globally (persists across remounts)
 const fetchedSectionsCache = new Map<string, ProductResponseModel[]>();
 
-// Single section renderer
-function ProductRailSection({
+// Single section renderer - memoized for performance
+const ProductRailSection = memo(function ProductRailSection({
   section,
   product,
   locale,
@@ -42,7 +42,10 @@ function ProductRailSection({
   const categoryId = product.category?.id;
 
   // Create a stable cache key
-  const cacheKey = `${sectionId}-${productId}-${brandId}-${categoryId}`;
+  const cacheKey = useMemo(
+    () => `${sectionId}-${productId}-${brandId}-${categoryId}`,
+    [sectionId, productId, brandId, categoryId]
+  );
 
   // Check cache for initial state
   const cachedProducts = fetchedSectionsCache.get(cacheKey);
@@ -177,6 +180,27 @@ function ProductRailSection({
     };
   }, [cacheKey, sectionId, productId, brandId, categoryId, section.filterBy, section.sortBy, section.customName]);
 
+  // All hooks must be called before any early returns (React rules of hooks)
+  const title = t(section.title, locale);
+  const subtitle = t(section.subtitle, locale);
+
+  // Memoize grid class computation
+  const gridClass = useMemo(() => {
+    if (section.columns === 2) return "grid-cols-2";
+    if (section.columns === 3) return "grid-cols-2 md:grid-cols-3";
+    if (section.columns === 4) return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+    if (section.columns === 5) return "grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
+    if (section.columns === 6) return "grid-cols-2 md:grid-cols-4 lg:grid-cols-6";
+    return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+  }, [section.columns]);
+
+  // Memoize grid items to prevent re-creating on every render
+  const gridItems = useMemo(() =>
+    products.map((p, index) => (
+      <ProductCard key={p.id} showActions priority={index < 4} product={p} size="compact" />
+    )), [products]
+  );
+
   if (loading) {
     return (
       <section className="my-12">
@@ -192,9 +216,6 @@ function ProductRailSection({
   if (products.length === 0) {
     return null;
   }
-
-  const title = t(section.title, locale);
-  const subtitle = t(section.subtitle, locale);
 
   return (
     <section className="my-12">
@@ -220,30 +241,15 @@ function ProductRailSection({
       </div>
 
       {section.layout === "grid" ? (
-        <div
-          className={`grid gap-3 md:gap-4 ${section.columns === 2
-            ? "grid-cols-2"
-            : section.columns === 3
-              ? "grid-cols-2 md:grid-cols-3"
-              : section.columns === 4
-                ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                : section.columns === 5
-                  ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                  : section.columns === 6
-                    ? "grid-cols-2 md:grid-cols-4 lg:grid-cols-6"
-                    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-            }`}
-        >
-          {products.map((p, index) => (
-            <ProductCard key={p.id} showActions priority={index < 4} product={p} size="compact" />
-          ))}
+        <div className={`grid gap-3 md:gap-4 ${gridClass}`}>
+          {gridItems}
         </div>
       ) : (
         <CarouselRail products={products} />
       )}
     </section>
   );
-}
+});
 
 export function DynamicProductRails({ product, sections }: DynamicProductRailsProps) {
   const dictionary = useDictionary();

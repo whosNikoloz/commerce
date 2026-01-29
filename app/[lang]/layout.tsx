@@ -78,6 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch (error) {
     // Fallback metadata if tenant config fails to load
     const errorMessage = error instanceof Error ? error.message : String(error);
+
     console.error("Failed to generate metadata:", errorMessage);
 
     // Return minimal metadata to prevent complete failure
@@ -112,11 +113,13 @@ export default async function RootLayout({
   const host = normalizeHost(h.get("x-forwarded-host") ?? h.get("host") ?? "");
 
   let tenant;
+
   try {
     tenant = await getTenantByHost(host);
   } catch (error) {
     // Log the error with full details for debugging
     const errorMessage = error instanceof Error ? error.message : String(error);
+
     console.error("❌ Critical error loading tenant configuration:", {
       host,
       error: errorMessage,
@@ -229,7 +232,7 @@ export default async function RootLayout({
         {/* Load tenant fonts from Google Fonts */}
         {googleFontsUrl && (
           <>
-            <link rel="preload" href={googleFontsUrl} as="style" />
+            <link as="style" href={googleFontsUrl} rel="preload" />
             <link href={googleFontsUrl} rel="stylesheet" />
             <noscript>
               <link href={googleFontsUrl} rel="stylesheet" />
@@ -290,7 +293,7 @@ export default async function RootLayout({
                 {children}
               </main>
               <AiChatWidget />
-              <BackToTopShadcn threshold={320} />
+              {/* <BackToTopShadcn threshold={320} /> */}
               <FloatingCompareButton />
             </LayoutWrapper>
           </SmoothScroll>

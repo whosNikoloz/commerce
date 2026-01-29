@@ -285,15 +285,22 @@ export default function ProductDetail({ initialProduct }: Props) {
   };
 
   useEffect(() => {
-    const handleScrollOrResize = () => {
-      const scrollThreshold = isMobile ? 900 : 700;
+    let ticking = false;
+    const scrollThreshold = isMobile ? 900 : 700;
 
-      setIsPriceVisible(window.scrollY < scrollThreshold);
+    const handleScrollOrResize = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsPriceVisible(window.scrollY < scrollThreshold);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     handleScrollOrResize();
-    window.addEventListener("scroll", handleScrollOrResize);
-    window.addEventListener("resize", handleScrollOrResize);
+    window.addEventListener("scroll", handleScrollOrResize, { passive: true });
+    window.addEventListener("resize", handleScrollOrResize, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScrollOrResize);

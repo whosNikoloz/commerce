@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -31,9 +31,19 @@ interface ProductCardProps {
   size?: "default" | "compact";
 }
 
+// Throttle helper for hover events
+function throttle<T extends (...args: any[]) => void>(fn: T, delay: number): T {
+  let lastCall = 0;
+  return ((...args: any[]) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  }) as T;
+}
 
-
-export function ProductCard({
+function ProductCardInner({
   product,
   className,
   showActions = true,
@@ -57,55 +67,85 @@ export function ProductCard({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const { flyToCart } = useFlyToCart({ durationMs: 800, rotateDeg: 0, scaleTo: 0.1, curve: 0.4 });
 
+  // Memoized user ID for stable dependency
+  const userId = user?.id;
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (user && product.id) {
+    if (userId && product.id) {
       isInWishlist(product.id).then(setInWishlist).catch(() => setInWishlist(false));
     }
-  }, [user, product.id]);
+  }, [userId, product.id]);
 
-  const images = product.images || [];
+  // Memoize computed values
+  const images = useMemo(() => product.images || [], [product.images]);
   const hasMultipleImages = images.length > 1;
   const imageUrl = resolveImageUrl(images[currentImageIndex]);
   const isInStock = product.status === StockStatus.InStock;
-  const hasDiscount = !!product.discountPrice && product.discountPrice < product.price;
-  const displayPrice = hasDiscount ? product.discountPrice! : product.price;
-  const discountPercent = hasDiscount
-    ? Math.max(0, Math.round(((product.price - (product.discountPrice as number)) / product.price) * 100))
-    : 0;
+
+  const { hasDiscount, displayPrice, discountPercent } = useMemo(() => {
+    const hasDisc = !!product.discountPrice && product.discountPrice < product.price;
+    const dispPrice = hasDisc ? product.discountPrice! : product.price;
+    const discPct = hasDisc
+      ? Math.max(0, Math.round(((product.price - (product.discountPrice as number)) / product.price) * 100))
+      : 0;
+    return { hasDiscount: hasDisc, displayPrice: dispPrice, discountPercent: discPct };
+  }, [product.discountPrice, product.price]);
 
   // Limit to max 4 zones
   const maxZones = 4;
-  const displayZones = Math.min(images.length, maxZones);
   const hasMoreImages = images.length > maxZones;
   const remainingImagesCount = images.length - maxZones;
 
-  const conditionLabel =
-    product.condition === Condition.New
+  const conditionLabel = useMemo(() => {
+    return product.condition === Condition.New
       ? "New"
       : product.condition === Condition.LikeNew
         ? "Like New"
         : product.condition === Condition.Used
           ? "Used"
           : "";
-  const isCompact = size === "compact";
-  const titleSize = isCompact ? "text-[12px] sm:text-[13px]" : undefined;
-  const priceSize = isCompact ? "text-sm sm:text-base" : "text-xl";
-  const oldPriceSize = isCompact ? "text-[11px] sm:text-xs" : "text-sm";
-  const footerPadding = isCompact ? "p-2.5" : "p-4";
-  const actionIconSize = isCompact ? "h-7 w-7" : "h-9 w-9";
-  const addBtnHeight = isCompact ? "h-9" : "h-11";
-  const iconDimension = isCompact ? "h-3 w-3 sm:h-3.5 sm:w-3.5" : "h-4 w-4";
-  const minTitleHeight = isCompact ? "min-h-[1.75rem]" : "min-h-[2.5rem]";
-  const discountBadge = isCompact ? "text-[9px] px-1.5 py-[2px]" : "text-xs px-2.5 py-1";
-  const imgSizes = isCompact
-    ? "(max-width:640px) 230px, (max-width:1024px) 230px, 230px"
-    : "(max-width:640px) 230px, (max-width:1024px) 230px, 230px";
+  }, [product.condition]);
 
-  const handleWishlistToggle = async (e: React.MouseEvent) => {
+  // Memoize size-dependent styles
+  const sizeStyles = useMemo(() => {
+    const isCompact = size === "compact";
+    return {
+      isCompact,
+      titleSize: isCompact ? "text-[12px] sm:text-[13px]" : undefined,
+      priceSize: isCompact ? "text-sm sm:text-base" : "text-xl",
+      oldPriceSize: isCompact ? "text-[11px] sm:text-xs" : "text-sm",
+      footerPadding: isCompact ? "p-2.5" : "p-4",
+      actionIconSize: isCompact ? "h-7 w-7" : "h-9 w-9",
+      addBtnHeight: isCompact ? "h-9" : "h-11",
+      iconDimension: isCompact ? "h-3 w-3 sm:h-3.5 sm:w-3.5" : "h-4 w-4",
+      minTitleHeight: isCompact ? "min-h-[1.75rem]" : "min-h-[2.5rem]",
+      discountBadge: isCompact ? "text-[9px] px-1.5 py-[2px]" : "text-xs px-2.5 py-1",
+      imgSizes: "(max-width:640px) 230px, (max-width:1024px) 230px, 230px",
+    };
+  }, [size]);
+
+  const { titleSize, priceSize, oldPriceSize, footerPadding, actionIconSize, addBtnHeight, iconDimension, minTitleHeight, discountBadge, imgSizes } = sizeStyles;
+
+  // Throttled image index setter - only update every 50ms max
+  const throttledSetImageIndex = useMemo(
+    () => throttle((index: number) => setCurrentImageIndex(index), 50),
+    []
+  );
+
+  // Memoized hover handlers
+  const handleImageHover = useCallback((index: number) => {
+    throttledSetImageIndex(index);
+  }, [throttledSetImageIndex]);
+
+  const handleImageLeave = useCallback(() => {
+    if (hasMultipleImages) setCurrentImageIndex(0);
+  }, [hasMultipleImages]);
+
+  const handleWishlistToggle = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) return toast.error("გთხოვთ, ჯერ გაიაროთ ავტორიზაცია");
@@ -124,22 +164,22 @@ export function ProductCard({
     } finally {
       setWishlistLoading(false);
     }
-  };
+  }, [user, product.id, inWishlist]);
 
-  const handleAddToCart = async (p: ProductResponseModel) => {
+  const handleAddToCart = useCallback(async () => {
     if (addingToCart) return;
 
     setAddingToCart(true);
 
     try {
       const item: CartItem = {
-        id: p.id,
-        name: p.name ?? "Unnamed Product",
-        price: p.discountPrice ?? p.price,
-        image: resolveImageUrl(p.images?.[0]),
+        id: product.id,
+        name: product.name ?? "Unnamed Product",
+        price: product.discountPrice ?? product.price,
+        image: resolveImageUrl(product.images?.[0]),
         quantity: 1,
         discount: discountPercent,
-        originalPrice: p.price,
+        originalPrice: product.price,
       };
 
       // smartAddToCart will handle stock check for FINA merchants
@@ -153,9 +193,9 @@ export function ProductCard({
     } finally {
       setAddingToCart(false);
     }
-  };
+  }, [addingToCart, product.id, product.name, product.discountPrice, product.price, product.images, discountPercent, addToCart, flyToCart]);
 
-  const handleCompareToggle = (e: React.MouseEvent) => {
+  const handleCompareToggle = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -173,7 +213,7 @@ export function ProductCard({
       addToCompare(product);
       toast.success("დაემატა შედარებაში");
     }
-  };
+  }, [inCompare, removeFromCompare, product, addToCompare]);
 
   return (
     <article
@@ -201,7 +241,7 @@ export function ProductCard({
           <AspectRatio
             className={cn("overflow-hidden bg-zinc-100 dark:bg-zinc-900/60 rounded-t-2xl relative")}
             ratio={1}
-            onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
+            onMouseLeave={handleImageLeave}
           >
             <Image
               ref={imgRef as any}
@@ -223,7 +263,7 @@ export function ProductCard({
                     key={index}
                     href={`/${currentLang}/product/${product.id}`}
                     className="flex-1 hover:bg-white/5 transition-all duration-200 relative pointer-events-auto"
-                    onMouseEnter={() => setCurrentImageIndex(index)}
+                    onMouseEnter={() => handleImageHover(index)}
                   >
                     {/* Subtle edge highlight on hover */}
                     <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity border-x border-white/10 pointer-events-none" />
@@ -373,7 +413,7 @@ export function ProductCard({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleAddToCart(product);
+                handleAddToCart();
               }}
             >
               {addingToCart ? (
@@ -397,6 +437,25 @@ export function ProductCard({
   );
 }
 
+// Memoized ProductCard - only re-renders when product data actually changes
+export const ProductCard = memo(ProductCardInner, (prevProps, nextProps) => {
+  // Custom comparison for performance - only re-render when necessary
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.discountPrice === nextProps.product.discountPrice &&
+    prevProps.product.status === nextProps.product.status &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.priority === nextProps.priority &&
+    prevProps.size === nextProps.size &&
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.className === nextProps.className &&
+    // Check images length - don't deep compare array
+    (prevProps.product.images?.length || 0) === (nextProps.product.images?.length || 0)
+  );
+});
+
+ProductCard.displayName = "ProductCard";
 
 export function ProductCardSkeleton() {
   return (

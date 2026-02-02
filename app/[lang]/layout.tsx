@@ -292,8 +292,8 @@ export default async function RootLayout({
               <main className="" id="main-content">
                 {children}
               </main>
-              <AiChatWidget />
-              {/* <BackToTopShadcn threshold={320} /> */}
+              {/* <AiChatWidget /> */}
+              <BackToTopShadcn threshold={320} />
               <FloatingCompareButton />
             </LayoutWrapper>
           </SmoothScroll>

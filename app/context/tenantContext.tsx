@@ -4,6 +4,7 @@ import type { TenantConfig } from "@/types/tenant";
 import React, { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 
 import { applyThemeOnDocument } from "@/lib/applyTheme";
+import { initializeIntegrationCache } from "@/app/api/services/integrationService";
 
 type TenantContextType = {
   config: TenantConfig | null;
@@ -33,17 +34,6 @@ export const getCachedTenantConfig = (): TenantConfig | null => {
   } catch {
     return null;
   }
-};
-
-export const getCachedMerchantType = (): string | null => {
-  const cfg = getCachedTenantConfig();
-
-  // eslint-disable-next-line no-console
-  //console.log("📦 Cached tenant config:", cfg);
-  // eslint-disable-next-line no-console
-  //console.log("📦 Merchant Type from config:", cfg?.merchantType);
-
-  return cfg?.merchantType ?? null;
 };
 
 export const useTenant = () => useContext(TenantContext);
@@ -82,6 +72,9 @@ export const TenantProvider: React.FC<{
     mounted.current = true;
 
     const boot = async () => {
+      // Initialize integration cache early
+      initializeIntegrationCache().catch(() => {});
+
       // If SSR provided config, we're done.
       if (initialConfig) {
         // eslint-disable-next-line no-console

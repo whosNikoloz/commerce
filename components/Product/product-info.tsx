@@ -34,7 +34,7 @@ interface ProductInfoProps {
 }
 
 function formatPrice(v: number, currency: Currency) {
-  console.log("Currency:", v);
+  // console.log("Currency:", v);
   return v.toFixed(2) + " " + currency;
 }
 

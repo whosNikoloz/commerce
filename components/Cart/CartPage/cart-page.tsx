@@ -9,7 +9,7 @@ import EmptyCart from "./EmptyCart";
 import CartItems from "./CartItems";
 
 import { useCartStore } from "@/app/context/cartContext";
-import { getCachedMerchantType } from "@/app/context/tenantContext";
+import { getCachedMerchantType } from "@/app/api/services/integrationService";
 import { getProductRestsByIds } from "@/app/api/services/productService";
 import { useGA4 } from "@/hooks/useGA4";
 import { useDictionary } from "@/app/context/dictionary-provider";

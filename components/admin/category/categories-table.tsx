@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useTenant } from "@/app/context/tenantContext";
+import { isCustomMerchant as checkIsCustomMerchant } from "@/app/api/services/integrationService";
 import {
   Table,
   TableBody,
@@ -49,9 +49,7 @@ interface Props {
 }
 
 export function CategoriesTable({ initialCategories }: Props) {
-  const { config } = useTenant();
-  const isCustomMerchant = config?.merchantType === "CUSTOM";
-
+  const [isCustomMerchant, setIsCustomMerchant] = useState(false);
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -61,6 +59,12 @@ export function CategoriesTable({ initialCategories }: Props) {
   useEffect(() => {
     setCategories(initialCategories ?? []);
   }, [initialCategories]);
+
+  useEffect(() => {
+    checkIsCustomMerchant()
+      .then(setIsCustomMerchant)
+      .catch(() => setIsCustomMerchant(false));
+  }, []);
 
   const refreshCategories = async () => {
     try {

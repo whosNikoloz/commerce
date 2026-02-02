@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { getProductRestsByIds } from "../api/services/productService";
 
-import { getCachedMerchantType } from "./tenantContext";
+import { getCachedMerchantType } from "@/app/api/services/integrationService";
 
 import { trackAddToCart, trackRemoveFromCart, cartItemToGA4Item, calculateItemsValue } from "@/lib/analytics/ga4";
 

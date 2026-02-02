@@ -3,7 +3,7 @@
 import type { CategoryModel } from "@/types/category";
 
 import Image from "next/image";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -27,8 +27,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useTenant } from "@/app/context/tenantContext";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { isCustomMerchant as checkIsCustomMerchant } from "@/app/api/services/integrationService";
 import {
   updateCategory,
   deleteCategory,
@@ -63,18 +63,23 @@ interface Props {
 }
 
 export function CategoriesTreeView({ initialCategories }: Props) {
-  const { config } = useTenant();
   const dict = useDictionary();
   const t = dict.admin.categories.treeView;
   const tToast = dict.admin.categories.toast;
-  const isCustomMerchant = config?.merchantType === "CUSTOM";
 
+  const [isCustomMerchant, setIsCustomMerchant] = useState(false);
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryModel | null>(null);
   const [categoryToEdit, setCategoryToEdit] = useState<CategoryModel | null>(null);
+
+  useEffect(() => {
+    checkIsCustomMerchant()
+      .then(setIsCustomMerchant)
+      .catch(() => setIsCustomMerchant(false));
+  }, []);
 
   const refreshCategories = async () => {
     try {

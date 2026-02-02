@@ -14,7 +14,7 @@ import { DynamicProductRails } from "./DynamicProductRails";
 import { ProductResponseModel, parseProductRailSections } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
-import { getCachedMerchantType } from "@/app/context/tenantContext";
+import { getCachedMerchantType } from "@/app/api/services/integrationService";
 import { useUser } from "@/app/context/userContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductNotFound from "@/app/[lang]/product/[id]/not-found";

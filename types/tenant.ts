@@ -322,8 +322,6 @@ export type DynamicPagesConfig = {
 
 
 
-// ===== Merchant Type =====
-export type MerchantType = "FINA" | "CUSTOM";
 
 // ===== SEO & Analytics Configuration =====
 export type SEOConfig = {
@@ -509,7 +507,6 @@ export type TenantConfig =
     homepage: Template1Homepage;
     infoPages?: InfoPagesConfig;
     dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
     siteConfig: SiteConfig;
     ui?: UIConfig;
     dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config
@@ -521,7 +518,6 @@ export type TenantConfig =
     homepage: Template2Homepage;
     infoPages?: InfoPagesConfig;
     dynamicPages?: DynamicPagesConfig;
-    merchantType?: MerchantType;
     siteConfig: SiteConfig;
     ui?: UIConfig;
     dictionaries?: Record<string, Dictionary>; // Dynamic dictionaries from tenant config

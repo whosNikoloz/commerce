@@ -21,9 +21,11 @@ import {
   SortAsc,
   Filter,
   Layers,
+  Plus,
+  Minus,
+  Check,
 } from "lucide-react";
 
-import { useTenant } from "@/app/context/tenantContext";
 import { getAllBrands } from "@/app/api/services/brandService";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +51,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -64,6 +71,12 @@ import {
   getProductsByCategory,
   updateProduct,
 } from "@/app/api/services/productService";
+import {
+  addStock,
+  removeStock,
+  updateStock,
+} from "@/app/api/services/stockService";
+import { isCustomMerchant as checkIsCustomMerchant } from "@/app/api/services/integrationService";
 
 // ✅ Lazy-load heavy pieces
 const UpdateProductModal = dynamic(() => import("./update-product-modal"), { ssr: false });
@@ -93,8 +106,6 @@ function useDebounced<T>(value: T, delay = 250): T {
 }
 
 export function ProductsTable({ initialCategories }: ProductsTableProps) {
-  const { config } = useTenant();
-  const isCustomMerchant = config?.merchantType === "CUSTOM";
   const dictionary = useDictionary();
   const t = dictionary?.admin?.products?.table || {};
   const tCommon = dictionary?.common || {};
@@ -119,6 +130,12 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_mounted, setMounted] = useState(false);
 
+  // Stock loading state for UI feedback
+  const [stockLoading, setStockLoading] = useState<Record<string, boolean>>({});
+
+  // Custom merchant state (not using Fina integration)
+  const [isCustomMerchant, setIsCustomMerchant] = useState(false);
+
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -128,6 +145,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
       if (isSmall) setViewMode("grid");
     }
+
+    // Check if this is a custom merchant (not using Fina integration)
+    checkIsCustomMerchant()
+      .then(setIsCustomMerchant)
+      .catch(() => setIsCustomMerchant(false));
 
     // Load brands for product modals
     setBrandsLoading(true);
@@ -228,7 +250,6 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     price?: number,
     discountPrice?: number,
     productAdditionalJson?: string,
-    stockQuantity?: number,
   ) => {
     const current = products.find((p) => p.id === productId);
 
@@ -253,7 +274,6 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       productFacetValues: facetValues,
       productGroupId: productGroupId || undefined,
       productAdditionalJson,
-      stockQuantity,
     };
 
     setProducts((prevList) => prevList.map((p) => (p.id === productId ? patched : p)));
@@ -299,6 +319,79 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       console.error("Failed to update product", err);
       toast.error(t?.toast?.productUpdateFailed || "Failed to update product");
       setProducts(prev);
+    }
+  };
+
+  // Helper to update product stock in local state
+  const updateProductStockLocally = (productId: string, newStock: number) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, stockQuantity: newStock } : p))
+    );
+  };
+
+  // Handle adding stock
+  const handleAddStock = async (productId: string, amount: number = 1) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    const currentStock = product.stockQuantity ?? 0;
+    setStockLoading((prev) => ({ ...prev, [productId]: true }));
+    try {
+      await addStock(productId, amount);
+      updateProductStockLocally(productId, currentStock + amount);
+      toast.success(t?.toast?.stockAdded || "Stock added");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to add stock", err);
+      toast.error(t?.toast?.stockAddFailed || "Failed to add stock");
+    } finally {
+      setStockLoading((prev) => ({ ...prev, [productId]: false }));
+    }
+  };
+
+  // Handle removing stock
+  const handleRemoveStock = async (productId: string, amount: number = 1) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    const currentStock = product.stockQuantity ?? 0;
+    if (currentStock < amount) {
+      toast.error(t?.toast?.insufficientStock || "Insufficient stock");
+      return;
+    }
+
+    setStockLoading((prev) => ({ ...prev, [productId]: true }));
+    try {
+      await removeStock(productId, amount);
+      updateProductStockLocally(productId, currentStock - amount);
+      toast.success(t?.toast?.stockRemoved || "Stock removed");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to remove stock", err);
+      toast.error(t?.toast?.stockRemoveFailed || "Failed to remove stock");
+    } finally {
+      setStockLoading((prev) => ({ ...prev, [productId]: false }));
+    }
+  };
+
+  // Handle manual stock update (set exact quantity)
+  const handleSetStock = async (productId: string, quantity: number) => {
+    if (quantity < 0) {
+      toast.error(t?.toast?.invalidQuantity || "Quantity must be 0 or greater");
+      return;
+    }
+
+    setStockLoading((prev) => ({ ...prev, [productId]: true }));
+    try {
+      await updateStock(productId, quantity);
+      updateProductStockLocally(productId, quantity);
+      toast.success(t?.toast?.stockUpdated || "Stock updated");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to update stock", err);
+      toast.error(t?.toast?.stockUpdateFailed || "Failed to update stock");
+    } finally {
+      setStockLoading((prev) => ({ ...prev, [productId]: false }));
     }
   };
 
@@ -352,6 +445,99 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       : condition === Condition.Used
         ? tCommon?.used
         : tCommon?.likeNew;
+
+  // Stock control component with +/- buttons and manual input
+  const StockControl = ({ productId, stock, size = "default" }: { productId: string; stock: number; size?: "small" | "default" }) => {
+    const [manualValue, setManualValue] = useState("");
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const currentStock = stock;
+    const isLoading = stockLoading[productId];
+
+    const buttonSize = size === "small" ? "h-6 w-6" : "h-7 w-7";
+    const iconSize = size === "small" ? "h-3 w-3" : "h-3 w-3";
+    const textSize = size === "small" ? "text-sm" : "text-base";
+    const minWidth = size === "small" ? "min-w-[32px]" : "min-w-[40px]";
+
+    const handleManualSubmit = () => {
+      const qty = parseInt(manualValue);
+      if (!isNaN(qty) && qty >= 0) {
+        handleSetStock(productId, qty);
+        setIsPopoverOpen(false);
+        setManualValue("");
+      }
+    };
+
+    return (
+      <div className="flex items-center gap-1">
+        <Button
+          size="icon"
+          variant="outline"
+          className={`${buttonSize} border-slate-300 dark:border-slate-600`}
+          disabled={isLoading || currentStock <= 0}
+          onClick={() => handleRemoveStock(productId)}
+        >
+          <Minus className={iconSize} />
+        </Button>
+
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <button
+              className={`${minWidth} ${textSize} text-center font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded px-1 py-0.5 transition-colors ${
+                currentStock === 0
+                  ? "text-red-600 dark:text-red-400"
+                  : currentStock <= 5
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-slate-900 dark:text-slate-100"
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? "..." : currentStock}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-3" align="center">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                {t?.setStock || "Set stock quantity"}
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder={String(currentStock)}
+                  value={manualValue}
+                  onChange={(e) => setManualValue(e.target.value)}
+                  className="h-8"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleManualSubmit();
+                    }
+                  }}
+                />
+                <Button
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={handleManualSubmit}
+                  disabled={!manualValue || isNaN(parseInt(manualValue))}
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <Button
+          size="icon"
+          variant="outline"
+          className={`${buttonSize} border-slate-300 dark:border-slate-600`}
+          disabled={isLoading}
+          onClick={() => handleAddStock(productId)}
+        >
+          <Plus className={iconSize} />
+        </Button>
+      </div>
+    );
+  };
 
   const ProductCard = ({ product }: { product: ProductRequestModel }) => (
     <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700">
@@ -424,42 +610,44 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               )}
             </div>
 
-            <div className="flex items-center gap-1">
-              <Switch
-                checked={product.isActive}
-                className="data-[state=checked]:bg-blue-600"
-                onCheckedChange={() => toggleProductVisibility(product.id)}
-              />
-              <UpdateProductModal
-                brands={brands}
-                categories={initialCategories}
-                initialBrandId={product.brandId}
-                initialCategoryId={product.categoryId}
-                initialCondition={product.condition}
-                initialDescription={product.description}
-                initialDiscountPrice={product.discountPrice}
-                initialFacetValues={product.productFacetValues ?? []}
-                initialProductAdditionalJson={product.productAdditionalJson}
-                initialStockQuantity={product.stockQuantity}
-                initialIsActive={product.isActive}
-                initialIsComingSoon={product.isComingSoon}
-                initialIsLiquidated={product.isLiquidated}
-                initialIsNewArrival={product.isNewArrival}
-                initialName={product.name}
-                initialPrice={product.price}
-                initialProductGroupId={product.productGroupId}
-                initialStockStatus={product.status}
-                productId={product.id}
-                onSave={handleUpdateProduct}
-              />
-              <ReviewImagesModal
-                existing={(product.images ?? []).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
-                maxFiles={12}
-                maxSizeMB={5}
-                productId={product.id}
-                onChanged={(urls) => handleImagesChanged(product.id, urls)}
-              />
-            </div>
+            {/* Stock controls */}
+            <StockControl productId={product.id} stock={product.stockQuantity ?? 0} size="small" />
+          </div>
+
+          <div className="flex items-center justify-end gap-1">
+            <Switch
+              checked={product.isActive}
+              className="data-[state=checked]:bg-blue-600"
+              onCheckedChange={() => toggleProductVisibility(product.id)}
+            />
+            <UpdateProductModal
+              brands={brands}
+              categories={initialCategories}
+              initialBrandId={product.brandId}
+              initialCategoryId={product.categoryId}
+              initialCondition={product.condition}
+              initialDescription={product.description}
+              initialDiscountPrice={product.discountPrice}
+              initialFacetValues={product.productFacetValues ?? []}
+              initialProductAdditionalJson={product.productAdditionalJson}
+              initialIsActive={product.isActive}
+              initialIsComingSoon={product.isComingSoon}
+              initialIsLiquidated={product.isLiquidated}
+              initialIsNewArrival={product.isNewArrival}
+              initialName={product.name}
+              initialPrice={product.price}
+              initialProductGroupId={product.productGroupId}
+              initialStockStatus={product.status}
+              productId={product.id}
+              onSave={handleUpdateProduct}
+            />
+            <ReviewImagesModal
+              existing={(product.images ?? []).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
+              maxFiles={12}
+              maxSizeMB={5}
+              productId={product.id}
+              onChanged={(urls) => handleImagesChanged(product.id, urls)}
+            />
           </div>
         </div>
       </CardContent>
@@ -673,6 +861,9 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                           <TableHead className="hidden xl:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             {t?.headers?.flags || "Flags"}
                           </TableHead>
+                          <TableHead className="hidden md:table-cell text-slate-700 dark:text-slate-300 font-bold text-center">
+                            {t?.headers?.stock || "Stock"}
+                          </TableHead>
                           <TableHead className="hidden sm:table-cell text-slate-700 dark:text-slate-300 font-bold">
                             {t?.headers?.visible || "Visible"}
                           </TableHead>
@@ -781,6 +972,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                     {tCommon.new || "New"}
                                   </Badge>
                                 )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              <div className="flex items-center justify-center">
+                                <StockControl productId={product.id} stock={product.stockQuantity ?? 0} />
                               </div>
                             </TableCell>
                             <TableCell className="hidden sm:table-cell">

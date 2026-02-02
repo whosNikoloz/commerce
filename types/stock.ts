@@ -3,6 +3,7 @@
 export interface ProductStock {
   id: string;
   productId: string;
+  productName: string;
   quantity: number;
   reservedQuantity: number;
   availableQuantity: number;
@@ -12,22 +13,13 @@ export interface ProductStock {
 export interface ProductSales {
   id: string;
   productId: string;
+  productName: string;
   totalSold: number;
   totalRevenue: number;
   lastSaleDate: string;
 }
 
-export interface UpdateStockRequest {
-  productId: string;
+export interface RecordSaleRequest {
   quantity: number;
-}
-
-export interface AddStockRequest {
-  productId: string;
-  quantity: number;
-}
-
-export interface RemoveStockRequest {
-  productId: string;
-  quantity: number;
+  unitPrice: number;
 }

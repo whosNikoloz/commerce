@@ -7,9 +7,9 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useTenant } from "@/app/context/tenantContext";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { getAllOrders } from "@/app/api/services/orderService";
+import { getIntegrationStatus, IntegrationType } from "@/app/api/services/integrationService";
 import { OrderSummary, OrderStatus } from "@/types/orderTypes";
 
 const stats = [
@@ -96,13 +96,19 @@ function formatDate(dateString: string): string {
 
 export default function AdminDashboard() {
   const dict = useDictionary();
-  const { config } = useTenant();
-  const isFinaMerchant = config?.merchantType === "FINA";
+
+  // isFinaMerchant = Fina integration is enabled (not a custom merchant)
+  const [isFinaMerchant, setIsFinaMerchant] = useState(false);
 
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
   useEffect(() => {
+    // Check if Fina integration is enabled
+    getIntegrationStatus(IntegrationType.Fina)
+      .then((status) => setIsFinaMerchant(status.isEnabled))
+      .catch(() => setIsFinaMerchant(false));
+
     const fetchOrders = async () => {
       try {
         setLoadingOrders(true);

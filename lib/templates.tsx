@@ -30,9 +30,15 @@ const CommercialBannerDataSchema = z.object({
   layout: z.enum(["carousel", "grid"]),
   columns: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).optional(),
   carouselStyle: z.enum(["full-width", "grid"]).optional(),
+  scrollDirection: z.enum(["horizontal", "vertical"]).optional(),
+  showArrows: z.boolean().optional(),
+  autoScroll: z.boolean().optional(),
+  autoScrollInterval: z.number().optional(),
+  bannerHeight: z.string().optional(),
   banners: z.array(
     z.object({
       imageUrl: z.string(),
+      laptopImageUrl: z.string().optional(),
       mobileImageUrl: z.string().optional(),
       href: z.string(),
       alt: LocalizedTextSchema,
@@ -155,6 +161,7 @@ const HeroDataSchema = z.object({
   banners: z.array(
     z.object({
       imageUrl: z.string(),
+      laptopImageUrl: z.string().optional(),
       mobileImageUrl: z.string().optional(),
       href: z.string(),
       alt: LocalizedTextSchema,
@@ -187,6 +194,7 @@ const HeroBrandDataSchema = z.object({
     .array(
       z.object({
         imageUrl: z.string(),
+        laptopImageUrl: z.string().optional(),
         mobileImageUrl: z.string().optional(),
         href: z.string().optional(),
         alt: LocalizedTextSchema,

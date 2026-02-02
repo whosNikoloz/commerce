@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 
 type Slide = {
   imageUrl: string;
+  laptopImageUrl?: string;
   mobileImageUrl?: string;
   href?: string;
   altText: string;
@@ -99,14 +100,43 @@ export default function HeroBrandClient({
                         }
                       >
                         <div className="relative h-[75vh] min-h-[600px] w-full">
+                          {/* Desktop Image (lg and above) */}
                           <Image
                             fill
                             alt={slide.altText}
-                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+                              slide.laptopImageUrl
+                                ? 'hidden lg:block'
+                                : slide.mobileImageUrl
+                                  ? 'hidden md:block'
+                                  : ''
+                            }`}
                             priority={i === 0}
-                            sizes="100vw"
+                            sizes="1200px"
                             src={slide.imageUrl}
                           />
+                          {/* Laptop/Tablet Image (md to lg) */}
+                          {slide.laptopImageUrl && (
+                            <Image
+                              fill
+                              alt={slide.altText}
+                              className="object-cover transition-transform duration-700 group-hover:scale-105 hidden md:block lg:hidden"
+                              priority={i === 0}
+                              sizes="(max-width: 1024px) 100vw"
+                              src={slide.laptopImageUrl}
+                            />
+                          )}
+                          {/* Mobile Image (below md) */}
+                          {slide.mobileImageUrl && (
+                            <Image
+                              fill
+                              alt={slide.altText}
+                              className="object-cover transition-transform duration-700 group-hover:scale-105 block md:hidden"
+                              priority={i === 0}
+                              sizes="100vw"
+                              src={slide.mobileImageUrl}
+                            />
+                          )}
                           {/* Sophisticated gradient overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                           <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />

@@ -66,7 +66,7 @@ const ProductRailSection = memo(function ProductRailSection({
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const finalLimit = section.filterBy?.productCount || (section.filterBy?.productIds?.length || 4);
+        const pageSize = section.filterBy?.productCount || (section.filterBy?.productIds?.length || 12);
 
         // Filter out current product and limit
         let filtered: ProductResponseModel[] = [];
@@ -77,7 +77,6 @@ const ProductRailSection = memo(function ProductRailSection({
         } else {
           // ONLY run search logic if no specific IDs were requested
           const filter: FilterModel = {};
-          // ... (rest of search logic)
 
           // Handle useCurrentProductCategory
           if (section.filterBy?.useCurrentProductCategory && categoryId) {
@@ -101,12 +100,9 @@ const ProductRailSection = memo(function ProductRailSection({
             filter.maxPrice = section.filterBy.maxPrice;
           }
 
-          // Random and Count
+          // Random
           if (section.filterBy?.isRandom !== undefined) {
             filter.isRandom = section.filterBy.isRandom;
-          }
-          if (section.filterBy?.productCount !== undefined) {
-            filter.productCount = section.filterBy.productCount;
           }
 
           // Condition and Stock Status
@@ -119,7 +115,7 @@ const ProductRailSection = memo(function ProductRailSection({
 
           const result = await searchProductsByFilter({
             filter,
-            pageSize: finalLimit * 2, // Align with ProductRail.tsx: data.limit * 2
+            pageSize,
             page: 1,
             sortBy: section.sortBy || "featured",
           });
@@ -153,7 +149,7 @@ const ProductRailSection = memo(function ProductRailSection({
 
             return p.id !== productId;
           })
-          .slice(0, finalLimit);
+          .slice(0, pageSize);
 
         if (cancelled) return;
 

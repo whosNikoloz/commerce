@@ -1,5 +1,9 @@
 "use client";
 
+import type { ProductRailSectionData } from "@/types/product";
+import type { CategoryModel } from "@/types/category";
+import type { BrandModel } from "@/types/brand";
+
 import { useState } from "react";
 import {
   Plus,
@@ -13,10 +17,9 @@ import {
   LayoutGrid,
   SlidersHorizontal
 } from "lucide-react";
+
 import { ProductRailSectionEditor } from "./ProductRailSectionEditor";
-import type { ProductRailSectionData, LocalizedText } from "@/types/product";
-import type { CategoryModel } from "@/types/category";
-import type { BrandModel } from "@/types/brand";
+
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { Button } from "@/components/ui/button";
 
@@ -61,43 +64,51 @@ export function ProductRailSectionsManager({
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
+  // Ensure sections is always a usable array at runtime
+  const safeSections = Array.isArray(sections) ? sections : [];
+
   // Sort sections by order
-  const sortedSections = [...sections].sort((a, b) => a.order - b.order);
+  const sortedSections = [...safeSections].sort((a, b) => a.order - b.order);
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id);
       } else {
         next.add(id);
       }
+
       return next;
     });
   };
 
   const addSection = () => {
-    const newSection = createDefaultSection(sections.length);
-    onChange([...sections, newSection]);
+    const newSection = createDefaultSection(safeSections.length);
+
+    onChange([...safeSections, newSection]);
     setExpandedIds((prev) => new Set(prev).add(newSection.id));
   };
 
   const removeSection = (id: string) => {
-    onChange(sections.filter((s) => s.id !== id));
+    onChange(safeSections.filter((s) => s.id !== id));
     setExpandedIds((prev) => {
       const next = new Set(prev);
+
       next.delete(id);
+
       return next;
     });
   };
 
   const updateSection = (id: string, data: ProductRailSectionData) => {
-    onChange(sections.map((s) => (s.id === id ? data : s)));
+    onChange(safeSections.map((s) => (s.id === id ? data : s)));
   };
 
   const toggleEnabled = (id: string) => {
     onChange(
-      sections.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s))
+      safeSections.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s))
     );
   };
 
@@ -106,6 +117,7 @@ export function ProductRailSectionsManager({
     const newSections = [...sortedSections];
     // Swap orders
     const currentOrder = newSections[index].order;
+
     newSections[index].order = newSections[index - 1].order;
     newSections[index - 1].order = currentOrder;
     onChange(newSections);
@@ -116,6 +128,7 @@ export function ProductRailSectionsManager({
     const newSections = [...sortedSections];
     // Swap orders
     const currentOrder = newSections[index].order;
+
     newSections[index].order = newSections[index + 1].order;
     newSections[index + 1].order = currentOrder;
     onChange(newSections);
@@ -126,6 +139,7 @@ export function ProductRailSectionsManager({
     if (section.customName) return section.customName;
     const titleKa = section.title?.ka;
     const titleEn = section.title?.en;
+
     return titleKa || titleEn || t.untitledSection || "Untitled Section";
   };
 
@@ -165,10 +179,10 @@ export function ProductRailSectionsManager({
           </p>
         </div>
         <Button
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-sm"
+          size="sm"
           type="button"
           onClick={addSection}
-          size="sm"
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-sm"
         >
           <Plus className="h-4 w-4 mr-1" />
           {t.addSection || "Add Section"}
@@ -186,11 +200,11 @@ export function ProductRailSectionsManager({
             {t.noSectionsHint || "Add a section to display related products on the product page."}
           </p>
           <Button
-            type="button"
-            onClick={addSection}
-            size="sm"
-            variant="outline"
             className="mt-4"
+            size="sm"
+            type="button"
+            variant="outline"
+            onClick={addSection}
           >
             <Plus className="h-4 w-4 mr-1" />
             {t.addFirstSection || "Add First Section"}
@@ -211,9 +225,9 @@ export function ProductRailSectionsManager({
               >
                 {/* Section Header */}
                 <div
+                  className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                   role="button"
                   tabIndex={0}
-                  className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                   onClick={() => toggleExpand(section.id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -250,46 +264,46 @@ export function ProductRailSectionsManager({
 
                   {/* Actions */}
                   <div
-                    role="toolbar"
                     aria-label="Section actions"
                     className="flex items-center gap-1"
+                    role="toolbar"
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
                   >
                     <button
+                      className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      disabled={index === 0}
+                      title={t.moveUp || "Move up"}
                       type="button"
                       onClick={() => moveUp(index)}
-                      disabled={index === 0}
-                      className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      title={t.moveUp || "Move up"}
                     >
                       <ArrowUp className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
                     </button>
                     <button
+                      className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      disabled={index === sortedSections.length - 1}
+                      title={t.moveDown || "Move down"}
                       type="button"
                       onClick={() => moveDown(index)}
-                      disabled={index === sortedSections.length - 1}
-                      className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      title={t.moveDown || "Move down"}
                     >
                       <ArrowDown className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
                     </button>
                     <button
-                      type="button"
-                      onClick={() => toggleEnabled(section.id)}
                       className={`p-1.5 rounded transition-colors ${section.enabled
                         ? "hover:bg-green-50 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400"
                         : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-600"
                         }`}
                       title={section.enabled ? t.disable || "Disable" : t.enable || "Enable"}
+                      type="button"
+                      onClick={() => toggleEnabled(section.id)}
                     >
                       <Power className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      type="button"
-                      onClick={() => removeSection(section.id)}
                       className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:text-slate-600 dark:hover:text-red-400 transition-colors"
                       title={t.remove || "Remove"}
+                      type="button"
+                      onClick={() => removeSection(section.id)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -306,11 +320,11 @@ export function ProductRailSectionsManager({
                 {isExpanded && (
                   <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50/50 dark:bg-slate-800/30">
                     <ProductRailSectionEditor
-                      data={section}
-                      onChange={(data) => updateSection(section.id, data)}
-                      categories={categories}
                       brands={brands}
+                      categories={categories}
+                      data={section}
                       locales={locales}
+                      onChange={(data) => updateSection(section.id, data)}
                     />
                   </div>
                 )}

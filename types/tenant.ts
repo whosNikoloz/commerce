@@ -75,8 +75,14 @@ export type CommercialBannerData = {
   layout: "carousel" | "grid";
   columns?: 1 | 2 | 3 | 4 | 5;
   carouselStyle?: "full-width" | "grid";
+  scrollDirection?: "horizontal" | "vertical";
+  showArrows?: boolean;
+  autoScroll?: boolean;
+  autoScrollInterval?: number;
+  bannerHeight?: string;
   banners: Array<{
     imageUrl: string;
+    laptopImageUrl?: string;
     mobileImageUrl?: string;
     href: string;
     alt: LocalizedText;
@@ -155,6 +161,7 @@ export type HeroData = {
   maxCategories?: number;
   banners: Array<{
     imageUrl: string;
+    laptopImageUrl?: string;
     mobileImageUrl?: string;
     href: string;
     alt: LocalizedText;
@@ -183,6 +190,7 @@ export type HeroBrandData = {
   backgroundImage?: string;
   slides?: Array<{
     imageUrl: string;
+    laptopImageUrl?: string;
     mobileImageUrl?: string;
     href?: string;
     alt: LocalizedText;

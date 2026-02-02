@@ -72,6 +72,7 @@ export async function getProductRestsByIds(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    requireAuth: false,
   });
 }
 
@@ -131,6 +132,7 @@ export async function searchProductsByFilter(params: {
       method: "POST",
       body: JSON.stringify(params.filter),
       headers: { "Content-Type": "application/json" },
+      requireAuth: false,
     },
   );
 }

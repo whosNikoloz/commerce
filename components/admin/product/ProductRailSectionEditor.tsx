@@ -1,12 +1,15 @@
 "use client";
 
-import { LocalizedTextInput } from "./LocalizedTextInput";
-import { CategoryTreeSelectMulti } from "./CategoryTreeSelectMulti";
-import type { ProductRailSectionData, LocalizedText, ProductResponseModel } from "@/types/product";
+import type { ProductRailSectionData, ProductResponseModel } from "@/types/product";
 import type { CategoryModel } from "@/types/category";
 import type { BrandModel } from "@/types/brand";
-import { useDictionary } from "@/app/context/dictionary-provider";
+
 import { useState, useEffect } from "react";
+
+import { CategoryTreeSelectMulti } from "./CategoryTreeSelectMulti";
+import { LocalizedTextInput } from "./LocalizedTextInput";
+
+import { useDictionary } from "@/app/context/dictionary-provider";
 import { searchProducts } from "@/app/api/services/productService";
 
 interface ProductRailSectionEditorProps {
@@ -72,12 +75,14 @@ export function ProductRailSectionEditor({
     const delayDebounceFn = setTimeout(async () => {
       if (!searchTerm.trim()) {
         setSearchResults([]);
+
         return;
       }
 
       setIsSearching(true);
       try {
         const result = await searchProducts(searchTerm, "name", "asc", 1, 20);
+
         setSearchResults(result.items || []);
       } catch (err) {
         console.error("Product search failed", err);
@@ -114,27 +119,27 @@ export function ProductRailSectionEditor({
             </span>
           </label>
           <input
+            className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
+            placeholder={t.customNamePlaceholder || "e.g., Same Brand Products, Related Items"}
             type="text"
             value={safeData.customName || ""}
             onChange={(e) => updateField("customName", e.target.value)}
-            className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
-            placeholder={t.customNamePlaceholder || "e.g., Same Brand Products, Related Items"}
           />
         </div>
 
         <LocalizedTextInput
+          required
           label={t.sectionTitle || "Section Title"}
+          locales={locales}
           value={safeData.title}
           onChange={(value) => updateField("title", value)}
-          required
-          locales={locales}
         />
 
         <LocalizedTextInput
           label={t.sectionSubtitle || "Section Subtitle"}
+          locales={locales}
           value={safeData.subtitle || { en: "", ka: "" }}
           onChange={(value) => updateField("subtitle", value)}
-          locales={locales}
         />
 
         <div className="grid grid-cols-2 gap-3">
@@ -143,9 +148,9 @@ export function ProductRailSectionEditor({
               {t.layout || "Layout"} <span className="text-red-500">*</span>
             </label>
             <select
+              className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
               value={safeData.layout}
               onChange={(e) => updateField("layout", e.target.value as "carousel" | "grid")}
-              className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
             >
               <option value="carousel">{t.carousel || "Carousel"}</option>
               <option value="grid">{t.grid || "Grid"}</option>
@@ -158,11 +163,11 @@ export function ProductRailSectionEditor({
                 {t.columns || "Grid Columns"}
               </label>
               <select
+                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
                 value={safeData.columns || 3}
                 onChange={(e) =>
                   updateField("columns", parseInt(e.target.value) as 2 | 3 | 4 | 5 | 6)
                 }
-                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
               >
                 <option value="2">2 Columns</option>
                 <option value="3">3 Columns</option>
@@ -180,11 +185,11 @@ export function ProductRailSectionEditor({
               {t.viewAllLink || "View All Link"}
             </label>
             <input
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
+              placeholder="/products"
               type="text"
               value={safeData.viewAllHref || ""}
               onChange={(e) => updateField("viewAllHref", e.target.value)}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
-              placeholder="/products"
             />
           </div>
 
@@ -193,9 +198,9 @@ export function ProductRailSectionEditor({
               {t.sortBy || "Sort By"}
             </label>
             <select
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
               value={safeData.sortBy || "featured"}
               onChange={(e) => updateField("sortBy", e.target.value as ProductRailSectionData["sortBy"])}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
             >
               <option value="featured">{t.sortFeatured || "Featured"}</option>
               <option value="newest">{t.sortNewest || "Newest"}</option>
@@ -217,10 +222,10 @@ export function ProductRailSectionEditor({
         <div className="grid grid-cols-2 gap-3">
           <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-emerald-50/10 dark:bg-emerald-900/10 cursor-pointer hover:bg-emerald-50/20 dark:hover:bg-emerald-900/20 transition-all group">
             <input
-              type="checkbox"
               checked={safeData.filterBy?.useCurrentProductCategory || false}
-              onChange={(e) => updateFilterField("useCurrentProductCategory", e.target.checked || undefined)}
               className="rounded-full border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 dark:bg-slate-800 w-4 h-4"
+              type="checkbox"
+              onChange={(e) => updateFilterField("useCurrentProductCategory", e.target.checked || undefined)}
             />
             <span className="text-xs text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               {t.useCurrentCategory || "Same category as this product"}
@@ -229,10 +234,10 @@ export function ProductRailSectionEditor({
 
           <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-emerald-50/10 dark:bg-emerald-900/10 cursor-pointer hover:bg-emerald-50/20 dark:hover:bg-emerald-900/20 transition-all group">
             <input
-              type="checkbox"
               checked={safeData.filterBy?.useCurrentProductBrand || false}
-              onChange={(e) => updateFilterField("useCurrentProductBrand", e.target.checked || undefined)}
               className="rounded-full border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 dark:bg-slate-800 w-4 h-4"
+              type="checkbox"
+              onChange={(e) => updateFilterField("useCurrentProductBrand", e.target.checked || undefined)}
             />
             <span className="text-xs text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               {t.useCurrentBrand || "Same brand as this product"}
@@ -336,9 +341,9 @@ export function ProductRailSectionEditor({
             </label>
             <CategoryTreeSelectMulti
               categories={categories}
+              emptyState={t.noCategoriesLoaded || "No categories loaded."}
               selectedIds={currentCategoryIds}
               onSelectionChange={(ids) => updateFilterField("categoryIds", ids.length > 0 ? ids : undefined)}
-              emptyState={t.noCategoriesLoaded || "No categories loaded."}
             />
 
             {/* Selected category badges */}
@@ -346,6 +351,7 @@ export function ProductRailSectionEditor({
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {currentCategoryIds.map((id) => {
                   const cat = categories.find((c) => c.id === id);
+
                   return (
                     <span
                       key={id}
@@ -353,12 +359,13 @@ export function ProductRailSectionEditor({
                     >
                       {cat?.name || id}
                       <button
+                        className="text-blue-500 hover:text-red-500 transition-colors ml-0.5"
                         type="button"
                         onClick={() => {
                           const newIds = currentCategoryIds.filter((cid) => cid !== id);
+
                           updateFilterField("categoryIds", newIds.length > 0 ? newIds : undefined);
                         }}
-                        className="text-blue-500 hover:text-red-500 transition-colors ml-0.5"
                       >
                         &times;
                       </button>
@@ -377,21 +384,22 @@ export function ProductRailSectionEditor({
               {brands.map((brand) => (
                 <label key={brand.id} className="flex items-center gap-2 cursor-pointer group p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors text-[11px] font-medium text-slate-600 dark:text-slate-400 group-hover:text-blue-500 transition-colors truncate">
                   <input
-                    type="checkbox"
                     checked={currentBrandIds.includes(brand.id)}
+                    className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 h-3.5 w-3.5"
+                    type="checkbox"
                     onChange={(e) => {
                       const newIds = e.target.checked
                         ? [...currentBrandIds, brand.id]
                         : currentBrandIds.filter((id) => id !== brand.id);
+
                       updateFilterField("brandIds", newIds.length > 0 ? newIds : undefined);
                     }}
-                    className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 h-3.5 w-3.5"
                   />
                   {brand.images?.[0] && (
                     <img
-                      src={brand.images[0]}
                       alt={brand.name || brand.id}
                       className="w-4 h-4 rounded object-cover border border-slate-200 dark:border-slate-700"
+                      src={brand.images[0]}
                     />
                   )}
                   <span className="truncate">
@@ -406,6 +414,7 @@ export function ProductRailSectionEditor({
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {currentBrandIds.map((id) => {
                   const brand = brands.find((b) => b.id === id);
+
                   return (
                     <span
                       key={id}
@@ -413,19 +422,20 @@ export function ProductRailSectionEditor({
                     >
                       {brand?.images?.[0] && (
                         <img
-                          src={brand.images[0]}
                           alt={brand?.name || id}
                           className="w-4 h-4 rounded-full object-cover border border-white/50 shadow-sm"
+                          src={brand.images[0]}
                         />
                       )}
                       <span className="truncate max-w-[100px]">{brand?.name || id}</span>
                       <button
+                        className="text-blue-500 hover:text-red-500 transition-colors ml-0.5"
                         type="button"
                         onClick={() => {
                           const newIds = currentBrandIds.filter((bid) => bid !== id);
+
                           updateFilterField("brandIds", newIds.length > 0 ? newIds : undefined);
                         }}
-                        className="text-blue-500 hover:text-red-500 transition-colors ml-0.5"
                       >
                         &times;
                       </button>
@@ -442,13 +452,13 @@ export function ProductRailSectionEditor({
                 {t.minPrice || "Min Price"}
               </label>
               <input
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
+                placeholder="0"
                 type="number"
                 value={safeData.filterBy?.minPrice || ""}
                 onChange={(e) =>
                   updateFilterField("minPrice", e.target.value ? parseFloat(e.target.value) : undefined)
                 }
-                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
-                placeholder="0"
               />
             </div>
             <div>
@@ -456,13 +466,13 @@ export function ProductRailSectionEditor({
                 {t.maxPrice || "Max Price"}
               </label>
               <input
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
+                placeholder="Any"
                 type="number"
                 value={safeData.filterBy?.maxPrice || ""}
                 onChange={(e) =>
                   updateFilterField("maxPrice", e.target.value ? parseFloat(e.target.value) : undefined)
                 }
-                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
-                placeholder="Any"
               />
             </div>
           </div>
@@ -476,10 +486,10 @@ export function ProductRailSectionEditor({
             ].map((item) => (
               <label key={item.field} className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group">
                 <input
-                  type="checkbox"
                   checked={!!(safeData.filterBy as any)?.[item.field]}
-                  onChange={(e) => updateFilterField(item.field as any, e.target.checked || undefined)}
                   className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 w-4 h-4"
+                  type="checkbox"
+                  onChange={(e) => updateFilterField(item.field as any, e.target.checked || undefined)}
                 />
                 <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {item.label}
@@ -492,10 +502,10 @@ export function ProductRailSectionEditor({
             <div className="grid grid-cols-2 gap-4">
               <label className="flex items-center gap-2 p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/30 dark:bg-blue-900/10 cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all group">
                 <input
-                  type="checkbox"
                   checked={safeData.filterBy?.isRandom || false}
-                  onChange={(e) => updateFilterField("isRandom", e.target.checked || undefined)}
                   className="rounded-full border-blue-300 dark:border-blue-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 w-4 h-4"
+                  type="checkbox"
+                  onChange={(e) => updateFilterField("isRandom", e.target.checked || undefined)}
                 />
                 <span className="text-[11px] font-bold text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300 transition-colors">
                   {t.randomOrder || "Show in Random Order"}
@@ -507,14 +517,14 @@ export function ProductRailSectionEditor({
                   {t.productCount || "Product Count"}
                 </label>
                 <input
+                  className="w-full px-2 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs text-center font-bold"
+                  min="1"
+                  placeholder="Count"
                   type="number"
                   value={safeData.filterBy?.productCount || "12"}
                   onChange={(e) =>
                     updateFilterField("productCount", e.target.value ? parseInt(e.target.value) : undefined)
                   }
-                  className="w-full px-2 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs text-center font-bold"
-                  placeholder="Count"
-                  min="1"
                 />
               </div>
             </div>

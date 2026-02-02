@@ -25,7 +25,7 @@ export default async function ProductRail({
   locale,
   className,
 }: ProductRailProps) {
-  const finalLimit = data.filterBy?.productCount || (data.filterBy?.productIds?.length || 4);
+  const pageSize = data.filterBy?.productCount || (data.filterBy?.productIds?.length || 12);
   let products: any[] | null = null;
   let error: Error | null = null;
 
@@ -33,11 +33,10 @@ export default async function ProductRail({
     if (data.filterBy?.productIds && data.filterBy.productIds.length > 0) {
       // If specific IDs are requested, ONLY fetch those
       const pResult = await getProductsByIds(data.filterBy.productIds);
-      products = pResult.slice(0, finalLimit);
+      products = pResult.slice(0, pageSize);
     } else {
       // ONLY run search logic if no specific IDs were requested
       const filter: FilterModel = {};
-      // ... (rest of search logic)
 
       if (data.filterBy?.categoryIds?.length) filter.categoryIds = data.filterBy.categoryIds;
       if (data.filterBy?.brandIds?.length) filter.brandIds = data.filterBy.brandIds;
@@ -46,11 +45,10 @@ export default async function ProductRail({
       if (data.filterBy?.minPrice !== undefined) filter.minPrice = data.filterBy.minPrice;
       if (data.filterBy?.maxPrice !== undefined) filter.maxPrice = data.filterBy.maxPrice;
       if (data.filterBy?.isRandom !== undefined) filter.isRandom = data.filterBy.isRandom;
-      if (data.filterBy?.productCount !== undefined) filter.productCount = data.filterBy.productCount;
 
       const result = await searchProductsByFilter({
         filter,
-        pageSize: finalLimit * 2,
+        pageSize,
         page: 1,
         sortBy: data.sortBy || "featured",
       });
@@ -62,7 +60,7 @@ export default async function ProductRail({
       if (data.filterBy?.isComingSoon) list = list.filter((p: any) => p.isComingSoon);
       if (data.filterBy?.hasDiscount) list = list.filter((p: any) => p.discountPrice > 0);
 
-      products = list.slice(0, finalLimit);
+      products = list.slice(0, pageSize);
     }
   } catch (e) {
     error = e as Error;
@@ -95,7 +93,7 @@ export default async function ProductRail({
       <div className="container mx-auto px-4">
         <div className="h-12 bg-muted rounded-lg w-64 mb-10 animate-pulse" />
         <div className={gridClass}>
-          {Array.from({ length: finalLimit }).map((_, idx) => (
+          {Array.from({ length: pageSize }).map((_, idx) => (
             <ProductCardSkeleton key={idx} />
           ))}
         </div>

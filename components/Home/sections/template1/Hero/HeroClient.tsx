@@ -67,17 +67,52 @@ export default function HeroClient({ data, locale }: HeroClientProps) {
           <SplideSlide key={index} style={{ height: bannerHeight }}>
             <Link className="block relative h-full w-full group" href={banner.href}>
               <div className="relative w-full h-full">
+                {/* Desktop Image (lg and above) */}
                 <Image
                   fill
                   alt={t(banner.alt, locale)}
-                  className="object-cover transition-transform duration-500"
+                  className={`object-cover transition-transform duration-500 ${
+                    banner.laptopImageUrl
+                      ? 'hidden lg:block'
+                      : banner.mobileImageUrl
+                        ? 'hidden md:block'
+                        : ''
+                  }`}
                   fetchPriority={index === 0 ? "high" : "low"}
                   loading={index === 0 ? "eager" : "lazy"}
                   priority={index === 0}
                   quality={index === 0 ? 85 : 70}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1200px"
+                  sizes="1200px"
                   src={banner.imageUrl}
                 />
+                {/* Laptop/Tablet Image (md to lg) */}
+                {banner.laptopImageUrl && (
+                  <Image
+                    fill
+                    alt={t(banner.alt, locale)}
+                    className={`object-cover transition-transform duration-500 hidden md:block lg:hidden`}
+                    fetchPriority={index === 0 ? "high" : "low"}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    priority={index === 0}
+                    quality={index === 0 ? 85 : 70}
+                    sizes="(max-width: 1024px) 100vw"
+                    src={banner.laptopImageUrl}
+                  />
+                )}
+                {/* Mobile Image (below md) */}
+                {banner.mobileImageUrl && (
+                  <Image
+                    fill
+                    alt={t(banner.alt, locale)}
+                    className="object-cover transition-transform duration-500 block md:hidden"
+                    fetchPriority={index === 0 ? "high" : "low"}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    priority={index === 0}
+                    quality={index === 0 ? 85 : 70}
+                    sizes="100vw"
+                    src={banner.mobileImageUrl}
+                  />
+                )}
                 {banner.badge?.en?.trim() && (
                   <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-10">
                     {t(banner.badge, locale)}

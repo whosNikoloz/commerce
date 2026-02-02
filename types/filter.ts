@@ -9,6 +9,5 @@ export interface FilterModel {
   minPrice?: number;
   maxPrice?: number;
   isRandom?: boolean;
-  productCount?: number;
   facetFilters?: FacetFilterModel[];
 }

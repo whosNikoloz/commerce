@@ -13,9 +13,20 @@ interface CommercialBannerProps {
   locale: Locale;
 }
 
-function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['banners'][0]; locale: Locale; index: number }) {
+function BannerItem({
+  banner,
+  locale,
+  index,
+  bannerHeight
+}: {
+  banner: CommercialBannerData['banners'][0];
+  locale: Locale;
+  index: number;
+  bannerHeight?: string;
+}) {
   const [isVisible, setIsVisible] = useState(false);
   const [desktopError, setDesktopError] = useState(false);
+  const [laptopError, setLaptopError] = useState(false);
   const [mobileError, setMobileError] = useState(false);
 
   useEffect(() => {
@@ -25,29 +36,64 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
   }, [index]);
 
   const desktopImageUrl = desktopError || !banner.imageUrl ? "/placeholder.png" : banner.imageUrl;
+  const laptopImageUrl = laptopError || !banner.laptopImageUrl
+    ? null
+    : banner.laptopImageUrl;
   const mobileImageUrl = mobileError || !banner.mobileImageUrl && !banner.imageUrl
     ? "/placeholder.png"
     : (banner.mobileImageUrl || banner.imageUrl);
 
+  // Determine visibility classes based on which images are available
+  const desktopVisibilityClass = banner.laptopImageUrl
+    ? 'hidden lg:block'
+    : 'hidden md:block';
+
+  // Use custom height or default heights
+  const hasCustomHeight = !!bannerHeight;
+
   return (
     <Link
       aria-label={t(banner.alt, locale)}
-      className={`group relative block overflow-hidden rounded-2xl  transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+      className={`group relative block overflow-hidden rounded-2xl transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
       href={`/${locale}${banner.href}`}
     >
-      <div className="relative hidden md:block h-64 lg:h-80 xl:h-96">
+      {/* Desktop Image (lg and above) */}
+      <div
+        className={`relative ${desktopVisibilityClass} ${!hasCustomHeight ? 'h-64 lg:h-80 xl:h-96' : ''}`}
+        style={hasCustomHeight ? { height: bannerHeight } : undefined}
+      >
         <Image
           fill
           alt={t(banner.alt, locale)}
-          className="object-cover w-full h-full transition-transform duration-700 "
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw"
+          className="object-cover w-full h-full transition-transform duration-700"
+          sizes="1200px"
           src={desktopImageUrl}
           onError={() => setDesktopError(true)}
         />
       </div>
 
-      {/* Mobile Image */}
-      <div className="relative block md:hidden h-48">
+      {/* Laptop/Tablet Image (md to lg) */}
+      {laptopImageUrl && (
+        <div
+          className={`relative hidden md:block lg:hidden ${!hasCustomHeight ? 'h-64' : ''}`}
+          style={hasCustomHeight ? { height: bannerHeight } : undefined}
+        >
+          <Image
+            fill
+            alt={t(banner.alt, locale)}
+            className="object-cover w-full h-full transition-transform duration-700"
+            sizes="(max-width: 1024px) 100vw"
+            src={laptopImageUrl}
+            onError={() => setLaptopError(true)}
+          />
+        </div>
+      )}
+
+      {/* Mobile Image (below md) */}
+      <div
+        className={`relative block md:hidden ${!hasCustomHeight ? 'h-48' : ''}`}
+        style={hasCustomHeight ? { height: bannerHeight } : undefined}
+      >
         <Image
           fill
           alt={t(banner.alt, locale)}
@@ -59,11 +105,11 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
       </div>
 
       {/* Badge overlay */}
-      {/* {banner.badge && (
+      {banner.badge && (
         <div className="absolute top-4 left-4 md:top-6 md:left-6 bg-primary text-primary-foreground text-sm md:text-base font-bold px-4 py-2 rounded-full shadow-lg">
           {t(banner.badge, locale)}
         </div>
-      )} */}
+      )}
 
     </Link>
   );
@@ -71,42 +117,15 @@ function BannerItem({ banner, locale, index }: { banner: CommercialBannerData['b
 
 export default function CommercialBanner({ data, locale }: CommercialBannerProps) {
   const splideRef = useRef<SplideCore | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_canGoPrev, setCanGoPrev] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_canGoNext, setCanGoNext] = useState(true);
 
   const isCarousel = data.layout === "carousel";
   const columns = data.columns || 1;
-  const carouselStyle = data.carouselStyle || "full-width"; // "full-width" or "grid"
-
-  useEffect(() => {
-    if (!isCarousel) return;
-
-    const splide = splideRef.current?.splide;
-
-    if (!splide) return;
-
-    const updateArrows = () => {
-      const index = splide.index;
-      const length = splide.length;
-
-      setCanGoPrev(index > 0);
-      setCanGoNext(index < length - 1);
-    };
-
-    splide.on("mounted", updateArrows);
-    splide.on("moved", updateArrows);
-    splide.on("updated", updateArrows);
-    splide.on("resized", updateArrows);
-
-    return () => {
-      splide.off("mounted");
-      splide.off("moved");
-      splide.off("updated");
-      splide.off("resized");
-    };
-  }, [isCarousel]);
+  const carouselStyle = data.carouselStyle || "full-width";
+  const scrollDirection = data.scrollDirection || "horizontal";
+  const showArrows = data.showArrows ?? true;
+  const autoScroll = data.autoScroll ?? true;
+  const autoScrollInterval = data.autoScrollInterval || 5000;
+  const bannerHeight = data.bannerHeight;
 
   // Grid Layout
   if (!isCarousel) {
@@ -114,14 +133,24 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
       ? "grid grid-cols-1 gap-6"
       : columns === 2
       ? "grid grid-cols-2 gap-4 md:gap-6"
-      : "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6";
+      : columns === 3
+      ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
+      : columns === 4
+      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+      : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6";
 
     return (
       <section className="relative overflow-hidden py-8 md:py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className={gridClass}>
             {data.banners.map((banner, index) => (
-              <BannerItem key={index} banner={banner} index={index} locale={locale} />
+              <BannerItem
+                key={index}
+                banner={banner}
+                bannerHeight={bannerHeight}
+                index={index}
+                locale={locale}
+              />
             ))}
           </div>
         </div>
@@ -129,79 +158,90 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
     );
   }
 
+  // Vertical scroll direction requires fixed height
+  const isVertical = scrollDirection === "vertical";
+  const carouselHeight = bannerHeight || (isVertical ? "500px" : undefined);
+
+  // Build Splide options based on configuration
+
+  console.log("Rendering CommercialBanner with data:", scrollDirection);
+  const getSplideOptions = () => {
+    const baseOptions = {
+      direction: isVertical ? ("ttb" as const) : ("ltr" as const),
+      height: isVertical ? carouselHeight : undefined,
+      arrows: showArrows,
+      autoplay: autoScroll,
+      interval: autoScrollInterval,
+      pauseOnHover: true,
+      pauseOnFocus: true,
+      resetProgress: false,
+      wheel: isVertical, // Enable mouse wheel scrolling for vertical
+    };
+
+    if (carouselStyle === "grid") {
+      return {
+        ...baseOptions,
+        type: "slide" as const,
+        gap: "1rem",
+        pagination: false,
+        drag: "free" as const,
+        trimSpace: true,
+        snap: false,
+        omitEnd: true,
+        focus: 0 as const,
+        perMove: 1,
+        perPage: columns >= 3 ? 3 : columns >= 2 ? 2 : 1,
+        breakpoints: {
+          1280: { perPage: columns >= 3 ? 3 : columns >= 2 ? 2 : 1, gap: "1rem" },
+          1024: { perPage: columns >= 2 ? 2 : 1, gap: "0.75rem" },
+          768: { perPage: columns >= 2 ? 2 : 1, gap: "0.75rem" },
+          640: { perPage: 1, gap: "0.5rem" },
+        },
+      };
+    }
+
+    // Full-width carousel
+    return {
+      ...baseOptions,
+      type: "slide" as const,
+      perPage: 1,
+      perMove: 1,
+      gap: isVertical ? "1rem" : "1.5rem",
+      pagination: true,
+      drag: true,
+    };
+  };
+
+  // Get slide height for vertical mode
+  const getSlideStyle = () => {
+    if (isVertical && carouselHeight) {
+      return { height: carouselHeight };
+    }
+    return undefined;
+  };
+
   // Carousel Layout
   return (
     <section className="relative overflow-hidden py-8 md:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative group">
-          {/* Navigation Buttons */}
-          {/* {canGoPrev && (
-            <button
-              aria-label="Previous"
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-border shadow-lg hover:bg-white transition-all opacity-0 group-hover:opacity-100 group-hover:-translate-x-2"
-              type="button"
-              onClick={() => splideRef.current?.go("<")}
-            >
-              <ArrowLeft className="h-6 w-6 text-foreground" />
-            </button>
-          )}
-
-          {canGoNext && (
-            <button
-              aria-label="Next"
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-border shadow-lg hover:bg-white transition-all opacity-0 group-hover:opacity-100 group-hover:translate-x-2"
-              type="button"
-              onClick={() => splideRef.current?.go(">")}
-            >
-              <ArrowRight className="h-6 w-6 text-foreground" />
-            </button>
-          )} */}
-
-          {/* Carousel */}
           <Splide
             ref={splideRef as any}
             aria-label="Commercial Banners"
-            options={
-              carouselStyle === "grid"
-                ? {
-                    type: "slide",
-                    gap: "1rem",
-                    pagination: false,
-                    arrows: true,
-                    drag: "free",
-                    trimSpace: true,
-                    snap: false,
-                    omitEnd: true,
-                    focus: 0,
-                    perMove: 1,
-                    autoplay: false,
-                    perPage: columns >= 3 ? 3 : columns >= 2 ? 2 : 1,
-                    breakpoints: {
-                      1280: { perPage: columns >= 3 ? 3 : columns >= 2 ? 2 : 1, gap: "1rem" },
-                      1024: { perPage: columns >= 2 ? 2 : 1, gap: "0.75rem" },
-                      768: { perPage: columns >= 2 ? 2 : 1, gap: "0.75rem" },
-                      640: { perPage: 1, gap: "0.5rem" },
-                    },
-                  }
-                : {
-                    // Full-width carousel (original behavior)
-                    type: "slide",
-                    perPage: 1,
-                    perMove: 1,
-                    gap: "1.5rem",
-                    pagination: true,
-                    arrows: true,
-                    drag: true,
-                    autoplay: true,
-                    interval: 5000,
-                    pauseOnHover: true,
-                    resetProgress: false,
-                  }
-            }
+            options={getSplideOptions()}
           >
             {data.banners.map((banner, index) => (
-              <SplideSlide key={index} className={carouselStyle === "grid" ? "!h-auto" : ""}>
-                <BannerItem banner={banner} index={carouselStyle === "grid" ? 0 : index} locale={locale} />
+              <SplideSlide
+                key={index}
+                className={carouselStyle === "grid" ? "!h-auto" : ""}
+                style={getSlideStyle()}
+              >
+                <BannerItem
+                  banner={banner}
+                  bannerHeight={isVertical ? carouselHeight : bannerHeight}
+                  index={carouselStyle === "grid" ? 0 : index}
+                  locale={locale}
+                />
               </SplideSlide>
             ))}
           </Splide>

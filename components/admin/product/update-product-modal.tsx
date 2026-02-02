@@ -4,7 +4,7 @@ import type { BrandModel } from "@/types/brand";
 import type { CategoryModel } from "@/types/category";
 import type { ProductFacetValueModel } from "@/types/facet";
 import type { ProductRailSectionData } from "@/types/product";
-import { parseProductRailSections, stringifyProductRailSections } from "@/types/product";
+
 
 import { useEffect, useMemo, useState } from "react";
 import { Box, Clock3, Edit, Layers, X, ChevronRight, ChevronDown, Power, Settings, FileText, Link2, Sparkles } from "lucide-react";
@@ -26,6 +26,7 @@ import { GoBackButton } from "../../go-back-button";
 import { ProductRailSectionsManager } from "./ProductRailSectionsManager";
 import { FacetSelector } from "./facet-selector";
 
+import { parseProductRailSections, stringifyProductRailSections } from "@/types/product";
 import { getAllProductGroups, type ProductGroupModel } from "@/app/api/services/productGroupService";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

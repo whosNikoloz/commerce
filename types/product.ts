@@ -94,7 +94,14 @@ export interface ProductRequestModel {
 export function parseProductRailSections(json?: string): ProductRailSectionData[] {
   if (!json) return [];
   try {
-    return JSON.parse(json) as ProductRailSectionData[];
+    const parsed = JSON.parse(json);
+
+    // Ensure we only accept valid array data; treat anything else (e.g. "{}", "null") as empty
+    if (Array.isArray(parsed)) {
+      return parsed as ProductRailSectionData[];
+    }
+
+    return [];
   } catch {
     return [];
   }

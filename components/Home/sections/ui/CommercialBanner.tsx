@@ -1,7 +1,7 @@
 'use client'
 import type { CommercialBannerData, Locale } from "@/types/tenant";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Splide, SplideSlide, Splide as SplideCore } from "@splidejs/react-splide";
@@ -13,7 +13,7 @@ interface CommercialBannerProps {
   locale: Locale;
 }
 
-function BannerItem({
+const BannerItem = memo(function BannerItem({
   banner,
   locale,
   index,
@@ -24,24 +24,12 @@ function BannerItem({
   index: number;
   bannerHeight?: string;
 }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [desktopError, setDesktopError] = useState(false);
-  const [laptopError, setLaptopError] = useState(false);
-  const [mobileError, setMobileError] = useState(false);
+  // Remove staggered animation to make it feel snappier
+  const isVisible = true;
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), index * 100);
-
-    return () => clearTimeout(timer);
-  }, [index]);
-
-  const desktopImageUrl = desktopError || !banner.imageUrl ? "/placeholder.png" : banner.imageUrl;
-  const laptopImageUrl = laptopError || !banner.laptopImageUrl
-    ? null
-    : banner.laptopImageUrl;
-  const mobileImageUrl = mobileError || !banner.mobileImageUrl && !banner.imageUrl
-    ? "/placeholder.png"
-    : (banner.mobileImageUrl || banner.imageUrl);
+  const desktopImageUrl = banner.imageUrl || "/placeholder.png";
+  const laptopImageUrl = banner.laptopImageUrl || null;
+  const mobileImageUrl = banner.mobileImageUrl || banner.imageUrl || "/placeholder.png";
 
   // Determine visibility classes based on which images are available
   const desktopVisibilityClass = banner.laptopImageUrl
@@ -50,6 +38,9 @@ function BannerItem({
 
   // Use custom height or default heights
   const hasCustomHeight = !!bannerHeight;
+
+  const badgeText =
+    banner.badge ? t(banner.badge, locale)?.trim() : "";
 
   return (
     <Link
@@ -64,11 +55,12 @@ function BannerItem({
       >
         <Image
           fill
+          priority={index === 0}
           alt={t(banner.alt, locale)}
           className="object-cover w-full h-full transition-transform duration-700"
           sizes="1200px"
           src={desktopImageUrl}
-          onError={() => setDesktopError(true)}
+          onError={() => console.error('Image load error')}
         />
       </div>
 
@@ -80,11 +72,12 @@ function BannerItem({
         >
           <Image
             fill
+            priority={index === 0}
             alt={t(banner.alt, locale)}
             className="object-cover w-full h-full transition-transform duration-700"
             sizes="(max-width: 1024px) 100vw"
             src={laptopImageUrl}
-            onError={() => setLaptopError(true)}
+            onError={() => console.error('Image load error')}
           />
         </div>
       )}
@@ -96,24 +89,25 @@ function BannerItem({
       >
         <Image
           fill
+          priority={index === 0}
           alt={t(banner.alt, locale)}
           className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
           sizes="100vw"
           src={mobileImageUrl}
-          onError={() => setMobileError(true)}
+          onError={() => console.error('Image load error')}
         />
       </div>
 
       {/* Badge overlay */}
-      {banner.badge && (
+      {badgeText !== "" && (
         <div className="absolute top-4 left-4 md:top-6 md:left-6 bg-primary text-primary-foreground text-sm md:text-base font-bold px-4 py-2 rounded-full shadow-lg">
-          {t(banner.badge, locale)}
+          {badgeText}
         </div>
       )}
 
     </Link>
   );
-}
+});
 
 export default function CommercialBanner({ data, locale }: CommercialBannerProps) {
   const splideRef = useRef<SplideCore | null>(null);
@@ -132,12 +126,12 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
     const gridClass = columns === 1
       ? "grid grid-cols-1 gap-6"
       : columns === 2
-      ? "grid grid-cols-2 gap-4 md:gap-6"
-      : columns === 3
-      ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
-      : columns === 4
-      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
-      : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6";
+        ? "grid grid-cols-2 gap-4 md:gap-6"
+        : columns === 3
+          ? "grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
+          : columns === 4
+            ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+            : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6";
 
     return (
       <section className="relative overflow-hidden py-8 md:py-12">
@@ -162,20 +156,22 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
   const isVertical = scrollDirection === "vertical";
   const carouselHeight = bannerHeight || (isVertical ? "500px" : undefined);
 
-  // Build Splide options based on configuration
-
-  console.log("Rendering CommercialBanner with data:", scrollDirection);
-  const getSplideOptions = () => {
+  // Memoize Splide options to avoid re-renders
+  const splideOptions = useMemo(() => {
     const baseOptions = {
       direction: isVertical ? ("ttb" as const) : ("ltr" as const),
       height: isVertical ? carouselHeight : undefined,
-      arrows: showArrows,
+      // If vertical and showArrows is requested, we show dots instead of arrows
+      arrows: isVertical && showArrows ? false : showArrows,
+      pagination: isVertical && showArrows ? true : true,
       autoplay: autoScroll,
       interval: autoScrollInterval,
       pauseOnHover: true,
       pauseOnFocus: true,
       resetProgress: false,
       wheel: isVertical, // Enable mouse wheel scrolling for vertical
+      speed: 600, // Faster, smoother transition
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
     };
 
     if (carouselStyle === "grid") {
@@ -183,7 +179,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
         ...baseOptions,
         type: "slide" as const,
         gap: "1rem",
-        pagination: false,
+        pagination: isVertical && showArrows ? true : false,
         drag: "free" as const,
         trimSpace: true,
         snap: false,
@@ -200,7 +196,6 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
       };
     }
 
-    // Full-width carousel
     return {
       ...baseOptions,
       type: "slide" as const,
@@ -210,7 +205,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
       pagination: true,
       drag: true,
     };
-  };
+  }, [isVertical, carouselHeight, showArrows, autoScroll, autoScrollInterval, carouselStyle, columns]);
 
   // Get slide height for vertical mode
   const getSlideStyle = () => {
@@ -225,11 +220,11 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
   return (
     <section className="relative overflow-hidden py-8 md:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative group">
+        <div className={`relative group ${isVertical && showArrows ? '[&_.splide__pagination]:flex-col [&_.splide__pagination]:!left-auto [&_.splide__pagination]:!right-4 [&_.splide__pagination]:!top-1/2 [&_.splide__pagination]:!-translate-y-1/2 [&_.splide__pagination]:!bottom-auto [&_.splide__pagination]:!gap-3 [&_.splide__pagination]:!z-50 [&_.splide__pagination]:!pointer-events-auto [&_.splide__pagination__page]:!bg-white/50 [&_.splide__pagination__page.is-active]:!bg-white [&_.splide__pagination__page.is-active]:!scale-150 [&_.splide__pagination__page]:!transition-all [&_.splide__pagination__page]:!duration-75 [&_.splide__pagination__page]:!w-2.5 [&_.splide__pagination__page]:!h-2.5 [&_.splide__pagination__page]:!shadow-md' : ''}`}>
           <Splide
             ref={splideRef as any}
             aria-label="Commercial Banners"
-            options={getSplideOptions()}
+            options={splideOptions}
           >
             {data.banners.map((banner, index) => (
               <SplideSlide

@@ -16,8 +16,8 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
   const isServer = typeof window === "undefined";
   const method = (options.method ?? "GET").toUpperCase();
 
-  const needsAuth = ["POST", "PUT", "PATCH", "DELETE"].includes(method) ||
-    options.requireAuth === true;
+  const needsAuth = options.requireAuth === true ||
+    (options.requireAuth !== false && ["POST", "PUT", "PATCH", "DELETE"].includes(method));
 
   const headers = new Headers(options.headers as Record<string, string> | undefined);
 
@@ -34,12 +34,15 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
     if (isServer) {
       const { cookies } = await import("next/headers");
 
-      token = (await cookies()).get("admin_token")?.value ?? null;
+      token = (await cookies()).get("accessToken")?.value ?? null;
     } else {
       try {
-        const r = await fetch("/api/auth/token", { credentials: "same-origin", cache: "no-store" });
-
-        token = r.ok ? ((await r.json())?.token ?? null) : null;
+        // Preference: local storage for immediate access, fallback to server-side session token
+        token = localStorage.getItem("accessToken");
+        if (!token) {
+          const r = await fetch("/api/auth/token", { credentials: "same-origin", cache: "no-store" });
+          token = r.ok ? ((await r.json())?.token ?? null) : null;
+        }
       } catch {
         token = null;
       }
@@ -60,12 +63,12 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
   //       const { headers: nextHeaders } = await import("next/headers");
   //       const h = await nextHeaders();
 
-  //       headers.set("X-Client-Domain", "www.toptools.ge");
+  //       headers.set("X-Client-Domain", "new.janishop.ge");
   //     } catch {
-  //       headers.set("X-Client-Domain", "www.toptools.ge");
+  //       headers.set("X-Client-Domain", "new.janishop.ge");
   //     }
   //   } else {
-  //     headers.set("X-Client-Domain", "www.toptools.ge");
+  //     headers.set("X-Client-Domain", "new.janishop.ge");
   //   }
   // }
   if (!headers.has("X-Client-Domain")) {

@@ -86,6 +86,7 @@ function mapCustomerModelToCustomer(model: CustomerModel): Customer {
 // Helper function to convert OrderStatus enum to readable string
 function getOrderStatusLabel(status: OrderStatus, dict: any): string {
   const key = (typeof status === "number" ? OrderStatus[status] : String(status)).toLowerCase();
+
   return dict.admin.orders.statuses[key] || key;
 }
 

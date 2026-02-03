@@ -4,9 +4,11 @@ import type { Condition, StockStatus } from "@/types/enums";
 import type { Locale } from "@/i18n.config";
 import type { FacetModel } from "@/types/facet";
 
+
 import Script from "next/script";
 import { notFound } from "next/navigation";
 
+import { getCoverImageUrl } from "@/types/product";
 import {
   i18nPageMetadataAsync,
   buildBreadcrumbJsonLd,
@@ -154,12 +156,7 @@ export async function generateMetadata({
 
       if (firstProduct?.items?.[0]) {
         const p = firstProduct.items[0] as any;
-        const productImage =
-          Array.isArray(p.images) && p.images.length > 0
-            ? p.images[0]
-            : typeof p.image === "string"
-              ? p.image
-              : null;
+        const productImage = getCoverImageUrl(p.images) ?? (typeof p.image === "string" ? p.image : null);
 
         if (productImage) {
           images = [productImage];
@@ -315,12 +312,7 @@ export default async function CategoryIndex({
       ? buildItemListJsonLd(
         await Promise.all(
           (initial.items ?? []).map(async (p: any) => {
-            const img =
-              typeof p.image === "string"
-                ? p.image
-                : Array.isArray(p.images) && p.images.length > 0
-                  ? p.images[0]
-                  : site.ogImage;
+            const img = getCoverImageUrl(p.images) ?? (typeof p.image === "string" ? p.image : site.ogImage);
 
             const { canonical: url } = await buildI18nUrls(`/product/${p.id}`, lang, site);
             const absoluteImages = await toAbsoluteImages(site, [img]);

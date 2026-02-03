@@ -20,12 +20,14 @@ function getApiBase(): string {
 export async function getTenantByHostApi(): Promise<TenantConfig> {
   try {
     const API_BASE = getApiBase();
+
     return await apiFetch<TenantConfig>(`${API_BASE}/tenant-configuration`, {
       cache: "no-store",
     });
   } catch (error) {
     // Log more details in production for debugging
     const errorMessage = error instanceof Error ? error.message : String(error);
+
     console.error("Failed to fetch tenant configuration:", {
       error: errorMessage,
       apiUrl: process.env.NEXT_PUBLIC_API_URL ? "Set" : "Missing",

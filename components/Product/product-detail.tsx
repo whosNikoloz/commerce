@@ -11,7 +11,7 @@ import { ImageReview, ImageReviewHandle } from "./image-review";
 import { CollapsibleDescription } from "./collapsible-description";
 import { DynamicProductRails } from "./DynamicProductRails";
 
-import { ProductResponseModel, parseProductRailSections } from "@/types/product";
+import { ProductResponseModel, parseProductRailSections, getProductImageUrls, getCoverImageUrl } from "@/types/product";
 import { getProductById, getProductRestsByIds } from "@/app/api/services/productService";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { getCachedMerchantType } from "@/app/api/services/integrationService";
@@ -256,7 +256,7 @@ export default function ProductDetail({ initialProduct }: Props) {
       id: product.id,
       name: product.name ?? dict.product.unnamedProduct,
       price: product.discountPrice ?? product.price,
-      image: product.images?.[0] ?? "/placeholder.png",
+      image: getCoverImageUrl(product.images) ?? "/placeholder.png",
       quantity: 1,
       discount: product.discountPrice
         ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
@@ -309,7 +309,7 @@ export default function ProductDetail({ initialProduct }: Props) {
   }, [isMobile]);
 
   const galleryImages = useMemo(
-    () => (product.images ?? []).filter((u) => typeof u === "string" && u.trim()),
+    () => getProductImageUrls(product.images).filter((u) => u.trim()),
     [product.images],
   );
 
@@ -489,7 +489,7 @@ export default function ProductDetail({ initialProduct }: Props) {
             ? Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))
             : 0
         }
-        image={product.images?.[0] ?? "/placeholder.png"}
+        image={getCoverImageUrl(product.images) ?? "/placeholder.png"}
         isComingSoon={product.isComingSoon}
         isLiquidated={product.isLiquidated}
         isNewArrival={product.isNewArrival}

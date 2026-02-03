@@ -1,6 +1,6 @@
 "use client";
 
-import type { ProductResponseModel } from "@/types/product";
+import type { ProductResponseModel, ProductImageModel } from "@/types/product";
 import type { PagedList } from "@/types/pagination";
 
 import React, { useEffect, useRef, useState, useMemo } from "react";
@@ -12,6 +12,7 @@ import Image from "next/image";
 
 import { SearchIcon } from "../icons";
 
+import { getCoverImageUrl } from "@/types/product";
 import { searchProducts } from "@/app/api/services/productService";
 import { useSearchHistory } from "@/app/context/useSearchHistory";
 import { useGA4 } from "@/hooks/useGA4";
@@ -43,7 +44,12 @@ interface SearchForMobileProps {
   isModalOpen: boolean;
 }
 
-type SearchResult = Pick<ProductResponseModel, "id" | "name" | "images" | "price">;
+type SearchResult = {
+  id: string;
+  name?: string;
+  images?: ProductImageModel[];
+  price: number;
+};
 
 const Search = ({
   searchQuery,
@@ -294,14 +300,14 @@ const Search = ({
                         onMouseDown={(e) => e.preventDefault()}
                       >
                         <div className="flex items-center gap-3">
-                          {result.images?.[0] ? (
+                          {getCoverImageUrl(result.images) ? (
                             <div className="relative h-10 w-10 flex-shrink-0 rounded-md overflow-hidden border">
                               <Image
                                 fill
                                 alt={result.name ?? "Product"}
                                 className="object-cover"
                                 sizes="40px"
-                                src={result.images[0]}
+                                src={getCoverImageUrl(result.images)!}
                               />
                             </div>
                           ) : (

@@ -19,6 +19,7 @@ type ChildrenMap = Record<string, CategoryModel[]>;
 
 function PortalWrapper({ children }: { children: React.ReactNode }) {
   if (typeof document === "undefined") return null;
+
   return createPortal(children, document.body);
 }
 
@@ -45,6 +46,7 @@ export default function CategoryDropdown() {
       try {
         setLoading(true);
         const data = await getAllCategories();
+
         setCategories(Array.isArray(data) ? data : []);
         hasLoadedRef.current = true;
       } catch (e) {
@@ -206,20 +208,20 @@ export default function CategoryDropdown() {
             <>
               {/* Backdrop */}
               <motion.div
-                initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black/50 z-[10000] backdrop-blur-sm"
+                exit={{ opacity: 0 }}
+                initial={{ opacity: 0 }}
                 onClick={() => setIsOpen(false)}
               />
 
               {/* Main panel – with inside scrolling only */}
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 12 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
                 className="fixed inset-0 z-[10000] flex items-start justify-center pt-28 md:pt-32 pb-4 px-2 md:px-6 pointer-events-none"
+                exit={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
               >
                 <div className="relative w-full max-w-6xl rounded-3xl bg-white dark:bg-neutral-900 shadow-[0_24px_80px_rgba(0,0,0,0.4)] border border-primary/40 backdrop-blur-xl overflow-hidden max-h-full flex flex-col pointer-events-auto">
                   {/* Header */}
@@ -318,14 +320,14 @@ export default function CategoryDropdown() {
                                   activeCategoryData &&
                                   activeSubcategories.length > 0 && (
                                     <motion.div
-                                      initial={{ height: 0, opacity: 0 }}
                                       animate={{ height: "auto", opacity: 1 }}
+                                      className="overflow-hidden w-full"
                                       exit={{ height: 0, opacity: 0 }}
+                                      initial={{ height: 0, opacity: 0 }}
                                       transition={{
                                         duration: 0.28,
                                         ease: "easeInOut",
                                       }}
-                                      className="overflow-hidden w-full"
                                     >
                                       <div className="mt-2 mb-6 rounded-2xl border border-border bg-neutral-50/90 dark:bg-neutral-900/80 p-3 md:p-4">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">

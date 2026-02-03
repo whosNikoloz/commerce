@@ -67,8 +67,8 @@ export default function FacetValuesEditor({
           key={node.id}
           depth={0}
           node={node}
-          valuePlaceholder={t.valuePlaceholder}
           subValuePlaceholder={t.subValuePlaceholder}
+          valuePlaceholder={t.valuePlaceholder}
           onAddChild={addChild}
           onChangeValue={updateValue}
           onRemove={removeValue}
@@ -122,8 +122,8 @@ function NodeRow({
           key={ch.id}
           depth={depth + 1}
           node={ch}
-          valuePlaceholder={valuePlaceholder}
           subValuePlaceholder={subValuePlaceholder}
+          valuePlaceholder={valuePlaceholder}
           onAddChild={onAddChild}
           onChangeValue={onChangeValue}
           onRemove={onRemove}

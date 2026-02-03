@@ -16,7 +16,6 @@ import { CartUIProvider } from "../context/cart-ui";
 import { DictionaryProvider } from "../context/dictionary-provider";
 import { CookieConsentProvider } from "../context/cookieConsentContext";
 
-import CookieBanner from "@/components/CookieConsent/CookieBanner";
 import ManagePreferencesModal from "@/components/CookieConsent/ManagePreferencesModal";
 import AnalyticsScripts from "@/components/Analytics/AnalyticsScripts";
 import Snowfall from "@/components/Effects/Snowfall";

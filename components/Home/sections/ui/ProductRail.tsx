@@ -33,6 +33,7 @@ export default async function ProductRail({
     if (data.filterBy?.productIds && data.filterBy.productIds.length > 0) {
       // If specific IDs are requested, ONLY fetch those
       const pResult = await getProductsByIds(data.filterBy.productIds);
+
       products = pResult.slice(0, pageSize);
     } else {
       // ONLY run search logic if no specific IDs were requested

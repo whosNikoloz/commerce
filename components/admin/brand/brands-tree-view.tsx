@@ -70,6 +70,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
   const refreshBrands = async () => {
     try {
       const fresh = await getAllBrands();
+
       setBrands(fresh ?? []);
     } catch (error) {
       console.error("Failed to refresh brands", error);
@@ -78,6 +79,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
 
   const handleImagesChanged = async (brandId: string, urls: string[]) => {
     const current = brands.find((b) => b.id === brandId);
+
     if (!current) return;
 
     const prev = brands;
@@ -105,6 +107,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
       toast.error(t.cannotDeleteWithChildren || "Cannot delete brand with sub-brands");
       setDeleteDialogOpen(false);
       setBrandToDelete(null);
+
       return;
     }
 
@@ -129,6 +132,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
     parentId?: string | null,
   ) => {
     const current = brands.find((b) => b.id === brandId);
+
     if (!current) return;
 
     const prev = brands;
@@ -165,6 +169,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
     setBrands([draft, ...prev]);
     try {
       const createdId: string = await createBrand(name, origin, description, [], parentId);
+
       setBrands((list) => list.map((b) => (b.id === tempId ? { ...b, id: createdId } : b)));
       toast.success(tToast.created);
     } catch (err) {
@@ -176,12 +181,14 @@ export function BrandsTreeView({ initialBrands }: Props) {
 
   const toggleExpanded = (brandId: string) => {
     const next = new Set(expanded);
+
     next.has(brandId) ? next.delete(brandId) : next.add(brandId);
     setExpanded(next);
   };
 
   const expandAll = () => {
     const allParents = new Set<string>();
+
     brands.forEach((brand) => {
       if (brands.some((b) => b.parentId === brand.id)) {
         allParents.add(brand.id);
@@ -196,6 +203,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
 
   const filtered = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+
     if (!q) return brands;
 
     return brands.filter(

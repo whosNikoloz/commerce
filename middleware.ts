@@ -82,16 +82,52 @@ export function middleware(request: NextRequest) {
   // The layout will handle tenant-specific default locale logic and redirects
   // This allows dynamic tenant defaults to work properly
 
-  const adminToken = request.cookies.get("admin_token")?.value;
+  const accessToken = request.cookies.get("accessToken")?.value;
   const isAdminRoot = pathname === `/${locInPath}/admin`;
   const isAdminSubRoute = pathname.startsWith(`/${locInPath}/admin/`) && !isAdminRoot;
 
-  if (!adminToken && isAdminSubRoute) {
-    const url = new URL(`/${locInPath}/admin`, request.url);
+  if (isAdminSubRoute || isAdminRoot) {
+    if (!accessToken) {
+      if (isAdminSubRoute) {
+        const url = new URL(`/${locInPath}/admin`, request.url);
+        url.searchParams.set("next", `${pathname}${search || ""}`);
+        return NextResponse.redirect(url);
+      }
+      return NextResponse.next();
+    }
 
-    url.searchParams.set("next", `${pathname}${search || ""}`);
+    try {
+      // Basic JWT decoding (Base64) to check roles in middleware
+      const base64Url = accessToken.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const payload = JSON.parse(jsonPayload);
+      console.log('Token Payload:', payload);
 
-    return NextResponse.redirect(url);
+      // Check for role in various possible claim keys
+      const roleValue = payload.role ||
+        payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+        payload["roles"];
+
+      const roles = Array.isArray(roleValue) ? roleValue : [roleValue];
+      const isAdmin = roles.some(r => typeof r === 'string' && r.toLowerCase() === 'admin');
+
+      if (!isAdmin && isAdminSubRoute) {
+        // Not an admin - redirect to home if trying to access sub-routes
+        return NextResponse.redirect(new URL(`/${locInPath}`, request.url));
+      }
+      // If not an admin but on isAdminRoot, we let it pass so the login form can be shown/used
+    } catch (e) {
+      // Invalid token
+      if (isAdminSubRoute) {
+        return NextResponse.redirect(new URL(`/${locInPath}/admin`, request.url));
+      }
+    }
   }
 
   // Add pathname as header for layout to use

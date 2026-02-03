@@ -53,8 +53,8 @@ export default function Error({
                 color: "#111827",
                 cursor: "pointer",
               }}
-              onDoubleClick={() => setShowDetails(!showDetails)}
               title="Double-click to toggle error details"
+              onDoubleClick={() => setShowDetails(!showDetails)}
             >
               Something went wrong!
             </h2>

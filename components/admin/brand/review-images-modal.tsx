@@ -10,6 +10,22 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import Image from "next/image";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, RefreshCw, Images, Trash2, Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,23 +38,6 @@ import { GoBackButton } from "@/components/go-back-button";
 import { compressImages } from "@/lib/image-compression";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-  rectSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, RefreshCw, Images, Trash2, Upload, X } from "lucide-react";
 
 type ExistingImage = { key: string; url: string };
 type UploadReplyItem = { key: string; url: string };
@@ -84,7 +83,7 @@ function SortableItem({ id, children }: SortableItemProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={cn("relative group", isDragging && "opacity-50 z-50")}>
+    <div ref={setNodeRef} className={cn("relative group", isDragging && "opacity-50 z-50")} style={style}>
       {children}
       <button
         {...attributes}
@@ -175,6 +174,7 @@ export default function ReviewImagesModal({
 
         const newImages: UnifiedImage[] = compressed.map((file) => {
           const id = crypto.randomUUID();
+
           return {
             id,
             url: URL.createObjectURL(file),
@@ -231,10 +231,13 @@ export default function ReviewImagesModal({
   const removeImage = (id: string) => {
     setUnifiedImages((prev) => {
       const img = prev.find((p) => p.id === id);
+
       if (img?.type === "pending") {
         URL.revokeObjectURL(img.url);
+
         return prev.filter((p) => p.id !== id);
       }
+
       // For server images, we just toggle toDelete
       return prev.map((s) => (s.id === id ? { ...s, toDelete: !s.toDelete } : s));
     });
@@ -278,6 +281,7 @@ export default function ReviewImagesModal({
 
       const pendingFiles = unifiedImages.filter((i) => i.type === "pending").map((i) => i.file!);
       let uploaded: UploadReply = [];
+
       if (pendingFiles.length) {
         uploaded = await uploadBrandImages(brandId, pendingFiles);
       }
@@ -295,6 +299,7 @@ export default function ReviewImagesModal({
           if (img.type === "pending") {
             return uploadedUrls[uploadIdx++];
           }
+
           return img.url;
         })
         .filter(url => !!url);

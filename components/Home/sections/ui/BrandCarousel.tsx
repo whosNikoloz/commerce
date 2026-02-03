@@ -116,9 +116,9 @@ export default function BrandCarousel({ data, locale, brands }: BrandCarouselPro
                 return (
                   <li key={brand.id} className="splide__slide bg-transparent">
                     <Link
+                      aria-label={brand.name || "Brand"}
                       className="group block h-full bg-transparent"
                       href={`/${locale}/brand/${brand.id}`}
-                      aria-label={brand.name || "Brand"}
                     >
                       <div className="relative flex h-24 w-full items-center justify-center px-6 py-4 sm:h-28 md:h-32 bg-transparent">
                         {imageUrl && !hasError ? (

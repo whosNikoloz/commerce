@@ -121,6 +121,7 @@ const nextConfig = {
       "https://storage.resorter360.ge",
       "https://img.janishop.ge",
       apiDomain,
+      apiDomain?.replace(/^http/, 'ws'), // Adds ws:// or wss:// based on the API protocol
       "https://vercel.live",
       "wss://ws-us3.pusher.com",
       "ws://localhost:3000",

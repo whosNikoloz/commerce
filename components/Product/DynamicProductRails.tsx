@@ -187,6 +187,7 @@ const ProductRailSection = memo(function ProductRailSection({
     if (section.columns === 4) return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
     if (section.columns === 5) return "grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
     if (section.columns === 6) return "grid-cols-2 md:grid-cols-4 lg:grid-cols-6";
+
     return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
   }, [section.columns]);
 

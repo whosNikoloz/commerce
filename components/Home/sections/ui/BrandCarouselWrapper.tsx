@@ -26,6 +26,7 @@ export default async function BrandCarouselWrapper({ data, locale }: BrandCarous
 
   // Filter by brandIds if provided
   let filteredBrands = brands
+
   if (data.brandIds && data.brandIds.length > 0) {
     filteredBrands = brands.filter(brand => data.brandIds!.includes(brand.id))
   }

@@ -178,6 +178,7 @@ export default function AddBrandModal({
                     variant="bordered"
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
+
                       setParentId(selected || null);
                     }}
                   >

@@ -73,12 +73,12 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                             <div className="flex-shrink-0 w-36 h-36 md:w-44 md:h-44 rounded-3xl bg-background border border-border/50 overflow-hidden flex items-center justify-center p-5 shadow-xl shadow-black/5 dark:shadow-black/20">
                                 {brandLogo ? (
                                     <Image
+                                        priority
                                         alt={brandName}
                                         className="w-full h-full object-contain"
                                         height={176}
                                         src={brandLogo}
                                         width={176}
-                                        priority
                                     />
                                 ) : (
                                     <Building2 className="w-20 h-20 text-muted-foreground" />
@@ -128,14 +128,14 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                                 animate={{
                                     height: isDescriptionExpanded ? "auto" : shouldCollapseDescription ? maxDescriptionHeight : "auto",
                                 }}
+                                className={`overflow-hidden relative ${!isDescriptionExpanded && shouldCollapseDescription ? "cursor-pointer" : ""}`}
                                 initial={false}
                                 transition={{ type: "tween", duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                                className={`overflow-hidden relative ${!isDescriptionExpanded && shouldCollapseDescription ? "cursor-pointer" : ""}`}
                                 onClick={() => !isDescriptionExpanded && shouldCollapseDescription && setIsDescriptionExpanded(true)}
                             >
                                 <div
-                                    ref={descriptionRef}
                                     dangerouslySetInnerHTML={{ __html: stripInlineColors(brand.description) }}
+                                    ref={descriptionRef}
                                     className={`rich-content prose prose-slate dark:prose-invert max-w-none
                                         text-slate-700 dark:text-slate-300
                                         prose-headings:text-foreground prose-headings:font-heading
@@ -149,13 +149,13 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                                 <div className="flex items-center justify-center gap-4 mt-6">
                                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                                     <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                                         className="group flex items-center justify-center gap-2 px-6 py-2 h-9 min-w-[140px]
                                             text-sm font-medium border-border/60 hover:border-brand-primary/50
                                             bg-background hover:bg-brand-primary/5 text-muted-foreground hover:text-brand-primary
                                             rounded-full transition-all duration-200"
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                                     >
                                         <span>{isDescriptionExpanded ? (dict?.common?.readLess || "Read Less") : (dict?.common?.readMore || "Read More")}</span>
                                         <motion.div
@@ -230,7 +230,7 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                             {dict?.pages?.brand?.checkBackLater || "Check back later for new products"}
                         </p>
                         <Link href={`/${locale}/brands`}>
-                            <Button size="lg" className="rounded-full px-8">
+                            <Button className="rounded-full px-8" size="lg">
                                 {dict?.common?.browseBrands || "Browse Other Brands"}
                             </Button>
                         </Link>

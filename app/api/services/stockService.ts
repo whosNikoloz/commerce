@@ -1,4 +1,5 @@
 import { apiFetch } from "../client/fetcher";
+
 import { ProductStock, ProductSales, RecordSaleRequest } from "@/types/stock";
 
 const STOCK_API_BASE = process.env.NEXT_PUBLIC_API_URL + "Stock";

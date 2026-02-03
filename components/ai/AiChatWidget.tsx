@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useUser } from "@/app/context/userContext";
 import { X, Send, Sparkles, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+
+import { useUser } from "@/app/context/userContext";
 
 type Message = {
     role: "user" | "model";
@@ -41,8 +42,10 @@ export default function AiChatWidget() {
     // Check if mobile
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
+
         checkMobile();
         window.addEventListener("resize", checkMobile, { passive: true });
+
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
@@ -56,6 +59,7 @@ export default function AiChatWidget() {
         } else {
             document.body.style.overflow = "";
         }
+
         return () => {
             document.body.style.overflow = "";
         };
@@ -65,6 +69,7 @@ export default function AiChatWidget() {
         if (!input.trim() || isLoading) return;
 
         const userMessage = input.trim();
+
         setInput("");
         setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
         setIsLoading(true);
@@ -133,20 +138,20 @@ export default function AiChatWidget() {
             <AnimatePresence>
                 {!isOpen && (
                     <motion.button
-                        initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setIsOpen(true)}
                         aria-label="Open AI Chat"
+                        className="h-14 w-14 rounded-full bg-brand-primary text-white shadow-lg hover:shadow-xl flex items-center justify-center transition-shadow"
+                        exit={{ scale: 0, opacity: 0 }}
+                        initial={{ scale: 0, opacity: 0 }}
                         style={{
                             position: "fixed",
                             bottom: isMobile ? 16 : 24,
                             right: isMobile ? 16 : 24,
                             zIndex: 50,
                         }}
-                        className="h-14 w-14 rounded-full bg-brand-primary text-white shadow-lg hover:shadow-xl flex items-center justify-center transition-shadow"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setIsOpen(true)}
                     >
                         <Sparkles className="h-6 w-6" />
                     </motion.button>
@@ -157,11 +162,11 @@ export default function AiChatWidget() {
             <AnimatePresence>
                 {isOpen && isMobile && (
                     <motion.div
-                        initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setIsOpen(false)}
                         className="fixed inset-0 bg-black/50 z-[99] backdrop-blur-sm"
+                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}
+                        onClick={() => setIsOpen(false)}
                     />
                 )}
             </AnimatePresence>
@@ -170,10 +175,16 @@ export default function AiChatWidget() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={isMobile ? { y: "100%" } : { opacity: 0, y: 20, scale: 0.95 }}
                         animate={isMobile ? { y: 0 } : { opacity: 1, y: 0, scale: 1 }}
+                        className={`
+                            flex flex-col bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden
+                            ${isMobile
+                                ? "rounded-t-[32px]"
+                                : "rounded-[28px] border border-zinc-200 dark:border-zinc-800"
+                            }
+                        `}
                         exit={isMobile ? { y: "100%" } : { opacity: 0, y: 20, scale: 0.95 }}
-                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        initial={isMobile ? { y: "100%" } : { opacity: 0, y: 20, scale: 0.95 }}
                         style={
                             isMobile
                                 ? {
@@ -194,13 +205,7 @@ export default function AiChatWidget() {
                                       zIndex: 100,
                                   }
                         }
-                        className={`
-                            flex flex-col bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden
-                            ${isMobile
-                                ? "rounded-t-[32px]"
-                                : "rounded-[28px] border border-zinc-200 dark:border-zinc-800"
-                            }
-                        `}
+                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     >
                         {/* ----- HEADER ----- */}
                         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
@@ -221,8 +226,8 @@ export default function AiChatWidget() {
                                 </div>
                             </div>
                             <button
-                                onClick={() => setIsOpen(false)}
                                 className="h-9 w-9 rounded-[12px] flex items-center justify-center text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
+                                onClick={() => setIsOpen(false)}
                             >
                                 {isMobile ? <ChevronDown className="h-5 w-5" /> : <X className="h-5 w-5" />}
                             </button>
@@ -249,8 +254,8 @@ export default function AiChatWidget() {
                                                 components={{
                                                     a: ({ node, ...props }) => (
                                                         <Link
-                                                            href={props.href || "#"}
                                                             className="underline underline-offset-2 hover:opacity-80"
+                                                            href={props.href || "#"}
                                                         >
                                                             {props.children}
                                                         </Link>
@@ -273,12 +278,12 @@ export default function AiChatWidget() {
                                                 <motion.span
                                                     key={i}
                                                     animate={{ opacity: [0.4, 1, 0.4] }}
+                                                    className="h-2 w-2 rounded-full bg-brand-primary"
                                                     transition={{
                                                         repeat: Infinity,
                                                         duration: 1.2,
                                                         delay: i * 0.2,
                                                     }}
-                                                    className="h-2 w-2 rounded-full bg-brand-primary"
                                                 />
                                             ))}
                                         </div>
@@ -292,28 +297,26 @@ export default function AiChatWidget() {
                         {/* ----- INPUT ----- */}
                         <div className="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800">
                             <form
+                                className="flex items-center gap-2"
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     handleSend();
                                 }}
-                                className="flex items-center gap-2"
                             >
                                 <input
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyDown={handleKeyDown}
+                                    className="flex-1 px-4 py-3 rounded-[18px] bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 transition-all"
+                                    disabled={isLoading}
                                     placeholder={
                                         lang === "ka"
                                             ? "დაწერეთ შეტყობინება..."
                                             : "Type a message..."
                                     }
-                                    disabled={isLoading}
-                                    className="flex-1 px-4 py-3 rounded-[18px] bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 transition-all"
+                                    type="text"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={handleKeyDown}
                                 />
                                 <button
-                                    type="submit"
-                                    disabled={!input.trim() || isLoading}
                                     className={`
                                         h-11 w-11 rounded-[14px] flex items-center justify-center transition-all
                                         ${input.trim()
@@ -322,6 +325,8 @@ export default function AiChatWidget() {
                                         }
                                         disabled:opacity-50 disabled:cursor-not-allowed
                                     `}
+                                    disabled={!input.trim() || isLoading}
+                                    type="submit"
                                 >
                                     <Send className="h-5 w-5" />
                                 </button>

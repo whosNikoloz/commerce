@@ -246,11 +246,11 @@ export default function Footer() {
                           {t.address}
                         </p>
                         <a
+                          aria-label={`Open ${getLocalizedText(currentStore.address, currentLocale)} in Google Maps`}
                           className="font-primary text-sm font-medium text-primary hover:underline transition-colors cursor-pointer inline-flex items-center gap-1 group"
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getLocalizedText(currentStore.address, currentLocale))}`}
-                          target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`Open ${getLocalizedText(currentStore.address, currentLocale)} in Google Maps`}
+                          target="_blank"
                         >
                           {getLocalizedText(currentStore.address, currentLocale)}
                           <MapPin className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />

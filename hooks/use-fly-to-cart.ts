@@ -24,6 +24,7 @@ export function useFlyToCart(options?: Options) {
     if (!isEnabled) {
       // Just bump the badge without animation
       bumpCartBadge();
+
       return;
     }
 

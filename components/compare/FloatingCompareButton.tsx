@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useCompareStore } from "@/app/context/compareContext";
 import { Button } from "@/components/ui/button";
 import { cn, resolveImageUrl } from "@/lib/utils";
+import { getCoverImageUrl } from "@/types/product";
 
 
 export default function FloatingCompareButton() {
@@ -62,7 +63,7 @@ export default function FloatingCompareButton() {
                       alt={item.name || "Product"}
                       className="object-cover w-full h-full"
                       height={64}
-                      src={resolveImageUrl(item.images?.[0])}
+                      src={resolveImageUrl(getCoverImageUrl(item.images))}
                       width={64}
                     />
                   </div>

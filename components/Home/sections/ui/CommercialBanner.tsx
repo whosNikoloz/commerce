@@ -217,6 +217,7 @@ export default function CommercialBanner({ data, locale }: CommercialBannerProps
     if (isVertical && carouselHeight) {
       return { height: carouselHeight };
     }
+
     return undefined;
   };
 

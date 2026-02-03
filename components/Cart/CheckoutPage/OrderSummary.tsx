@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Shield, Truck, Check } from "lucide-react";
+import { Shield, Check } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,22 +80,22 @@ export default function OrderSummary({
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.subtotal}</span>
+            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.subtotal ?? "SubTotal"}</span>
             <span className="font-primary text-text-light dark:text-text-lightdark">{`₾${subtotal.toFixed(2)}`}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.shipping}</span>
+          {/* <div className="flex justify-between">
+            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.shipping ?? "Shipping"}</span>
             <span className="font-primary text-text-light dark:text-text-lightdark">
               {shipping === 0 ? dictionary.checkout.free : `₾${shipping.toFixed(2)}`}
             </span>
-          </div>
+          </div> */}
           <div className="flex justify-between">
-            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.tax}</span>
+            <span className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.tax ?? "TAX"}</span>
             <span className="font-primary text-text-light dark:text-text-lightdark">{`₾${tax.toFixed(2)}`}</span>
           </div>
           <Separator className="bg-brand-muted/60 dark:bg-brand-muteddark/50" />
           <div className="flex justify-between font-medium text-lg">
-            <span className="font-primary text-text-light dark:text-text-lightdark">{dictionary.checkout.total}</span>
+            <span className="font-primary text-text-light dark:text-text-lightdark">{dictionary.checkout.total ?? "Total"}</span>
             <span className="font-primary text-text-light dark:text-text-lightdark">{`₾${total.toFixed(2)}`}</span>
           </div>
         </div>
@@ -103,15 +103,15 @@ export default function OrderSummary({
         <div className="space-y-2 pt-4">
           <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
             <Shield className="h-4 w-4" />
-            <span>{dictionary.checkout.secureEncryption}</span>
+            <span>{dictionary.checkout.secureEncryption ?? "Secure Encryption"}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
+          {/* <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
             <Truck className="h-4 w-4" />
             <span>{dictionary.checkout.freeShippingOver.replace("{amount}", "₾50")}</span>
-          </div>
+          </div> */}
           <div className="flex items-center gap-2 text-sm text-text-subtle dark:text-text-subtledark">
             <Check className="h-4 w-4" />
-            <span>{dictionary.checkout.returnPolicy}</span>
+            <span>{dictionary.checkout.returnPolicy ?? "Return Policy"}</span>
           </div>
         </div>
         <Button

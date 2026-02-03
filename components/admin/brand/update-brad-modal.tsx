@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit } from "lucide-react";
 import {
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  useDisclosure,
 } from "@heroui/modal";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
@@ -164,6 +162,7 @@ export default function UpdateBrandModal({
                   variant="bordered"
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0] as string;
+
                     setParentId(selected || null);
                   }}
                 >

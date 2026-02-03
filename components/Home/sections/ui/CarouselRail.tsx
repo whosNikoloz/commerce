@@ -45,6 +45,7 @@ function CarouselRailInner({ products, columns: _columns = 4 }: Props) {
 
   useEffect(() => {
     const container = containerRef.current;
+
     if (!container) return;
 
     const observer = new IntersectionObserver(
@@ -117,6 +118,7 @@ const CarouselRail = memo(CarouselRailInner, (prevProps, nextProps) => {
   for (let i = 0; i < prevProps.products.length; i++) {
     if (prevProps.products[i]?.id !== nextProps.products[i]?.id) return false;
   }
+
   return true;
 });
 

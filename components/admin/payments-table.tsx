@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { CreditCard, DollarSign, TrendingUp, TrendingDown, Eye, Download, Filter, Search } from "lucide-react";
+
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { currencyFmt } from "@/lib/utils";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -121,6 +121,7 @@ export function PaymentsTable() {
       t.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.customer.toLowerCase().includes(searchQuery.toLowerCase());
+
     return matchesStatus && matchesSearch;
   });
 
@@ -234,8 +235,8 @@ export function PaymentsTable() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
-                placeholder={t.table.searchPlaceholder}
                 className="pl-9 bg-white dark:bg-slate-800"
+                placeholder={t.table.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

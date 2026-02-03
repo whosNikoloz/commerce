@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
 import type { LocalizedText } from "@/types/product";
+
+import { useMemo } from "react";
 
 // Language display mapping
 const LOCALE_DISPLAY: Record<string, { flag: string; name: string }> = {
@@ -38,9 +39,11 @@ export function LocalizedTextInput({
   // Ensure value has all required locales
   const safeValue = useMemo(() => {
     const result: Record<string, string> = {};
+
     locales.forEach((locale) => {
       result[locale] = (value as Record<string, string>)?.[locale] || "";
     });
+
     return result;
   }, [value, locales]);
 
@@ -74,18 +77,19 @@ export function LocalizedTextInput({
       <div className={`grid ${gridCols} gap-3`}>
         {locales.map((locale) => {
           const { flag, name } = getLocaleInfo(locale);
+
           return (
             <div key={locale}>
               <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
                 {flag} {name}
               </label>
               <InputComponent
-                type={multiline ? undefined : "text"}
-                value={safeValue[locale] || ""}
-                onChange={(e) => handleChange(locale, e.target.value)}
                 className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors duration-200 text-sm"
                 placeholder={placeholder?.[locale] || `Enter ${label.toLowerCase()} in ${name}`}
                 rows={multiline ? 3 : undefined}
+                type={multiline ? undefined : "text"}
+                value={safeValue[locale] || ""}
+                onChange={(e) => handleChange(locale, e.target.value)}
               />
             </div>
           );

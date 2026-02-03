@@ -50,7 +50,7 @@ export default function CartSummary({ autoShowLoginPrompt = false }: CartSummary
       case "overnight":
         return 39.99;
       default:
-        return 9.99;
+        return 0;
     }
   };
 

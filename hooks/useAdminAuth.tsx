@@ -52,6 +52,7 @@ export function useAdminAuth() {
       }
 
       const nextParam = pathname !== loginPath ? `?next=${encodeURIComponent(pathname)}` : "";
+
       router.push(`${loginPath}${nextParam}`);
     };
 

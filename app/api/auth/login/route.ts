@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const token = await loginAdmin({ email, password });
 
-    (await cookies()).set("admin_token", token, {
+    (await cookies()).set("accessToken", token, {
       httpOnly: true,
       // Use secure cookies only in production to avoid issues on http://localhost
       secure: process.env.NODE_ENV === "production",

@@ -1,112 +1,144 @@
 // ====================================
-// Payment Provider Types
+// Payment Type Enum
 // ====================================
 
-export type PaymentProvider = "bog" | "tbc";
+export enum PaymentType {
+  TBC = 10,           // TBC Bank - Standard
+  BOG = 11,           // Bank of Georgia - Standard
+  TBCSplitPay = 12,   // TBC Split Pay
+  BOGInstallment = 21, // Bank of Georgia - Installment
+  Flitt = 13,         // Flitt Payment
+  FlittInstallment = 20, // Flitt Installment (TBC)
+}
 
 // ====================================
-// TBC Payment Types
+// Create Order Request Types
 // ====================================
 
-export interface TBCPaymentAmount {
-  currency: string;
+export interface OrderItemModel {
+  productId: string;
+  quantity: number;
+  variant?: string;
+}
+
+export interface CreateOrderRequest {
+  // Order Items
+  orderItems: OrderItemModel[];
+
+  // Shipping Information
+  shippingAddress: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingZipCode?: string;
+  shippingCountry?: string;
+
+  // Order Details
+  customerNotes?: string;
+  currency: "GEL" | "USD" | "EUR";
+
+  // Payment Configuration
+  paymentReturnUrl: string;
+  paymentType: PaymentType;
+
+  // Buyer Information (Optional - for BOG/Flitt)
+  buyerFullName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+
+  // Delivery (Optional - for BOG)
+  deliveryAmount?: number;
+
+  // Payment Options (Optional)
+  applicationTypes?: "web" | "mobile";
+  paymentMethods?: ("card")[];
+  paymentTimeoutMinutes?: number;
+  captureType?: "automatic" | "manual";
+
+  // Campaign/Discount Options (Optional - for BOG)
+  loanType?: string;
+  loanMonths?: number;
+  campaignCardType?: string;
+  campaignType?: string;
+  accountTag?: string;
+
+  // Wallet Tokens (Optional)
+  googlePayToken?: string;
+  enableExternalGooglePay?: boolean;
+  enableExternalApplePay?: boolean;
+}
+
+// ====================================
+// Order Response Types
+// ====================================
+
+export interface OrderItemResponse {
+  productId: string;
+  productName: string;
+  productImage: string;
+  quantity: number;
+  unitPrice: number;
   total: number;
 }
 
-export interface TBCCreatePaymentRequest {
-  amount: TBCPaymentAmount;
-  currency: string;
-  returnUrl: string;
-  extraInfo?: string;
-  language: string;
-  merchantPaymentId?: string;
-  methods?: number[];
-}
-
-export interface TBCPaymentCreationResult {
-  paymentId: string;
-  redirectUrl: string;
-  success: boolean;
-  errorMessage?: string;
-}
-
-export interface TBCPaymentDetails {
-  paymentId: string;
+export interface CreateOrderResponse {
+  id: string;
+  orderNumber: string;
+  orderDate: string;
   status: string;
-  amount: number;
+  subtotal: number;
+  tax: number;
+  shippingCost: number;
+  discount: number;
+  total: number;
   currency: string;
-  transactionId: string;
-  paymentMethod: string;
-  recurringCard?: TBCRecurringCard;
-  developerMessage?: string;
-  userMessage?: string;
-}
-
-export interface TBCRecurringCard {
-  recurringId: string;
-  cardMask: string;
-  expiryDate: string;
-}
-
-export interface TBCCancelPaymentRequest {
-  amount: number;
-}
-
-// ====================================
-// BOG Payment Types
-// ====================================
-
-export interface BOGPaymentItem {
-  product_id: string;
   quantity: number;
-  amount: string;
-  description: string;
+
+  // Payment Information
+  paymentId: string;
+  paymentRedirectUrl: string;
+  paymentSuccess: boolean;
+  paymentErrorMessage?: string;
+
+  // Order Items
+  orderItems: OrderItemResponse[];
 }
 
-export interface BOGPurchaseUnit {
-  amount: {
-    currency_code: string;
-    value: string;
-  };
+// ====================================
+// Order Status Enum
+// ====================================
+
+export enum OrderStatus {
+  Pending = 0,
+  Processing = 1,
+  Paid = 2,
+  Shipped = 3,
+  Delivered = 4,
+  Cancelled = 5,
+  Refunded = 6,
 }
 
-export interface BOGCreatePaymentRequest {
-  intent: string;
-  items: BOGPaymentItem[];
-  purchase_units: BOGPurchaseUnit[];
-  shop_order_id: string;
-  redirect_url: string;
-  callback_url: string;
-  locale: string;
-  show_shop_order_id_on_extract: boolean;
-}
+// ====================================
+// Payment Status Types (from Gateway)
+// ====================================
 
-export interface BOGPaymentCreationResult {
-  orderId: string;
-  redirectUrl: string;
-  success: boolean;
-  errorMessage?: string;
-}
+// BOG Payment Statuses
+export type BOGPaymentStatus =
+  | "created"
+  | "processing"
+  | "completed"
+  | "rejected"
+  | "expired"
+  | "refunded"
+  | "refunded_partially"
+  | "blocked";
 
-export interface BOGPaymentDetails {
-  order_id: string;
-  status: string;
-  intent: string;
-  purchase_units: BOGPurchaseUnit[];
-  links?: BOGPaymentLink[];
-  _links?: BOGPaymentLink[];
-  shop_order_id?: string;
-}
-
-export interface BOGPaymentLink {
-  href: string;
-  rel: string;
-  method?: string;
-}
-
-export interface BOGCancelPaymentRequest {
-  orderId: string;
-}
+// Flitt Payment Statuses
+export type FlittPaymentStatus =
+  | "created"
+  | "processing"
+  | "approved"
+  | "declined"
+  | "expired";
 
 // ====================================
 // SignalR Payment Hub Types
@@ -115,86 +147,72 @@ export interface BOGCancelPaymentRequest {
 export interface PaymentStatusUpdate {
   status: string;
   message: string;
+  paymentId: string;
+  success: boolean;
 }
 
 // ====================================
-// Order Session Types (Backend Integration)
+// Payment Return URL Parameters
 // ====================================
 
-export interface OrderSessionItem {
-  productId: string;
-  qty: number;
-  unitPrice: number;
-  name?: string;
-}
-
-export interface CreateOrderSessionInput {
-  orderId: string;
-  provider: PaymentProvider;
-  amount: number;
-  currency: "GEL";
-  customer: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-  };
-  cart: OrderSessionItem[];
-  bank?: {
-    bogOrderId?: string;
-    tbcPayId?: string;
-  };
-}
-
-export interface CompleteOrderInput {
-  provider: PaymentProvider;
-  bankId: string;
-  bankStatus: string;
-  bankResponse?: any;
-}
-
-export interface FailOrderInput {
-  provider: PaymentProvider;
-  bankId: string;
-  reason: string;
-  bankResponse?: any;
+export interface PaymentReturnParams {
+  status: "success" | "failed";
+  orderId?: string;
+  paymentId?: string;
+  error?: string;
 }
 
 // ====================================
-// Legacy Payment Types (for existing checkout)
+// Error Response Types
 // ====================================
 
-export interface CreateOrderItem {
-  productId: string;
-  qty: number;
-  unitPrice: number;
-  name?: string;
+export interface PaymentErrorResponse {
+  success: false;
+  message: string;
+  errors?: Record<string, string[]>;
 }
 
-export interface CreateOrderPayload {
-  orderId: string;
-  currency: "GEL";
-  amount: number;
-  items: CreateOrderItem[];
-  customer: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-  };
-  shippingAddress?: {
-    line1: string;
-    city: string;
-    state?: string;
-    zip?: string;
-    country?: string;
-  };
-  billingAddress?: {
-    line1?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    country?: string;
-  };
-  metadata?: Record<string, any>;
+// ====================================
+// Payment Provider Info (for UI)
+// ====================================
+
+export interface PaymentProviderOption {
+  type: PaymentType;
+  name: string;
+  description: string;
+  icon?: string;
+  isInstallment?: boolean;
 }
+
+export const PAYMENT_PROVIDERS: PaymentProviderOption[] = [
+  {
+    type: PaymentType.TBC,
+    name: "TBC Bank",
+    description: "Pay with card via TBC",
+    isInstallment: false,
+  },
+  {
+    type: PaymentType.BOG,
+    name: "Bank of Georgia",
+    description: "Pay with card via BOG",
+    isInstallment: false,
+  },
+  {
+    type: PaymentType.BOGInstallment,
+    name: "BOG Installment",
+    description: "Pay in installments via BOG",
+    isInstallment: true,
+  },
+  {
+    type: PaymentType.Flitt,
+    name: "Flitt",
+    description: "Pay with Flitt",
+    isInstallment: false,
+  },
+  {
+    type: PaymentType.FlittInstallment,
+    name: "Flitt Installment",
+    description: "Pay in installments via Flitt (TBC)",
+    isInstallment: true,
+  },
+];

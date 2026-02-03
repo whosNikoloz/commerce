@@ -71,6 +71,7 @@ function statusKey(s: OrderStatus): string {
 }
 function statusLabel(s: OrderStatus, dict: any): string {
   const key = (typeof s === "number" ? OrderStatus[s] : String(s)).toLowerCase();
+
   return dict.admin.orders.statuses[key] || key;
 }
 function keyToStatus(key: string): OrderStatus {

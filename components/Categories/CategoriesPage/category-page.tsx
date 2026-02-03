@@ -124,6 +124,7 @@ export default function CategoryPage({
   // Lookup map from facetValueId to Name (for UI chips)
   const facetValueLookup = useMemo(() => {
     const map: Record<string, string> = {};
+
     facets.forEach((f) => {
       f.facetValues?.forEach((fv) => {
         if (fv.id) {
@@ -131,6 +132,7 @@ export default function CategoryPage({
         }
       });
     });
+
     return map;
   }, [facets]);
 
@@ -165,6 +167,7 @@ export default function CategoryPage({
       facetFilters: facetIds
         .map((facetValueId) => {
           const facetId = facetValueToFacetId[facetValueId];
+
           return facetId ? { facetId, facetValueId } : null;
         })
         .filter((f): f is { facetId: string; facetValueId: string } => f !== null),
@@ -174,6 +177,7 @@ export default function CategoryPage({
 
     if (hasUsedInitialData) {
       setHasUsedInitialData(false);
+
       return;
     }
 
@@ -309,10 +313,12 @@ export default function CategoryPage({
 
   const onBrandToggle = (brandId: string) => {
     const newBrands = toggleInArray(filter.brandIds, brandId);
+
     updateUrl({ brandIds: newBrands, page: 1 });
   };
   const onConditionToggle = (cond: Condition) => {
     const newCond = toggleInArray(filter.condition, cond);
+
     updateUrl({ condition: newCond, page: 1 });
   };
   const onStockChange = (status?: StockStatus) => {
@@ -323,6 +329,7 @@ export default function CategoryPage({
   };
   const onFacetToggle = (facetId: string, facetValueId: string) => {
     const newFacets = toggleFacetValue(filter.facetFilters, facetId, facetValueId);
+
     updateUrl({ facetFilters: newFacets, page: 1 });
   };
   const onFacetRadioChange = (facetId: string, facetValueId: string) => {
@@ -333,6 +340,7 @@ export default function CategoryPage({
     );
     const cleaned = current.filter((ff) => !removeIds.has(ff.facetValueId));
     const newFacets = [...cleaned, { facetId, facetValueId }];
+
     updateUrl({ facetFilters: newFacets, page: 1 });
   };
 
@@ -363,6 +371,7 @@ export default function CategoryPage({
   const clearFilters = () => {
     // Reset everything in URL
     const next = new URLSearchParams();
+
     next.set("page", "1"); // or just delete page
     // Keep category implied by route
     router.replace(window.location.pathname, { scroll: false });
@@ -421,6 +430,7 @@ export default function CategoryPage({
                 onRemoveFacet={(vid) => {
                   // reverse lookup facetId from vid if possible, or iterate
                   const pair = filter.facetFilters?.find(f => f.facetValueId === vid);
+
                   if (pair) onFacetToggle(pair.facetId, vid);
                 }}
                 onSortChange={(v) => {

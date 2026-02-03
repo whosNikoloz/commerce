@@ -12,7 +12,6 @@ import FontAwesomeLoader from "@/components/FontAwesomeLoader";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import { locales, defaultLocale } from "@/i18n.config";
 import BackToTopShadcn from "@/components/back_to_top";
-import AiChatWidget from "@/components/ai/AiChatWidget";
 import { themeToStyle } from "@/lib/applyTheme";
 import { getTenantByHost } from "@/lib/getTenantByHost";
 import ClientUADataFix from "@/components/ClientUADataFix";

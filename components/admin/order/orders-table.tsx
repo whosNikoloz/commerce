@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Eye, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
 import { toast } from "sonner";
-import { useDictionary } from "@/app/context/dictionary-provider";
 
 import OrderDetailsModal from "./view-order-dialog";
 
+import { useDictionary } from "@/app/context/dictionary-provider";
 import { OrderDetail, OrderSummary, OrderStatus, PagedResult, UpdateOrderStatusModel } from "@/types/orderTypes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +62,7 @@ function statusKey(s: OrderStatus): string {
 }
 function statusLabel(s: OrderStatus, dict: any): string {
   const key = (typeof s === "number" ? OrderStatus[s] : String(s)).toLowerCase();
+
   return dict.admin.orders.statuses[key] || key;
 }
 

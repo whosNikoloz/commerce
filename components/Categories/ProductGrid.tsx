@@ -13,7 +13,7 @@ import { useParams } from "next/navigation";
 import { cn, isS3Url } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ProductResponseModel } from "@/types/product";
+import { ProductResponseModel, getProductImageUrls, getCoverImageUrl } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 import { CartItem, useCartStore } from "@/app/context/cartContext";
 import { addToWishlist, removeFromWishlist, isInWishlist } from "@/app/api/services/orderService";
@@ -70,7 +70,8 @@ const ProductCard = memo(function ProductCard({
     }
   }, [user, product.id]);
 
-  const images = product.images?.length ? product.images : ["/placeholder.png"];
+  const imageUrls = getProductImageUrls(product.images);
+  const images = imageUrls.length ? imageUrls : ["/placeholder.png"];
   const hasMultipleImages = images.length > 1;
   const imageUrl = images[currentImageIndex] || images[0];
   const inStock = product.status === StockStatus.InStock;
@@ -518,7 +519,7 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
       id: product.id,
       name: product.name ?? "Unnamed Product",
       price: product.discountPrice ?? product.price,
-      image: product.images?.[0] ?? "/placeholder.png",
+      image: getCoverImageUrl(product.images) ?? "/placeholder.png",
       quantity: 1,
       discount: product.discountPrice
         ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))

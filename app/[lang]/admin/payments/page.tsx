@@ -28,6 +28,7 @@ export default async function PaymentsPage(
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'ka';
   const dict = await getDictionary(lang, null, 'admin');
+
   return (
     <div className="space-y-6">
       <div>

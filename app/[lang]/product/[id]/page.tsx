@@ -21,11 +21,10 @@ export const revalidate = 60; // Revalidate every 60 seconds
 type DetailPageParams = { lang: Locale; id: string };
 type DetailPageProps = { params: Promise<DetailPageParams> };
 
-function normalizeImages(imgs: unknown, fallbackOg: string): string[] {
-  const raw = Array.isArray(imgs) ? imgs : [];
-  const list = raw
-    .map((i) => (typeof i === "string" ? i : (i as any)?.url))
-    .filter((s): s is string => !!s);
+import { getProductImageUrls, ProductImageModel } from "@/types/product";
+
+function normalizeImages(imgs: ProductImageModel[] | undefined, fallbackOg: string): string[] {
+  const list = getProductImageUrls(imgs);
 
   return list.length ? list : [fallbackOg];
 }

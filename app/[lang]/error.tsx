@@ -20,8 +20,8 @@ export default function Error({
       <div className="max-w-2xl w-full text-center">
         <h2
           className="font-heading mb-4 text-2xl font-bold text-text-light dark:text-text-lightdark cursor-pointer"
-          onDoubleClick={() => setShowDetails(!showDetails)}
           title="Double-click to toggle error details"
+          onDoubleClick={() => setShowDetails(!showDetails)}
         >
           Something went wrong!
         </h2>

@@ -8,7 +8,7 @@ import { Heart, ShoppingCart, ArrowLeftRight, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 
 import { cn, resolveImageUrl, formatPrice, isS3Url } from "@/lib/utils";
-import { ProductResponseModel } from "@/types/product";
+import { ProductResponseModel, getProductImageUrls, getCoverImageUrl } from "@/types/product";
 import { StockStatus, Condition } from "@/types/enums";
 // shadcn/ui
 import { CardContent, CardFooter } from "@/components/ui/card";
@@ -34,8 +34,10 @@ interface ProductCardProps {
 // Throttle helper for hover events
 function throttle<T extends (...args: any[]) => void>(fn: T, delay: number): T {
   let lastCall = 0;
+
   return ((...args: any[]) => {
     const now = Date.now();
+
     if (now - lastCall >= delay) {
       lastCall = now;
       fn(...args);
@@ -81,7 +83,7 @@ function ProductCardInner({
   }, [userId, product.id]);
 
   // Memoize computed values
-  const images = useMemo(() => product.images || [], [product.images]);
+  const images = useMemo(() => getProductImageUrls(product.images), [product.images]);
   const hasMultipleImages = images.length > 1;
   const imageUrl = resolveImageUrl(images[currentImageIndex]);
   const isInStock = product.status === StockStatus.InStock;
@@ -92,6 +94,7 @@ function ProductCardInner({
     const discPct = hasDisc
       ? Math.max(0, Math.round(((product.price - (product.discountPrice as number)) / product.price) * 100))
       : 0;
+
     return { hasDiscount: hasDisc, displayPrice: dispPrice, discountPercent: discPct };
   }, [product.discountPrice, product.price]);
 
@@ -113,6 +116,7 @@ function ProductCardInner({
   // Memoize size-dependent styles
   const sizeStyles = useMemo(() => {
     const isCompact = size === "compact";
+
     return {
       isCompact,
       titleSize: isCompact ? "text-[12px] sm:text-[13px]" : undefined,
@@ -176,7 +180,7 @@ function ProductCardInner({
         id: product.id,
         name: product.name ?? "Unnamed Product",
         price: product.discountPrice ?? product.price,
-        image: resolveImageUrl(product.images?.[0]),
+        image: resolveImageUrl(getCoverImageUrl(product.images)),
         quantity: 1,
         discount: discountPercent,
         originalPrice: product.price,
@@ -261,8 +265,8 @@ function ProductCardInner({
                 {images.slice(0, 4).map((_, index) => (
                   <Link
                     key={index}
-                    href={`/${currentLang}/product/${product.id}`}
                     className="flex-1 hover:bg-white/5 transition-all duration-200 relative pointer-events-auto"
+                    href={`/${currentLang}/product/${product.id}`}
                     onMouseEnter={() => handleImageHover(index)}
                   >
                     {/* Subtle edge highlight on hover */}

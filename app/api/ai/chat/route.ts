@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import { searchProducts } from "../../services/productService";
+
 import { ProductResponseModel } from "@/types/product";
 
 // Helper to format currency
@@ -15,6 +17,7 @@ export async function POST(req: NextRequest) {
     try {
         // 1. Check for API Key
         const apiKey = process.env.GOOGLE_API_KEY;
+
         if (!apiKey) {
             return NextResponse.json(
                 { error: "API key not configured" },
@@ -35,8 +38,10 @@ export async function POST(req: NextRequest) {
 
         // 3. Fetch Enriched Context (Products with Facets/Brands)
         let products: ProductResponseModel[] = [];
+
         try {
             const searchResult = await searchProducts("", "name", "asc", 1, 30);
+
             products = searchResult.items;
         } catch (e) {
             console.error("Failed to fetch search results for AI context", e);
@@ -97,6 +102,7 @@ INSTRUCTIONS:
 
     } catch (error) {
         console.error("AI Chat Error:", error);
+
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 }

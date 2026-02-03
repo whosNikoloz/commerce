@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { getAllFaqs, createFaq, updateFaq, deleteFaq } from "@/app/api/services/faqService";
 import { Switch } from "@/components/ui/switch";
-
 import { useDictionary } from "@/app/context/dictionary-provider";
 
 

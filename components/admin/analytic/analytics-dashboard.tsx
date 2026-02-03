@@ -1,6 +1,5 @@
 'use client'
 
-import { currencyFmt } from '@/lib/utils'
 
 import React, { useState } from 'react'
 import {
@@ -20,6 +19,7 @@ import {
 } from 'recharts'
 import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Eye, MousePointer, Package, MapPin, Smartphone } from 'lucide-react'
 
+import { currencyFmt } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {

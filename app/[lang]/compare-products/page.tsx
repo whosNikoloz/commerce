@@ -2,6 +2,7 @@
 
 import type { ProductResponseModel } from "@/types/product";
 
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useParams, useRouter } from "next/navigation";
 import { X, Share2, ArrowLeft, Check } from "lucide-react";
@@ -9,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 
+import { getCoverImageUrl } from "@/types/product";
 import { getProductById } from "@/app/api/services/productService";
 import { Button } from "@/components/ui/button";
 import { cn, formatPrice, resolveImageUrl } from "@/lib/utils";
@@ -282,7 +284,7 @@ function ProductCard({ product, onRemove, currentLang }: ProductCardProps) {
           alt={product.name || "Product"}
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           src={
-            resolveImageUrl(product.images?.[0]) ||
+            resolveImageUrl(getCoverImageUrl(product.images)) ||
             "/placeholder.png"
           }
         />

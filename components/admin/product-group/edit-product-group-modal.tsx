@@ -22,7 +22,7 @@ import {
   removeProductsFromGroup,
 } from "@/app/api/services/productGroupService";
 import { searchProductsByFilter } from "@/app/api/services/productService";
-import { ProductResponseModel } from "@/types/product";
+import { ProductResponseModel, getCoverImageUrl } from "@/types/product";
 import { FilterModel } from "@/types/filter";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -173,6 +173,7 @@ export function EditProductGroupModal({
   const handleSave = async () => {
     if (!hasChanges) {
       onOpenChange(false);
+
       return;
     }
 
@@ -320,13 +321,13 @@ export function EditProductGroupModal({
                               {productsInGroup.map((product) => (
                                 <TableRow key={product.id}>
                                   <TableCell>
-                                    {product.images && product.images.length > 0 ? (
+                                    {getCoverImageUrl(product.images) ? (
                                       <div className="relative w-12 h-12 rounded-md overflow-hidden">
                                         <Image
                                           fill
                                           alt={product.name || "Product"}
                                           className="object-cover"
-                                          src={product.images[0]}
+                                          src={getCoverImageUrl(product.images)!}
                                         />
                                       </div>
                                     ) : (
@@ -381,13 +382,13 @@ export function EditProductGroupModal({
                               className="bg-white dark:bg-slate-800 rounded-lg border p-4 space-y-3"
                             >
                               <div className="flex gap-3">
-                                {product.images && product.images.length > 0 ? (
+                                {getCoverImageUrl(product.images) ? (
                                   <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
                                     <Image
                                       fill
                                       alt={product.name || "Product"}
                                       className="object-cover"
-                                      src={product.images[0]}
+                                      src={getCoverImageUrl(product.images)!}
                                     />
                                   </div>
                                 ) : (
@@ -473,13 +474,13 @@ export function EditProductGroupModal({
                             {productsNotInGroup.slice(0, 10).map((product) => (
                               <TableRow key={product.id}>
                                 <TableCell>
-                                  {product.images && product.images.length > 0 ? (
+                                  {getCoverImageUrl(product.images) ? (
                                     <div className="relative w-12 h-12 rounded-md overflow-hidden">
                                       <Image
                                         fill
                                         alt={product.name || "Product"}
                                         className="object-cover"
-                                        src={product.images[0]}
+                                        src={getCoverImageUrl(product.images)!}
                                       />
                                     </div>
                                   ) : (
@@ -534,13 +535,13 @@ export function EditProductGroupModal({
                             className="bg-white dark:bg-slate-800 rounded-lg border p-4 space-y-3"
                           >
                             <div className="flex gap-3">
-                              {product.images && product.images.length > 0 ? (
+                              {getCoverImageUrl(product.images) ? (
                                 <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
                                   <Image
                                     fill
                                     alt={product.name || "Product"}
                                     className="object-cover"
-                                    src={product.images[0]}
+                                    src={getCoverImageUrl(product.images)!}
                                   />
                                 </div>
                               ) : (

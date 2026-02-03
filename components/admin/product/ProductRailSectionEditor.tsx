@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { CategoryTreeSelectMulti } from "./CategoryTreeSelectMulti";
 import { LocalizedTextInput } from "./LocalizedTextInput";
 
+import { getCoverImageUrl } from "@/types/product";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { searchProducts } from "@/app/api/services/productService";
 
@@ -296,8 +297,8 @@ export function ProductRailSectionEditor({
                       onClick={() => toggleProductId(p.id)}
                     >
                       <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded flex-shrink-0 relative overflow-hidden">
-                        {p.images?.[0] ? (
-                          <img alt="" className="w-full h-full object-cover" src={p.images[0]} />
+                        {getCoverImageUrl(p.images) ? (
+                          <img alt="" className="w-full h-full object-cover" src={getCoverImageUrl(p.images)!} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-400 text-[10px]">?</div>
                         )}

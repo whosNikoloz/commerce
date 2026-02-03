@@ -17,10 +17,9 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { Input } from "@heroui/input";
-
-import { CustomEditor } from "../../wysiwyg-text-custom";
 import { Select, SelectItem } from "@heroui/select";
 
+import { CustomEditor } from "../../wysiwyg-text-custom";
 import { ProductGroupCategoryTree } from "../product-group/product-group-category-tree";
 
 import { FacetSelector } from "./facet-selector";

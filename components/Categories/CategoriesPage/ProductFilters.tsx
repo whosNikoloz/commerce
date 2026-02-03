@@ -343,11 +343,12 @@ function SidebarContent({
                   className="w-24 bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
                   type="number"
                   value={String(localPriceRange[0])}
+                  onBlur={() => onPriceChange(localPriceRange[0], localPriceRange[1])}
                   onChange={(e) => {
                     const val = Number(e.target.value);
+
                     setLocalPriceRange([val, localPriceRange[1]]);
                   }}
-                  onBlur={() => onPriceChange(localPriceRange[0], localPriceRange[1])}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       onPriceChange(localPriceRange[0], localPriceRange[1]);
@@ -358,11 +359,12 @@ function SidebarContent({
                   className="w-24 bg-brand-surface dark:bg-brand-surfacedark border-brand-muted dark:border-brand-muteddark text-text-light dark:text-text-lightdark"
                   type="number"
                   value={String(localPriceRange[1])}
+                  onBlur={() => onPriceChange(localPriceRange[0], localPriceRange[1])}
                   onChange={(e) => {
                     const val = Number(e.target.value);
+
                     setLocalPriceRange([localPriceRange[0], val]);
                   }}
-                  onBlur={() => onPriceChange(localPriceRange[0], localPriceRange[1])}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       onPriceChange(localPriceRange[0], localPriceRange[1]);

@@ -1,7 +1,7 @@
 "use client";
 
 import type { CategoryModel } from "@/types/category";
-import type { ProductResponseModel } from "@/types/product";
+import type { ProductResponseModel, ProductImageModel } from "@/types/product";
 import type { PagedList } from "@/types/pagination";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { SearchIcon } from "../icons";
 import { GoBackButton } from "../go-back-button";
 
+import { getCoverImageUrl } from "@/types/product";
 import { searchProducts } from "@/app/api/services/productService";
 import { getAllCategories } from "@/app/api/services/categoryService";
 import { useSearchHistory } from "@/app/context/useSearchHistory"; // ✅ history
@@ -32,7 +33,12 @@ interface SearchForMobileProps {
   forBottomNav?: boolean;
 }
 
-type SearchResult = Pick<ProductResponseModel, "id" | "name" | "images" | "price">;
+type SearchResult = {
+  id: string;
+  name?: string;
+  images?: ProductImageModel[];
+  price: number;
+};
 
 export default function SearchForMobile({
   searchQuery,
@@ -432,14 +438,14 @@ export default function SearchForMobile({
                         onMouseDown={(e) => e.preventDefault()}
                       >
                         <div className="flex items-center gap-3">
-                          {result.images?.[0] ? (
+                          {getCoverImageUrl(result.images) ? (
                             <div className="relative h-10 w-10 flex-shrink-0 rounded-md overflow-hidden border">
                               <Image
                                 fill
                                 alt={result.name ?? "Product"}
                                 className="object-cover"
                                 sizes="40px"
-                                src={result.images[0]}
+                                src={getCoverImageUrl(result.images)!}
                               />
                             </div>
                           ) : (

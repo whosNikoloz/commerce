@@ -5,7 +5,7 @@ import type { BrandModel } from "@/types/brand";
 import Image from "next/image";
 import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { toast } from "sonner";
-import { TriangleAlert, Trash2, Edit, Tag, CornerDownRight, ChevronRight, ChevronDown } from "lucide-react";
+import { TriangleAlert, Trash2, Edit, CornerDownRight, ChevronRight, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 
 import UpdateBrandModal from "./update-brad-modal";
@@ -49,6 +49,7 @@ interface Props {
 // Utility to build a flat list with depth for tree rendering
 function buildBrandTree(brands: BrandModel[]): Array<BrandModel & { depth: number }> {
   const brandMap = new Map<string, BrandModel>();
+
   brands.forEach(b => brandMap.set(b.id, b));
 
   const childrenMap = new Map<string, BrandModel[]>();
@@ -71,12 +72,14 @@ function buildBrandTree(brands: BrandModel[]): Array<BrandModel & { depth: numbe
   function traverse(brand: BrandModel, depth: number) {
     result.push({ ...brand, depth });
     const children = childrenMap.get(brand.id) || [];
+
     // Sort children by name
     children.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     children.forEach(child => traverse(child, depth + 1));
   }
 
   roots.forEach(root => traverse(root, 0));
+
   return result;
 }
 
@@ -103,11 +106,13 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
   const toggleExpand = (id: string) => {
     setExpandedIds(prev => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id);
       } else {
         next.add(id);
       }
+
       return next;
     });
   };
@@ -257,6 +262,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
     // Build Tree
     const brandMap = new Map<string, BrandModel>();
+
     brands.forEach(b => brandMap.set(b.id, b));
 
     const childrenMap = new Map<string, BrandModel[]>();
@@ -290,6 +296,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     }
 
     roots.forEach(root => traverse(root, 0));
+
     return result;
   }, [brands, searchTerm, expandedIds]);
 
@@ -384,8 +391,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
 
                               {brand.hasChildren ? (
                                 <button
-                                  onClick={() => toggleExpand(brand.id)}
                                   className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                                  onClick={() => toggleExpand(brand.id)}
                                 >
                                   {expandedIds.has(brand.id) ? (
                                     <ChevronDown className="h-4 w-4 text-slate-500" />
@@ -552,8 +559,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                                   <span className="flex-1">{brand.name}</span>
                                   {brand.hasChildren && (
                                     <button
-                                      onClick={() => toggleExpand(brand.id)}
                                       className="p-1"
+                                      onClick={() => toggleExpand(brand.id)}
                                     >
                                       {isExpanded ? (
                                         <ChevronDown className="h-4 w-4 text-slate-500" />
@@ -697,8 +704,8 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
             <AlertDialogCancel disabled={deleting}>{t.cancel}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
-              onClick={handleDeleteBrand}
               disabled={deleting}
+              onClick={handleDeleteBrand}
             >
               {deleting ? "Deleting..." : (t.deleteBrand || "Delete Brand")}
             </AlertDialogAction>
@@ -710,11 +717,11 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
       {brandToEdit && (
         <UpdateBrandModal
           brandId={brandToEdit.id}
+          brands={brands}
           initialDescription={brandToEdit.description}
           initialName={brandToEdit.name}
           initialOrigin={brandToEdit.origin}
           initialParentId={brandToEdit.parentId}
-          brands={brands}
           open={!!brandToEdit}
           onOpenChange={(open) => !open && setBrandToEdit(null)}
           onSave={handleUpdateBrand}

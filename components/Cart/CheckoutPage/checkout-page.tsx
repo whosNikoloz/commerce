@@ -1,7 +1,5 @@
 "use client";
 
-import type { PaymentProvider } from "@/types/payment";
-
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -12,9 +10,10 @@ import OrderSummary from "./OrderSummary";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
-import { apiPost } from "@/app/api/payment/helpers";
 import { useUser } from "@/app/context/userContext";
-import { createOrder } from "@/app/api/services/orderService";
+import { createOrderWithPayment } from "@/app/api/services/orderService";
+import { PaymentType } from "@/types/payment";
+import { getEnabledPaymentTypes } from "@/app/api/services/integrationService";
 import { useGA4 } from "@/hooks/useGA4";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
@@ -30,44 +29,91 @@ export default function CheckoutPage() {
   const subtotal = useCartStore((s) => s.getSubtotal());
   const { trackCheckoutBegin, trackPaymentInfo } = useGA4();
 
-  const [provider, setProvider] = useState<PaymentProvider>("bog");
+  const [paymentType, setPaymentType] = useState<PaymentType>(PaymentType.BOG);
+  const [availablePaymentTypes, setAvailablePaymentTypes] = useState<PaymentType[] | null>(null);
+  const [paymentTypesLoaded, setPaymentTypesLoaded] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const shipping = subtotal > 50 ? 0 : 9.99;
-  const tax = subtotal * 0.08;
+  // Load enabled payment integrations for the current tenant
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPaymentTypes = async () => {
+      try {
+        const types = await getEnabledPaymentTypes();
+
+        if (cancelled) return;
+
+        if (types.length > 0) {
+          setAvailablePaymentTypes(types);
+          // Ensure current selection is valid
+          if (!types.includes(paymentType)) {
+            setPaymentType(types[0]);
+          }
+        } else {
+          // Fallback to default providers if no integrations returned
+          setAvailablePaymentTypes([PaymentType.BOG, PaymentType.Flitt]);
+        }
+      } catch {
+        if (cancelled) return;
+        // On error fall back to default providers
+        setAvailablePaymentTypes([PaymentType.BOG, PaymentType.Flitt]);
+      }
+
+      if (!cancelled) {
+        setPaymentTypesLoaded(true);
+      }
+    };
+
+    loadPaymentTypes();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Calculate totals
+  //const shipping = subtotal > 50 ? 0 : 9.99;
+  const shipping = 0;
+  const tax = 0; // Tax disabled - handled by payment gateway
   const total = useMemo(
     () => Number((subtotal + shipping + tax).toFixed(2)),
     [subtotal, shipping, tax],
   );
 
+  // Redirect to cart if empty
   useEffect(() => {
-    if (cartLen === 0) router.push("/cart");
-  }, [cartLen, router]);
+    if (mounted && cartLen === 0) {
+      router.push("/cart");
+    }
+  }, [cartLen, router, mounted]);
 
   // Redirect to cart with login prompt if not logged in
   useEffect(() => {
-    if (!user) {
+    if (mounted && !user) {
       router.push("/cart?login=required");
     }
-  }, [user, router]);
+  }, [user, router, mounted]);
 
   // Track begin checkout event
   useEffect(() => {
     if (cart && cart.length > 0) {
       trackCheckoutBegin(cart);
     }
-  }, [cart.length, trackCheckoutBegin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart.length]);
 
+  // Loading skeleton
   if (!mounted) {
     return (
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="animate-pulse space-y-8">
-            {/* Header Skeleton */}
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 bg-gray-200 dark:bg-gray-800 rounded" />
               <div className="space-y-2">
@@ -75,10 +121,7 @@ export default function CheckoutPage() {
                 <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-48" />
               </div>
             </div>
-
-            {/* Content Grid Skeleton */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Payment Form Skeleton */}
               <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
                 <div className="space-y-4">
                   <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
@@ -88,13 +131,10 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Order Summary Skeleton */}
               <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
                 <div className="space-y-4">
                   <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
                   <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
                     <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
                     <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
                     <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
@@ -113,7 +153,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = async () => {
     if (!user?.id) {
-      setError(dictionary.checkout.errors.userNotLoggedIn);
+      setError(dictionary.checkout?.errors?.userNotLoggedIn || "Please log in to continue");
 
       return;
     }
@@ -122,12 +162,11 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // Format order items with variant field (per guide)
-      const orderItems = cart.map((i) => {
-        // Format variant from selectedFacets if available
-        // CartItem type doesn't include selectedFacets, but it may exist at runtime
-        const itemWithFacets = i as typeof i & { selectedFacets?: Record<string, string> };
+      // Format order items with variant field
+      const orderItems = cart.map((item) => {
+        const itemWithFacets = item as typeof item & { selectedFacets?: Record<string, string> };
         let variant: string | undefined;
+
         if (itemWithFacets.selectedFacets && Object.keys(itemWithFacets.selectedFacets).length > 0) {
           variant = Object.entries(itemWithFacets.selectedFacets)
             .map(([k, v]) => `${k}: ${v}`)
@@ -135,87 +174,87 @@ export default function CheckoutPage() {
         }
 
         return {
-          productId: i.id,
-          quantity: i.quantity,
-          variant: variant || undefined,
+          productId: item.id,
+          quantity: item.quantity,
+          variant,
         };
       });
 
-      // Per guide: Create order with paymentReturnUrl
-      // Backend should return paymentRedirectUrl and paymentId if payment is created automatically
-      const paymentReturnUrl = `${window.location.origin}/payment/callback?provider=${provider}`;
-      
-      const orderResponse = await createOrder({
+      // Build return URL with status parameters
+      const paymentReturnUrl = `${window.location.origin}/payment/callback`;
+
+      // Create order with payment
+      const orderResponse = await createOrderWithPayment({
         orderItems,
         shippingAddress: "Default Address", // TODO: Get from form
-        shippingCity: "Tbilisi", // TODO: Get from form
-        shippingState: "Tbilisi", // TODO: Get from form
-        shippingZipCode: "0108", // TODO: Get from form
-        shippingCountry: "Georgia", // TODO: Get from form
-        customerNotes: undefined, // TODO: Get from form if available
+        shippingCity: "Tbilisi",
+        shippingCountry: "Georgia",
         currency: "GEL",
-        paymentReturnUrl, // Per guide: URL where user returns after payment
-      }, user.id);
+        paymentType,
+        paymentReturnUrl,
+        // Buyer info from user context
+        buyerFullName: user.userName || undefined,
+        buyerEmail: user.email || undefined,
+        //buyerPhone: user.phone || undefined,
+        buyerPhone: "+995555555555",
+        // Delivery amount
+        deliveryAmount: shipping > 0 ? shipping : undefined,
+        // Payment options
+        applicationTypes: "web",
+        paymentMethods: ["card"],
+      });
 
-      const orderId = orderResponse.id;
+      // Track payment info
+      const paymentMethodName = paymentType === PaymentType.BOG || paymentType === PaymentType.BOGInstallment
+        ? 'BOG'
+        : 'FLITT';
 
-      // Track payment info being added
-      trackPaymentInfo(cart, provider.toUpperCase());
+      trackPaymentInfo(cart, paymentMethodName);
 
-      // Per guide: Backend MUST return paymentRedirectUrl and paymentId in order response
-      // The backend creates the payment automatically when creating the order
-      if (!orderResponse.paymentRedirectUrl || !orderResponse.paymentId) {
-        throw new Error(
-          orderResponse.paymentErrorMessage || 
-          dictionary.checkout.errors.paymentFailed
-        );
-      }
-
-      // Per guide: Store order and payment IDs for callback page
+      // Store order and payment IDs for callback page
       if (typeof window !== "undefined") {
-        sessionStorage.setItem("lastOrderId", orderId);
-        sessionStorage.setItem("currentPaymentId", orderResponse.paymentId);
+        sessionStorage.setItem("lastOrderId", orderResponse.id);
+        sessionStorage.setItem("lastOrderNumber", orderResponse.orderNumber);
+        if (orderResponse.paymentId) {
+          sessionStorage.setItem("currentPaymentId", orderResponse.paymentId);
+        }
       }
 
-      // Per guide: Redirect to TBC payment page
-      window.location.href = orderResponse.paymentRedirectUrl;
+      // Redirect to payment gateway
+      if (orderResponse.paymentRedirectUrl) {
+        window.location.href = orderResponse.paymentRedirectUrl;
+      } else {
+        throw new Error("No payment redirect URL received");
+      }
     } catch (e: any) {
+      // eslint-disable-next-line no-console
       console.error('Checkout error:', e);
-      
+
       // Handle specific error types
-      let errorMessage = dictionary.checkout.errors.paymentFailed;
-      
+      let errorMessage = dictionary.checkout?.errors?.paymentFailed || "Payment failed. Please try again.";
+
       if (e?.response?.status === 400) {
-        // Bad request - likely validation error
-        errorMessage = e?.response?.data?.detail || e?.message || 'Invalid order data. Please check your information.';
+        errorMessage = e?.response?.data?.message || e?.message || 'Invalid order data. Please check your information.';
       } else if (e?.response?.status === 401) {
-        // Unauthorized
         errorMessage = 'Please log in to complete your purchase.';
         router.push('/cart?login=required');
       } else if (e?.response?.status === 403) {
-        // Forbidden
         errorMessage = 'You do not have permission to complete this action.';
       } else if (e?.response?.status === 404) {
-        // Not found
-        errorMessage = 'Product or service not found. Please refresh and try again.';
+        errorMessage = 'Product not available. Please refresh and try again.';
       } else if (e?.response?.status >= 500) {
-        // Server error
         errorMessage = 'Server error. Please try again in a moment.';
       } else if (e?.message) {
-        // Use error message if available
         errorMessage = e.message;
-      } else if (typeof e === 'string') {
-        errorMessage = e;
       }
-      
+
       setError(errorMessage);
       setIsProcessing(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center gap-4 mb-8">
           <Button
@@ -231,9 +270,11 @@ export default function CheckoutPage() {
           </Button>
           <div>
             <h1 className="font-heading text-2xl font-bold text-text-light dark:text-text-lightdark">
-              {dictionary.checkout.title}
+              {dictionary.checkout?.title || 'Checkout'}
             </h1>
-            <p className="font-primary text-text-subtle dark:text-text-subtledark">{dictionary.checkout.completePurchase}</p>
+            <p className="font-primary text-text-subtle dark:text-text-subtledark">
+              {dictionary.checkout?.completePurchase || 'Complete your purchase'}
+            </p>
           </div>
         </div>
 
@@ -244,11 +285,18 @@ export default function CheckoutPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <CheckoutForm value={provider} onChange={setProvider} />
+          <CheckoutForm
+            availableTypes={paymentTypesLoaded ? (availablePaymentTypes ?? [PaymentType.BOG, PaymentType.Flitt]) : []}
+            loading={!paymentTypesLoaded}
+            value={paymentType}
+            onChange={setPaymentType}
+          />
           <OrderSummary
             isProcessing={isProcessing}
             submitButtonLabel={
-              isProcessing ? dictionary.checkout.redirecting : `${dictionary.checkout.paySecurely} • ₾${total.toFixed(2)}`
+              isProcessing
+                ? (dictionary.checkout?.redirecting || 'Redirecting...')
+                : `${dictionary.checkout?.paySecurely || 'Pay Securely'} • ₾${total.toFixed(2)}`
             }
             totalOverride={total}
             onSubmit={handleSubmit}

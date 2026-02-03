@@ -8,8 +8,6 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
-
-import { useDictionary } from "@/app/context/dictionary-provider";
 import {
   Eye,
   EyeOff,
@@ -26,6 +24,8 @@ import {
   Check,
 } from "lucide-react";
 
+import { useDictionary } from "@/app/context/dictionary-provider";
+import { getProductImageUrls, getCoverImageUrl } from "@/types/product";
 import { getAllBrands } from "@/app/api/services/brandService";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -332,9 +332,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   // Handle adding stock
   const handleAddStock = async (productId: string, amount: number = 1) => {
     const product = products.find((p) => p.id === productId);
+
     if (!product) return;
 
     const currentStock = product.stockQuantity ?? 0;
+
     setStockLoading((prev) => ({ ...prev, [productId]: true }));
     try {
       await addStock(productId, amount);
@@ -352,11 +354,14 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   // Handle removing stock
   const handleRemoveStock = async (productId: string, amount: number = 1) => {
     const product = products.find((p) => p.id === productId);
+
     if (!product) return;
 
     const currentStock = product.stockQuantity ?? 0;
+
     if (currentStock < amount) {
       toast.error(t?.toast?.insufficientStock || "Insufficient stock");
+
       return;
     }
 
@@ -378,6 +383,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const handleSetStock = async (productId: string, quantity: number) => {
     if (quantity < 0) {
       toast.error(t?.toast?.invalidQuantity || "Quantity must be 0 or greater");
+
       return;
     }
 
@@ -460,6 +466,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
 
     const handleManualSubmit = () => {
       const qty = parseInt(manualValue);
+
       if (!isNaN(qty) && qty >= 0) {
         handleSetStock(productId, qty);
         setIsPopoverOpen(false);
@@ -470,10 +477,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     return (
       <div className="flex items-center gap-1">
         <Button
-          size="icon"
-          variant="outline"
           className={`${buttonSize} border-slate-300 dark:border-slate-600`}
           disabled={isLoading || currentStock <= 0}
+          size="icon"
+          variant="outline"
           onClick={() => handleRemoveStock(productId)}
         >
           <Minus className={iconSize} />
@@ -494,19 +501,19 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               {isLoading ? "..." : currentStock}
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-48 p-3" align="center">
+          <PopoverContent align="center" className="w-48 p-3">
             <div className="space-y-2">
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 {t?.setStock || "Set stock quantity"}
               </p>
               <div className="flex gap-2">
                 <Input
-                  type="number"
+                  className="h-8"
                   min="0"
                   placeholder={String(currentStock)}
+                  type="number"
                   value={manualValue}
                   onChange={(e) => setManualValue(e.target.value)}
-                  className="h-8"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       handleManualSubmit();
@@ -514,10 +521,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                   }}
                 />
                 <Button
-                  size="icon"
                   className="h-8 w-8 shrink-0"
-                  onClick={handleManualSubmit}
                   disabled={!manualValue || isNaN(parseInt(manualValue))}
+                  size="icon"
+                  onClick={handleManualSubmit}
                 >
                   <Check className="h-4 w-4" />
                 </Button>
@@ -527,10 +534,10 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         </Popover>
 
         <Button
-          size="icon"
-          variant="outline"
           className={`${buttonSize} border-slate-300 dark:border-slate-600`}
           disabled={isLoading}
+          size="icon"
+          variant="outline"
           onClick={() => handleAddStock(productId)}
         >
           <Plus className={iconSize} />
@@ -550,11 +557,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               className="rounded-lg object-cover"
               priority={false}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              src={product.images?.[0] || "/placeholder.png"}
+              src={getCoverImageUrl(product.images) || "/placeholder.png"}
             />
-            {product.images && product.images.length > 1 && (
+            {getProductImageUrls(product.images).length > 1 && (
               <span className="font-primary absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
-                +{product.images.length}
+                +{getProductImageUrls(product.images).length}
               </span>
             )}
             <div className="absolute top-2 left-2">
@@ -611,7 +618,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
             </div>
 
             {/* Stock controls */}
-            <StockControl productId={product.id} stock={product.stockQuantity ?? 0} size="small" />
+            <StockControl productId={product.id} size="small" stock={product.stockQuantity ?? 0} />
           </div>
 
           <div className="flex items-center justify-end gap-1">
@@ -629,20 +636,20 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               initialDescription={product.description}
               initialDiscountPrice={product.discountPrice}
               initialFacetValues={product.productFacetValues ?? []}
-              initialProductAdditionalJson={product.productAdditionalJson}
               initialIsActive={product.isActive}
               initialIsComingSoon={product.isComingSoon}
               initialIsLiquidated={product.isLiquidated}
               initialIsNewArrival={product.isNewArrival}
               initialName={product.name}
               initialPrice={product.price}
+              initialProductAdditionalJson={product.productAdditionalJson}
               initialProductGroupId={product.productGroupId}
               initialStockStatus={product.status}
               productId={product.id}
               onSave={handleUpdateProduct}
             />
             <ReviewImagesModal
-              existing={(product.images ?? []).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
+              existing={getProductImageUrls(product.images).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
               maxFiles={12}
               maxSizeMB={5}
               productId={product.id}
@@ -884,11 +891,11 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                     alt={product.name ?? "Product"}
                                     className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
                                     sizes="48px"
-                                    src={product.images?.[0] || "/placeholder.png"}
+                                    src={getCoverImageUrl(product.images) || "/placeholder.png"}
                                   />
-                                  {product.images && product.images.length > 1 && (
+                                  {getProductImageUrls(product.images).length > 1 && (
                                     <span className="font-primary absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[10px] px-1 py-0.5 rounded-full font-medium">
-                                      +{product.images.length}
+                                      +{getProductImageUrls(product.images).length}
                                     </span>
                                   )}
                                 </div>
@@ -1004,20 +1011,20 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   initialDescription={product.description}
                                   initialDiscountPrice={product.discountPrice}
                                   initialFacetValues={product.productFacetValues ?? []}
-                                  initialProductAdditionalJson={product.productAdditionalJson}
                                   initialIsActive={product.isActive}
                                   initialIsComingSoon={product.isComingSoon}
                                   initialIsLiquidated={product.isLiquidated}
                                   initialIsNewArrival={product.isNewArrival}
                                   initialName={product.name}
                                   initialPrice={product.price}
+                                  initialProductAdditionalJson={product.productAdditionalJson}
                                   initialProductGroupId={product.productGroupId}
                                   initialStockStatus={product.status}
                                   productId={product.id}
                                   onSave={handleUpdateProduct}
                                 />
                                 <ReviewImagesModal
-                                  existing={(product.images ?? []).map((url, idx) => ({
+                                  existing={getProductImageUrls(product.images).map((url, idx) => ({
                                     key: (idx + 1).toString(),
                                     url,
                                   }))}

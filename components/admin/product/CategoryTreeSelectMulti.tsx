@@ -1,8 +1,9 @@
 "use client";
 
+import type { CategoryModel } from "@/types/category";
+
 import { useEffect, useMemo, useState } from "react";
 import { ChevronRight, ChevronDown, Search } from "lucide-react";
-import type { CategoryModel } from "@/types/category";
 
 type CategoryNode = CategoryModel & { children: CategoryNode[] };
 
@@ -60,9 +61,11 @@ function filterTree(nodes: CategoryNode[], query: string): CategoryNode[] {
     .map((node) => {
       const nameMatches = (node.name || node.id).toLowerCase().includes(term);
       const filteredChildren = filterTree(node.children, term);
+
       if (nameMatches || filteredChildren.length > 0) {
         return { ...node, children: filteredChildren };
       }
+
       return null;
     })
     .filter(Boolean) as CategoryNode[];
@@ -84,10 +87,12 @@ export function CategoryTreeSelectMulti({
     // Expand root nodes and ancestors of selected categories
     setExpanded((prev) => {
       const next = new Set(prev);
+
       roots.forEach((root) => next.add(root.id));
 
       selectedIds.forEach((id) => {
         let current = parentLookup[id];
+
         while (current) {
           next.add(current);
           current = parentLookup[current];
@@ -101,17 +106,20 @@ export function CategoryTreeSelectMulti({
   const toggleExpand = (id: string) => {
     setExpanded((prev) => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id);
       } else {
         next.add(id);
       }
+
       return next;
     });
   };
 
   const handleToggleSelection = (id: string) => {
     const isSelected = selectedIds.includes(id);
+
     if (selectionMode === "single") {
       onSelectionChange(isSelected ? [] : [id]);
     } else {
@@ -138,10 +146,10 @@ export function CategoryTreeSelectMulti({
         >
           {hasChildren ? (
             <button
+              aria-label={isExpanded ? "Collapse category" : "Expand category"}
+              className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
               type="button"
               onClick={() => toggleExpand(node.id)}
-              className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
-              aria-label={isExpanded ? "Collapse category" : "Expand category"}
             >
               {isExpanded ? (
                 <ChevronDown className="h-3.5 w-3.5" />
@@ -154,22 +162,22 @@ export function CategoryTreeSelectMulti({
           )}
 
           <input
-            type="checkbox"
             checked={isSelected}
-            onChange={() => handleToggleSelection(node.id)}
             className="rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-slate-800 h-4 w-4"
+            type="checkbox"
+            onChange={() => handleToggleSelection(node.id)}
           />
 
           <button
+            className="flex items-center gap-2 flex-1 text-left"
             type="button"
             onClick={() => handleToggleSelection(node.id)}
-            className="flex items-center gap-2 flex-1 text-left"
           >
             {node.images?.[0] && (
               <img
-                src={node.images[0]}
                 alt={node.name || node.id}
                 className="w-5 h-5 rounded object-cover border border-slate-200 dark:border-slate-700"
+                src={node.images[0]}
               />
             )}
             <span className={`text-sm ${isSelected ? "text-blue-700 dark:text-blue-300 font-medium" : "text-slate-800 dark:text-slate-100"}`}>
@@ -198,11 +206,11 @@ export function CategoryTreeSelectMulti({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 h-4 w-4" />
         <input
+          className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+          placeholder={placeholder}
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={placeholder}
-          className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
         />
       </div>
 
@@ -223,6 +231,7 @@ export function CategoryTreeSelectMulti({
         <div className="flex flex-wrap gap-1.5">
           {selectedIds.map((id) => {
             const cat = categories.find((c) => c.id === id);
+
             return (
               <span
                 key={id}
@@ -230,16 +239,16 @@ export function CategoryTreeSelectMulti({
               >
                 {cat?.images?.[0] && (
                   <img
-                    src={cat.images[0]}
                     alt={cat.name || id}
                     className="w-4 h-4 rounded-full object-cover border border-white/50 shadow-sm"
+                    src={cat.images[0]}
                   />
                 )}
                 <span className="truncate max-w-[100px]">{cat?.name || id}</span>
                 <button
+                  className="text-blue-500 hover:text-red-500 transition-colors"
                   type="button"
                   onClick={() => handleToggleSelection(id)}
-                  className="text-blue-500 hover:text-red-500 transition-colors"
                 >
                   &times;
                 </button>

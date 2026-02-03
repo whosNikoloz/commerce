@@ -11,8 +11,6 @@ import { Sidebar, SidebarBody, SidebarLink, SidebarGroup } from "@/components/ui
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDictionary } from "@/app/context/dictionary-provider";
-
-
 import { defaultLocale } from "@/i18n.config";
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
@@ -31,6 +29,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     if (currentLang === defaultLocale) {
       return `/admin${path}`;
     }
+
     return `/${currentLang}/admin${path}`;
   };
 

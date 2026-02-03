@@ -82,7 +82,15 @@ function PaymentCallbackContent() {
     if (hubStatus) {
       const statusUpper = hubStatus.status?.toUpperCase() || '';
 
-      if (hubStatus.success || statusUpper === 'APPROVED' || statusUpper === 'COMPLETED' || statusUpper === 'SUCCEEDED') {
+      // Check if success (based on boolean or status strings)
+      // Including variations like "Succeeded", "Succeeded", "Approved", "Completed", "Success"
+      const isSuccessful = hubStatus.success ||
+        ['APPROVED', 'COMPLETED', 'SUCCEEDED', 'SUCCESS'].includes(statusUpper);
+
+      // Check if failed
+      const isFailed = ['DECLINED', 'REJECTED', 'FAILED', 'CANCELLED', 'EXPIRED'].includes(statusUpper);
+
+      if (isSuccessful) {
         setStatus('success');
         setMessage(hubStatus.message || dictionary.checkout?.processing?.successMessage || 'Payment successful!');
 
@@ -104,7 +112,7 @@ function PaymentCallbackContent() {
           if (hubStatus.paymentId || paymentId) params.set('paymentId', hubStatus.paymentId || paymentId || '');
           router.push(`/checkout/success?${params.toString()}`);
         }, 2000);
-      } else if (statusUpper === 'DECLINED' || statusUpper === 'REJECTED' || statusUpper === 'FAILED' || statusUpper === 'CANCELLED' || statusUpper === 'EXPIRED') {
+      } else if (isFailed) {
         setStatus('failed');
         setMessage(hubStatus.message || dictionary.checkout?.processing?.failed || 'Payment failed');
 
@@ -117,7 +125,7 @@ function PaymentCallbackContent() {
           router.push(`/checkout/failed?${params.toString()}`);
         }, 2000);
       } else {
-        // Still processing
+        // Still processing or unknown status
         setStatus('pending');
         setMessage(hubStatus.message || dictionary.checkout?.processing?.description || 'Processing your payment...');
       }

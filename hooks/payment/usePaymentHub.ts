@@ -71,19 +71,6 @@ export function usePaymentHub(
 
         hubRef.current = hub;
 
-        // Set connection timeout (10 seconds)
-        const connectionTimeout = setTimeout(() => {
-          if (!hub.isConnected()) {
-            setError('Connection timeout. Using polling fallback.');
-            setIsConnected(false);
-          }
-        }, 10000);
-
-        await hub.connect();
-        clearTimeout(connectionTimeout);
-        setIsConnected(true);
-        setError(null);
-
         // Listen for payment status updates
         hub.onPaymentStatus((update) => {
           setStatus(update);
@@ -115,6 +102,19 @@ export function usePaymentHub(
             setIsConnected(true);
           },
         });
+
+        // Set connection timeout (10 seconds)
+        const connectionTimeout = setTimeout(() => {
+          if (!hub.isConnected()) {
+            setError('Connection timeout. Using polling fallback.');
+            setIsConnected(false);
+          }
+        }, 10000);
+
+        await hub.connect();
+        clearTimeout(connectionTimeout);
+        setIsConnected(true);
+        setError(null);
       } catch (err: any) {
         // Provide user-friendly error messages
         if (err?.message?.includes('timeout') || err?.message?.includes('ECONNREFUSED')) {

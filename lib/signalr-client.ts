@@ -12,49 +12,40 @@ import * as signalR from '@microsoft/signalr';
  * 4. Call disconnect() when done
  */
 export class PaymentHubClient {
-  private connection: signalR.HubConnection | null = null;
+  private connection: signalR.HubConnection;
   private paymentId: string;
   private hubUrl: string;
+  private handlers = new Map<string, Set<any>>();
 
   constructor(paymentId: string, hubUrl?: string) {
     this.paymentId = paymentId;
     this.hubUrl = hubUrl || process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 'https://localhost:7043';
-  }
 
-  async connect(): Promise<void> {
-    if (this.connection) {
-      return;
-    }
-
-    // Get auth token if available
+    // Get auth token if available (client-side only)
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    //const domain = typeof window !== 'undefined' ? window.location.hostname : '';
     const domain = 'new.janishop.ge';
-    const connectionBuilder = new signalR.HubConnectionBuilder()
+
+    this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${this.hubUrl}/transactionHub?domain=${encodeURIComponent(domain)}`, {
         accessTokenFactory: token ? () => token : undefined,
       })
-      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000]) // Retry intervals
+      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Warning)
       .build();
+  }
 
-    this.connection = connectionBuilder;
-
-    // Register internal handlers for lifecycle events
-    this.connection.on('Joined', (data: { paymentId: string; message: string }) => {
-      console.log('Joined payment group:', data.paymentId, data.message);
-    });
-
-    this.connection.on('Error', (data: { message: string }) => {
-      console.error('Hub error:', data.message);
-    });
+  async connect(): Promise<void> {
+    if (this.connection.state === signalR.HubConnectionState.Connected) {
+      return;
+    }
 
     try {
       await this.connection.start();
+      console.log('SignalR connected, joining group:', this.paymentId);
       // Join the payment-specific group to receive updates
       await this.connection.invoke('JoinGroup', this.paymentId);
     } catch (err) {
-      this.connection = null;
+      console.error('Failed to connect to SignalR:', err);
       throw err;
     }
   }
@@ -63,9 +54,6 @@ export class PaymentHubClient {
    * Listen for successful join event
    */
   onJoined(callback: (data: { paymentId: string; message: string }) => void): void {
-    if (!this.connection) {
-      throw new Error('Connection not established. Call connect() first.');
-    }
     this.connection.on('Joined', callback);
   }
 
@@ -73,25 +61,13 @@ export class PaymentHubClient {
    * Listen for hub errors
    */
   onError(callback: (data: { message: string }) => void): void {
-    if (!this.connection) {
-      throw new Error('Connection not established. Call connect() first.');
-    }
     this.connection.on('Error', callback);
   }
 
   /**
    * Listen for payment status updates
-   * The callback receives PaymentStatusUpdate with:
-   * - status: string (e.g., "approved", "declined")
-   * - message: string (human-readable message)
-   * - paymentId: string
-   * - success: boolean
    */
   onPaymentStatus(callback: (update: PaymentStatusUpdate) => void): void {
-    if (!this.connection) {
-      throw new Error('Connection not established. Call connect() first.');
-    }
-
     this.connection.on('PaymentStatus', callback);
   }
 
@@ -103,8 +79,6 @@ export class PaymentHubClient {
     onReconnecting?: (error?: Error) => void;
     onReconnected?: (connectionId?: string) => void;
   }): void {
-    if (!this.connection) return;
-
     if (callbacks.onClose) {
       this.connection.onclose(callbacks.onClose);
     }
@@ -126,7 +100,6 @@ export class PaymentHubClient {
       }
 
       await this.connection.stop();
-      this.connection = null;
     }
   }
 

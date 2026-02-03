@@ -20,7 +20,7 @@ function PaymentSuccessContent() {
   const [purchaseTracked, setPurchaseTracked] = useState(false);
 
   /* Hook */
-  const { dictionary } = useDictionary();
+  const dictionary = useDictionary();
 
   useEffect(() => {
     const paymentId = searchParams.get('paymentId');
@@ -83,7 +83,7 @@ function PaymentSuccessContent() {
           </p>
 
           {/* Order Information */}
-          {orderInfo && (
+          {/* {orderInfo && (
             <div className="mb-6 rounded-lg bg-gray-50 p-4 text-left">
               <h2 className="font-heading mb-2 text-sm font-semibold text-gray-700">{dictionary.checkout.success.orderDetails}</h2>
               <div className="space-y-1 text-sm text-gray-600">
@@ -99,7 +99,7 @@ function PaymentSuccessContent() {
                 )}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Confirmation Email Notice */}
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">

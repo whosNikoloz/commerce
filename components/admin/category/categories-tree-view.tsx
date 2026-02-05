@@ -1,6 +1,7 @@
 "use client";
 
 import type { CategoryModel } from "@/types/category";
+import { getCategoryCoverImageUrl } from "@/types/category";
 
 import Image from "next/image";
 import { useState, useMemo } from "react";
@@ -237,7 +238,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               alt={category.name ?? "Category"}
               className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               height={48}
-              src={category.images?.[0] || "/placeholder.png"}
+              src={getCategoryCoverImageUrl(category.images) || "/placeholder.png"}
               width={48}
             />
             {!!category.images && category.images.length > 1 && (

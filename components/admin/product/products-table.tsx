@@ -70,6 +70,9 @@ import {
   getAllProducts,
   getProductsByCategory,
   updateProduct,
+  deleteImage as deleteProductImage,
+  uploadProductImages,
+  setCoverImage as setProductCoverImage,
 } from "@/app/api/services/productService";
 import {
   addStock,
@@ -167,13 +170,13 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
       });
   }, []);
 
-  const handleImagesChanged = async (productId: string, urls: string[]) => {
+  const handleImagesChanged = async (productId: string, images: import("@/types/product").ProductImageModel[]) => {
     const current = products.find((p) => p.id === productId);
 
     if (!current) return;
 
     const prev = products;
-    const patched: ProductRequestModel = { ...current, images: urls };
+    const patched: ProductRequestModel = { ...current, images: images };
 
     setProducts((prevList) => prevList.map((p) => (p.id === productId ? patched : p)));
 
@@ -487,13 +490,12 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
             <button
-              className={`${minWidth} ${textSize} text-center font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded px-1 py-0.5 transition-colors ${
-                currentStock === 0
-                  ? "text-red-600 dark:text-red-400"
-                  : currentStock <= 5
-                    ? "text-amber-600 dark:text-amber-400"
-                    : "text-slate-900 dark:text-slate-100"
-              }`}
+              className={`${minWidth} ${textSize} text-center font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded px-1 py-0.5 transition-colors ${currentStock === 0
+                ? "text-red-600 dark:text-red-400"
+                : currentStock <= 5
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-slate-900 dark:text-slate-100"
+                }`}
               disabled={isLoading}
             >
               {isLoading ? "..." : currentStock}
@@ -647,11 +649,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               onSave={handleUpdateProduct}
             />
             <ReviewImagesModal
-              existing={getProductImageUrls(product.images).map((url, idx) => ({ key: (idx + 1).toString(), url }))}
+              entityId={product.id}
+              entityType="product"
+              existing={product.images ?? []}
               maxFiles={12}
               maxSizeMB={5}
-              productId={product.id}
-              onChanged={(urls) => handleImagesChanged(product.id, urls)}
+              uploadService={uploadProductImages}
+              setCoverService={setProductCoverImage}
+              deleteService={deleteProductImage}
+              onChanged={(images) => handleImagesChanged(product.id, images as any)}
             />
           </div>
         </div>
@@ -1022,14 +1028,15 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
                                   onSave={handleUpdateProduct}
                                 />
                                 <ReviewImagesModal
-                                  existing={getProductImageUrls(product.images).map((url, idx) => ({
-                                    key: (idx + 1).toString(),
-                                    url,
-                                  }))}
+                                  entityId={product.id}
+                                  entityType="product"
+                                  existing={product.images ?? []}
                                   maxFiles={8}
                                   maxSizeMB={5}
-                                  productId={product.id}
-                                  onChanged={(urls) => handleImagesChanged(product.id, urls)}
+                                  uploadService={uploadProductImages}
+                                  setCoverService={setProductCoverImage}
+                                  deleteService={deleteProductImage}
+                                  onChanged={(images) => handleImagesChanged(product.id, images as any)}
                                 />
                                 <Button
                                   size="sm"

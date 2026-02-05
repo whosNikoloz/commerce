@@ -11,6 +11,7 @@ import { Squares2X2Icon } from "@heroicons/react/24/outline"
 import type { CategoryCarouselData, Locale } from "@/types/tenant"
 // eslint-disable-next-line import/order
 import type { CategoryModel } from "@/types/category"
+import { getCategoryCoverImageUrl } from "@/types/category"
 
 import { t } from "@/lib/i18n"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -165,9 +166,7 @@ export default function CategoryCarousel({ data, locale, categories }: CategoryC
               <div className="splide__track">
                 <ul className="splide__list">
                   {displayCategories.map((category) => {
-                    const imageUrl = category.images && category.images.length > 0
-                      ? category.images[0]
-                      : "/placeholder.png"
+                    const imageUrl = getCategoryCoverImageUrl(category.images) || "/placeholder.png"
                     const hasError = imageErrors.has(category.id)
 
                     return (

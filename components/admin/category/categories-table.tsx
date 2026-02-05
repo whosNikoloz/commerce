@@ -36,9 +36,10 @@ import {
   deleteCategory,
   getAllCategories,
 } from "@/app/api/services/categoryService";
+import { getCategoryCoverImageUrl } from "@/types/category";
 
 const AddCategoryModal = dynamic(() => import("./add-category-modal"), { ssr: false });
-const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
+const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false }) as any;
 const EditCategoryModal = dynamic(
   () => import("./edit-category-modal").then((m) => m.EditCategoryModal),
   { ssr: false },
@@ -71,13 +72,13 @@ export function CategoriesTable({ initialCategories }: Props) {
     }
   };
 
-  const handleImagesChanged = async (categoryId: string, urls: string[]) => {
+  const handleImagesChanged = async (categoryId: string, images: any) => {
     const current = categories.find((c) => c.id === categoryId);
 
     if (!current) return;
 
     const prev = categories;
-    const patched: CategoryModel = { ...current, images: urls };
+    const patched: CategoryModel = { ...current, images };
 
     setCategories((prevList) => prevList.map((c) => (c.id === categoryId ? patched : c)));
 
@@ -221,7 +222,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           alt={category.name ?? "Category"}
                           className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
                           height={64}
-                          src={category.images?.[0] || "/placeholder.png"}
+                          src={getCategoryCoverImageUrl(category.images) || "/placeholder.png"}
                           width={64}
                         />
                         {!!category.images && category.images.length > 1 && (
@@ -321,7 +322,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           }))}
                           maxFiles={8}
                           maxSizeMB={5}
-                          onChanged={(urls) => handleImagesChanged(category.id, urls)}
+                          onChanged={(urls: string[]) => handleImagesChanged(category.id, urls)}
                         />
                         {customMerchant && (
                           <Button
@@ -383,7 +384,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                     className="object-cover"
                     priority={false}
                     sizes="100vw"
-                    src={category.images?.[0] || "/placeholder.png"}
+                    src={getCategoryCoverImageUrl(category.images) || "/placeholder.png"}
                   />
                   {!!category.images && category.images.length > 1 && (
                     <span className="font-primary absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
@@ -502,7 +503,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           }))}
                           maxFiles={8}
                           maxSizeMB={5}
-                          onChanged={(urls) => handleImagesChanged(category.id, urls)}
+                          onChanged={(urls: string[]) => handleImagesChanged(category.id, urls)}
                         />
                         <Button
                           className="flex-1"

@@ -11,6 +11,7 @@ import { AutoScroll } from "@splidejs/splide-extension-auto-scroll"
 import type { BrandCarouselData, Locale } from "@/types/tenant"
 // eslint-disable-next-line import/order
 import type { BrandModel } from "@/types/brand"
+import { getBrandCoverImageUrl } from "@/types/brand"
 
 import { t } from "@/lib/i18n"
 
@@ -110,7 +111,7 @@ export default function BrandCarousel({ data, locale, brands }: BrandCarouselPro
           <div className="splide__track">
             <ul className="splide__list">
               {brands.map((brand) => {
-                const imageUrl = brand.images?.[0]
+                const imageUrl = getBrandCoverImageUrl(brand.images)
                 const hasError = brand.id ? imageErrors.has(brand.id) : false
 
                 return (

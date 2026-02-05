@@ -1,5 +1,4 @@
 import { apiFetch } from "../client/fetcher";
-
 import { BrandModel } from "@/types/brand";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL + "Brand";
@@ -15,7 +14,9 @@ export async function getBrandById(id: string): Promise<BrandModel> {
 export async function updateBrand(brand: BrandModel): Promise<string> {
   return apiFetch<string>(`${API_BASE}/update-brand`, {
     method: "PUT",
-    body: JSON.stringify(brand), requireAuth: true , failIfUnauthenticated : true 
+    body: JSON.stringify(brand),
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
 }
 
@@ -39,26 +40,26 @@ export async function createBrand(
   });
 }
 
-/**
- * Get a brand and all its descendants (children, grandchildren, etc.) recursively
- */
 export async function getBrandWithSubBrands(brandId: string): Promise<BrandModel[]> {
   return apiFetch<BrandModel[]>(`${API_BASE}/get-brand-with-subbrands?id=${brandId}`);
 }
 
-
 export async function deleteBrand(id: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-brand-by-${id}`, {
-    method: "PUT", requireAuth: true , failIfUnauthenticated : true 
+    method: "PUT",
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
 }
-
 
 export async function deleteImage(id: string, key: string): Promise<string> {
   return apiFetch<string>(`${API_BASE}/delete-image-${key}-by-brand-${id}`, {
-    method: "DELETE", requireAuth: true , failIfUnauthenticated : true 
+    method: "DELETE",
+    requireAuth: true,
+    failIfUnauthenticated: true,
   });
 }
+
 export async function uploadBrandImages(
   brandId: string,
   files: File[],
@@ -68,14 +69,11 @@ export async function uploadBrandImages(
   if (!files || files.length === 0) throw new Error("at least one file is required");
 
   const formData = new FormData();
-
   formData.append("id", brandId);
-
   files.forEach((file) => {
     formData.append("files", file, file.name);
   });
 
-  // Add coverIndex if specified
   if (coverIndex !== undefined && coverIndex >= 0) {
     formData.append("coverIndex", coverIndex.toString());
   }
@@ -88,15 +86,12 @@ export async function uploadBrandImages(
   });
 }
 
-/**
- * Set a specific image as the cover/main image for a brand
- */
 export async function setCoverImage(
   brandId: string,
-  imageKey: string
+  position: number
 ): Promise<{ message: string }> {
   return apiFetch<{ message: string }>(
-    `${API_BASE}/${brandId}/set-cover-image/${encodeURIComponent(imageKey)}`,
+    `${API_BASE}/${brandId}/set-cover-image/${position}`,
     {
       method: "PUT",
       requireAuth: true,
@@ -105,15 +100,6 @@ export async function setCoverImage(
   );
 }
 
-/**
- * Get all images for a brand with cover information
- */
-export async function getAllImagesForBrand(brandId: string): Promise<Array<{
-  id: string;
-  brandId: string;
-  imagePath: string;
-  isCover: boolean;
-  displayOrder: number;
-}>> {
+export async function getAllImagesForBrand(brandId: string): Promise<string[]> {
   return apiFetch(`${API_BASE}/get-all-images-by-brand-${brandId}`);
 }

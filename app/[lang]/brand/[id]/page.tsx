@@ -6,6 +6,7 @@ import { Locale } from "@/i18n.config";
 import { getDictionary } from "@/lib/dictionaries";
 import { i18nPageMetadataAsync } from "@/lib/seo";
 import { getBrandById } from "@/app/api/services/brandService";
+import { getBrandCoverImageUrl } from "@/types/brand";
 import BrandDetailPage from "@/components/Brands/BrandDetailPage";
 
 export const revalidate = 3600; // Revalidate every hour
@@ -26,7 +27,7 @@ export async function generateMetadata({
             description: brand.description || `Explore products from ${brand.name}`,
             lang,
             path: `/brand/${id}`,
-            images: brand.images?.[0] ? [brand.images[0]] : undefined,
+            images: getBrandCoverImageUrl(brand.images) ? [getBrandCoverImageUrl(brand.images)!] : undefined,
         });
     } catch (error) {
         return i18nPageMetadataAsync({

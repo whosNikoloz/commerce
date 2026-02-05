@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Locale } from "@/i18n.config";
-import { BrandModel } from "@/types/brand";
+import { BrandModel, getBrandCoverImageUrl } from "@/types/brand";
 import { ProductResponseModel } from "@/types/product";
 import ProductGrid from "@/components/Categories/ProductGrid";
 import { searchProductsByFilter } from "@/app/api/services/productService";
@@ -58,7 +58,7 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
         }
     }, [brand.description]);
 
-    const brandLogo = brand.images?.[0];
+    const brandLogo = getBrandCoverImageUrl(brand.images);
     const brandName = brand.name || "Unknown Brand";
 
     return (
@@ -77,7 +77,7 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                                         alt={brandName}
                                         className="w-full h-full object-contain"
                                         height={176}
-                                        src={brandLogo}
+                                        src={brandLogo || "/placeholder.png"}
                                         width={176}
                                     />
                                 ) : (
@@ -178,20 +178,24 @@ export default function BrandDetailPage({ locale, brand, dict }: BrandDetailPage
                 <div className="container mx-auto px-4 py-8">
                     <div className="max-w-6xl mx-auto">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {brand.images.slice(1, 5).map((image, index) => (
-                                <div
-                                    key={index}
-                                    className="aspect-square rounded-2xl bg-muted/30 border border-border/30 overflow-hidden group"
-                                >
-                                    <Image
-                                        alt={`${brandName} ${index + 1}`}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        height={300}
-                                        src={image}
-                                        width={300}
-                                    />
-                                </div>
-                            ))}
+                            {brand.images.filter(img => {
+                                return img !== brandLogo;
+                            }).slice(0, 4).map((image, index) => {
+                                return (
+                                    <div
+                                        key={index}
+                                        className="aspect-square rounded-2xl bg-muted/30 border border-border/30 overflow-hidden group"
+                                    >
+                                        <Image
+                                            alt={`${brandName} ${index + 1}`}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            height={300}
+                                            src={image}
+                                            width={300}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

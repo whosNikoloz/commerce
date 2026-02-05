@@ -1,6 +1,7 @@
 "use client";
 
 import type { BrandModel } from "@/types/brand";
+import { getBrandCoverImageUrl } from "@/types/brand";
 
 import Image from "next/image";
 import { useState, useMemo } from "react";
@@ -271,7 +272,7 @@ export function BrandsTreeView({ initialBrands }: Props) {
               alt={brand.name ?? "Brand"}
               className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               height={48}
-              src={brand.images?.[0] || "/placeholder.png"}
+              src={getBrandCoverImageUrl(brand.images) || "/placeholder.png"}
               width={48}
             />
             {!!brand.images && brand.images.length > 1 && (

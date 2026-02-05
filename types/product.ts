@@ -75,7 +75,7 @@ export interface ProductRequestModel {
   status: StockStatus;
   condition: Condition;
   description?: string;
-  images?: string[];
+  images?: ProductImageModel[];
   brandId: string;
   categoryId: string;
   isActive?: boolean;

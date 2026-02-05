@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Building2, MapPin, ChevronRight } from "lucide-react";
 
 import { Locale } from "@/i18n.config";
-import { BrandModel } from "@/types/brand";
+import { BrandModel, getBrandCoverImageUrl } from "@/types/brand";
 
 interface BrandCardProps {
     brand: BrandModel;
@@ -15,7 +15,7 @@ interface BrandCardProps {
 }
 
 export default function BrandCard({ brand, locale, viewMode, dict }: BrandCardProps) {
-    const brandLogo = brand.images?.[0];
+    const brandLogo = getBrandCoverImageUrl(brand.images);
     const brandName = brand.name || "Unknown Brand";
     const brandOrigin = brand.origin;
     const brandDescription = brand.description;

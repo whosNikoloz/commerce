@@ -173,7 +173,7 @@ export async function uploadProductImages(
   productId: string,
   files: File[],
   coverIndex?: number
-): Promise<string[]> {
+): Promise<ProductImageModel[]> {
   if (!productId) throw new Error("productId is required");
   if (!files || files.length === 0) throw new Error("at least one file is required");
 
@@ -190,7 +190,7 @@ export async function uploadProductImages(
     formData.append("coverIndex", coverIndex.toString());
   }
 
-  return apiFetch<string[]>(`${PRODUCT_API_BASE}/images`, {
+  return apiFetch<ProductImageModel[]>(`${PRODUCT_API_BASE}/images`, {
     method: "POST",
     body: formData,
     requireAuth: true,
@@ -212,10 +212,10 @@ export async function getAllImagesForProduct(productId: string): Promise<Product
  */
 export async function setCoverImage(
   productId: string,
-  imageKey: string
+  position: number
 ): Promise<{ message: string }> {
   return apiFetch<{ message: string }>(
-    `${PRODUCT_API_BASE}/${productId}/set-cover-image/${encodeURIComponent(imageKey)}`,
+    `${PRODUCT_API_BASE}/${productId}/set-cover-image/${position}`,
     {
       method: "PUT",
       requireAuth: true,

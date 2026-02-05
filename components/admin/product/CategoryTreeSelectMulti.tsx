@@ -1,6 +1,7 @@
 "use client";
 
 import type { CategoryModel } from "@/types/category";
+import { getCategoryCoverImageUrl } from "@/types/category";
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronRight, ChevronDown, Search } from "lucide-react";
@@ -173,11 +174,11 @@ export function CategoryTreeSelectMulti({
             type="button"
             onClick={() => handleToggleSelection(node.id)}
           >
-            {node.images?.[0] && (
+            {getCategoryCoverImageUrl(node.images) && (
               <img
                 alt={node.name || node.id}
                 className="w-5 h-5 rounded object-cover border border-slate-200 dark:border-slate-700"
-                src={node.images[0]}
+                src={getCategoryCoverImageUrl(node.images)!}
               />
             )}
             <span className={`text-sm ${isSelected ? "text-blue-700 dark:text-blue-300 font-medium" : "text-slate-800 dark:text-slate-100"}`}>
@@ -237,11 +238,11 @@ export function CategoryTreeSelectMulti({
                 key={id}
                 className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800"
               >
-                {cat?.images?.[0] && (
+                {getCategoryCoverImageUrl(cat?.images) && (
                   <img
-                    alt={cat.name || id}
+                    alt={cat?.name || id}
                     className="w-4 h-4 rounded-full object-cover border border-white/50 shadow-sm"
-                    src={cat.images[0]}
+                    src={getCategoryCoverImageUrl(cat?.images)!}
                   />
                 )}
                 <span className="truncate max-w-[100px]">{cat?.name || id}</span>

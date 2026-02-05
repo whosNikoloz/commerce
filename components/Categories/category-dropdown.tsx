@@ -1,6 +1,7 @@
 "use client";
 
 import type { CategoryModel } from "@/types/category";
+import { getCategoryCoverImageUrl } from "@/types/category";
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -161,12 +162,12 @@ export default function CategoryDropdown() {
 
       <div className="flex items-center gap-2">
         <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-xl overflow-hidden bg-white dark:bg-neutral-800 border border-border/60 flex items-center justify-center">
-          {cat.images && cat.images[0] ? (
+          {getCategoryCoverImageUrl(cat.images) ? (
             <Image
               fill
               alt={cat.name || (tDrawer?.title ?? "Category")}
               className="object-cover"
-              src={cat.images[0]}
+              src={getCategoryCoverImageUrl(cat.images)!}
             />
           ) : (
             <Boxes className="w-6 h-6 text-muted-foreground/60" />
@@ -344,7 +345,7 @@ export default function CategoryDropdown() {
 
                                               <div className="flex items-center gap-1">
                                                 <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-border/50 flex items-center justify-center overflow-hidden">
-                                                  {sub.images && sub.images[0] ? (
+                                                  {getCategoryCoverImageUrl(sub.images) ? (
                                                     <Image
                                                       fill
                                                       alt={
@@ -353,7 +354,7 @@ export default function CategoryDropdown() {
                                                           "Category")
                                                       }
                                                       className="object-cover"
-                                                      src={sub.images[0]}
+                                                      src={getCategoryCoverImageUrl(sub.images)!}
                                                     />
                                                   ) : (
                                                     <Boxes className="w-4 h-4 text-muted-foreground/70" />

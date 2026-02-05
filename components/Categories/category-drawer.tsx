@@ -1,6 +1,7 @@
 "use client";
 
 import type { CategoryModel } from "@/types/category";
+import { getCategoryCoverImageUrl } from "@/types/category";
 
 import { useMemo, useRef, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -117,7 +118,7 @@ export default function CategoryDrawer() {
     const id = normalizeId(node.id);
     const kids = getChildren(id);
     const hasChildren = kids.length > 0;
-    const imageUrl = node.images && node.images.length > 0 ? node.images[0] : "/placeholder.png";
+    const imageUrl = getCategoryCoverImageUrl(node.images) || "/placeholder.png";
     const hasError = imageErrors.has(id);
 
     return (

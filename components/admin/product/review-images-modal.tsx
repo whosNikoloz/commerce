@@ -34,24 +34,32 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { deleteImage, uploadProductImages, setCoverImage } from "@/app/api/services/productService";
 import { GoBackButton } from "@/components/go-back-button";
 import { compressImages } from "@/lib/image-compression";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
-type ExistingImage = { key: string; url: string; isCover?: boolean };
-type UploadReplyItem = { key: string; url: string };
-type UploadReply = string[] | UploadReplyItem[];
+// Generic Image Model that maps common fields
+export interface BaseImageModel {
+  id: string;
+  imagePath: string;
+  isCover: boolean;
+  displayOrder: number;
+  productId?: string;
+  [key: string]: any; // Allow for productId, brandId, categoryId, etc.
+}
 
-type ReviewImagesModalProps = {
-  productId: string;
-  existing?: ExistingImage[];
+type ReviewImagesModalProps<T extends BaseImageModel> = {
+  entityId: string;
+  existing?: T[];
   maxFiles?: number;
   maxSizeMB?: number;
-  onChanged?: (urls: string[]) => void | Promise<void>;
+  onChanged?: (images: T[]) => void | Promise<void>;
   trigger?: React.ReactNode;
+  uploadService: (id: string, files: File[], coverIndex?: number) => Promise<T[]>;
+  setCoverService: (id: string, position: number) => Promise<any>;
+  deleteService: (id: string, key: string) => Promise<any>;
+  entityType?: "product" | "brand" | "category";
 };
-
 
 type UnifiedImage = {
   id: string;
@@ -100,14 +108,21 @@ function SortableItem({ id, children }: SortableItemProps) {
   );
 }
 
-export default function ReviewImagesModal({
-  productId,
+// ... (keep UnifiedImage, SortableItem)
+
+export default function ReviewImagesModal<T extends BaseImageModel>({
+  entityId,
   existing,
   maxFiles = 8,
   maxSizeMB = 0.5,
   onChanged,
   trigger,
-}: ReviewImagesModalProps) {
+  uploadService,
+  setCoverService,
+  deleteService,
+  entityType = "product",
+}: ReviewImagesModalProps<T>) {
+
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -115,7 +130,7 @@ export default function ReviewImagesModal({
   const dict = useDictionary();
   const t = dict?.admin?.products?.imagesModal;
 
-  const normalizedExisting = useMemo<ExistingImage[]>(() => {
+  const normalizedExisting = useMemo<T[]>(() => {
     if (Array.isArray(existing)) return existing;
 
     return [];
@@ -137,13 +152,13 @@ export default function ReviewImagesModal({
     if (!isOpen) return;
 
     // Initialize unifiedImages from existing
-    const existingMapped: UnifiedImage[] = normalizedExisting.map((i, idx) => ({
-      id: i.key, // Use server key as id for existing
-      url: i.url,
+    const existingMapped: UnifiedImage[] = normalizedExisting.map((i) => ({
+      id: i.id, // Use image id as id for existing
+      url: i.imagePath,
       type: "server",
       toDelete: false,
-      serverKey: i.key,
-      isCover: i.isCover ?? idx === 0, // First image is cover by default
+      serverKey: String(i.displayOrder),
+      isCover: i.isCover,
     }));
 
     setUnifiedImages(existingMapped);
@@ -299,52 +314,78 @@ export default function ReviewImagesModal({
         .sort((a, b) => b - a);
 
       for (const pos of toDelete) {
-        await deleteImage(productId, String(pos));
+        await deleteService(entityId, String(pos));
       }
 
       // 2. Upload new images (with cover index if a pending image is marked as cover)
       const pendingImages = unifiedImages.filter((i) => i.type === "pending");
       const pendingFiles = pendingImages.map((i) => i.file!);
       const pendingCoverIndex = pendingImages.findIndex((i) => i.isCover);
-
-      let uploaded: string[] = [];
+      let uploaded: T[] = [];
 
       if (pendingFiles.length) {
-        uploaded = await uploadProductImages(
-          productId,
+        uploaded = await uploadService(
+          entityId,
           pendingFiles,
           pendingCoverIndex >= 0 ? pendingCoverIndex : undefined
         );
       }
+      // 3. Set cover image by position (excluding images marked for deletion)
+      const visibleImages = unifiedImages.filter((img) => !img.toDelete);
+      const coverIndex = visibleImages.findIndex((img) => img.isCover);
 
-      // 3. If a server image is set as cover, call setCoverImage API
-      const coverImage = unifiedImages.find((img) => img.isCover && !img.toDelete);
-
-      if (coverImage?.type === "server" && coverImage.serverKey) {
+      if (coverIndex >= 0) {
         try {
-          await setCoverImage(productId, coverImage.serverKey);
+          // Pass the position index to the updated service
+          await setCoverService(entityId, coverIndex);
         } catch (err) {
           console.error("Failed to set cover image:", err);
         }
       }
 
       // 4. Construct final order
-      // Mapping uploaded back to their corresponding records is hard if we don't know the index.
-      // uploadProductImages returns urls in the same order as files.
-
       let uploadIdx = 0;
-      const finalUrls: string[] = unifiedImages
+      const idField = entityType === "product" ? "productId" : entityType === "brand" ? "brandId" : "categoryId";
+      const finalImages: T[] = unifiedImages
         .filter(img => !img.toDelete)
-        .map(img => {
+        .map((img, index) => {
           if (img.type === "pending") {
-            return uploaded[uploadIdx++];
+            const uploadedItem = uploaded[uploadIdx++];
+
+            // Backend may return a full model object or just a URL string
+            if (typeof uploadedItem === 'string') {
+              return {
+                id: crypto.randomUUID(),
+                [idField]: entityId,
+                imagePath: uploadedItem as string,
+                isCover: img.isCover ?? false,
+                displayOrder: index,
+              } as unknown as T;
+            }
+
+            // Already a proper model object — update displayOrder and isCover
+            return {
+              ...uploadedItem,
+              isCover: img.isCover ?? false,
+              displayOrder: index,
+            } as T;
           }
 
-          return img.url;
-        })
-        .filter(url => !!url); // Filter out any that failed
+          // Return the original server image model with updated displayOrder and isCover
+          const original = normalizedExisting.find(e => e.id === img.id);
 
-      await onChanged?.(finalUrls);
+          return {
+            ...original,
+            id: img.id,
+            [idField]: entityId,
+            imagePath: img.url,
+            isCover: img.isCover ?? false,
+            displayOrder: index,
+          } as T;
+        })
+        .filter(img => !!img);
+
+      await onChanged?.(finalImages);
 
       // Cleanup locally
       unifiedImages.forEach(img => {
@@ -431,7 +472,7 @@ export default function ReviewImagesModal({
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
                       <h2 className="font-heading text-2xl font-black text-slate-900 dark:text-slate-100">
-                        {t?.title || "Manage Product Images"}
+                        {t?.title || `Manage ${entityType.charAt(0).toUpperCase() + entityType.slice(1)} Images`}
                       </h2>
                       <p className="font-primary text-sm text-slate-600 dark:text-slate-400 font-medium">
                         {t?.subtitle?.replace("{maxFiles}", String(maxFiles)).replace("{maxSize}", String(maxSizeMB)) || `Upload up to ${maxFiles} images • Max ${maxSizeMB}MB each`}

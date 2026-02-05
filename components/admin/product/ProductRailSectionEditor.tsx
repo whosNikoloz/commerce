@@ -12,6 +12,8 @@ import { LocalizedTextInput } from "./LocalizedTextInput";
 import { getCoverImageUrl } from "@/types/product";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { searchProducts } from "@/app/api/services/productService";
+import { getBrandCoverImageUrl } from "@/types/brand";
+import { getCategoryCoverImageUrl } from "@/types/category";
 
 interface ProductRailSectionEditorProps {
   data: ProductRailSectionData;
@@ -396,11 +398,11 @@ export function ProductRailSectionEditor({
                       updateFilterField("brandIds", newIds.length > 0 ? newIds : undefined);
                     }}
                   />
-                  {brand.images?.[0] && (
+                  {getBrandCoverImageUrl(brand.images) && (
                     <img
                       alt={brand.name || brand.id}
                       className="w-4 h-4 rounded object-cover border border-slate-200 dark:border-slate-700"
-                      src={brand.images[0]}
+                      src={getBrandCoverImageUrl(brand.images)!}
                     />
                   )}
                   <span className="truncate">
@@ -421,11 +423,11 @@ export function ProductRailSectionEditor({
                       key={id}
                       className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800 font-medium"
                     >
-                      {brand?.images?.[0] && (
+                      {brand && getBrandCoverImageUrl(brand.images) && (
                         <img
-                          alt={brand?.name || id}
+                          alt={brand.name || id}
                           className="w-4 h-4 rounded-full object-cover border border-white/50 shadow-sm"
-                          src={brand.images[0]}
+                          src={getBrandCoverImageUrl(brand.images)!}
                         />
                       )}
                       <span className="truncate max-w-[100px]">{brand?.name || id}</span>

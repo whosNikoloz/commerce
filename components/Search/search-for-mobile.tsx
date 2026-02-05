@@ -23,6 +23,8 @@ import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useGA4 } from "@/hooks/useGA4";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
+import { getCategoryCoverImageUrl } from "@/types/category";
+
 type CategoryWithSubs = CategoryModel & { subcategories?: CategoryModel[] };
 
 interface SearchForMobileProps {
@@ -380,7 +382,7 @@ export default function SearchForMobile({
                                       alt={category.name ?? "Category"}
                                       className="object-cover rounded-md"
                                       sizes="64px"
-                                      src={category.images[0]}
+                                      src={getCategoryCoverImageUrl(category.images) || "/placeholder.png"}
                                     />
                                   ) : (
                                     <div className="h-full w-full rounded-md flex items-center justify-center bg-gray-100 text-gray-400">

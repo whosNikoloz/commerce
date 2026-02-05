@@ -39,8 +39,9 @@ import {
   deleteBrand,
 } from "@/app/api/services/brandService";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { getBrandCoverImageUrl } from "@/types/brand";
 
-const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false });
+const ReviewImagesModal = dynamic(() => import("./review-images-modal"), { ssr: false }) as any;
 
 interface Props {
   Brands: BrandModel[];
@@ -148,13 +149,13 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
     };
   }, [initialBrands]);
 
-  const handleImagesChanged = async (brandId: string, urls: string[]) => {
+  const handleImagesChanged = async (brandId: string, images: any) => {
     const current = brands.find((p) => p.id === brandId);
 
     if (!current) return;
 
     const prev = brands;
-    const patched: BrandModel = { ...current, images: urls };
+    const patched: BrandModel = { ...current, images };
 
     setBrands((prevList) => prevList.map((p) => (p.id === brandId ? patched : p)));
 
@@ -439,7 +440,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                                 alt={brand.name ?? "Brand"}
                                 className="rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-800"
                                 height={64}
-                                src={brand.images?.[0] || "/placeholder.png"}
+                                src={getBrandCoverImageUrl(brand.images) || "/placeholder.png"}
                                 width={64}
                               />
                               {!!brand.images && brand.images.length > 1 && (
@@ -469,7 +470,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                                 }))}
                                 maxFiles={8}
                                 maxSizeMB={5}
-                                onChanged={(urls) => handleImagesChanged(brand.id, urls)}
+                                onChanged={(urls: string[]) => handleImagesChanged(brand.id, urls)}
                               />
                               <Button
                                 className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
@@ -541,7 +542,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                               className="object-cover"
                               priority={false}
                               sizes="100vw"
-                              src={brand.images?.[0] || "/placeholder.png"}
+                              src={getBrandCoverImageUrl(brand.images) || "/placeholder.png"}
                             />
                             {!!brand.images && brand.images.length > 1 && (
                               <span className="font-primary absolute top-2 right-2 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full">
@@ -634,7 +635,7 @@ export function BrandsTable({ Brands: initialBrands }: Props) {
                               }))}
                               maxFiles={8}
                               maxSizeMB={5}
-                              onChanged={(urls) => handleImagesChanged(brand.id, urls)}
+                              onChanged={(urls: string[]) => handleImagesChanged(brand.id, urls)}
                             />
                             <Button
                               className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300 gap-2"

@@ -35,12 +35,12 @@ export interface OrderSummary {
 }
 
 export interface UserModel {
-    id : string;
-    firstName : string;
-    lastName : string;
-    userName : string;
-    phoneNumber : string;
-    email : string;
+    id: string;
+    firstName: string;
+    lastName: string;
+    userName: string;
+    phoneNumber: string;
+    email: string;
 }
 
 export interface OrderDetail extends OrderSummary {
@@ -49,7 +49,7 @@ export interface OrderDetail extends OrderSummary {
     trackingNumber?: string | null;
     estimatedDelivery?: string | null;
     trackingSteps: TrackingStep[];
-    user : UserModel;
+    user: UserModel;
     currency: string;
     // Payment fields from order creation response (per guide)
     paymentId?: string | null;
@@ -82,4 +82,20 @@ export interface UpdateOrderStatusModel {
     description?: string;
     trackingNumber?: string;
     estimatedDelivery?: string;
+}
+
+// Real-time order event from SSE stream
+export interface OrderEvent {
+    eventId: string;
+    orderId: string;
+    orderNumber: string;
+    eventType: 'Created' | 'StatusChanged' | 'Cancelled' | 'Paid' | 'PaymentCallback';
+    previousStatus: OrderStatus;
+    currentStatus: OrderStatus;
+    total: number;
+    customerName: string | null;
+    trackingNumber: string | null;
+    description: string | null;
+    changedBy: string;
+    timestamp: string;
 }

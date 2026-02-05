@@ -57,35 +57,35 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
     }
   }
 
-  // if (!headers.has("X-Client-Domain")) {
-  //   if (isServer) {
-  //     try {
-  //       const { headers: nextHeaders } = await import("next/headers");
-  //       const h = await nextHeaders();
-
-  //       headers.set("X-Client-Domain", "new.janishop.ge");
-  //     } catch {
-  //       headers.set("X-Client-Domain", "new.janishop.ge");
-  //     }
-  //   } else {
-  //     headers.set("X-Client-Domain", "new.janishop.ge");
-  //   }
-  // }
   if (!headers.has("X-Client-Domain")) {
     if (isServer) {
       try {
         const { headers: nextHeaders } = await import("next/headers");
         const h = await nextHeaders();
-        const host = h.get("x-forwarded-host") ?? h.get("host");
 
-        headers.set("X-Client-Domain", host ?? "unknown");
+        headers.set("X-Client-Domain", "new.janishop.ge");
       } catch {
-        headers.set("X-Client-Domain", "unknown");
+        headers.set("X-Client-Domain", "new.janishop.ge");
       }
     } else {
-      headers.set("X-Client-Domain", window.location.hostname);
+      headers.set("X-Client-Domain", "new.janishop.ge");
     }
   }
+  // if (!headers.has("X-Client-Domain")) {
+  //   if (isServer) {
+  //     try {
+  //       const { headers: nextHeaders } = await import("next/headers");
+  //       const h = await nextHeaders();
+  //       const host = h.get("x-forwarded-host") ?? h.get("host");
+
+  //       headers.set("X-Client-Domain", host ?? "unknown");
+  //     } catch {
+  //       headers.set("X-Client-Domain", "unknown");
+  //     }
+  //   } else {
+  //     headers.set("X-Client-Domain", window.location.hostname);
+  //   }
+  // }
 
 
   const fetchOptions: RequestInit = {

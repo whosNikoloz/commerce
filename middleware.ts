@@ -107,7 +107,6 @@ export function middleware(request: NextRequest) {
           .join("")
       );
       const payload = JSON.parse(jsonPayload);
-      console.log('Token Payload:', payload);
 
       // Check for role in various possible claim keys
       const roleValue = payload.role ||

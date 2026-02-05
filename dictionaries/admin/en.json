@@ -622,6 +622,43 @@
         "orderCancelled": "{id} order has been cancelled",
         "orderCancelFailed": "Failed to cancel order",
         "cancelReasonPrompt": "Cancellation reason?"
+      },
+      "realtime": {
+        "title": "Real-Time Orders",
+        "subtitle": "Live order updates via Server-Sent Events",
+        "tabs": {
+          "all": "All Orders",
+          "realtime": "Real-Time"
+        },
+        "connection": {
+          "live": "Live",
+          "disconnected": "Disconnected",
+          "connecting": "Connecting...",
+          "error": "Connection Error"
+        },
+        "filters": {
+          "all": "All Events",
+          "created": "Created",
+          "statusChanged": "Status Changed",
+          "cancelled": "Cancelled",
+          "paid": "Paid",
+          "paymentCallback": "Payment Callback"
+        },
+        "eventTypes": {
+          "Created": "New Order",
+          "StatusChanged": "Status Update",
+          "Cancelled": "Cancelled",
+          "Paid": "Payment Linked",
+          "PaymentCallback": "Payment Gateway"
+        },
+        "empty": {
+          "title": "No Events Yet",
+          "description": "Waiting for order updates..."
+        },
+        "error": {
+          "title": "Connection Failed",
+          "description": "Unable to connect to order stream. Please check your connection and try again."
+        }
       }
     },
     "faqs": {

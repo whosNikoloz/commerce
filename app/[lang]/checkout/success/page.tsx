@@ -118,7 +118,7 @@ function PaymentSuccessContent() {
             </Link>
             <Link
               className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-              href="/orders"
+              href="/user"
             >
               {dictionary.checkout.success.viewOrders}
             </Link>

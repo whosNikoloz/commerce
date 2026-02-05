@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
 import { toast } from "sonner";
@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import OrderDetailsModal from "./view-order-dialog";
 
 import { useDictionary } from "@/app/context/dictionary-provider";
-import { OrderDetail, OrderSummary, OrderStatus, PagedResult, UpdateOrderStatusModel } from "@/types/orderTypes";
+import { OrderDetail, OrderSummary, OrderStatus, OrderEvent, PagedResult, UpdateOrderStatusModel } from "@/types/orderTypes";
+import { useOrderStream, type ConnectionStatus } from "@/hooks/use-order-stream";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,38 @@ function statusLabel(s: OrderStatus, dict: any): string {
 }
 
 
+function ConnectionIndicator({ status }: { status: ConnectionStatus }) {
+  const dict = useDictionary();
+  const t = dict.admin.orders.realtime.connection;
+
+  const config = {
+    connected: { color: 'bg-green-500', text: t.live },
+    connecting: { color: 'bg-yellow-500', text: t.connecting },
+    disconnected: { color: 'bg-gray-400', text: t.disconnected },
+    error: { color: 'bg-red-500', text: t.error },
+  };
+
+  const { color, text } = config[status];
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`h-2.5 w-2.5 rounded-full ${color} ${status === 'connected' ? 'animate-pulse' : ''}`} />
+      <span className="text-sm font-medium">{text}</span>
+    </div>
+  );
+}
+
+/** Convert an SSE OrderEvent into an OrderSummary for the table */
+function eventToSummary(event: OrderEvent): OrderSummary {
+  return {
+    id: event.orderId,
+    date: event.timestamp,
+    status: event.currentStatus,
+    items: 0, // not available from SSE — refreshed on next page load
+    total: event.total,
+  };
+}
+
 interface OrdersTableProps {
   lang?: string;
 }
@@ -97,6 +130,71 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
   const [activeTab, setActiveTab] = useState<"details" | "items" | "shipping">("details");
 
   const [updating, setUpdating] = useState(false);
+
+  // SSE real-time connection
+  const [adminToken, setAdminToken] = useState<string>("");
+  const [domain, setDomain] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setDomain("new.janishop.ge");
+
+      fetch('/api/auth/token')
+        .then(res => res.json())
+        .then(data => {
+          if (data.token) {
+            setAdminToken(data.token);
+          }
+        })
+        .catch(err => console.error('OrdersTable: Failed to fetch token', err));
+    }
+  }, []);
+
+  const { events: sseEvents, connected: sseStatus } = useOrderStream({
+    token: adminToken,
+    domain,
+    maxEvents: 100,
+    autoConnect: true,
+  });
+
+  // Process incoming SSE events into the orders table
+  const lastProcessedRef = useRef(0);
+
+  useEffect(() => {
+    if (sseEvents.length === 0) return;
+
+    const newCount = sseEvents.length;
+
+    if (newCount <= lastProcessedRef.current) return;
+
+    // Events are newest-first; process only the new ones
+    const unprocessed = sseEvents.slice(0, newCount - lastProcessedRef.current);
+
+    lastProcessedRef.current = newCount;
+
+    setData(prev => {
+      let updated = [...prev.data];
+      let totalDelta = 0;
+
+      for (const event of unprocessed) {
+        const existingIdx = updated.findIndex(o => o.id === event.orderId);
+
+        if (event.eventType === 'Created' && existingIdx === -1) {
+          // New order — prepend to table
+          updated = [eventToSummary(event), ...updated];
+          totalDelta++;
+        } else if (existingIdx !== -1) {
+          // Update existing order status
+          updated[existingIdx] = {
+            ...updated[existingIdx],
+            status: event.currentStatus,
+          };
+        }
+      }
+
+      return { ...prev, data: updated, total: prev.total + totalDelta };
+    });
+  }, [sseEvents]);
 
   // list fetch
   useEffect(() => {
@@ -273,9 +371,12 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
       <Card className="border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 backdrop-blur">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>{t.table.title}</CardTitle>
-              <CardDescription>{t.table.subtitle}</CardDescription>
+            <div className="flex items-center gap-4">
+              <div>
+                <CardTitle>{t.table.title}</CardTitle>
+                <CardDescription>{t.table.subtitle}</CardDescription>
+              </div>
+              <ConnectionIndicator status={sseStatus} />
             </div>
             <div className="flex items-center gap-2">
               <Input

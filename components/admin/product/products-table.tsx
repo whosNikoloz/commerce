@@ -76,7 +76,7 @@ import {
   removeStock,
   updateStock,
 } from "@/app/api/services/stockService";
-import { isCustomMerchant as checkIsCustomMerchant } from "@/app/api/services/integrationService";
+import { isCustomMerchant } from "@/app/api/services/integrationService";
 
 // ✅ Lazy-load heavy pieces
 const UpdateProductModal = dynamic(() => import("./update-product-modal"), { ssr: false });
@@ -134,7 +134,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
   const [stockLoading, setStockLoading] = useState<Record<string, boolean>>({});
 
   // Custom merchant state (not using Fina integration)
-  const [isCustomMerchant, setIsCustomMerchant] = useState(false);
+  const [customMerchant, setCustomMerchant] = useState(false);
 
   const [isPending, startTransition] = useTransition();
 
@@ -147,9 +147,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
     }
 
     // Check if this is a custom merchant (not using Fina integration)
-    checkIsCustomMerchant()
-      .then(setIsCustomMerchant)
-      .catch(() => setIsCustomMerchant(false));
+    setCustomMerchant(isCustomMerchant());
 
     // Load brands for product modals
     setBrandsLoading(true);
@@ -680,7 +678,7 @@ export function ProductsTable({ initialCategories }: ProductsTableProps) {
               <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 flex-1">
                   {/* Add Product Button - Only for CUSTOM merchants */}
-                  {isCustomMerchant && (
+                  {customMerchant && (
                     <AddProductModal
                       brands={brands}
                       categories={initialCategories}

@@ -93,6 +93,7 @@ export interface OrderEvent {
     previousStatus: OrderStatus;
     currentStatus: OrderStatus;
     total: number;
+    items: number;
     customerName: string | null;
     trackingNumber: string | null;
     description: string | null;

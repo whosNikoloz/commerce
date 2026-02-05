@@ -1,7 +1,5 @@
 import { apiFetch } from "../client/fetcher";
 
-import { Tokens } from "@/app/context/userContext";
-
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "CustomerAuth/";
 const AUTH_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Auth/";
 const TENANT_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Tenant/";
@@ -59,13 +57,13 @@ export async function loginAdmin({ email, password }: LoginRequest): Promise<Log
   });
 }
 
-export async function loginCustomer(email: string, password: string): Promise<Tokens> {
+export async function loginCustomer(email: string, password: string): Promise<TokensResponse> {
   const data = await apiFetch<any>(`${BASE}login`, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 
-  return Tokens.fromJSON(data); 
+  return normalizeTokens(data);
 }
 
 export async function registerCustomer(p: RegisterPayload): Promise<void | TokensResponse> {

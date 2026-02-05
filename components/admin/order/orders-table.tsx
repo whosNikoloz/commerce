@@ -95,7 +95,7 @@ function eventToSummary(event: OrderEvent): OrderSummary {
     id: event.orderId,
     date: event.timestamp,
     status: event.currentStatus,
-    items: 0, // not available from SSE — refreshed on next page load
+    items: event.items, // not available from SSE — refreshed on next page load
     total: event.total,
   };
 }
@@ -137,7 +137,9 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setDomain("new.janishop.ge");
+      // In a real app, the domain might be determined dynamically
+      setDomain(window.location.hostname);
+      //setDomain("new.janishop.ge");
 
       fetch('/api/auth/token')
         .then(res => res.json())

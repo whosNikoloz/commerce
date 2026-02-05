@@ -28,7 +28,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useDictionary } from "@/app/context/dictionary-provider";
-import { isCustomMerchant as checkIsCustomMerchant } from "@/app/api/services/integrationService";
+import { isCustomMerchant } from "@/app/api/services/integrationService";
 import {
   updateCategory,
   deleteCategory,
@@ -67,19 +67,13 @@ export function CategoriesTreeView({ initialCategories }: Props) {
   const t = dict.admin.categories.treeView;
   const tToast = dict.admin.categories.toast;
 
-  const [isCustomMerchant, setIsCustomMerchant] = useState(false);
+  const customMerchant = isCustomMerchant();
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryModel | null>(null);
   const [categoryToEdit, setCategoryToEdit] = useState<CategoryModel | null>(null);
-
-  useEffect(() => {
-    checkIsCustomMerchant()
-      .then(setIsCustomMerchant)
-      .catch(() => setIsCustomMerchant(false));
-  }, []);
 
   const refreshCategories = async () => {
     try {
@@ -333,7 +327,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
               maxSizeMB={5}
               onChanged={(urls) => handleImagesChanged(category.id, urls)}
             />
-            {isCustomMerchant && (
+            {customMerchant && (
               <Button
                 className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                 size="sm"
@@ -389,7 +383,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
                   <Tag className="h-4 w-4 mr-2" />
                   {t.manageImages}
                 </DropdownMenuItem>
-                {isCustomMerchant && (
+                {customMerchant && (
                   <DropdownMenuItem
                     className="text-red-600 dark:text-red-400"
                     onClick={() => {
@@ -442,7 +436,7 @@ export function CategoriesTreeView({ initialCategories }: Props) {
           {/* Top Row: Add Button + Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-2 flex-wrap">
-              {isCustomMerchant && (
+              {customMerchant && (
                 <AddCategoryModal categories={categories} onCategoryAdded={refreshCategories} />
               )}
               <Button

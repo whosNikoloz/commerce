@@ -6,6 +6,8 @@ import { Button } from "@heroui/button";
 
 import { InputLoadingBtn } from "../AuthModal/input-loading-button";
 
+import { useUser } from "@/app/context/userContext";
+
 interface LoginProps {
   loginData: {
     title: string;
@@ -18,6 +20,7 @@ interface LoginProps {
 }
 
 export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
+  const { login } = useUser();
   const loginRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loginState, setLoginState] = useState({ email: "", password: "" });
@@ -67,6 +70,10 @@ export default function LoginModal({ loginData, lng, onSuccess }: LoginProps) {
       if (!res.ok || !result.success) {
         throw new Error(result.message || "Unauthorized");
       }
+
+      // Update UserContext with the new session
+      await login();
+
       onSuccess?.();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_err: any) {

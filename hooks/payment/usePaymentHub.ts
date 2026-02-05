@@ -3,6 +3,7 @@ import type { PaymentStatusUpdate } from '@/types/payment';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 import { PaymentHubClient } from '@/lib/signalr-client';
+import { useUser } from '@/app/context/userContext';
 
 interface UsePaymentHubReturn {
   /** Latest payment status update from SignalR */
@@ -38,6 +39,7 @@ export function usePaymentHub(
   paymentId: string | null,
   enabled: boolean = true
 ): UsePaymentHubReturn {
+  const { accessToken } = useUser();
   const [status, setStatus] = useState<PaymentStatusUpdate | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,7 @@ export function usePaymentHub(
 
     const setupHub = async () => {
       try {
-        const hub = new PaymentHubClient(paymentId);
+        const hub = new PaymentHubClient(paymentId, accessToken);
 
         hubRef.current = hub;
 
@@ -135,7 +137,7 @@ export function usePaymentHub(
       disconnect();
       connectionAttemptedRef.current = false;
     };
-  }, [paymentId, enabled, disconnect]);
+  }, [paymentId, enabled, disconnect, accessToken]);
 
   return {
     status,

@@ -17,13 +17,15 @@ export class PaymentHubClient {
   private hubUrl: string;
   private handlers = new Map<string, Set<any>>();
 
-  constructor(paymentId: string, hubUrl?: string) {
+  constructor(paymentId: string, token?: string | null, hubUrl?: string) {
     this.paymentId = paymentId;
     this.hubUrl = hubUrl || process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 'https://localhost:7043';
 
-    // Get auth token if available (client-side only)
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    const domain = 'new.janishop.ge';
+    const domain =
+      typeof window !== "undefined"
+        ? window.location.hostname
+        : "";
+    //const domain = 'new.janishop.ge';
 
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${this.hubUrl}/transactionHub?domain=${encodeURIComponent(domain)}`, {

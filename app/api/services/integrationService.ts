@@ -6,7 +6,6 @@ import { PaymentType } from "@/types/payment";
 const INTEGRATION_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "api/Integration/";
 
 const MERCHANT_TYPE_KEY = "merchantType";
-const CUSTOM_MERCHANT_KEY = "isCustomMerchant";
 
 export enum IntegrationType {
   Fina = "FINA",
@@ -128,7 +127,6 @@ export async function initializeIntegrationCache(): Promise<void> {
     const merchantType = finaStatus.isEnabled ? "FINA" : "CUSTOM";
 
     window.localStorage.setItem(MERCHANT_TYPE_KEY, merchantType);
-    window.localStorage.setItem(CUSTOM_MERCHANT_KEY, finaStatus.isEnabled ? "false" : "true");
   } catch {
     // Swallow errors; fall back to defaults in getters
   }
@@ -137,21 +135,10 @@ export async function initializeIntegrationCache(): Promise<void> {
 /**
  * Returns true when this tenant behaves as a "custom merchant"
  * (i.e. Fina integration is not enabled).
+ * Reads from the cache populated by initializeIntegrationCache().
  */
-export async function isCustomMerchant(): Promise<boolean> {
-  try {
-    const status = await getIntegrationStatus(IntegrationType.Fina);
-    const custom = !status.isEnabled;
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CUSTOM_MERCHANT_KEY, custom ? "true" : "false");
-      window.localStorage.setItem(MERCHANT_TYPE_KEY, custom ? "CUSTOM" : "FINA");
-    }
-
-    return custom;
-  } catch {
-    return true;
-  }
+export function isCustomMerchant(): boolean {
+  return getCachedMerchantType() !== "FINA";
 }
 
 /**

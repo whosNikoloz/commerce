@@ -1,7 +1,7 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { loginAdmin } from "@/app/api/services/authService";
+import { setAuthCookies } from "@/lib/auth-cookies";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -9,14 +9,7 @@ export async function POST(req: Request) {
   try {
     const token = await loginAdmin({ email, password });
 
-    (await cookies()).set("accessToken", token, {
-      httpOnly: true,
-      // Use secure cookies only in production to avoid issues on http://localhost
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 2,
-      sameSite: "lax",
-    });
+    await setAuthCookies(token);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

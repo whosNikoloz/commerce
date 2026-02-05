@@ -195,7 +195,7 @@ function PaymentCallbackContent() {
               <div className="mt-6 space-y-3">
                 <button
                   className="font-primary w-full rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
-                  onClick={() => router.push('/orders')}
+                  onClick={() => router.push('/user')}
                 >
                   {dictionary.checkout?.processing?.checkOrders || 'Check My Orders'}
                 </button>

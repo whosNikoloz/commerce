@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@heroui/button";
 
 import { type OAuthProvider } from "@/lib/oauth";
-import { useUser, Tokens } from "@/app/context/userContext";
+import { useUser } from "@/app/context/userContext";
 
 interface OAuthButtonsProps {
   onSuccess?: () => void;
@@ -72,15 +72,15 @@ export function OAuthButtons({ onSuccess, variant = "bordered", className }: OAu
       }
 
       // Listen for messages from the popup
-      const messageHandler = (event: MessageEvent) => {
+      const messageHandler = async (event: MessageEvent) => {
         // Verify origin
         if (event.origin !== window.location.origin) return;
 
-        const { type, provider: msgProvider, tokens, error } = event.data;
+        const { type, provider: msgProvider, error } = event.data;
 
         if (type === "oauth-success" && msgProvider === provider) {
-          // Successfully got tokens from backend
-          login(Tokens.fromJSON(tokens));
+          // Cookies are already set by the server — fetch session
+          await login();
           toast.success(`Successfully logged in with ${provider}`);
           window.removeEventListener("message", messageHandler);
           setLoading(null);

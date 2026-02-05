@@ -8,7 +8,7 @@ import { InputLoadingBtn } from "./input-loading-button";
 
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { useUser } from "@/app/context/userContext";
-import { loginCustomer, validateUser } from "@/app/api/services/authService";
+import { validateUser } from "@/app/api/services/authService";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface LoginProps {
@@ -63,9 +63,20 @@ export default function LoginModal({
 
     setIsLoading(true);
     try {
-      const tokens = await loginCustomer(loginState.email, loginState.password);
+      const res = await fetch("/api/auth/customer-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginState.email, password: loginState.password }),
+        credentials: "same-origin",
+      });
 
-      login(tokens);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+
+        throw new Error(data.message || dictionary.auth.login.loginFailed);
+      }
+
+      await login();
 
       if (onLoginSuccess) onLoginSuccess();
     } catch (e: any) {

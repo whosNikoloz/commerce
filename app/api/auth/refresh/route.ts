@@ -1,23 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 import { refreshTokens } from "@/app/api/services/authService";
+import { getRefreshTokenFromCookie, setAuthCookies } from "@/lib/auth-cookies";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const body = await request.json();
-    const { refreshToken } = body;
+    const refreshToken = await getRefreshTokenFromCookie();
 
     if (!refreshToken) {
       return NextResponse.json(
         { error: "Refresh token is required" },
-        { status: 400 }
+        { status: 401 }
       );
     }
 
-    // Call the backend to refresh the tokens
     const tokens = await refreshTokens(refreshToken);
 
-    return NextResponse.json(tokens);
+    await setAuthCookies(tokens.accessToken, tokens.refreshToken);
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     // eslint-disable-next-line no-console
     console.error("Token refresh error:", error);

@@ -1,7 +1,5 @@
 import type { ApiEnvelope } from "./authService";
 
-import { jwtDecode } from "jwt-decode";
-
 import { apiFetch } from "../client/fetcher";
 
 import { OrderDetail, OrderSummary, PagedResult, TrackingStep, UpdateOrderStatusModel, WishlistItem, OrderStatus } from "@/types/orderTypes";
@@ -10,20 +8,19 @@ import { CreateOrderRequest, CreateOrderResponse, PaymentType } from "@/types/pa
 const ORDER_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Order/";
 const WISHLIST_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "Wishlist/";
 
-function getUserIdFromToken(): string {
-  if (typeof window === "undefined") throw new Error("Not authenticated");
+async function getUserIdFromToken(): Promise<string> {
+  const res = await fetch("/api/auth/session", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
 
-  const accessToken = localStorage.getItem("accessToken");
+  if (!res.ok) throw new Error("Not authenticated");
 
-  if (!accessToken) throw new Error("Not authenticated");
+  const { user } = await res.json();
 
-  try {
-    const decoded = jwtDecode<{ id: string }>(accessToken);
+  if (!user?.id) throw new Error("Not authenticated");
 
-    return decoded.id;
-  } catch {
-    throw new Error("Invalid token");
-  }
+  return user.id;
 }
 
 // Helper to convert OrderStatus string from C# to enum number
@@ -186,7 +183,7 @@ export async function createOrder(
 // ====================================
 
 export async function getMyOrders(page = 1, pageSize = 10): Promise<PagedResult<OrderSummary>> {
-  const userId = getUserIdFromToken();
+  const userId = await getUserIdFromToken();
   const url = `${ORDER_BASE}get-user-orders?userId=${encodeURIComponent(userId)}&page=${page}&pageSize=${pageSize}`;
 
   const res = await apiFetch<any>(url, {
@@ -197,7 +194,8 @@ export async function getMyOrders(page = 1, pageSize = 10): Promise<PagedResult<
 }
 
 export async function getOrderByIdForClient(id: string): Promise<OrderDetail> {
-  const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}?userId=${encodeURIComponent(getUserIdFromToken())}`;
+  const userId = await getUserIdFromToken();
+  const url = `${ORDER_BASE}get-order-by-${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`;
 
   const res = await apiFetch<any>(url, { method: "GET", requireAuth: false, failIfUnauthenticated: false } as any);
 
@@ -297,7 +295,7 @@ export async function cancelOrder(
 // ====================================
 
 export async function getWishlist(): Promise<WishlistItem[]> {
-  const userId = getUserIdFromToken();
+  const userId = await getUserIdFromToken();
   const url = `${WISHLIST_BASE}get-wishlist?userId=${encodeURIComponent(userId)}`;
 
   const res = await apiFetch<any>(url, { method: "GET" } as any);
@@ -306,21 +304,21 @@ export async function getWishlist(): Promise<WishlistItem[]> {
 }
 
 export async function addToWishlist(productId: string): Promise<void> {
-  const userId = getUserIdFromToken();
+  const userId = await getUserIdFromToken();
   const url = `${WISHLIST_BASE}add-to-wishlist-${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}`;
 
   await apiFetch<{ message: string }>(url, { method: "POST" } as any);
 }
 
 export async function removeFromWishlist(productId: string): Promise<void> {
-  const userId = getUserIdFromToken();
+  const userId = await getUserIdFromToken();
   const url = `${WISHLIST_BASE}remove-from-wishlist-${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}`;
 
   await apiFetch<{ message: string }>(url, { method: "DELETE" } as any);
 }
 
 export async function isInWishlist(productId: string): Promise<boolean> {
-  const userId = getUserIdFromToken();
+  const userId = await getUserIdFromToken();
   const url = `${WISHLIST_BASE}is-in-wishlist-${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}`;
 
   const res = await apiFetch<{ inWishlist: boolean }>(url, { method: "GET" } as any);
@@ -329,7 +327,7 @@ export async function isInWishlist(productId: string): Promise<boolean> {
 }
 
 export async function clearWishlist(): Promise<void> {
-  const userId = getUserIdFromToken();
+  const userId = await getUserIdFromToken();
   const url = `${WISHLIST_BASE}clear-wishlist?userId=${encodeURIComponent(userId)}`;
 
   await apiFetch<{ message: string }>(url, { method: "DELETE" } as any);

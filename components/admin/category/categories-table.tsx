@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { isCustomMerchant as checkIsCustomMerchant } from "@/app/api/services/integrationService";
+import { isCustomMerchant } from "@/app/api/services/integrationService";
 import {
   Table,
   TableBody,
@@ -49,7 +49,7 @@ interface Props {
 }
 
 export function CategoriesTable({ initialCategories }: Props) {
-  const [isCustomMerchant, setIsCustomMerchant] = useState(false);
+  const customMerchant = isCustomMerchant();
   const [categories, setCategories] = useState<CategoryModel[]>(initialCategories ?? []);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -59,12 +59,6 @@ export function CategoriesTable({ initialCategories }: Props) {
   useEffect(() => {
     setCategories(initialCategories ?? []);
   }, [initialCategories]);
-
-  useEffect(() => {
-    checkIsCustomMerchant()
-      .then(setIsCustomMerchant)
-      .catch(() => setIsCustomMerchant(false));
-  }, []);
 
   const refreshCategories = async () => {
     try {
@@ -157,7 +151,7 @@ export function CategoriesTable({ initialCategories }: Props) {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none rounded-lg" />
       <CardHeader className="relative">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          {isCustomMerchant && (
+          {customMerchant && (
             <AddCategoryModal categories={categories} onCategoryAdded={refreshCategories} />
           )}
 
@@ -329,7 +323,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                           maxSizeMB={5}
                           onChanged={(urls) => handleImagesChanged(category.id, urls)}
                         />
-                        {isCustomMerchant && (
+                        {customMerchant && (
                           <Button
                             size="sm"
                             variant="destructive"
@@ -498,7 +492,7 @@ export function CategoriesTable({ initialCategories }: Props) {
                       <Edit className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
-                    {isCustomMerchant && (
+                    {customMerchant && (
                       <>
                         <ReviewImagesModal
                           categoryId={category.id}

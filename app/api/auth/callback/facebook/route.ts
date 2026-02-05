@@ -69,7 +69,7 @@ export async function GET(_request: NextRequest) {
           return;
         }
 
-        // Send token to your backend to exchange for your app's tokens
+        // Send token to backend — cookies are set server-side
         const response = await fetch('/api/auth/oauth-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -83,19 +83,15 @@ export async function GET(_request: NextRequest) {
           throw new Error('Failed to authenticate with backend');
         }
 
-        const data = await response.json();
- 
-        // Send success message to parent window
+        // Cookies are now set. Notify parent (no tokens in message).
         if (window.opener && !window.opener.closed) {
           window.opener.postMessage({
             type: 'oauth-success',
-            provider: 'facebook',
-            tokens: data
+            provider: 'facebook'
           }, '*');
           setTimeout(() => window.close(), 100);
         } else {
           console.warn("window.opener is null or closed. Redirecting to home.");
-          // If not in popup, redirect to home with tokens in session
           window.location.href = '/';
         }
       } catch (err) {

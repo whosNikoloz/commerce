@@ -1,9 +1,10 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+
+import { clearAuthCookies } from "@/lib/auth-cookies";
 
 export async function GET() {
   try {
-    (await cookies()).delete("accessToken");
+    await clearAuthCookies();
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

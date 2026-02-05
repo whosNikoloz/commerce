@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { googleLogin, facebookLogin } from "@/app/api/services/authService";
+import { setAuthCookies } from "@/lib/auth-cookies";
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +42,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(tokens);
+    await setAuthCookies(tokens.accessToken, tokens.refreshToken);
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     // eslint-disable-next-line no-console
     console.error("OAuth login error:", error);

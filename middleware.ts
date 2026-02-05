@@ -90,9 +90,12 @@ export function middleware(request: NextRequest) {
     if (!accessToken) {
       if (isAdminSubRoute) {
         const url = new URL(`/${locInPath}/admin`, request.url);
+
         url.searchParams.set("next", `${pathname}${search || ""}`);
+
         return NextResponse.redirect(url);
       }
+
       return NextResponse.next();
     }
 

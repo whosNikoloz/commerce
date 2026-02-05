@@ -54,10 +54,26 @@ export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
     setUser(u);
     setAccessToken(token);
+
+     // Mark that this browser had an authenticated session
+     if (typeof window !== "undefined" && u) {
+       window.localStorage.setItem("hasAuthSession", "1");
+     }
   };
 
   const refresh = async () => {
     try {
+      // If this browser never had an authenticated session, skip refresh entirely
+      if (typeof window !== "undefined") {
+        const hadSession = window.localStorage.getItem("hasAuthSession") === "1";
+
+        if (!hadSession) {
+          setIsInitializing(false);
+
+          return;
+        }
+      }
+
       // First try to get the existing session (cookie may still be valid)
       const { user: u, token } = await fetchSession();
 
@@ -96,6 +112,10 @@ export const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
   const logout = async () => {
     setUser(null);
     setAccessToken(null);
+
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("hasAuthSession");
+    }
 
     try {
       await fetch("/api/auth/logout", { credentials: "same-origin" });

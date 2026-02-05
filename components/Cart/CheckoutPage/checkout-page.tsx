@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const [paymentType, setPaymentType] = useState<PaymentType>(PaymentType.BOG);
   const [availablePaymentTypes, setAvailablePaymentTypes] = useState<PaymentType[] | null>(null);
   const [paymentTypesLoaded, setPaymentTypesLoaded] = useState(false);
+  const [noPaymentMethods, setNoPaymentMethods] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,13 +56,15 @@ export default function CheckoutPage() {
             setPaymentType(types[0]);
           }
         } else {
-          // Fallback to default providers if no integrations returned
-          setAvailablePaymentTypes([PaymentType.BOG, PaymentType.Flitt]);
+          // No payment providers enabled for this tenant
+          setAvailablePaymentTypes([]);
+          setNoPaymentMethods(true);
         }
       } catch {
         if (cancelled) return;
-        // On error fall back to default providers
-        setAvailablePaymentTypes([PaymentType.BOG, PaymentType.Flitt]);
+        // On error, treat as no payment methods to avoid misleading options
+        setAvailablePaymentTypes([]);
+        setNoPaymentMethods(true);
       }
 
       if (!cancelled) {
@@ -154,6 +157,15 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     if (!user?.id) {
       setError(dictionary.checkout?.errors?.userNotLoggedIn || "Please log in to continue");
+
+      return;
+    }
+
+    if (noPaymentMethods) {
+      setError(
+        dictionary.checkout?.noPaymentMethodsEnabled
+        || "No payment methods are currently available. Please contact the store or try again later.",
+      );
 
       return;
     }
@@ -286,13 +298,13 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <CheckoutForm
-            availableTypes={paymentTypesLoaded ? (availablePaymentTypes ?? [PaymentType.BOG, PaymentType.Flitt]) : []}
+            availableTypes={paymentTypesLoaded ? (availablePaymentTypes ?? []) : []}
             loading={!paymentTypesLoaded}
             value={paymentType}
             onChange={setPaymentType}
           />
           <OrderSummary
-            isProcessing={isProcessing}
+            isProcessing={isProcessing || noPaymentMethods}
             submitButtonLabel={
               isProcessing
                 ? (dictionary.checkout?.redirecting || 'Redirecting...')

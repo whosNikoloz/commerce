@@ -25,6 +25,7 @@ export default function CartPage() {
 
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(false);
+  const [stockEnabled, setStockEnabled] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -44,6 +45,8 @@ export default function CartPage() {
       // Only check availability for FINA merchants
       const merchantType = getCachedMerchantType();
 
+      setStockEnabled(merchantType === "FINA");
+
       if (merchantType !== "FINA") {
         setAvailability({});
         setLoading(false);
@@ -53,6 +56,7 @@ export default function CartPage() {
 
       if (productIds.length === 0) {
         setAvailability({});
+        setLoading(false);
 
         return;
       }
@@ -74,6 +78,11 @@ export default function CartPage() {
           clearTimeout(timeout);
 
           const map: AvailabilityMap = {};
+
+          // Default all requested products to 0 so UI doesn't stay in "checking" state
+          for (const id of productIds) {
+            map[String(id)] = 0;
+          }
 
           if (!res.ex && Array.isArray(res.summedRests)) {
             for (const r of res.summedRests) map[String(r.id)] = Number(r.totalRest ?? 0);
@@ -195,7 +204,7 @@ export default function CartPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20">
         <CartHeader itemCount={cartLen} />
 
-        {loading && (
+        {stockEnabled && loading && (
           <div className="mb-4 text-sm text-text-subtle dark:text-text-subtledark">
             {dictionary.cart.checkingStock}
           </div>
@@ -203,7 +212,7 @@ export default function CartPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <CartItems availability={availability} loading={loading} />
+            <CartItems availability={availability} loading={loading} stockEnabled={stockEnabled} />
           </div>
           <div className="lg:sticky lg:top-6 h-fit">
             <CartSummary autoShowLoginPrompt={showLoginPrompt} />

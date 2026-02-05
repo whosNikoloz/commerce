@@ -1,7 +1,7 @@
 'use client'
 import type { CommercialBannerData, Locale } from "@/types/tenant";
 
-import { useState, useEffect, useRef, useMemo, memo } from "react";
+import { useRef, useMemo, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Splide, SplideSlide, Splide as SplideCore } from "@splidejs/react-splide";
@@ -55,9 +55,9 @@ const BannerItem = memo(function BannerItem({
       >
         <Image
           fill
-          priority={index === 0}
           alt={t(banner.alt, locale)}
           className="object-cover w-full h-full transition-transform duration-700"
+          priority={index === 0}
           sizes="1200px"
           src={desktopImageUrl}
           onError={() => console.error('Image load error')}
@@ -72,9 +72,9 @@ const BannerItem = memo(function BannerItem({
         >
           <Image
             fill
-            priority={index === 0}
             alt={t(banner.alt, locale)}
             className="object-cover w-full h-full transition-transform duration-700"
+            priority={index === 0}
             sizes="(max-width: 1024px) 100vw"
             src={laptopImageUrl}
             onError={() => console.error('Image load error')}
@@ -89,9 +89,9 @@ const BannerItem = memo(function BannerItem({
       >
         <Image
           fill
-          priority={index === 0}
           alt={t(banner.alt, locale)}
           className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+          priority={index === 0}
           sizes="100vw"
           src={mobileImageUrl}
           onError={() => console.error('Image load error')}

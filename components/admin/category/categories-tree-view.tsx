@@ -3,7 +3,7 @@
 import type { CategoryModel } from "@/types/category";
 
 import Image from "next/image";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   ChevronRight,
   ChevronDown,

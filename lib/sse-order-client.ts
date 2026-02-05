@@ -32,6 +32,7 @@ export class SSEOrderClient {
     connect(): void {
         if (this.eventSource) {
             console.warn('SSE connection already exists');
+
             return;
         }
 
@@ -45,6 +46,7 @@ export class SSEOrderClient {
             this.eventSource.addEventListener('order-event', (event: MessageEvent) => {
                 try {
                     const data: OrderEvent = JSON.parse(event.data);
+
                     this.eventHandlers.forEach(handler => handler(data));
                 } catch (err) {
                     console.error('Failed to parse order event:', err);

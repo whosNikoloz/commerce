@@ -28,13 +28,17 @@ function formatSpecs(facets?: Record<string, string>) {
   return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
 }
 
-export default function CartItems({
-  availability = {} as AvailabilityMap,
-  loading = false
-}: {
+interface CartItemsProps {
   availability?: AvailabilityMap;
   loading?: boolean;
-}) {
+  stockEnabled?: boolean;
+}
+
+export default function CartItems({
+  availability = {} as AvailabilityMap,
+  loading = false,
+  stockEnabled = false,
+}: CartItemsProps) {
   const dictionary = useDictionary();
   const cart = useCartStore((s) => s.cart);
   const updateCartItem = useCartStore((s) => s.updateCartItem);
@@ -67,8 +71,8 @@ export default function CartItems({
         const specsLine = formatSpecs(item.selectedFacets);
 
         const available = Number(availability[String(item.id)] ?? 0);
-        const isCheckingStock = loading || !(String(item.id) in availability);
-        const outOfStock = !isCheckingStock && available <= 0;
+        const isCheckingStock = stockEnabled && (loading || !(String(item.id) in availability));
+        const outOfStock = stockEnabled && !isCheckingStock && available <= 0;
 
         return (
           <Card
@@ -114,27 +118,29 @@ export default function CartItems({
                   )}
 
                   {/* stock info */}
-                  <div className="mt-2 flex items-center gap-2">
-                    {isCheckingStock ? (
-                      <Badge className="text-[11px] px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 animate-pulse">
-                        {dictionary.cart.checkingStock}
-                      </Badge>
-                    ) : outOfStock ? (
-                      <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
-                        {dictionary.cart.outOfStock}
-                      </Badge>
-                    ) : (
-                      <Badge className="text-[11px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                        {dictionary.cart.stock.replace("{count}", String(available))}
-                      </Badge>
-                    )}
-                    {!isCheckingStock && quantity > available && available > 0 && (
-                      <span className="font-primary flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
-                        <AlertTriangle className="h-3.5 w-3.5" />
-                        {dictionary.cart.stockLimitExceeded.replace("{count}", String(available))}
-                      </span>
-                    )}
-                  </div>
+                  {stockEnabled && (
+                    <div className="mt-2 flex items-center gap-2">
+                      {isCheckingStock ? (
+                        <Badge className="text-[11px] px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 animate-pulse">
+                          {dictionary.cart.checkingStock}
+                        </Badge>
+                      ) : outOfStock ? (
+                        <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
+                          {dictionary.cart.outOfStock}
+                        </Badge>
+                      ) : (
+                        <Badge className="text-[11px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                          {dictionary.cart.stock.replace("{count}", String(available))}
+                        </Badge>
+                      )}
+                      {!isCheckingStock && quantity > available && available > 0 && (
+                        <span className="font-primary flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          {dictionary.cart.stockLimitExceeded.replace("{count}", String(available))}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* mobile price */}
                   <div className="mt-2 md:hidden">

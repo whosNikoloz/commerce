@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useState, useRef } from "react";
 import { Input } from "@heroui/input";
@@ -9,6 +9,7 @@ import { InputLoadingBtn } from "./input-loading-button";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { registerCustomer, sendVerificationCode } from "@/app/api/services/authService";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { useAuthConfig } from "@/hooks/useAuthConfig";
 
 interface RegisterProps {
   onSwitchMode: (mode: string) => void;
@@ -44,6 +45,8 @@ export default function RegisterModal({ onSwitchMode }: RegisterProps) {
   const [regEmailHasBlurred] = useState(false);
   const [usernameAvailable] = useState<boolean | null>(null);
   const [emailAvailable] = useState<boolean | null>(null);
+  const { config: authConfig, loading: authLoading } = useAuthConfig();
+  const basicEnabled = authConfig?.basicEnabled === true;
 
   const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -227,6 +230,31 @@ export default function RegisterModal({ onSwitchMode }: RegisterProps) {
     setRegUserNameError("");
     setRegistrationState((s) => ({ ...s, username: "" }));
   };
+
+  if (authLoading && !authConfig) {
+    return (
+      <div className="space-y-4">
+        <div className="h-11 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        <div className="h-11 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        <div className="h-11 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        <div className="h-24 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        <div className="h-12 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        <div className="flex items-center justify-center my-6">
+          <div className="flex-grow h-px bg-gray-200 dark:bg-gray-800" />
+          <span className="mx-4 h-4 w-16 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse" />
+          <div className="flex-grow h-px bg-gray-200 dark:bg-gray-800" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!basicEnabled) {
+    return (
+      <div className="space-y-4">
+        <OAuthButtons onSuccess={() => onSwitchMode("login")} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

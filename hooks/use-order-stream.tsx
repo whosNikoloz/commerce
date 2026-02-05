@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
 import type { OrderEvent } from '@/types/orderTypes';
+
+import { useEffect, useState, useCallback, useRef } from 'react';
+
 import { SSEOrderClient } from '@/lib/sse-order-client';
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -52,11 +54,13 @@ export function useOrderStream({
     const connect = useCallback(() => {
         if (!token || !domain) {
             console.error('Token and domain are required to connect');
+
             return;
         }
 
         if (clientRef.current?.isConnected()) {
             console.warn('Already connected to order stream');
+
             return;
         }
 
@@ -65,12 +69,14 @@ export function useOrderStream({
             setError(null);
 
             const client = new SSEOrderClient(token, domain);
+
             clientRef.current = client;
 
             // Handle order events
             const handleOrderEvent = (event: OrderEvent) => {
                 setEvents(prev => {
                     const newEvents = [event, ...prev];
+
                     return newEvents.slice(0, maxEvents);
                 });
             };

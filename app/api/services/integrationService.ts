@@ -4,6 +4,7 @@ import { apiFetch } from "@/app/api/client/fetcher";
 import { PaymentType } from "@/types/payment";
 
 const INTEGRATION_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "") + "api/Integration/";
+const INTEGRATION_CHECK_URL = (process.env.NEXT_PUBLIC_API_URL ?? "") + "api/integration/check";
 
 const MERCHANT_TYPE_KEY = "merchantType";
 
@@ -15,6 +16,9 @@ export enum IntegrationType {
   Flitt = 13,
   TBCInstallment = 20,
   BOGInstallment = 21,
+  BasicAuth = 50,
+  GoogleOAuth = 51,
+  FacebookOAuth = 52,
 }
 
 export interface IntegrationConfigurationItem {
@@ -38,6 +42,12 @@ export interface IntegrationStatus {
 
 interface IntegrationStatusesResponse {
   integrations: IntegrationStatus[];
+}
+
+interface IntegrationCheckStatus {
+  integrationType: number;
+  isEnabled: boolean;
+  isConfigured: boolean;
 }
 
 // Map backend integrationType IDs to frontend PaymentType enum
@@ -84,8 +94,33 @@ export async function getIntegrationStatus(
   }
 
   const numericType = integrationType as unknown as number;
-  const integrations = await getIntegrationStatuses();
-  const integration = integrations.find((i) => i.integrationType === numericType) ?? null;
+
+  const res = await apiFetch<IntegrationCheckStatus[]>(
+    `${INTEGRATION_CHECK_URL}?integrationType=${numericType}`,
+    {
+      method: "GET",
+      requireAuth: true,
+      failIfUnauthenticated: true,
+      cache: "no-store",
+    } as any,
+  );
+
+  const item = res?.[0];
+
+  const integration: IntegrationStatus | null = item
+    ? {
+        id: "",
+        tenantId: "",
+        integrationType: item.integrationType,
+        integrationTypeName: "",
+        category: "",
+        isEnabled: item.isEnabled,
+        isPrimary: false,
+        autoSyncOrders: false,
+        autoSyncPayments: false,
+        configuration: [],
+      }
+    : null;
 
   return {
     isEnabled: !!integration?.isEnabled,
@@ -95,21 +130,36 @@ export async function getIntegrationStatus(
 
 /**
  * Get enabled payment-related PaymentType values for the current tenant
- * based on /api/Integration/statuses.
+ * using /api/integration/check.
  */
 export async function getEnabledPaymentTypes(): Promise<PaymentType[]> {
-  const integrations = await getIntegrationStatuses();
-
-  const enabled = integrations.filter((i) => i.isEnabled);
-
   const types = new Set<PaymentType>();
 
-  for (const integ of enabled) {
-    const mapped = integrationTypeToPaymentType[integ.integrationType];
+  const checkStatuses = await apiFetch<IntegrationCheckStatus[]>(INTEGRATION_CHECK_URL, {
+    method: "GET",
+    requireAuth: true,
+    failIfUnauthenticated: true,
+    cache: "no-store",
+  } as any);
 
-    if (mapped !== undefined) {
-      types.add(mapped);
-    }
+  const paymentIntegrationTypes: IntegrationType[] = [
+    IntegrationType.TBC,
+    IntegrationType.BOG,
+    IntegrationType.TBCSplitPay,
+    IntegrationType.Flitt,
+    IntegrationType.TBCInstallment,
+    IntegrationType.BOGInstallment,
+  ];
+
+  for (const integrationType of paymentIntegrationTypes) {
+    const numericType = integrationType as unknown as number;
+    const status = checkStatuses.find((s) => s.integrationType === numericType);
+
+    if (!status || !status.isEnabled) continue;
+
+    const mapped = integrationTypeToPaymentType[numericType];
+
+    if (mapped !== undefined) types.add(mapped);
   }
 
   return Array.from(types);

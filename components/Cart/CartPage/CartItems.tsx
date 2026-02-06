@@ -14,7 +14,7 @@ import { CartItemType } from "@/types/cart";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
 const formatPrice = (price: number) =>
-  new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
+  new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price).replace("GEL", "₾");
 
 const toNumber = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0));
 const percent = (o: number, c: number) => Math.max(0, Math.round(((o - c) / o) * 100));

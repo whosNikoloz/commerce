@@ -13,7 +13,7 @@ import { useUser } from "@/app/context/userContext";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
 const formatPrice = (price: number) =>
-  new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price);
+  new Intl.NumberFormat("ka-GE", { style: "currency", currency: "GEL" }).format(price).replace("GEL", "₾");
 
 const PROMO_CODES = {
   SAVE10: { discount: 0.1, label: "10% OFF" },

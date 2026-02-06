@@ -77,7 +77,7 @@ const ProductCard = memo(function ProductCard({
   const inStock = product.status === StockStatus.InStock;
 
   const hasDiscount =
-    typeof product.discountPrice === "number" && product.discountPrice < product.price;
+    typeof product.discountPrice === "number" && product.discountPrice > 0 && product.discountPrice < product.price;
   const displayPrice = hasDiscount ? product.discountPrice! : product.price;
   const originalPrice = hasDiscount ? product.price : undefined;
 
@@ -369,7 +369,7 @@ const ProductCard = memo(function ProductCard({
                         itemProp="offers"
                         itemType="https://schema.org/Offer"
                       >
-                        <meta content="GEL" itemProp="priceCurrency" />
+                        <meta content="₾" itemProp="priceCurrency" />
                         <meta content={displayPrice.toString()} itemProp="price" />
                         <meta content={inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
                         {formatPrice(displayPrice)}
@@ -518,13 +518,13 @@ export default function ProductGrid({ products, viewMode }: ProductGridProps) {
     const item: CartItem = {
       id: product.id,
       name: product.name ?? "Unnamed Product",
-      price: product.discountPrice ?? product.price,
+      price: (product.discountPrice && product.discountPrice > 0) ? product.discountPrice : product.price,
       image: getCoverImageUrl(product.images) ?? "/placeholder.png",
       quantity: 1,
-      discount: product.discountPrice
+      discount: (product.discountPrice && product.discountPrice > 0)
         ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
         : 0,
-      originalPrice: product.price,
+      originalPrice: (product.discountPrice && product.discountPrice > 0) ? product.price : undefined,
     };
 
     addToCart(item);

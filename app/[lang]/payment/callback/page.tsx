@@ -2,10 +2,13 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Loader2, CheckCircle2, XCircle, AlertCircle, ShoppingBag, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { usePaymentHub } from '@/hooks/payment/usePaymentHub';
 import { useDictionary } from '@/app/context/dictionary-provider';
 import { useCartStore } from '@/app/context/cartContext';
+import { Button } from '@/components/ui/button';
 
 type PaymentStatus = 'checking' | 'success' | 'failed' | 'pending' | 'timeout';
 
@@ -33,7 +36,7 @@ function PaymentCallbackContent() {
   const orderId = orderIdFromUrl || orderIdFromStorage;
 
   // Connect to SignalR for real-time updates
-  const { status: hubStatus, isConnected, error: hubError } = usePaymentHub(paymentId, true);
+  const { status: hubStatus, isConnected } = usePaymentHub(paymentId, true);
 
   const [status, setStatus] = useState<PaymentStatus>('checking');
   const [message, setMessage] = useState(dictionary.checkout?.processing?.description || 'Processing your payment...');
@@ -159,97 +162,174 @@ function PaymentCallbackContent() {
     return () => clearTimeout(timeoutId);
   }, [status, statusFromUrl, paymentId, router]);
 
+  // Render content based on status
+  const renderContent = () => {
+    switch (status) {
+      case 'checking':
+      case 'pending':
+        return (
+          <div className="flex flex-col items-center justify-center text-center p-8">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-blue-500/20 dark:bg-blue-500/10 rounded-full blur-xl animate-pulse" />
+              <div className="relative bg-white dark:bg-neutral-800 rounded-full p-4 shadow-sm border border-gray-100 dark:border-neutral-700">
+                <Loader2 className="h-10 w-10 text-blue-600 dark:text-blue-400 animate-spin" />
+              </div>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-heading">
+              {dictionary.checkout?.processing?.title || 'Processing Payment'}
+            </h2>
+
+            <p className="text-gray-500 dark:text-gray-400 max-w-xs mb-6 font-primary text-sm leading-relaxed">
+              {message}
+            </p>
+
+            {isConnected && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/20 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs font-medium text-green-700 dark:text-green-400">
+                  Connected to payment gateway
+                </span>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'success':
+        return (
+          <div className="flex flex-col items-center justify-center text-center p-8">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative mb-6"
+            >
+              <div className="absolute inset-0 bg-green-500/20 dark:bg-green-500/10 rounded-full blur-xl" />
+              <div className="relative bg-white dark:bg-neutral-800 rounded-full p-4 shadow-sm border border-gray-100 dark:border-neutral-700">
+                <CheckCircle2 className="h-10 w-10 text-green-600 dark:text-green-400" />
+              </div>
+            </motion.div>
+
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-heading">
+              {dictionary.checkout?.processing?.success || 'Payment Successful'}
+            </h2>
+
+            <p className="text-gray-500 dark:text-gray-400 max-w-xs mb-6 font-primary text-sm">
+              {message}
+            </p>
+
+            <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              {dictionary.checkout?.processing?.redirecting || 'Redirecting...'}
+            </div>
+          </div>
+        );
+
+      case 'failed':
+        return (
+          <div className="flex flex-col items-center justify-center text-center p-8">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative mb-6"
+            >
+              <div className="absolute inset-0 bg-red-500/20 dark:bg-red-500/10 rounded-full blur-xl" />
+              <div className="relative bg-white dark:bg-neutral-800 rounded-full p-4 shadow-sm border border-gray-100 dark:border-neutral-700">
+                <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
+              </div>
+            </motion.div>
+
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-heading">
+              {dictionary.checkout?.processing?.failed || 'Payment Failed'}
+            </h2>
+
+            <p className="text-gray-500 dark:text-gray-400 max-w-xs mb-8 font-primary text-sm">
+              {message}
+            </p>
+
+            <div className="grid grid-cols-1 w-full gap-3">
+              <Button
+                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100"
+                onClick={() => router.push('/checkout')}
+              >
+                {dictionary.checkout?.processing?.tryAgain || 'Try Again'}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                onClick={() => router.push('/cart')}
+              >
+                {dictionary.checkout?.processing?.backToCart || 'Back to Cart'}
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'timeout':
+        return (
+          <div className="flex flex-col items-center justify-center text-center p-8">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-amber-500/20 dark:bg-amber-500/10 rounded-full blur-xl" />
+              <div className="relative bg-white dark:bg-neutral-800 rounded-full p-4 shadow-sm border border-gray-100 dark:border-neutral-700">
+                <AlertCircle className="h-10 w-10 text-amber-600 dark:text-amber-400" />
+              </div>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-heading">
+              {dictionary.checkout?.processing?.timeout || 'Verification Timeout'}
+            </h2>
+
+            <p className="text-gray-500 dark:text-gray-400 max-w-xs mb-8 font-primary text-sm">
+              {message}
+            </p>
+
+            <div className="grid grid-cols-1 w-full gap-3">
+              <Button
+                className="w-full"
+                onClick={() => router.push('/profile/orders')}
+              >
+                {dictionary.checkout?.processing?.checkOrders || 'Check My Orders'}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-gray-200 dark:border-neutral-700"
+                onClick={() => router.push('/')}
+              >
+                {dictionary.checkout?.processing?.goHome || 'Go to Home'}
+              </Button>
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-8 shadow-lg">
-        <div className="text-center">
-          {status === 'checking' || status === 'pending' ? (
-            <>
-              <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700 border-t-blue-600" />
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                {dictionary.checkout?.processing?.title || 'Processing Payment'}
-              </h2>
-              <p className="font-primary text-gray-600 dark:text-gray-400">{message}</p>
-              {isConnected && (
-                <p className="font-primary mt-2 text-xs text-green-600 dark:text-green-400">
-                  Connected to payment updates
-                </p>
-              )}
-              {hubError && (
-                <p className="font-primary mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-                  {hubError}
-                </p>
-              )}
-            </>
-          ) : status === 'timeout' ? (
-            <>
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30">
-                <svg className="h-8 w-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-                </svg>
-              </div>
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-yellow-800 dark:text-yellow-300">
-                {dictionary.checkout?.processing?.timeout || 'Verification Timeout'}
-              </h2>
-              <p className="font-primary text-gray-600 dark:text-gray-400">{message}</p>
-              <div className="mt-6 space-y-3">
-                <button
-                  className="font-primary w-full rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
-                  onClick={() => router.push('/user')}
-                >
-                  {dictionary.checkout?.processing?.checkOrders || 'Check My Orders'}
-                </button>
-                <button
-                  className="font-primary w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-2 text-gray-700 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-600"
-                  onClick={() => router.push('/')}
-                >
-                  {dictionary.checkout?.processing?.goHome || 'Go to Home'}
-                </button>
-              </div>
-            </>
-          ) : status === 'success' ? (
-            <>
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-                </svg>
-              </div>
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-green-800 dark:text-green-300">
-                {dictionary.checkout?.processing?.success || 'Payment Successful'}
-              </h2>
-              <p className="font-primary text-gray-600 dark:text-gray-400">{message}</p>
-              <p className="font-primary mt-2 text-sm text-gray-500 dark:text-gray-500">
-                {dictionary.checkout?.processing?.redirecting || 'Redirecting...'}
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                <svg className="h-8 w-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-                </svg>
-              </div>
-              <h2 className="font-heading mb-2 text-2xl font-semibold text-red-800 dark:text-red-300">
-                {dictionary.checkout?.processing?.failed || 'Payment Failed'}
-              </h2>
-              <p className="font-primary text-gray-600 dark:text-gray-400">{message}</p>
-              <div className="mt-6 space-y-3">
-                <button
-                  className="font-primary w-full rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
-                  onClick={() => router.push('/checkout')}
-                >
-                  {dictionary.checkout?.processing?.tryAgain || 'Try Again'}
-                </button>
-                <button
-                  className="font-primary w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-2 text-gray-700 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-600"
-                  onClick={() => router.push('/cart')}
-                >
-                  {dictionary.checkout?.processing?.backToCart || 'Back to Cart'}
-                </button>
-              </div>
-            </>
-          )}
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Brand/Logo Area */}
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-2 text-gray-900 dark:text-white font-bold text-xl">
+            <ShoppingBag className="h-6 w-6" />
+            <span>Store</span>
+          </div>
         </div>
+
+        {/* Content Card */}
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-neutral-800 overflow-hidden relative">
+          {/* Progress Bar for Checking state */}
+          {(status === 'checking' || status === 'pending') && (
+            <div className="absolute top-0 left-0 w-full h-1 bg-gray-100 dark:bg-neutral-800">
+              <div className="h-full bg-blue-500 dark:bg-blue-400 animate-progress-indeterminate" />
+            </div>
+          )}
+
+          {renderContent()}
+        </div>
+
+        {/* Footer Help Text */}
+        <p className="text-center mt-8 text-xs text-gray-400 dark:text-neutral-500">
+          Need help? <a href="/contact" className="underline hover:text-gray-600 dark:hover:text-neutral-400">Contact Support</a>
+        </p>
       </div>
     </div>
   );
@@ -258,8 +338,8 @@ function PaymentCallbackContent() {
 export default function PaymentCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700 border-t-blue-600" />
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-neutral-950">
+        <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
       </div>
     }>
       <PaymentCallbackContent />

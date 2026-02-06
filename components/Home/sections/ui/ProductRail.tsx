@@ -59,7 +59,7 @@ export default async function ProductRail({
       if (data.filterBy?.isNewArrival) list = list.filter((p: any) => p.isNewArrival);
       if (data.filterBy?.isLiquidated) list = list.filter((p: any) => p.isLiquidated);
       if (data.filterBy?.isComingSoon) list = list.filter((p: any) => p.isComingSoon);
-      if (data.filterBy?.hasDiscount) list = list.filter((p: any) => p.discountPrice > 0);
+      if (data.filterBy?.hasDiscount) list = list.filter((p: any) => p.discountPrice && p.discountPrice > 0);
 
       products = list.slice(0, pageSize);
     }

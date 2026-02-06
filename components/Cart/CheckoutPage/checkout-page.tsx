@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 import CheckoutForm from "./CheckoutForm";
 import OrderSummary from "./OrderSummary";
+import { CheckoutStep } from "./CheckoutProgress";
+import CheckoutAddressStep from "./CheckoutAddressStep";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/app/context/cartContext";
@@ -19,6 +21,8 @@ import { useDictionary } from "@/app/context/dictionary-provider";
 
 export default function CheckoutPage() {
   const dictionary = useDictionary();
+  const params = useParams();
+  const lang = params.lang as string;
   const { user } = useUser();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +37,9 @@ export default function CheckoutPage() {
   const [availablePaymentTypes, setAvailablePaymentTypes] = useState<PaymentType[] | null>(null);
   const [paymentTypesLoaded, setPaymentTypesLoaded] = useState(false);
   const [noPaymentMethods, setNoPaymentMethods] = useState(false);
+
+  const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -81,7 +88,6 @@ export default function CheckoutPage() {
   }, []);
 
   // Calculate totals
-  //const shipping = subtotal > 50 ? 0 : 9.99;
   const shipping = 0;
   const tax = 0; // Tax disabled - handled by payment gateway
   const total = useMemo(
@@ -92,16 +98,16 @@ export default function CheckoutPage() {
   // Redirect to cart if empty
   useEffect(() => {
     if (mounted && cartLen === 0) {
-      router.push("/cart");
+      router.push(`/${lang}/cart`);
     }
-  }, [cartLen, router, mounted]);
+  }, [cartLen, router, mounted, lang]);
 
   // Redirect to cart with login prompt if not logged in
   useEffect(() => {
     if (mounted && !user) {
-      router.push("/cart?login=required");
+      router.push(`/${lang}/cart?login=required`);
     }
-  }, [user, router, mounted]);
+  }, [user, router, mounted, lang]);
 
   // Track begin checkout event
   useEffect(() => {
@@ -157,7 +163,6 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     if (!user?.id) {
       setError(dictionary.checkout?.errors?.userNotLoggedIn || "Please log in to continue");
-
       return;
     }
 
@@ -166,7 +171,12 @@ export default function CheckoutPage() {
         dictionary.checkout?.noPaymentMethodsEnabled
         || "No payment methods are currently available. Please contact the store or try again later.",
       );
+      return;
+    }
 
+    if (!selectedAddress) {
+      setError(dictionary.checkout?.addressStep?.selectAction || "Please select a shipping address");
+      setCurrentStep("address");
       return;
     }
 
@@ -198,17 +208,16 @@ export default function CheckoutPage() {
       // Create order with payment
       const orderResponse = await createOrderWithPayment({
         orderItems,
-        shippingAddress: "Default Address", // TODO: Get from form
-        shippingCity: "Tbilisi",
-        shippingCountry: "Georgia",
+        shippingAddress: selectedAddress ? `${selectedAddress.street}, ${selectedAddress.city}` : "Default Address",
+        shippingCity: selectedAddress?.city || "Tbilisi",
+        shippingCountry: selectedAddress?.country || "Georgia",
         currency: "GEL",
         paymentType,
         paymentReturnUrl,
         // Buyer info from user context
-        buyerFullName: user.userName || undefined,
+        buyerFullName: user.userName || `${selectedAddress?.firstName} ${selectedAddress?.lastName}`.trim() || undefined,
         buyerEmail: user.email || undefined,
-        //buyerPhone: user.phone || undefined,
-        buyerPhone: "+995555555555",
+        buyerPhone: selectedAddress?.phoneNumber || "+995555555555",
         // Delivery amount
         deliveryAmount: shipping > 0 ? shipping : undefined,
         // Payment options
@@ -239,27 +248,16 @@ export default function CheckoutPage() {
         throw new Error("No payment redirect URL received");
       }
     } catch (e: any) {
-      // eslint-disable-next-line no-console
       console.error('Checkout error:', e);
-
-      // Handle specific error types
       let errorMessage = dictionary.checkout?.errors?.paymentFailed || "Payment failed. Please try again.";
-
       if (e?.response?.status === 400) {
-        errorMessage = e?.response?.data?.message || e?.message || 'Invalid order data. Please check your information.';
+        errorMessage = e?.response?.data?.message || e?.message || (dictionary.checkout?.errors?.invalidData || 'Invalid order data. Please check your information.');
       } else if (e?.response?.status === 401) {
-        errorMessage = 'Please log in to complete your purchase.';
-        router.push('/cart?login=required');
-      } else if (e?.response?.status === 403) {
-        errorMessage = 'You do not have permission to complete this action.';
-      } else if (e?.response?.status === 404) {
-        errorMessage = 'Product not available. Please refresh and try again.';
-      } else if (e?.response?.status >= 500) {
-        errorMessage = 'Server error. Please try again in a moment.';
+        errorMessage = dictionary.checkout?.errors?.userNotLoggedIn || 'Please log in to complete your purchase.';
+        router.push(`/${lang}/cart?login=required`);
       } else if (e?.message) {
         errorMessage = e.message;
       }
-
       setError(errorMessage);
       setIsProcessing(false);
     }
@@ -270,22 +268,26 @@ export default function CheckoutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center gap-4 mb-8">
           <Button
-            asChild
             className="text-text-light dark:text-text-lightdark hover:bg-brand-muted/40 dark:hover:bg-brand-muteddark/30"
             disabled={isProcessing}
             size="icon"
             variant="ghost"
+            onClick={() => {
+              if (currentStep === "payment") {
+                setCurrentStep("address");
+              } else {
+                router.push(`/${lang}/cart`);
+              }
+            }}
           >
-            <Link href="/cart">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
             <h1 className="font-heading text-2xl font-bold text-text-light dark:text-text-lightdark">
               {dictionary.checkout?.title || 'Checkout'}
             </h1>
             <p className="font-primary text-text-subtle dark:text-text-subtledark">
-              {dictionary.checkout?.completePurchase || 'Complete your purchase'}
+              {currentStep === "address" ? (dictionary.checkout?.selectAddress || "Select your delivery location") : (dictionary.checkout?.choosePayment || "Choose how you want to pay")}
             </p>
           </div>
         </div>
@@ -296,22 +298,49 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <CheckoutForm
-            availableTypes={paymentTypesLoaded ? (availablePaymentTypes ?? []) : []}
-            loading={!paymentTypesLoaded}
-            value={paymentType}
-            onChange={setPaymentType}
-          />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
+            {currentStep === "address" ? (
+              user ? (
+                <CheckoutAddressStep
+                  userId={user.id}
+                  selectedAddressId={selectedAddress?.id || null}
+                  onSelect={setSelectedAddress}
+                  onAddNew={() => router.push(`/${lang}/profile/addresses/new?redirect=checkout`)}
+                />
+              ) : null
+            ) : (
+              <CheckoutForm
+                availableTypes={paymentTypesLoaded ? (availablePaymentTypes ?? []) : []}
+                loading={!paymentTypesLoaded}
+                value={paymentType}
+                onChange={setPaymentType}
+              />
+            )}
+          </div>
+
           <OrderSummary
-            isProcessing={isProcessing || noPaymentMethods}
+            isProcessing={isProcessing || noPaymentMethods || (currentStep === "address" && !selectedAddress)}
             submitButtonLabel={
               isProcessing
                 ? (dictionary.checkout?.redirecting || 'Redirecting...')
-                : `${dictionary.checkout?.paySecurely || 'Pay Securely'} • ₾${total.toFixed(2)}`
+                : currentStep === "address"
+                  ? (dictionary.checkout?.continueToPayment || "Continue to Payment")
+                  : `${dictionary.checkout?.paySecurely || 'Pay Securely'} • ₾${total.toFixed(2)}`
             }
             totalOverride={total}
-            onSubmit={handleSubmit}
+            onSubmit={() => {
+              if (currentStep === "address") {
+                if (!selectedAddress) {
+                  toast.error(dictionary.checkout?.addressStep?.selectAction || "Please select a shipping address");
+                  return;
+                }
+                setCurrentStep("payment");
+              } else {
+                handleSubmit();
+              }
+            }}
           />
         </div>
       </div>

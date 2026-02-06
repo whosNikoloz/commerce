@@ -42,7 +42,7 @@ function isPlainObject(v: unknown): v is AnyRecord {
 export function formatCurrency(amount: number, locale: Locale = "en"): string {
   const fmt = CURRENCY_FORMATTERS[locale] ?? CURRENCY_FORMATTERS.en;
 
-  return fmt.format(amount);
+  return fmt.format(amount).replace("GEL", "₾");
 }
 
 /** Format date based on locale */

@@ -61,7 +61,6 @@ export function ProductInfo({
   const { user } = useUser();
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
-
   // Check wishlist status on mount
   useEffect(() => {
     if (user && productId) {

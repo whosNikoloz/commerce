@@ -62,8 +62,8 @@ export default function ProductDetail({ initialProduct }: Props) {
       trackProductView({
         id: product.id,
         name: product.name || '',
-        price: product.price,
-        discountPrice: product.discountPrice,
+        price: (product.discountPrice && product.discountPrice > 0) ? product.discountPrice : product.price,
+        discountPrice: (product.discountPrice && product.discountPrice > 0) ? product.discountPrice : undefined,
         brand: product.brand,
         category: product.category,
       });
@@ -255,13 +255,13 @@ export default function ProductDetail({ initialProduct }: Props) {
     const item: CartItem = {
       id: product.id,
       name: product.name ?? dict.product.unnamedProduct,
-      price: product.discountPrice ?? product.price,
+      price: (product.discountPrice && product.discountPrice > 0) ? product.discountPrice : product.price,
       image: getCoverImageUrl(product.images) ?? "/placeholder.png",
       quantity: 1,
-      discount: product.discountPrice
+      discount: (product.discountPrice && product.discountPrice > 0)
         ? Math.max(0, Math.round(((product.price - product.discountPrice) / product.price) * 100))
         : 0,
-      originalPrice: product.price,
+      originalPrice: (product.discountPrice && product.discountPrice > 0) ? product.price : undefined,
     };
 
     await addToCart(item);
@@ -368,8 +368,8 @@ export default function ProductDetail({ initialProduct }: Props) {
     ];
   }, [product.productFacetValues]);
 
-  const price = product.discountPrice ?? product.price;
-  const originalPrice = product.discountPrice ? product.price : undefined;
+  const price = (product.discountPrice && product.discountPrice > 0) ? product.discountPrice : product.price;
+  const originalPrice = (product.discountPrice && product.discountPrice > 0) ? product.price : undefined;
 
   // Memoize rail sections to prevent unnecessary re-fetches
   const railSections = useMemo(() => {

@@ -21,6 +21,7 @@ import SearchForMobile from "../Search/search-for-mobile";
 import LoginModal from "./login-modal";
 import RegisterModal from "./register-modal";
 import ForgotPasswordModal from "./forgot-password-modal";
+import UserDropdown from "../Navbar/user-dropdown";
 
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useUser } from "@/app/context/userContext";
@@ -54,7 +55,7 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
       // Ideally we should get current lang from params or context if strictly needed for URL.
       // For now, let's assume /en/user or just /user if middleware handles it.
       // The original code used a hardcoded 'lng' var.
-      router.push(`/en/user`);
+      router.push(`/en/profile/orders`);
     } else {
       // If not logged in, open the modal
       onOpen();
@@ -69,6 +70,10 @@ export default function AuthModal({ IsMobile }: AuthModalProps) {
     onClose();
     setAuthMode("login");
   };
+
+  if (user && !IsMobile) {
+    return <UserDropdown lang={lng} />;
+  }
 
   return (
     <>

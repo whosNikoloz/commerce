@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(price: number, currency: string = "GEL"): string {
+export function formatPrice(price: number, currency: string = "₾"): string {
   // Use a deterministic formatter to avoid hydration mismatches
   // Format: "GEL 2,799.00" or "2,799.00 ₾"
   const formatted = price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -20,8 +20,8 @@ export function formatPrice(price: number, currency: string = "GEL"): string {
   const symbol = currencySymbols[currency] || currency;
 
   // Georgian currency (₾) goes after, others before
-  if (currency === "GEL") {
-    return `${formatted} ${symbol}`;
+  if (currency === "GEL" || currency === "₾") {
+    return `${formatted} ₾`;
   }
 
   return `${symbol}${formatted}`;

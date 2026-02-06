@@ -369,7 +369,7 @@ function ProductCardInner({
       {/* CONTENT */}
       <CardFooter className={cn("relative pointer-events-none flex flex-col items-start gap-3 flex-1", footerPadding)}>
         <div itemScope className="flex items-baseline gap-2 w-full flex-wrap" itemProp="offers" itemType="https://schema.org/Offer">
-          <meta content="GEL" itemProp="priceCurrency" />
+          <meta content="₾" itemProp="priceCurrency" />
           <meta content={displayPrice.toString()} itemProp="price" />
           <meta content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} itemProp="availability" />
           <span

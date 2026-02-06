@@ -32,6 +32,13 @@ export interface OrderSummary {
     status: OrderStatus;
     items: number;
     total: number;          // numeric
+    images?: Array<{        // Product images from order items
+        id: string;
+        productId: string;
+        imagePath: string;
+        isCover: boolean;
+        displayOrder: number;
+    }> | null;
 }
 
 export interface UserModel {

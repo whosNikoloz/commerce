@@ -47,8 +47,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const disallowTopLevel = [
     "/admin",
     "/admin/",
-    "/user",
-    "/user/",
+    "/profile",
+    "/profile/",
     "/wishlists/",
     "/cart*",
     "/checkout*",

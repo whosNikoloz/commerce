@@ -126,6 +126,16 @@ const nextConfig = {
       "wss://ws-us3.pusher.com",
       "ws://localhost:3000",
       "ws://192.168.1.105:3000",
+      "https://*.openstreetmap.org",
+      "https://openstreetmap.org",
+      "https://*.basemaps.cartocdn.com",
+      "https://basemaps.cartocdn.com",
+      "https://*.tile.openstreetmap.org",
+      "https://*.tile.openstreetmap.fr",
+      "https://*.arcgisonline.com",
+      "https://server.arcgisonline.com",
+      "https://cdnjs.cloudflare.com",
+      "https://unpkg.com"
     ].filter(Boolean);
 
     return [
@@ -147,15 +157,15 @@ const nextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(), microphone=(), geolocation=(self)",
           },
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://vercel.live",
-              "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://*.amazonaws.com https://storage.resorter360.ge https://img.janishop.ge https://picsum.photos https://placehold.co https://via.placeholder.com https://maps.googleapis.com https://maps.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://unpkg.com",
+              "img-src 'self' data: blob: https:",
               "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
               `connect-src ${connectSrcParts.join(" ")}`,
               "worker-src 'self' blob:",

@@ -7,6 +7,7 @@ import CartHeader from "./CartHeader";
 import CartSummary from "./CartSummary";
 import EmptyCart from "./EmptyCart";
 import CartItems from "./CartItems";
+import CartSuggestions from "../cart-suggestions";
 
 import { useCartStore } from "@/app/context/cartContext";
 import { getCachedMerchantType } from "@/app/api/services/integrationService";
@@ -50,7 +51,7 @@ export default function CartPage() {
       if (merchantType !== "FINA") {
         setAvailability({});
         setLoading(false);
-        
+
         return;
       }
 
@@ -213,10 +214,18 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <CartItems availability={availability} loading={loading} stockEnabled={stockEnabled} />
+            <div className="hidden lg:block">
+              <CartSuggestions />
+            </div>
           </div>
           <div className="lg:sticky lg:top-6 h-fit">
             <CartSummary autoShowLoginPrompt={showLoginPrompt} />
           </div>
+        </div>
+
+        {/* Mobile View Suggestions - shown below everything */}
+        <div className="lg:hidden">
+          <CartSuggestions />
         </div>
       </div>
     </div>

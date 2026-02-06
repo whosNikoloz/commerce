@@ -39,15 +39,14 @@ export function SimilarProducts({ products }: SimilarProductsProps) {
                 {product.name}
               </h3>
               <div className="mt-2 flex items-center justify-between">
-                <p className="font-primary text-xl font-bold text-slate-900 dark:text-white">${product.price}</p>
+                <p className="font-primary text-xl font-bold text-slate-900 dark:text-white">₾{product.price}</p>
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <svg
                       key={i}
                       aria-hidden="true"
-                      className={`h-5 w-5 ${
-                        i < Math.round(product.rating) ? "text-yellow-300" : "text-gray-300"
-                      }`}
+                      className={`h-5 w-5 ${i < Math.round(product.rating) ? "text-yellow-300" : "text-gray-300"
+                        }`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >

@@ -411,9 +411,10 @@ export const productToGA4Item = (product: {
   index?: number;
   listName?: string;
 }): GA4Item => {
-  const price = product.discountPrice ?? product.price ?? 0;
-  const discount = product.price && product.discountPrice
-    ? product.price - product.discountPrice
+  const hasDiscount = (product.discountPrice ?? 0) > 0;
+  const price = hasDiscount ? product.discountPrice! : product.price ?? 0;
+  const discount = hasDiscount && product.price
+    ? product.price - product.discountPrice!
     : 0;
 
   return {

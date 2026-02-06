@@ -36,13 +36,6 @@
     "grid": "Grid",
     "list": "List"
   },
-  "wishlist": {
-    "add": "Add to wishlist",
-    "remove": "Remove from wishlist",
-    "added": "Added to wishlist",
-    "removed": "Removed from wishlist",
-    "error": "Failed to update wishlist"
-  },
   "auth": {
     "login": {
       "title": "Login",
@@ -253,7 +246,11 @@
     "loginToCheckout": "Log in to checkout",
     "freeShippingOver": "Free shipping on orders over {amount}",
     "returnPolicy": "Easy 30-day returns",
-    "secureCheckout": "Secure SSL-encrypted checkout"
+    "secureCheckout": "Secure SSL-encrypted checkout",
+    "suggestions": {
+      "title": "You Might Also Like",
+      "subtitle": "Selected for you based on your cart"
+    }
   },
   "checkout": {
     "title": "Checkout",
@@ -263,7 +260,6 @@
     "redirecting": "Redirecting to payment...",
     "paySecurely": "Secure payment",
     "secureHostedCheckout": "Secure hosted checkout",
-    "chooseProvider": "Choose a payment provider",
     "providers": {
       "bog": "Bank of Georgia",
       "tbc": "TBC Bank"
@@ -278,6 +274,18 @@
       "invalidProvider": "Invalid payment provider selected",
       "redirectUrlMissing": "Payment URL was not found",
       "paymentFailed": "Payment processing failed"
+    },
+    "noPaymentMethodsEnabled": "No payment methods are currently available. Please contact the store or try again later.",
+    "selectAddress": "Select your delivery location",
+    "choosePayment": "Choose how you want to pay",
+    "continueToPayment": "Continue to Payment",
+    "addressStep": {
+      "loading": "Loading your addresses...",
+      "selectAction": "Select Shipping Address",
+      "addNew": "Add New",
+      "empty": "No addresses found",
+      "emptyDesc": "Add an address to continue with your checkout",
+      "addAddress": "Add Address"
     },
     "processing": {
       "title": "Processing payment",
@@ -313,6 +321,10 @@
       "backToCart": "Back to cart",
       "contactSupport": "Support"
     },
+    "installment": "Installment",
+    "installmentDescription": "Pay in installments",
+    "installmentBadge": "Installment",
+    "chooseProvider": "Choose Payment Method",
     "summary": {
       "subtotal": "Subtotal",
       "shipping": "Shipping",
@@ -332,6 +344,150 @@
     "meta": {
       "title": "My account",
       "description": "Manage your profile, orders, and settings."
+    }
+  },
+  "wishlist": {
+    "title": "My Wishlist",
+    "subtitle": "Items you've saved for later",
+    "empty": "Your wishlist is empty",
+    "emptyDesc": "Save products you like to find them easily later and track price changes.",
+    "browse": "Browse Products",
+    "remove": "Remove from wishlist",
+    "free": "Free",
+    "premium": "Premium Product",
+    "removed": "Item removed from wishlist",
+    "removeError": "Failed to remove item",
+    "addSuccess": "Added to cart",
+    "addError": "Failed to add to cart"
+  },
+  "profile": {
+    "welcome": "Hello",
+    "sidebar": {
+      "orders": "Orders",
+      "wishlist": "Wishlist",
+      "cards": "My Cards",
+      "addresses": "Addresses",
+      "notifications": "Notifications",
+      "account": "Account settings",
+      "settings": "Settings",
+      "logout": "Log out"
+    },
+    "status": {
+      "Delivered": "Delivered",
+      "Shipped": "Shipped",
+      "Processing": "Processing",
+      "Pending": "Pending",
+      "Paid": "Paid",
+      "Unknown": "Unknown"
+    },
+    "orders": {
+      "title": "My Orders",
+      "subtitle": "Review and track your purchase history",
+      "viewMode": {
+        "list": "List",
+        "grid": "Grid"
+      },
+      "searchPlaceholder": "Search by Order ID...",
+      "pagination": {
+        "page": "Page",
+        "prev": "Prev",
+        "next": "Next"
+      },
+      "empty": "No orders found",
+      "emptyDesc": "When you place an order, it will appear here.",
+      "emptySearch": "Try a different search query.",
+      "orderItems": "Items",
+      "totalAmount": "Total Amount",
+      "placedOn": "Placed on"
+    },
+    "orderDetails": {
+      "title": "Order",
+      "backToOrders": "Back to Orders",
+      "notFound": "Order not found",
+      "notFoundDesc": "The requested order could not be loaded.",
+      "invoice": "Invoice",
+      "generating": "Generating...",
+      "review": "Review",
+      "itemsTitle": "Order Items",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "complementary": "Complementary",
+      "deliveryDetails": "Delivery Details",
+      "destination": "Destination",
+      "trackingId": "Tracking ID",
+      "estimatedArrival": "Estimated Arrival",
+      "timeline": "Timeline",
+      "trackingPending": "Tracking information is pending for this order history."
+    },
+    "account": {
+      "title": "Account Settings",
+      "subtitle": "Manage your personal information and security",
+      "personalDetails": "Personal Details",
+      "fullName": "Full Name / Username",
+      "phone": "Phone Number",
+      "email": "Email Address (Read Only)",
+      "emailDesc": "Email is verified and linked to your primary login.",
+      "saveBtn": "Save Profile Details",
+      "saving": "Saving Changes...",
+      "security": "Security & Passwords",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "updatePasswordBtn": "Update Password",
+      "updating": "Updating...",
+      "secureAccount": "Secure Account",
+      "updateProfileSuccess": "Profile updated successfully!",
+      "updatePasswordSuccess": "Password updated successfully!",
+      "passwordMismatch": "New passwords do not match"
+    },
+    "addresses": {
+      "title": "My Addresses",
+      "subtitle": "Manage your delivery locations",
+      "addNew": "Add New Address",
+      "addNewDesc": "Set up a new shipping or billing location",
+      "default": "Default",
+      "setPrimary": "Set as Primary Address",
+      "primaryLocation": "Primary Delivery Location",
+      "removeSuccess": "Address removed",
+      "removeError": "Failed to delete address",
+      "defaultSuccess": "Default address updated",
+      "defaultError": "Failed to set default address",
+      "loadError": "Failed to load addresses"
+    },
+    "addressForm": {
+      "newTitle": "Add New Address",
+      "editTitle": "Edit Address",
+      "subtitle": "Complete your shipping details for faster checkout",
+      "cancel": "Cancel",
+      "save": "Save Address",
+      "update": "Update Address",
+      "locateOnMap": "Locate on Map",
+      "mapTip": "Tip: Click on the map to automatically pin and suggest address fields below.",
+      "detailsTitle": "Address Details",
+      "label": "Label (e.g. Home, Office)",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "street": "Street Address",
+      "city": "City",
+      "country": "Country",
+      "setDefault": "Set as default address",
+      "validationError": "Please fill in all required fields",
+      "addSuccess": "Address added",
+      "updateSuccess": "Address updated",
+      "saveError": "Failed to save address",
+      "mapSuccess": "Address fields populated from map"
+    },
+    "map": {
+      "locateMe": "Find my location",
+      "switchToSatellite": "Switch to Satellite",
+      "switchToStreet": "Switch to Street View",
+      "clickMap": "Click map to set address",
+      "connectivityIssue": "Connectivity Issue",
+      "connectivityDesc": "Some map tiles are being blocked by your browser or network.",
+      "retry": "Retry",
+      "dismiss": "Dismiss"
     }
   },
   "info": {
@@ -395,5 +551,10 @@
     "hours": "Working hours",
     "contact": "Contact",
     "cookiePolicy": "Cookie policy"
+  },
+  "navbar": {
+    "profile": {
+      "contactUs": "Contact Us"
+    }
   }
 }

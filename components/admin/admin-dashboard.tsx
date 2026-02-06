@@ -75,14 +75,14 @@ function getStatusLabel(status: OrderStatus): string {
   return typeof status === 'number' ? OrderStatus[status] : String(status);
 }
 
-function formatCurrency(amount: number, currency: string = 'GEL'): string {
+function formatCurrency(amount: number, currency: string = '₾'): string {
   try {
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
-      currency,
-    }).format(amount);
+      currency: 'GEL',
+    }).format(amount).replace("GEL", "₾");
   } catch {
-    return `${amount.toFixed(2)} ${currency}`;
+    return `${amount.toFixed(2)} ₾`;
   }
 }
 

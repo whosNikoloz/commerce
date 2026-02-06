@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 
@@ -9,7 +9,7 @@ import { useGA4 } from '@/hooks/useGA4';
 import { useCartStore } from '@/app/context/cartContext';
 import { useDictionary } from '@/app/context/dictionary-provider';
 
-function PaymentSuccessContent() {
+function PaymentSuccessContent({ lang }: { lang: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { trackPurchaseComplete } = useGA4();
@@ -112,13 +112,13 @@ function PaymentSuccessContent() {
           <div className="flex flex-col gap-3">
             <Link
               className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-              href="/"
+              href={`/${lang}`}
             >
               {dictionary.checkout.success.continueShopping}
             </Link>
             <Link
               className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-              href="/user"
+              href={`/${lang}/profile/orders`}
             >
               {dictionary.checkout.success.viewOrders}
             </Link>
@@ -130,13 +130,15 @@ function PaymentSuccessContent() {
 }
 
 export default function PaymentSuccessPage() {
+  const { lang } = useParams();
+
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
       </div>
     }>
-      <PaymentSuccessContent />
+      <PaymentSuccessContent lang={lang as string} />
     </Suspense>
   );
 }

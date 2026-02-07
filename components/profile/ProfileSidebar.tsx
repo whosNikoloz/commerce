@@ -9,13 +9,12 @@ import {
     MapPin,
     Settings,
     LogOut,
+    ShoppingCart,
     User as UserIcon
 } from "lucide-react";
-import { useUser } from "@/app/context/userContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
+import { useUser } from "@/app/context/userContext";
+import { cn } from "@/lib/utils";
 import { defaultLocale } from "@/i18n.config";
 
 interface ProfileSidebarProps {
@@ -32,6 +31,7 @@ export default function ProfileSidebar({ dict, lang }: ProfileSidebarProps) {
         if (lang === defaultLocale) {
             return path;
         }
+
         return `/${lang}${path}`;
     };
 
@@ -47,6 +47,11 @@ export default function ProfileSidebar({ dict, lang }: ProfileSidebarProps) {
             icon: Heart,
         },
         {
+            label: dict.profile.sidebar.cart || "კალათის ნახვა",
+            href: getLink("/cart"),
+            icon: ShoppingCart,
+        },
+        {
             label: dict.profile.sidebar.addresses,
             href: getLink("/profile/addresses"),
             icon: MapPin,
@@ -59,71 +64,59 @@ export default function ProfileSidebar({ dict, lang }: ProfileSidebarProps) {
     ];
 
     return (
-        <div className="flex flex-col gap-6 p-8 backdrop-blur-xl bg-brand-surface/80 dark:bg-brand-surfacedark/80 border border-border dark:border-white/10 rounded-[2.5rem] shadow-xl shadow-black/5 animate-in slide-in-from-left-4 duration-700">
+        <div className="flex flex-col gap-1">
             {/* Profile Header */}
-            <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16 border-2 border-brand-primary/20 shadow-lg ring-4 ring-brand-primary/10">
-                    <AvatarImage src="" />
-                    <AvatarFallback className="bg-brand-primary/10 text-brand-primary">
-                        <UserIcon className="h-8 w-8" />
-                    </AvatarFallback>
-                </Avatar>
+            <div className="flex items-center gap-3 px-3 py-4 mb-2">
+                <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <UserIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                </div>
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em]">
+                    <span className="text-xs text-muted-foreground">
                         {dict.profile.welcome}
                     </span>
-                    <span className="text-xl font-black truncate dark:text-white tracking-tight">
+                    <span className="text-sm font-bold truncate dark:text-white">
                         {user?.userName || "User"}
                     </span>
                 </div>
             </div>
 
-            <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent dark:via-white/10" />
-
             {/* Navigation */}
-            <nav className="flex flex-col gap-2">
+            <nav className="flex flex-col gap-0.5">
                 {navItems.map((item) => {
-                    const isActive = pathname.startsWith(item.href);
+                    const isActive = pathname.startsWith(item.href) && item.href.includes("/profile");
                     const Icon = item.icon;
 
                     return (
                         <Link
                             key={item.href}
-                            href={item.href}
                             className={cn(
-                                "flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden",
+                                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm",
                                 isActive
-                                    ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20 transform scale-102"
-                                    : "text-text-subtle dark:text-text-subtledark hover:bg-brand-primary/5 hover:text-brand-primary dark:hover:bg-brand-primary/10 transition-all duration-300"
+                                    ? "text-brand-primary font-semibold bg-brand-primary/10"
+                                    : "text-muted-foreground hover:text-brand-primary hover:bg-brand-primary/5"
                             )}
+                            href={item.href}
                         >
-                            <Icon className={cn(
-                                "h-5 w-5 transition-transform duration-300 group-hover:scale-110 z-10",
-                                isActive ? "text-white" : "text-muted-foreground group-hover:text-brand-primary"
-                            )} />
-                            <span className="z-10 tracking-tight">{item.label}</span>
-                            {isActive && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none" />
-                            )}
+                            <Icon className="h-5 w-5" />
+                            <span>{item.label}</span>
                         </Link>
                     );
                 })}
             </nav>
 
-            <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent dark:via-white/10" />
+            <div className="h-px bg-border dark:bg-white/10 my-2 mx-3" />
 
             {/* Logout */}
-            <Button
-                variant="ghost"
-                className="flex items-center justify-start gap-4 px-5 py-4 h-auto rounded-2xl text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300 group border border-transparent hover:border-destructive/20"
+            <button
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors w-full text-left"
                 onClick={async () => {
                     await logout();
                     router.push(`/${lang}`);
                 }}
             >
-                <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-x-1" />
-                <span className="font-bold tracking-tight">{dict.profile.sidebar.logout}</span>
-            </Button>
+                <LogOut className="h-5 w-5" />
+                <span>{dict.profile.sidebar.logout}</span>
+            </button>
         </div>
     );
 }

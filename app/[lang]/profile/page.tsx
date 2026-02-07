@@ -1,11 +1,22 @@
-import { redirect } from "next/navigation";
-import { Locale } from "@/i18n.config";
+"use client";
 
-export default async function ProfilePage({
-    params,
-}: {
-    params: Promise<{ lang: string }>;
-}) {
-    const { lang } = await params;
-    redirect(`/${lang}/profile/orders`);
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { defaultLocale } from "@/i18n.config";
+
+export default function ProfilePage() {
+    const { lang } = useParams();
+    const router = useRouter();
+
+    // On desktop, redirect to orders since the sidebar is always visible
+    useEffect(() => {
+        const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+        if (isDesktop) {
+            const prefix = lang === defaultLocale ? "" : `/${lang}`;
+            router.replace(`${prefix}/profile/orders`);
+        }
+    }, [lang, router]);
+
+    // On mobile, the layout shell shows the sidebar nav as the main content
+    return null;
 }

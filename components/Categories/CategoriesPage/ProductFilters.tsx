@@ -311,7 +311,7 @@ function SidebarContent({
         </div>
       </div>
 
-      <Accordion collapsible className="w-full" type="single">
+      <Accordion className="w-full" type="multiple">
         {/* Price */}
         <AccordionItem className="border-b border-border/50" value="price">
           <AccordionTrigger className="text-foreground font-semibold hover:text-brand-primary transition-colors px-2 hover:no-underline">

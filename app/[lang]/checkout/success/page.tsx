@@ -68,17 +68,17 @@ function PaymentSuccessContent({ lang }: { lang: string }) {
   }, [searchParams, router, cart, subtotal, trackPurchaseComplete, clearCart, purchaseTracked]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50">
         <div className="text-center">
           {/* Success Icon */}
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="h-12 w-12 text-green-600" />
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
           </div>
 
           {/* Success Message */}
-          <h1 className="font-heading mb-2 text-3xl font-bold text-gray-900">{dictionary.checkout.success.title}</h1>
-          <p className="font-primary mb-6 text-gray-600">
+          <h1 className="font-heading mb-2 text-3xl font-bold text-gray-900 dark:text-white">{dictionary.checkout.success.title}</h1>
+          <p className="font-primary mb-6 text-gray-600 dark:text-gray-300">
             {dictionary.checkout.success.message}
           </p>
 
@@ -102,8 +102,8 @@ function PaymentSuccessContent({ lang }: { lang: string }) {
           )} */}
 
           {/* Confirmation Email Notice */}
-          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <p className="font-primary text-sm text-blue-800">
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/30">
+            <p className="font-primary text-sm text-blue-800 dark:text-blue-300">
               {dictionary.checkout.success.emailConfirmation}
             </p>
           </div>
@@ -111,13 +111,13 @@ function PaymentSuccessContent({ lang }: { lang: string }) {
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
             <Link
-              className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
               href={`/${lang}`}
             >
               {dictionary.checkout.success.continueShopping}
             </Link>
             <Link
-              className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               href={`/${lang}/profile/orders`}
             >
               {dictionary.checkout.success.viewOrders}
@@ -134,8 +134,8 @@ export default function PaymentSuccessPage() {
 
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 dark:border-gray-700 dark:border-t-blue-400" />
       </div>
     }>
       <PaymentSuccessContent lang={lang as string} />

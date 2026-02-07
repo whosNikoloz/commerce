@@ -10,7 +10,7 @@ const formatCurrency = (price: number, lang: string = "ka") => {
     return new Intl.NumberFormat(lang === "ka" ? "ka-GE" : "en-US", {
         style: "currency",
         currency: "GEL",
-    }).format(price);
+    }).format(price).replace("GEL", "₾");
 };
 
 export async function POST(req: NextRequest) {

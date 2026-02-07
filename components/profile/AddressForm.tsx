@@ -117,30 +117,25 @@ export default function AddressForm({ initialData, userId, onSave, lang, title }
     };
 
     return (
-        <form className="space-y-12 animate-in fade-in slide-in-from-right-8 duration-700 pb-20" onSubmit={handleSave}>
+        <form className="space-y-5 animate-in fade-in slide-in-from-right-8 duration-700 pb-10" onSubmit={handleSave}>
             {/* Header Area */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-5">
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
                     <Button
-                        className="rounded-2xl h-12 w-12 sm:h-14 sm:w-14 border-border dark:border-white/10 bg-white/40 backdrop-blur-md shadow-lg shadow-black/5 hover:bg-brand-primary hover:text-white transition-all duration-500"
+                        className="rounded-xl h-9 w-9 border-border dark:border-white/10 hover:bg-brand-primary hover:text-white transition-all"
                         size="icon"
                         type="button"
                         variant="outline"
                         onClick={() => router.back()}
                     >
-                        <ArrowLeft className="h-6 w-6" />
+                        <ArrowLeft className="h-4 w-4" />
                     </Button>
-                    <div>
-                        <h1 className="text-3xl font-black dark:text-white tracking-tighter uppercase">{title}</h1>
-                        <p className="text-muted-foreground text-sm mt-1 font-bold italic">
-                            {dict?.profile?.addressForm?.subtitle || "Complete your shipping details for faster checkout"}
-                        </p>
-                    </div>
+                    <h1 className="text-xl font-black dark:text-white tracking-tight">{title}</h1>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                     <Button
-                        className="rounded-2xl h-12 px-6 font-black uppercase tracking-widest text-[10px]"
+                        className="rounded-xl h-9 px-4 text-xs font-bold"
                         type="button"
                         variant="ghost"
                         onClick={() => router.back()}
@@ -148,152 +143,144 @@ export default function AddressForm({ initialData, userId, onSave, lang, title }
                         {dict?.profile?.addressForm?.cancel || "Cancel"}
                     </Button>
                     <Button
-                        className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest text-[10px] bg-brand-primary text-white shadow-xl shadow-brand-primary/20 hover:bg-brand-primary/90"
+                        className="rounded-xl h-9 px-5 text-xs font-bold bg-brand-primary text-white hover:bg-brand-primary/90"
                         disabled={submitting}
                         type="submit"
                     >
-                        {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                        {initialData ? (dict?.profile?.addressForm?.update || "Update Address") : (dict?.profile?.addressForm?.save || "Save Address")}
+                        {submitting ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1.5" />}
+                        {initialData ? (dict?.profile?.addressForm?.update || "Update") : (dict?.profile?.addressForm?.save || "Save")}
                     </Button>
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-10">
+            <div className="grid lg:grid-cols-2 gap-5">
                 {/* Map Picker Card */}
-                <div className="space-y-6">
-                    <div className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-border dark:border-white/10 rounded-[2.5rem] p-8 space-y-6 shadow-2xl shadow-black/5">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                                <MapPin className="h-5 w-5 text-brand-primary" />
-                            </div>
-                            <h3 className="text-xl font-black dark:text-white tracking-tight uppercase">
-                                {dict?.profile?.addressForm?.locateOnMap || "Locate on Map"}
-                            </h3>
-                        </div>
-                        <AddressMapPicker
-                            className="border-none"
-                            height="500px"
-                            onLocationSelect={handleLocationSelect}
-                        />
-                        <p className="text-[10px] text-muted-foreground font-bold italic px-2">
-                            {dict?.profile?.addressForm?.mapTip || "Tip: Click on the map to automatically pin and suggest address fields below."}
-                        </p>
+                <div className="bg-white dark:bg-white/5 border border-border/60 dark:border-white/10 rounded-2xl p-5 space-y-3">
+                    <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-brand-primary" />
+                        <h3 className="text-sm font-bold dark:text-white">
+                            {dict?.profile?.addressForm?.locateOnMap || "Locate on Map"}
+                        </h3>
                     </div>
+                    <AddressMapPicker
+                        className="border-none"
+                        height="300px"
+                        onLocationSelect={handleLocationSelect}
+                    />
+                    <p className="text-xs text-muted-foreground italic">
+                        {dict?.profile?.addressForm?.mapTip || "Click on the map to auto-fill address fields."}
+                    </p>
                 </div>
 
                 {/* Form Fields Card */}
-                <div className="space-y-6">
-                    <div className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-border dark:border-white/10 rounded-[2.5rem] p-10 space-y-8 shadow-2xl shadow-black/5">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                                <Plus className="h-5 w-5 text-brand-primary" />
-                            </div>
-                            <h3 className="text-xl font-black dark:text-white tracking-tight uppercase">
-                                {dict?.profile?.addressForm?.detailsTitle || "Address Details"}
-                            </h3>
-                        </div>
+                <div className="bg-white dark:bg-white/5 border border-border/60 dark:border-white/10 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <Plus className="h-4 w-4 text-brand-primary" />
+                        <h3 className="text-sm font-bold dark:text-white">
+                            {dict?.profile?.addressForm?.detailsTitle || "Address Details"}
+                        </h3>
+                    </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="title">
-                                    {dict?.profile?.addressForm?.label || "Label (e.g. Home, Office)"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="title"
-                                    placeholder="Home"
-                                    value={form.title}
-                                    onChange={e => setForm({ ...form, title: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="phoneNumber">
-                                    {dict?.profile?.account?.phone || "Phone Number"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="phoneNumber"
-                                    placeholder="+995 5xx xxx xxx"
-                                    value={form.phoneNumber}
-                                    onChange={e => setForm({ ...form, phoneNumber: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="firstName">
-                                    {dict?.profile?.addressForm?.firstName || "First Name"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="firstName"
-                                    value={form.firstName}
-                                    onChange={e => setForm({ ...form, firstName: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="lastName">
-                                    {dict?.profile?.addressForm?.lastName || "Last Name"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="lastName"
-                                    value={form.lastName}
-                                    onChange={e => setForm({ ...form, lastName: e.target.value })}
-                                />
-                            </div>
-                            <div className="sm:col-span-2 space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="street">
-                                    {dict?.profile?.addressForm?.street || "Street Address"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="street"
-                                    value={form.street}
-                                    onChange={e => setForm({ ...form, street: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="city">
-                                    {dict?.profile?.addressForm?.city || "City"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="city"
-                                    value={form.city}
-                                    onChange={e => setForm({ ...form, city: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 px-1 ml-1" htmlFor="country">
-                                    {dict?.profile?.addressForm?.country || "Country"}
-                                </Label>
-                                <Input
-                                    className="h-14 rounded-2xl bg-brand-surface dark:bg-white/5 border-none font-bold text-lg focus-visible:ring-2 focus-visible:ring-brand-primary/20"
-                                    id="country"
-                                    value={form.country}
-                                    onChange={e => setForm({ ...form, country: e.target.value })}
-                                />
-                            </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="title">
+                                {dict?.profile?.addressForm?.label || "Label (e.g. Home, Office)"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="title"
+                                placeholder="Home"
+                                value={form.title}
+                                onChange={e => setForm({ ...form, title: e.target.value })}
+                            />
                         </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="phoneNumber">
+                                {dict?.profile?.account?.phone || "Phone Number"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="phoneNumber"
+                                placeholder="+995 5xx xxx xxx"
+                                value={form.phoneNumber}
+                                onChange={e => setForm({ ...form, phoneNumber: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="firstName">
+                                {dict?.profile?.addressForm?.firstName || "First Name"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="firstName"
+                                value={form.firstName}
+                                onChange={e => setForm({ ...form, firstName: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="lastName">
+                                {dict?.profile?.addressForm?.lastName || "Last Name"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="lastName"
+                                value={form.lastName}
+                                onChange={e => setForm({ ...form, lastName: e.target.value })}
+                            />
+                        </div>
+                        <div className="sm:col-span-2 space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="street">
+                                {dict?.profile?.addressForm?.street || "Street Address"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="street"
+                                value={form.street}
+                                onChange={e => setForm({ ...form, street: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="city">
+                                {dict?.profile?.addressForm?.city || "City"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="city"
+                                value={form.city}
+                                onChange={e => setForm({ ...form, city: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground ml-0.5" htmlFor="country">
+                                {dict?.profile?.addressForm?.country || "Country"}
+                            </Label>
+                            <Input
+                                className="h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none text-sm font-medium focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                id="country"
+                                value={form.country}
+                                onChange={e => setForm({ ...form, country: e.target.value })}
+                            />
+                        </div>
+                    </div>
 
-                        <div className="pt-6 border-t border-border/50 dark:border-white/10 flex items-center gap-4">
-                            <button
-                                className={cn(
-                                    "h-6 w-6 rounded-md flex items-center justify-center border-2 transition-all",
-                                    form.isDefault ? "bg-brand-primary border-brand-primary text-white" : "border-border dark:border-white/20"
-                                )}
-                                type="button"
-                                onClick={() => setForm({ ...form, isDefault: !form.isDefault })}
-                            >
-                                {form.isDefault && <CheckCircle2 className="h-4 w-4" />}
-                            </button>
-                            <button
-                                className="text-xs font-black uppercase tracking-widest text-muted-foreground cursor-pointer select-none bg-transparent border-none p-0 hover:text-brand-primary transition-colors"
-                                type="button"
-                                onClick={() => setForm({ ...form, isDefault: !form.isDefault })}
-                            >
-                                {dict?.profile?.addressForm?.setDefault || "Set as default address"}
-                            </button>
-                        </div>
+                    <div className="pt-3 border-t border-border/50 dark:border-white/10 flex items-center gap-3">
+                        <button
+                            className={cn(
+                                "h-5 w-5 rounded flex items-center justify-center border-2 transition-all",
+                                form.isDefault ? "bg-brand-primary border-brand-primary text-white" : "border-border dark:border-white/20"
+                            )}
+                            type="button"
+                            onClick={() => setForm({ ...form, isDefault: !form.isDefault })}
+                        >
+                            {form.isDefault && <CheckCircle2 className="h-3.5 w-3.5" />}
+                        </button>
+                        <button
+                            className="text-xs font-semibold text-muted-foreground cursor-pointer select-none bg-transparent border-none p-0 hover:text-brand-primary transition-colors"
+                            type="button"
+                            onClick={() => setForm({ ...form, isDefault: !form.isDefault })}
+                        >
+                            {dict?.profile?.addressForm?.setDefault || "Set as default address"}
+                        </button>
                     </div>
                 </div>
             </div>

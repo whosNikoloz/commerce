@@ -205,7 +205,7 @@ export function EditProductGroupModal({
     return new Intl.NumberFormat("ka-GE", {
       style: "currency",
       currency: "GEL",
-    }).format(price);
+    }).format(price).replace("GEL", "₾");
   };
 
   return (

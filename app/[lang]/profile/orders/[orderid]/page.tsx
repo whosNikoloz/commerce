@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { useDictionary } from "@/app/context/dictionary-provider";
+import { defaultLocale } from "@/i18n.config";
 
 export default function OrderDetailPage() {
     const { lang, orderid } = useParams();
@@ -35,6 +36,8 @@ export default function OrderDetailPage() {
     const [error, setError] = useState<string | null>(null);
     const [order, setOrder] = useState<OrderDetail | null>(null);
     const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+
+    const getLink = (path: string) => lang === defaultLocale ? path : `/${lang}${path}`;
 
     const fmtMoney = (n: number) => {
         return new Intl.NumberFormat(undefined, {
@@ -93,63 +96,59 @@ export default function OrderDetailPage() {
 
     if (loading) {
         return (
-            <div className="space-y-8 animate-in fade-in duration-500">
-                <div className="flex items-center gap-4">
-                    <Skeleton className="h-10 w-10 rounded-lg" />
-                    <div className="space-y-2">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-6 w-48" />
-                    </div>
+            <div className="space-y-4 animate-in fade-in duration-500">
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-9 w-9 rounded-lg" />
+                    <Skeleton className="h-5 w-48" />
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
-                    <Skeleton className="h-64 w-full rounded-2xl" />
-                    <Skeleton className="h-64 w-full rounded-2xl" />
+                <div className="grid gap-4 lg:grid-cols-3">
+                    <Skeleton className="h-48 w-full rounded-2xl lg:col-span-2" />
+                    <Skeleton className="h-48 w-full rounded-2xl" />
                 </div>
-                <Skeleton className="h-96 w-full rounded-2xl" />
             </div>
         );
     }
 
     if (error || !order) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
-                    <Package className="h-8 w-8" />
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-3">
+                    <Package className="h-6 w-6" />
                 </div>
-                <h2 className="text-xl font-bold dark:text-white">
+                <h2 className="text-lg font-bold dark:text-white">
                     {dict?.profile?.orderDetails?.notFound || "Order not found"}
                 </h2>
-                <p className="text-muted-foreground mt-2">
+                <p className="text-muted-foreground text-sm mt-1">
                     {error || (dict?.profile?.orderDetails?.notFoundDesc || "The requested order could not be loaded.")}
                 </p>
-                <Button variant="outline" className="mt-6 font-black uppercase tracking-widest text-xs h-12 px-8 rounded-2xl" onClick={() => router.back()}>
-                    <ArrowLeft className="h-4 w-4 mr-2" /> {dict?.profile?.orderDetails?.backToOrders || "Back to Orders"}
+                <Button variant="outline" className="mt-4 text-xs font-bold h-9 px-4 rounded-xl" onClick={() => router.back()}>
+                    <ArrowLeft className="h-3.5 w-3.5 mr-1.5" /> {dict?.profile?.orderDetails?.backToOrders || "Back to Orders"}
                 </Button>
             </div>
         );
     }
 
     return (
-        <div className="space-y-10 animate-in slide-in-from-right-8 duration-700">
+        <div className="space-y-5 animate-in slide-in-from-right-8 duration-700">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
                     <Button
                         variant="outline"
                         size="icon"
-                        className="rounded-2xl h-12 w-12 sm:h-14 sm:w-14 border-border dark:border-white/10 bg-white/40 backdrop-blur-md shadow-lg shadow-black/5 hover:bg-brand-primary hover:text-white transition-all duration-500"
+                        className="rounded-xl h-9 w-9 border-border dark:border-white/10 hover:bg-brand-primary hover:text-white transition-all"
                         onClick={() => router.back()}
                     >
-                        <ArrowLeft className="h-6 w-6" />
+                        <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <h1 className="text-2xl sm:text-3xl font-black dark:text-white tracking-tighter uppercase">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h1 className="text-lg font-black dark:text-white tracking-tight">
                                 {dict?.profile?.orderDetails?.title || "Order"} #{order.id.slice(0, 12)}
                             </h1>
                             <Badge
                                 className={cn(
-                                    "uppercase font-black tracking-widest px-4 py-1 rounded-full border-none shadow-sm text-[10px]",
+                                    "uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border-none text-[10px]",
                                     order.status === OrderStatus.Delivered && "bg-emerald-500 text-white",
                                     order.status === OrderStatus.Shipped && "bg-blue-500 text-white",
                                     order.status === OrderStatus.Processing && "bg-amber-500 text-white",
@@ -160,41 +159,37 @@ export default function OrderDetailPage() {
                                 {getStatusName(order.status)}
                             </Badge>
                         </div>
-                        <p className="text-muted-foreground text-sm mt-1 font-bold">
-                            {dict?.profile?.orders?.placedOn || "Placed on"} {new Date(order.date).toLocaleDateString(lang as string || undefined, { dateStyle: 'full' })}
+                        <p className="text-muted-foreground text-xs mt-0.5">
+                            {dict?.profile?.orders?.placedOn || "Placed on"} {new Date(order.date).toLocaleDateString(lang as string || undefined, { dateStyle: 'medium' })}
                         </p>
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" className="rounded-2xl h-12 px-6 border-border dark:border-white/10 font-bold tracking-tight bg-white/40 backdrop-blur-md" onClick={handleDownloadInvoice} disabled={downloadingInvoice}>
-                        <Download className="h-4 w-4 mr-2" /> {downloadingInvoice ? (dict?.profile?.orderDetails?.generating || "Generating...") : (dict?.profile?.orderDetails?.invoice || "Invoice")}
+                    <Button variant="outline" className="rounded-xl h-9 px-4 border-border dark:border-white/10 text-xs font-bold" onClick={handleDownloadInvoice} disabled={downloadingInvoice}>
+                        <Download className="h-3.5 w-3.5 mr-1.5" /> {downloadingInvoice ? (dict?.profile?.orderDetails?.generating || "...") : (dict?.profile?.orderDetails?.invoice || "Invoice")}
                     </Button>
                     {order.status === OrderStatus.Delivered && (
-                        <Button className="rounded-2xl h-12 px-6 font-bold tracking-tight shadow-xl shadow-brand-primary/20 bg-brand-primary hover:bg-brand-primary/90 text-white">
-                            <Star className="h-4 w-4 mr-2" /> {dict?.profile?.orderDetails?.review || "Review"}
+                        <Button className="rounded-xl h-9 px-4 text-xs font-bold bg-brand-primary hover:bg-brand-primary/90 text-white">
+                            <Star className="h-3.5 w-3.5 mr-1.5" /> {dict?.profile?.orderDetails?.review || "Review"}
                         </Button>
                     )}
                 </div>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
+            <div className="grid gap-5 lg:grid-cols-3">
                 {/* Main Content - Items */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-border dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/5">
-                        <div className="p-8 border-b border-border dark:border-white/10 flex items-center justify-between bg-white/20">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                                    <ShoppingCart className="h-5 w-5 text-brand-primary" />
-                                </div>
-                                <h3 className="text-xl font-black dark:text-white tracking-tight">
-                                    {dict?.profile?.orderDetails?.itemsTitle || "Order Items"} ({order.orderItems?.length || 0})
-                                </h3>
-                            </div>
+                <div className="lg:col-span-2">
+                    <div className="bg-white dark:bg-white/5 border border-border/60 dark:border-white/10 rounded-2xl overflow-hidden">
+                        <div className="px-5 py-3 border-b border-border/60 dark:border-white/10 flex items-center gap-2">
+                            <ShoppingCart className="h-4 w-4 text-brand-primary" />
+                            <h3 className="text-sm font-bold dark:text-white">
+                                {dict?.profile?.orderDetails?.itemsTitle || "Order Items"} ({order.orderItems?.length || 0})
+                            </h3>
                         </div>
-                        <div className="divide-y divide-border dark:divide-white/10">
+                        <div className="divide-y divide-border/60 dark:divide-white/10">
                             {order.orderItems?.map((item: OrderItem, idx: number) => (
-                                <div key={idx} className="p-8 flex items-center gap-6 group hover:bg-white/40 transition-colors">
-                                    <div className="h-24 w-24 rounded-3xl overflow-hidden bg-brand-surface dark:bg-white/5 shrink-0 border border-border dark:border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
+                                <Link key={idx} href={item.productId ? getLink(`/product/${item.productId}`) : "#"} className="px-5 py-3 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                    <div className="h-14 w-14 rounded-xl overflow-hidden bg-brand-surface dark:bg-white/5 shrink-0 border border-border/60 dark:border-white/10">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             alt={item.name}
@@ -203,96 +198,69 @@ export default function OrderDetailPage() {
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="font-black text-lg truncate dark:text-white tracking-tight">{item.name}</h4>
-                                        <p className="text-sm text-muted-foreground mt-1 font-bold">
-                                            {dict?.profile?.orderDetails?.quantity || "Quantity"}: {item.quantity}
+                                        <h4 className="font-bold text-sm truncate dark:text-white">{item.name}</h4>
+                                        <p className="text-xs text-muted-foreground">
+                                            {dict?.profile?.orderDetails?.quantity || "Qty"}: {item.quantity}
                                         </p>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="font-black text-xl dark:text-white tracking-tight">{fmtMoney(item.price)}</p>
-                                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">
-                                            {dict?.profile?.orderDetails?.unitPrice || "Unit Price"}
-                                        </p>
-                                    </div>
-                                </div>
+                                    <p className="font-bold text-sm dark:text-white">{fmtMoney(item.price)}</p>
+                                </Link>
                             ))}
                         </div>
-                        <div className="p-8 bg-black/5 dark:bg-white/5 space-y-4">
-                            <div className="flex justify-between text-sm font-bold">
-                                <span className="text-muted-foreground uppercase tracking-widest">
-                                    {dict?.profile?.orderDetails?.subtotal || "Subtotal"}
-                                </span>
+                        <div className="px-5 py-3 bg-black/[0.02] dark:bg-white/5 space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">{dict?.profile?.orderDetails?.subtotal || "Subtotal"}</span>
                                 <span className="dark:text-white">{fmtMoney(order.total || 0)}</span>
                             </div>
-                            <div className="flex justify-between text-sm font-bold">
-                                <span className="text-muted-foreground uppercase tracking-widest">
-                                    {dict?.profile?.orderDetails?.shipping || "Shipping"}
-                                </span>
-                                <span className="text-emerald-500 font-black">
-                                    {dict?.profile?.orderDetails?.complementary || "Complementary"}
-                                </span>
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">{dict?.profile?.orderDetails?.shipping || "Shipping"}</span>
+                                <span className="text-emerald-500 font-semibold">{dict?.profile?.orderDetails?.complementary || "Free"}</span>
                             </div>
-                            <div className="h-px bg-border dark:bg-white/10 my-4" />
+                            <div className="h-px bg-border/60 dark:bg-white/10" />
                             <div className="flex justify-between items-center">
-                                <span className="font-black text-xl dark:text-white tracking-tight uppercase">
-                                    {dict?.profile?.orders?.totalAmount || "Total Amount"}
-                                </span>
-                                <span className="font-black text-3xl text-brand-primary tracking-tighter">{fmtMoney(order.total || 0)}</span>
+                                <span className="font-bold dark:text-white">{dict?.profile?.orders?.totalAmount || "Total"}</span>
+                                <span className="font-black text-lg text-brand-primary">{fmtMoney(order.total || 0)}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Sidebar - Shipping & Tracking */}
-                <div className="space-y-8">
+                <div className="space-y-5">
                     {/* Shipping Info */}
-                    <div className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-border dark:border-white/10 rounded-[2.5rem] p-8 space-y-8 shadow-2xl shadow-black/5">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                                <Truck className="h-5 w-5 text-brand-primary" />
-                            </div>
-                            <h3 className="text-xl font-black dark:text-white tracking-tight">
+                    <div className="bg-white dark:bg-white/5 border border-border/60 dark:border-white/10 rounded-2xl p-5 space-y-4">
+                        <div className="flex items-center gap-2">
+                            <Truck className="h-4 w-4 text-brand-primary" />
+                            <h3 className="text-sm font-bold dark:text-white">
                                 {dict?.profile?.orderDetails?.deliveryDetails || "Delivery Details"}
                             </h3>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className="flex gap-4">
-                                <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                                    <MapPin className="h-5 w-5 text-muted-foreground" />
-                                </div>
+                        <div className="space-y-3">
+                            <div className="flex gap-3">
+                                <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                                 <div>
-                                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
-                                        {dict?.profile?.orderDetails?.destination || "Destination"}
-                                    </p>
-                                    <p className="text-sm font-bold dark:text-white leading-relaxed">{order.shippingAddress || "No address provided"}</p>
+                                    <p className="text-xs text-muted-foreground">{dict?.profile?.orderDetails?.destination || "Destination"}</p>
+                                    <p className="text-sm font-medium dark:text-white">{order.shippingAddress || "No address provided"}</p>
                                 </div>
                             </div>
 
                             {order.trackingNumber && (
-                                <div className="flex gap-4">
-                                    <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                                        <Receipt className="h-5 w-5 text-muted-foreground" />
-                                    </div>
+                                <div className="flex gap-3">
+                                    <Receipt className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
-                                            {dict?.profile?.orderDetails?.trackingId || "Tracking ID"}
-                                        </p>
-                                        <p className="text-sm font-black text-brand-primary font-mono select-all bg-brand-primary/5 px-2 py-0.5 rounded-lg border border-brand-primary/10 inline-block">{order.trackingNumber}</p>
+                                        <p className="text-xs text-muted-foreground">{dict?.profile?.orderDetails?.trackingId || "Tracking ID"}</p>
+                                        <p className="text-sm font-semibold text-brand-primary font-mono select-all">{order.trackingNumber}</p>
                                     </div>
                                 </div>
                             )}
 
                             {order.estimatedDelivery && (
-                                <div className="flex gap-4">
-                                    <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                                        <Clock className="h-5 w-5 text-muted-foreground" />
-                                    </div>
+                                <div className="flex gap-3">
+                                    <Clock className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
-                                            {dict?.profile?.orderDetails?.estimatedArrival || "Estimated Arrival"}
-                                        </p>
-                                        <p className="text-sm dark:text-white font-black">{order.estimatedDelivery}</p>
+                                        <p className="text-xs text-muted-foreground">{dict?.profile?.orderDetails?.estimatedArrival || "Estimated Arrival"}</p>
+                                        <p className="text-sm font-medium dark:text-white">{order.estimatedDelivery}</p>
                                     </div>
                                 </div>
                             )}
@@ -300,54 +268,50 @@ export default function OrderDetailPage() {
                     </div>
 
                     {/* Tracking Timeline */}
-                    <div className="bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-border dark:border-white/10 rounded-[2.5rem] p-8 space-y-8 shadow-2xl shadow-black/5">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                                <Clock className="h-5 w-5 text-brand-primary" />
-                            </div>
-                            <h3 className="text-xl font-black dark:text-white tracking-tight">
+                    <div className="bg-white dark:bg-white/5 border border-border/60 dark:border-white/10 rounded-2xl p-5 space-y-4">
+                        <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-brand-primary" />
+                            <h3 className="text-sm font-bold dark:text-white">
                                 {dict?.profile?.orderDetails?.timeline || "Timeline"}
                             </h3>
                         </div>
 
-                        <div className="space-y-8">
+                        <div className="space-y-4">
                             {order.trackingSteps && order.trackingSteps.length > 0 ? (
                                 order.trackingSteps.map((step, i) => (
-                                    <div key={i} className="flex gap-5 relative">
+                                    <div key={i} className="flex gap-3 relative">
                                         {i < order.trackingSteps.length - 1 && (
                                             <div className={cn(
-                                                "absolute left-[13px] top-8 w-[2px] h-[calc(100%-12px)]",
+                                                "absolute left-[9px] top-6 w-[2px] h-[calc(100%-4px)]",
                                                 step.completed ? "bg-brand-primary" : "bg-muted"
                                             )} />
                                         )}
                                         <div className={cn(
-                                            "h-7 w-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all duration-500",
-                                            step.completed ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/30 scale-110" : "bg-muted text-muted-foreground"
+                                            "h-5 w-5 rounded-full flex items-center justify-center shrink-0 z-10 mt-0.5",
+                                            step.completed ? "bg-brand-primary text-white" : "bg-muted text-muted-foreground"
                                         )}>
-                                            <CheckCircle2 className="h-4 w-4" />
+                                            <CheckCircle2 className="h-3 w-3" />
                                         </div>
-                                        <div className="space-y-1 pt-0.5">
+                                        <div>
                                             <p className={cn(
-                                                "text-sm font-black tracking-tight",
+                                                "text-sm font-semibold",
                                                 step.completed ? "dark:text-white text-brand-primary" : "text-muted-foreground"
                                             )}>
                                                 {typeof step.status === 'number' ? getStatusName(step.status) : step.status}
                                             </p>
-                                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                                            <p className="text-xs text-muted-foreground">
                                                 {new Date(step.date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                                             </p>
                                             {step.description && (
-                                                <p className="text-xs text-muted-foreground font-medium italic mt-2 bg-black/5 dark:bg-white/5 p-3 rounded-2xl leading-relaxed">{step.description}</p>
+                                                <p className="text-xs text-muted-foreground italic mt-1 bg-black/[0.03] dark:bg-white/5 p-2 rounded-lg">{step.description}</p>
                                             )}
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <div className="py-6 text-center">
-                                    <p className="text-sm text-muted-foreground font-medium italic">
-                                        {dict?.profile?.orderDetails?.trackingPending || "Tracking information is pending for this order history."}
-                                    </p>
-                                </div>
+                                <p className="text-sm text-muted-foreground italic text-center py-3">
+                                    {dict?.profile?.orderDetails?.trackingPending || "Tracking information is pending."}
+                                </p>
                             )}
                         </div>
                     </div>

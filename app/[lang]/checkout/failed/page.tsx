@@ -26,32 +26,32 @@ function PaymentFailedContent({ lang }: { lang: string }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
       <div className="w-full max-w-md">
-        <div className="rounded-lg bg-white p-8 shadow-lg">
+        <div className="rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50">
           <div className="mb-6 flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-              <XCircle className="h-10 w-10 text-red-600" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
             </div>
           </div>
 
-          <h1 className="font-heading mb-2 text-center text-2xl font-bold text-gray-900">
+          <h1 className="font-heading mb-2 text-center text-2xl font-bold text-gray-900 dark:text-white">
             {dictionary.checkout?.failed?.title || "Payment Failed"}
           </h1>
 
           {paymentInfo?.reason && (
-            <div className="mb-6 rounded-lg bg-red-50 p-4">
-              <p className="font-primary text-sm text-red-800">
+            <div className="mb-6 rounded-lg bg-red-50 p-4 dark:bg-red-900/30">
+              <p className="font-primary text-sm text-red-800 dark:text-red-300">
                 <strong>{dictionary.checkout?.failed?.reason || "Reason:"}</strong> {paymentInfo.reason}
               </p>
             </div>
           )}
 
           <div className="mb-6">
-            <p className="font-primary mb-4 text-center text-gray-600">
+            <p className="font-primary mb-4 text-center text-gray-600 dark:text-gray-300">
               {dictionary.checkout?.failed?.message || "We couldn't process your payment. This may be due to:"}
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-start">
                 <span className="font-primary mr-2">•</span>
                 <span>{dictionary.checkout?.failed?.reasons?.funds || "Insufficient funds"}</span>
@@ -72,26 +72,26 @@ function PaymentFailedContent({ lang }: { lang: string }) {
           </div>
 
           <div className="space-y-3">
-            <button className="font-primary flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
+            <button className="font-primary flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
               onClick={handleRetry}
             >
               <RefreshCw className="h-5 w-5" />
               {dictionary.checkout?.failed?.tryAgain || "Try again"}
             </button>
 
-            <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50"
+            <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               href={`/${lang}/cart`}
             >
               {dictionary.checkout?.failed?.backToCart || "Back to cart"}
             </Link>
 
-            <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50"
+            <Link className="block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               href={`/${lang}`}
             >
               {dictionary.checkout?.success?.continueShopping || "Continue shopping"}
             </Link>
 
-            <Link className="block w-full text-center text-sm text-blue-600 hover:underline" href="mailto:support@example.com">
+            <Link className="block w-full text-center text-sm text-blue-600 hover:underline dark:text-blue-400" href="mailto:support@example.com">
               {dictionary.checkout?.failed?.contactSupport || "Support"}
             </Link>
           </div>
@@ -106,8 +106,8 @@ export default function PaymentFailedPage() {
 
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 dark:border-gray-700 dark:border-t-blue-400" />
       </div>
     }>
       <PaymentFailedContent lang={lang as string} />

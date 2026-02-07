@@ -5,9 +5,12 @@ import {
     Heart,
     Trash2,
     ShoppingCart,
-    ShoppingBag,
     ArrowRight
 } from "lucide-react";
+import { toast } from "sonner";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
 import {
     getWishlist,
     removeFromWishlist
@@ -16,13 +19,7 @@ import { WishlistItem } from "@/types/orderTypes";
 import { Button } from "@/components/ui/button";
 import { useCartStore, CartItem } from "@/app/context/cartContext";
 import { resolveImageUrl } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useDictionary } from "@/app/context/dictionary-provider";
-
 import { defaultLocale } from "@/i18n.config";
 
 export default function WishlistPage() {
@@ -36,6 +33,7 @@ export default function WishlistPage() {
         if (lang === defaultLocale) {
             return path;
         }
+
         return `/${lang}${path}`;
     };
 
@@ -49,6 +47,7 @@ export default function WishlistPage() {
             try {
                 setLoading(true);
                 const data = await getWishlist();
+
                 setWishlist(data);
             } catch (err) {
                 console.error("Failed to fetch wishlist", err);
@@ -56,6 +55,7 @@ export default function WishlistPage() {
                 setLoading(false);
             }
         };
+
         fetchWishlist();
     }, []);
 
@@ -108,69 +108,66 @@ export default function WishlistPage() {
             </div>
 
             {wishlist.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 bg-white/40 dark:bg-white/5 backdrop-blur-xl rounded-[3rem] border border-dashed border-border dark:border-white/10">
-                    <div className="h-20 w-20 rounded-3xl bg-brand-primary/10 flex items-center justify-center text-brand-primary mb-6 animate-pulse">
-                        <Heart className="h-10 w-10 fill-current" />
+                <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-white/5 rounded-2xl border border-dashed border-border dark:border-white/10">
+                    <div className="h-14 w-14 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary mb-4 animate-pulse">
+                        <Heart className="h-7 w-7 fill-current" />
                     </div>
-                    <h3 className="text-xl font-bold dark:text-white tracking-tight">
+                    <h3 className="text-base font-bold dark:text-white tracking-tight">
                         {dict?.wishlist?.empty || "Your wishlist is empty"}
                     </h3>
-                    <p className="text-muted-foreground text-sm max-w-xs text-center mt-2 font-medium">
+                    <p className="text-muted-foreground text-sm max-w-xs text-center mt-2">
                         {dict?.wishlist?.emptyDesc || "Save products you like to find them easily later and track price changes."}
                     </p>
-                    <Button className="mt-8 rounded-2xl h-12 px-8 font-bold tracking-tight shadow-xl shadow-brand-primary/20 bg-brand-primary hover:bg-brand-primary/90 text-white" asChild>
+                    <Button asChild className="mt-6 rounded-xl h-10 px-6 text-sm font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white">
                         <Link href={getLink("/all-products")}>
                             {dict?.wishlist?.browse || "Browse Products"} <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {wishlist.map((item) => (
                         <div
                             key={item.id}
-                            className="group bg-white/40 dark:bg-white/5 backdrop-blur-md border border-border dark:border-white/10 rounded-[2.5rem] overflow-hidden hover:border-brand-primary/50 hover:shadow-2xl hover:shadow-brand-primary/5 transition-all duration-500 flex flex-col"
+                            className="group relative overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-950 flex flex-col h-full transition-all duration-300"
                         >
-                            <div className="relative aspect-square overflow-hidden bg-brand-surface dark:bg-white/5 border-b border-border dark:border-white/10">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    alt={item.name}
-                                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                    src={item.image || "/placeholder.png"}
-                                />
+                            {/* Image */}
+                            <div className="relative aspect-square overflow-hidden rounded-t-2xl bg-zinc-100 dark:bg-zinc-900/60">
+                                <Link href={getLink(`/product/${item.id}`)}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        alt={item.name}
+                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        src={item.image || "/placeholder.png"}
+                                    />
+                                </Link>
                                 <button
+                                    className="absolute top-2 right-2 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm"
                                     title={dict?.wishlist?.remove || "Remove from wishlist"}
-                                    className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md flex items-center justify-center text-destructive hover:bg-destructive hover:text-white transition-all shadow-lg"
                                     onClick={() => handleRemove(item.id)}
                                 >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-3.5 w-3.5" />
                                 </button>
                             </div>
 
-                            <div className="p-6 flex flex-col flex-1">
-                                <div className="flex-1">
-                                    <h3 className="font-black text-lg dark:text-white line-clamp-2 tracking-tight group-hover:text-brand-primary transition-colors">{item.name}</h3>
-                                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-2">
-                                        {item.price === 0 ? (dict?.wishlist?.free || "Free") : (dict?.wishlist?.premium || "Premium Product")}
-                                    </p>
-                                </div>
+                            {/* Content */}
+                            <div className="p-2.5 flex flex-col flex-1">
+                                <span className="text-sm sm:text-base font-extrabold text-brand-primary">
+                                    {fmtMoney(item.price)}
+                                </span>
+                                <h3 className="text-xs sm:text-[13px] font-semibold leading-snug text-zinc-900 dark:text-zinc-100 line-clamp-2 mt-1 min-h-[2rem]">
+                                    {item.name}
+                                </h3>
 
-                                <div className="mt-6 flex items-center justify-between">
-                                    <span className="text-2xl font-black text-brand-primary tracking-tighter">{fmtMoney(item.price)}</span>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            size="icon"
-                                            className="h-12 w-12 rounded-2xl shadow-lg shadow-brand-primary/20 bg-brand-primary hover:bg-brand-primary/90 text-white"
-                                            onClick={() => handleAddToCart(item)}
-                                        >
-                                            <ShoppingCart className="h-5 w-5" />
-                                        </Button>
-                                        <Button asChild variant="outline" size="icon" className="h-12 w-12 rounded-2xl border-border dark:border-white/10">
-                                            <Link href={getLink(`/product/${item.id}`)}>
-                                                <ShoppingBag className="h-5 w-5" />
-                                            </Link>
-                                        </Button>
-                                    </div>
+                                <div className="mt-auto pt-2">
+                                    <Button
+                                        className="w-full h-9 rounded-xl text-xs font-semibold bg-brand-primary hover:bg-brand-primary/90 text-white flex items-center justify-center gap-1.5"
+                                        onClick={() => handleAddToCart(item)}
+                                    >
+                                        <ShoppingCart className="h-3.5 w-3.5" />
+                                        <span className="hidden sm:inline">{dict?.common?.addToCart || "Add to Cart"}</span>
+                                        <span className="sm:hidden">{dict?.common?.addToCartShort || "Add"}</span>
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -179,8 +176,4 @@ export default function WishlistPage() {
             )}
         </div>
     );
-}
-
-function cn(...inputs: any[]) {
-    return inputs.filter(Boolean).join(" ");
 }

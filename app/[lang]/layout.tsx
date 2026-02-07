@@ -288,7 +288,7 @@ export default async function RootLayout({
             {/* <WebVitals /> */}
             <LayoutWrapper>
               <ClientUADataFix />
-              <main className="" id="main-content">
+              <main id="main-content">
                 {children}
               </main>
               {/* <AiChatWidget /> */}

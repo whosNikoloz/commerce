@@ -21,6 +21,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   // More robust admin page check
   const isAdminPage = pathname?.includes("/admin") ?? false;
+  const isProfilePage = pathname?.includes("/profile") ?? false;
 
   // Prevent hydration mismatch by not rendering Navbar until mounted
   const shouldShowNavbar = mounted && !isAdminPage;
@@ -29,7 +30,11 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
     <div className={`${isAdminPage ? "" : "relative flex flex-col  min-h-screen"}`}>
       <GA4PageTracker />
-      {shouldShowNavbar && <Navbar />}
+      {shouldShowNavbar && (
+        <div className={isProfilePage ? "hidden md:block" : ""}>
+          <Navbar />
+        </div>
+      )}
       <main className={`${isAdminPage ? "" : "   "}`}>{children}</main>
       {shouldShowFooter && <Footer />}
     </div>

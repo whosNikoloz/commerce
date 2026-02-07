@@ -3,26 +3,28 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
     Package,
-    Eye,
     ChevronRight,
     Search,
-    Filter,
     LayoutGrid,
-    List
+    List,
+    CheckCircle,
+    Truck,
+    Clock,
+    CreditCard,
+    Loader
 } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
 import {
     getMyOrders,
 } from "@/app/api/services/orderService";
 import { OrderSummary, OrderStatus } from "@/types/orderTypes";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { cn } from "@/lib/utils";
-
 import { defaultLocale } from "@/i18n.config";
 
 export default function OrdersPage() {
@@ -43,6 +45,7 @@ export default function OrdersPage() {
         if (lang === defaultLocale) {
             return path;
         }
+
         return `/${lang}${path}`;
     };
 
@@ -55,6 +58,7 @@ export default function OrdersPage() {
 
     function getStatusName(status: OrderStatus): string {
         const statuses = dict?.profile?.status;
+
         if (!statuses) return OrderStatus[status] || "Unknown";
 
         switch (status) {
@@ -72,6 +76,7 @@ export default function OrdersPage() {
             try {
                 setLoading(true);
                 const res = await getMyOrders(paged.page, paged.pageSize);
+
                 setOrders(res.data);
                 setPaged((p) => ({ ...p, total: res.total }));
             } catch (err: any) {
@@ -80,8 +85,19 @@ export default function OrdersPage() {
                 setLoading(false);
             }
         };
+
         fetchOrders();
     }, [paged.page, paged.pageSize]);
+
+    function getStatusColor(status: OrderStatus) {
+        switch (status) {
+            case OrderStatus.Delivered: return { dot: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800", icon: CheckCircle };
+            case OrderStatus.Shipped: return { dot: "bg-blue-500", badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800", icon: Truck };
+            case OrderStatus.Processing: return { dot: "bg-amber-500", badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800", icon: Loader };
+            case OrderStatus.Paid: return { dot: "bg-brand-primary", badge: "bg-brand-primary/10 text-brand-primary border-brand-primary/20 dark:bg-brand-primary/20 dark:border-brand-primary/30", icon: CreditCard };
+            case OrderStatus.Pending: default: return { dot: "bg-gray-400", badge: "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700", icon: Clock };
+        }
+    }
 
     const filteredOrders = useMemo(() => {
         return orders.filter(order =>
@@ -90,7 +106,7 @@ export default function OrdersPage() {
     }, [orders, searchQuery]);
 
     if (loading && orders.length === 0) {
-        return <OrdersSkeleton viewMode={viewMode} dict={dict} />;
+        return <OrdersSkeleton dict={dict} viewMode={viewMode} />;
     }
 
     return (
@@ -107,32 +123,32 @@ export default function OrdersPage() {
 
                 <div className="flex bg-white/40 dark:bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-border dark:border-white/10 shadow-sm">
                     <button
-                        onClick={() => setViewMode("list")}
                         className={cn(
                             "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
                             viewMode === "list" ? "bg-brand-primary text-white shadow-lg" : "text-muted-foreground hover:bg-brand-primary/5 hover:text-brand-primary"
                         )}
+                        onClick={() => setViewMode("list")}
                     >
                         <List className="h-4 w-4" /> {dict?.profile?.orders?.viewMode?.list || "List"}
                     </button>
                     <button
-                        onClick={() => setViewMode("grid")}
                         className={cn(
                             "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
                             viewMode === "grid" ? "bg-brand-primary text-white shadow-lg" : "text-muted-foreground hover:bg-brand-primary/5 hover:text-brand-primary"
                         )}
+                        onClick={() => setViewMode("grid")}
                     >
                         <LayoutGrid className="h-4 w-4" /> {dict?.profile?.orders?.viewMode?.grid || "Grid"}
                     </button>
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between backdrop-blur-xl bg-white/40 dark:bg-white/5 p-6 rounded-[2rem] border border-border dark:border-white/10 shadow-xl shadow-black/5">
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between backdrop-blur-xl bg-white/40 dark:bg-white/5 p-4 rounded-2xl border border-border dark:border-white/10 shadow-xl shadow-black/5">
                 <div className="relative w-full sm:max-w-xs group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
                     <Input
+                        className="pl-10 h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none focus-visible:ring-2 focus-visible:ring-brand-primary/20 transition-all font-bold text-sm"
                         placeholder={dict?.profile?.orders?.searchPlaceholder || "Search by Order ID..."}
-                        className="pl-12 h-12 rounded-2xl bg-brand-surface dark:bg-white/5 border-none focus-visible:ring-2 focus-visible:ring-brand-primary/20 transition-all font-bold"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -143,19 +159,19 @@ export default function OrdersPage() {
                     </span>
                     <div className="flex gap-1">
                         <Button
-                            variant="outline"
-                            size="sm"
                             className="rounded-xl h-10 border-border dark:border-white/10"
                             disabled={paged.page <= 1}
+                            size="sm"
+                            variant="outline"
                             onClick={() => setPaged(p => ({ ...p, page: p.page - 1 }))}
                         >
                             {dict?.profile?.orders?.pagination?.prev || "Prev"}
                         </Button>
                         <Button
-                            variant="outline"
-                            size="sm"
                             className="rounded-xl h-10 border-border dark:border-white/10"
                             disabled={paged.page >= Math.ceil(paged.total / paged.pageSize)}
+                            size="sm"
+                            variant="outline"
                             onClick={() => setPaged(p => ({ ...p, page: p.page + 1 }))}
                         >
                             {dict?.profile?.orders?.pagination?.next || "Next"}
@@ -171,11 +187,11 @@ export default function OrdersPage() {
                     </CardContent>
                 </Card>
             ) : filteredOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 bg-white/40 dark:bg-white/5 rounded-[3rem] border border-dashed border-border dark:border-white/10">
-                    <div className="h-20 w-20 rounded-3xl bg-brand-primary/10 flex items-center justify-center text-brand-primary mb-6 animate-pulse">
-                        <Package className="h-10 w-10" />
+                <div className="flex flex-col items-center justify-center py-16 bg-white/40 dark:bg-white/5 rounded-2xl border border-dashed border-border dark:border-white/10">
+                    <div className="h-14 w-14 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary mb-4 animate-pulse">
+                        <Package className="h-7 w-7" />
                     </div>
-                    <h3 className="text-xl font-bold dark:text-white tracking-tight">
+                    <h3 className="text-base font-bold dark:text-white tracking-tight">
                         {dict?.profile?.orders?.empty || "No orders found"}
                     </h3>
                     <p className="text-muted-foreground text-sm max-w-xs text-center mt-2 font-medium">
@@ -185,145 +201,145 @@ export default function OrdersPage() {
                     </p>
                 </div>
             ) : viewMode === "list" ? (
-                <div className="grid gap-4">
+                <div className="grid gap-3">
                     {filteredOrders.map((order) => {
+                        const statusStyle = getStatusColor(order.status);
+                        const StatusIcon = statusStyle.icon;
+
                         return (
-                            <Link
+                            <div
                                 key={order.id}
-                                href={getLink(`/profile/orders/${order.id}`)}
-                                className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/60 dark:bg-white/5 border border-border dark:border-white/10 rounded-[2rem] hover:border-brand-primary/50 hover:shadow-2xl hover:shadow-brand-primary/5 hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-500"
+                                className="group bg-white dark:bg-gray-900 border border-border dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="flex items-center gap-6">
-                                    <div className="flex flex-col gap-3">
-                                        <div className="relative h-20 w-20 flex-shrink-0">
-                                            <div className="h-full w-full rounded-2xl bg-brand-primary/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
-                                                <Package className="h-10 w-10 transition-colors" />
+                                {/* Header */}
+                                <div className="flex items-center justify-between px-5 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn("h-2.5 w-2.5 rounded-full flex-shrink-0", statusStyle.dot)} />
+                                        <div className="h-9 w-9 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                                            <Package className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="font-bold text-sm dark:text-white">
+                                                    {dict?.profile?.orders?.orderLabel || "Order"} #{order.id.slice(0, 6)}
+                                                </span>
+                                                <span className="font-bold text-sm dark:text-white">
+                                                    {dict?.profile?.orders?.priceLabel || "Price"}: {fmtMoney(order.total || 0)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                                                <span>{dict?.profile?.orders?.productsLabel || "Products"}: {order.items}</span>
+                                                <span>·</span>
+                                                <span>{dict?.profile?.orders?.dateLabel || "Date"}: {new Date(order.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                                                {/* <span className="flex items-center gap-1">
+                                                    <span className={cn("h-1.5 w-1.5 rounded-full", statusStyle.dot)} />
+                                                    {dict?.profile?.orders?.statusLabel || "Status"}: {getStatusName(order.status)}
+                                                </span> */}
                                             </div>
                                         </div>
-                                        {order.images && order.images.length > 0 && (
-                                            <div className="flex gap-1.5 flex-wrap max-w-[80px]">
-                                                {order.images.slice(0, 4).map((img, idx) => (
-                                                    <div key={img.id || idx} className="h-9 w-9 rounded-lg overflow-hidden border border-border dark:border-white/10">
-                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img
-                                                            alt="Product"
-                                                            className="h-full w-full object-cover"
-                                                            src={img.imagePath}
-                                                        />
-                                                    </div>
-                                                ))}
-                                                {order.images.length > 4 && (
-                                                    <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                                                        +{order.images.length - 4}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
                                     </div>
-                                    <div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="font-black text-lg tracking-tighter dark:text-white uppercase">#{order.id.slice(0, 8)}</span>
-                                            <Badge
-                                                className={cn(
-                                                    "text-[10px] uppercase font-black tracking-widest py-0.5 px-3 rounded-full border-none shadow-sm",
-                                                    order.status === OrderStatus.Delivered && "bg-emerald-500 text-white",
-                                                    order.status === OrderStatus.Shipped && "bg-blue-500 text-white",
-                                                    order.status === OrderStatus.Processing && "bg-amber-500 text-white",
-                                                    order.status === OrderStatus.Pending && "bg-muted text-muted-foreground",
-                                                    order.status === OrderStatus.Paid && "bg-brand-primary text-white"
-                                                )}
-                                            >
-                                                {getStatusName(order.status)}
-                                            </Badge>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground mt-1 font-black uppercase tracking-widest">
-                                            {new Date(order.date).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })} • {order.items} {dict?.profile?.orders?.orderItems || "Items"}
-                                        </p>
+                                    <div className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold flex-shrink-0", statusStyle.badge)}>
+                                        <StatusIcon className="h-3.5 w-3.5" />
+                                        {getStatusName(order.status)}
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between md:justify-end gap-10 mt-8 md:mt-0">
-                                    <div className="text-right">
-                                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">
-                                            {dict?.profile?.orders?.totalAmount || "Total Amount"}
-                                        </p>
-                                        <p className="text-2xl font-black dark:text-white tracking-tight text-brand-primary">{fmtMoney(order.total || 0)}</p>
+                                {/* Product images */}
+                                {order.images && order.images.length > 0 && (
+                                    <div className="px-5 pb-3 flex gap-2">
+                                        {order.images.slice(0, 5).map((img, idx) => (
+                                            <Link key={img.id || idx} href={getLink(`/product/${img.productId}`)} className="h-14 w-14 rounded-lg overflow-hidden border border-border dark:border-white/10 bg-gray-50 dark:bg-white/5 flex-shrink-0 hover:ring-2 hover:ring-brand-primary/40 transition-all">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    alt="Product"
+                                                    className="h-full w-full object-cover"
+                                                    src={img.imagePath}
+                                                />
+                                            </Link>
+                                        ))}
+                                        {order.images.length > 5 && (
+                                            <div className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-muted-foreground flex-shrink-0">
+                                                +{order.images.length - 5}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="h-14 w-14 rounded-full border border-border dark:border-white/10 flex items-center justify-center group-hover:bg-brand-primary group-hover:border-brand-primary group-hover:translate-x-1 transition-all duration-500 shadow-sm group-hover:shadow-lg group-hover:shadow-brand-primary/20">
-                                        <ChevronRight className="h-7 w-7 text-muted-foreground group-hover:text-white transition-colors" />
-                                    </div>
+                                )}
+
+                                {/* Details link */}
+                                <div className="px-5 pb-4 pt-1">
+                                    <Link
+                                        className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
+                                        href={getLink(`/profile/orders/${order.id}`)}
+                                    >
+                                        {dict?.profile?.orders?.details || "Details"}
+                                        <ChevronRight className="h-4 w-4" />
+                                    </Link>
                                 </div>
-                            </Link>
+                            </div>
                         );
                     })}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {filteredOrders.map((order) => {
+                        const statusStyle = getStatusColor(order.status);
+                        const StatusIcon = statusStyle.icon;
+
                         return (
-                            <Link
+                            <div
                                 key={order.id}
-                                href={getLink(`/profile/orders/${order.id}`)}
-                                className="group bg-white/60 dark:bg-white/5 border border-border dark:border-white/10 rounded-[2.5rem] p-8 hover:border-brand-primary/50 hover:shadow-2xl hover:shadow-brand-primary/5 hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-500 flex flex-col gap-6"
+                                className="group bg-white dark:bg-gray-900 border border-border dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex flex-col gap-3">
-                                        <div className="h-16 w-16 rounded-[1.5rem] bg-brand-primary/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
-                                            <Package className="h-8 w-8" />
+                                {/* Header */}
+                                <div className="flex items-start justify-between px-4 py-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1.5", statusStyle.dot)} />
+                                        <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                                            <Package className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                                         </div>
-                                        {order.images && order.images.length > 0 && (
-                                            <div className="flex gap-1.5 flex-wrap max-w-[64px]">
-                                                {order.images.slice(0, 4).map((img, idx) => (
-                                                    <div key={img.id || idx} className="h-7 w-7 rounded-md overflow-hidden border border-border dark:border-white/10">
-                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img
-                                                            alt="Product"
-                                                            className="h-full w-full object-cover"
-                                                            src={img.imagePath}
-                                                        />
-                                                    </div>
-                                                ))}
-                                                {order.images.length > 4 && (
-                                                    <div className="h-7 w-7 rounded-md bg-muted flex items-center justify-center text-[9px] font-bold text-muted-foreground">
-                                                        +{order.images.length - 4}
-                                                    </div>
-                                                )}
+                                        <div>
+                                            <span className="font-bold text-sm dark:text-white">
+                                                #{order.id.slice(0, 6)} · {fmtMoney(order.total || 0)}
+                                            </span>
+                                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                                                {order.items} {dict?.profile?.orders?.orderItems || "Items"} · {new Date(order.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className={cn("flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold flex-shrink-0", statusStyle.badge)}>
+                                        <StatusIcon className="h-3 w-3" />
+                                        {getStatusName(order.status)}
+                                    </div>
+                                </div>
+
+                                {/* Product images */}
+                                {order.images && order.images.length > 0 && (
+                                    <div className="px-4 pb-2 flex gap-1.5">
+                                        {order.images.slice(0, 4).map((img, idx) => (
+                                            <Link key={img.id || idx} href={getLink(`/product/${img.productId}`)} className="h-12 w-12 rounded-lg overflow-hidden border border-border dark:border-white/10 bg-gray-50 dark:bg-white/5 flex-shrink-0 hover:ring-2 hover:ring-brand-primary/40 transition-all">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img alt="Product" className="h-full w-full object-cover" src={img.imagePath} />
+                                            </Link>
+                                        ))}
+                                        {order.images.length > 4 && (
+                                            <div className="h-12 w-12 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-muted-foreground flex-shrink-0">
+                                                +{order.images.length - 4}
                                             </div>
                                         )}
                                     </div>
-                                    <Badge
-                                        className={cn(
-                                            "text-[10px] uppercase font-black tracking-widest py-1 px-4 rounded-full border-none shadow-sm",
-                                            order.status === OrderStatus.Delivered && "bg-emerald-500 text-white",
-                                            order.status === OrderStatus.Shipped && "bg-blue-500 text-white",
-                                            order.status === OrderStatus.Processing && "bg-amber-500 text-white",
-                                            order.status === OrderStatus.Pending && "bg-muted text-muted-foreground",
-                                            order.status === OrderStatus.Paid && "bg-brand-primary text-white"
-                                        )}
+                                )}
+
+                                {/* Details link */}
+                                <div className="px-4 pb-3 pt-1">
+                                    <Link
+                                        className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
+                                        href={getLink(`/profile/orders/${order.id}`)}
                                     >
-                                        {getStatusName(order.status)}
-                                    </Badge>
+                                        {dict?.profile?.orders?.details || "Details"}
+                                        <ChevronRight className="h-4 w-4" />
+                                    </Link>
                                 </div>
-
-                                <div className="space-y-1">
-                                    <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter">#{order.id.slice(0, 8)}</h3>
-                                    <p className="text-xs text-muted-foreground font-black uppercase tracking-widest">
-                                        {new Date(order.date).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
-                                    </p>
-                                </div>
-
-                                <div className="mt-auto pt-6 border-t border-border/50 dark:border-white/5 flex items-end justify-between">
-                                    <div>
-                                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1">
-                                            {dict?.profile?.orders?.orderItems || "Items"}: {order.items}
-                                        </p>
-                                        <p className="text-3xl font-black text-brand-primary tracking-tighter">{fmtMoney(order.total || 0)}</p>
-                                    </div>
-                                    <div className="h-12 w-12 rounded-[1rem] bg-brand-surface dark:bg-white/5 flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
-                                        <ChevronRight className="h-6 w-6" />
-                                    </div>
-                                </div>
-                            </Link>
+                            </div>
                         );
                     })}
                 </div>
@@ -343,18 +359,18 @@ function OrdersSkeleton({ viewMode, dict }: { viewMode: "list" | "grid", dict: a
                 <div className="h-14 w-32 bg-muted dark:bg-white/10 rounded-2xl" />
             </div>
 
-            <div className="h-24 w-full bg-muted dark:bg-white/5 rounded-[2rem] border border-border dark:border-white/10" />
+            <div className="h-16 w-full bg-muted dark:bg-white/5 rounded-2xl border border-border dark:border-white/10" />
 
             {viewMode === "list" ? (
-                <div className="grid gap-4">
+                <div className="grid gap-3">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-32 w-full bg-muted dark:bg-white/10 rounded-[2rem] border border-border dark:border-white/10" />
+                        <div key={i} className="h-[140px] w-full bg-muted dark:bg-white/10 rounded-2xl border border-border dark:border-white/10" />
                     ))}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="aspect-[4/3] w-full bg-muted dark:bg-white/10 rounded-[2.5rem] border border-border dark:border-white/10" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-[140px] w-full bg-muted dark:bg-white/10 rounded-2xl border border-border dark:border-white/10" />
                     ))}
                 </div>
             )}

@@ -21,11 +21,11 @@ import {
 } from "@/app/api/services/orderService";
 import { OrderSummary, OrderStatus } from "@/types/orderTypes";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { cn } from "@/lib/utils";
 import { defaultLocale } from "@/i18n.config";
+import Pagination from "@/components/ui/Pagination";
 
 export default function OrdersPage() {
     const { lang } = useParams();
@@ -87,6 +87,7 @@ export default function OrdersPage() {
         };
 
         fetchOrders();
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, [paged.page, paged.pageSize]);
 
     function getStatusColor(status: OrderStatus) {
@@ -111,17 +112,17 @@ export default function OrdersPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-3xl font-black dark:text-white tracking-tight uppercase">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
+                <div className="flex flex-col gap-1 sm:gap-2">
+                    <h1 className="text-2xl sm:text-3xl font-black dark:text-white tracking-tight uppercase">
                         {dict?.profile?.orders?.title || "My Orders"}
                     </h1>
-                    <p className="text-muted-foreground text-sm font-medium italic">
+                    <p className="text-muted-foreground text-xs sm:text-sm font-medium italic">
                         {dict?.profile?.orders?.subtitle || "Review and track your purchase history"}
                     </p>
                 </div>
 
-                <div className="flex bg-white/40 dark:bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-border dark:border-white/10 shadow-sm">
+                <div className="hidden sm:flex bg-white/40 dark:bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-border dark:border-white/10 shadow-sm">
                     <button
                         className={cn(
                             "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
@@ -143,41 +144,14 @@ export default function OrdersPage() {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between backdrop-blur-xl bg-white/40 dark:bg-white/5 p-4 rounded-2xl border border-border dark:border-white/10 shadow-xl shadow-black/5">
-                <div className="relative w-full sm:max-w-xs group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
-                    <Input
-                        className="pl-10 h-10 rounded-xl bg-brand-surface dark:bg-white/5 border-none focus-visible:ring-2 focus-visible:ring-brand-primary/20 transition-all font-bold text-sm"
-                        placeholder={dict?.profile?.orders?.searchPlaceholder || "Search by Order ID..."}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-muted-foreground px-2 uppercase tracking-widest">
-                        {dict?.profile?.orders?.pagination?.page || "Page"} {paged.page} / {Math.max(1, Math.ceil(paged.total / paged.pageSize))}
-                    </span>
-                    <div className="flex gap-1">
-                        <Button
-                            className="rounded-xl h-10 border-border dark:border-white/10"
-                            disabled={paged.page <= 1}
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setPaged(p => ({ ...p, page: p.page - 1 }))}
-                        >
-                            {dict?.profile?.orders?.pagination?.prev || "Prev"}
-                        </Button>
-                        <Button
-                            className="rounded-xl h-10 border-border dark:border-white/10"
-                            disabled={paged.page >= Math.ceil(paged.total / paged.pageSize)}
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setPaged(p => ({ ...p, page: p.page + 1 }))}
-                        >
-                            {dict?.profile?.orders?.pagination?.next || "Next"}
-                        </Button>
-                    </div>
-                </div>
+            <div className="relative w-full sm:max-w-xs group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-brand-primary transition-colors" />
+                <Input
+                    className="pl-10 h-10 rounded-xl bg-white dark:bg-white/5 border border-border dark:border-white/10 focus-visible:ring-2 focus-visible:ring-brand-primary/20 transition-all font-bold text-sm shadow-sm"
+                    placeholder={dict?.profile?.orders?.searchPlaceholder || "Search by Order ID..."}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
             </div>
 
             {error ? (
@@ -207,75 +181,72 @@ export default function OrdersPage() {
                         const StatusIcon = statusStyle.icon;
 
                         return (
-                            <div
+                            <Link
                                 key={order.id}
-                                className="group bg-white dark:bg-gray-900 border border-border dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
+                                href={getLink(`/profile/orders/${order.id}`)}
+                                className="group block bg-white dark:bg-gray-900 border border-border dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg active:scale-[0.99] transition-all duration-300"
                             >
                                 {/* Header */}
-                                <div className="flex items-center justify-between px-5 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className={cn("h-2.5 w-2.5 rounded-full flex-shrink-0", statusStyle.dot)} />
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 px-4 sm:px-5 pt-4 pb-2 sm:py-4">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className={cn("h-2.5 w-2.5 rounded-full flex-shrink-0 hidden sm:block", statusStyle.dot)} />
                                         <div className="h-9 w-9 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
                                             <Package className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                                         </div>
-                                        <div>
+                                        <div className="min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <span className="font-bold text-sm dark:text-white">
                                                     {dict?.profile?.orders?.orderLabel || "Order"} #{order.id.slice(0, 6)}
                                                 </span>
                                                 <span className="font-bold text-sm dark:text-white">
-                                                    {dict?.profile?.orders?.priceLabel || "Price"}: {fmtMoney(order.total || 0)}
+                                                    {fmtMoney(order.total || 0)}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 flex-wrap">
-                                                <span>{dict?.profile?.orders?.productsLabel || "Products"}: {order.items}</span>
+                                            <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground mt-0.5 flex-wrap">
+                                                <span>{order.items} {dict?.profile?.orders?.orderItems || "items"}</span>
                                                 <span>·</span>
-                                                <span>{dict?.profile?.orders?.dateLabel || "Date"}: {new Date(order.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
-                                                {/* <span className="flex items-center gap-1">
-                                                    <span className={cn("h-1.5 w-1.5 rounded-full", statusStyle.dot)} />
-                                                    {dict?.profile?.orders?.statusLabel || "Status"}: {getStatusName(order.status)}
-                                                </span> */}
+                                                <span>{new Date(order.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold flex-shrink-0", statusStyle.badge)}>
-                                        <StatusIcon className="h-3.5 w-3.5" />
-                                        {getStatusName(order.status)}
+                                    <div className="flex items-center justify-between sm:justify-end gap-2 ml-12 sm:ml-0">
+                                        <div className={cn("flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border text-[11px] sm:text-xs font-semibold flex-shrink-0", statusStyle.badge)}>
+                                            <StatusIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                            {getStatusName(order.status)}
+                                        </div>
+                                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-brand-primary transition-colors sm:hidden" />
                                     </div>
                                 </div>
 
                                 {/* Product images */}
                                 {order.images && order.images.length > 0 && (
-                                    <div className="px-5 pb-3 flex gap-2">
+                                    <div className="px-4 sm:px-5 pb-3 flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
                                         {order.images.slice(0, 5).map((img, idx) => (
-                                            <Link key={img.id || idx} href={getLink(`/product/${img.productId}`)} className="h-14 w-14 rounded-lg overflow-hidden border border-border dark:border-white/10 bg-gray-50 dark:bg-white/5 flex-shrink-0 hover:ring-2 hover:ring-brand-primary/40 transition-all">
+                                            <div key={img.id || idx} className="h-11 w-11 sm:h-14 sm:w-14 rounded-lg overflow-hidden border border-border dark:border-white/10 bg-gray-50 dark:bg-white/5 flex-shrink-0">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img
                                                     alt="Product"
                                                     className="h-full w-full object-cover"
                                                     src={img.imagePath}
                                                 />
-                                            </Link>
+                                            </div>
                                         ))}
                                         {order.images.length > 5 && (
-                                            <div className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-muted-foreground flex-shrink-0">
+                                            <div className="h-11 w-11 sm:h-14 sm:w-14 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-[11px] sm:text-xs font-bold text-muted-foreground flex-shrink-0">
                                                 +{order.images.length - 5}
                                             </div>
                                         )}
                                     </div>
                                 )}
 
-                                {/* Details link */}
-                                <div className="px-5 pb-4 pt-1">
-                                    <Link
-                                        className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
-                                        href={getLink(`/profile/orders/${order.id}`)}
-                                    >
+                                {/* Details link - desktop only */}
+                                <div className="hidden sm:block px-5 pb-4 pt-1">
+                                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary group-hover:underline">
                                         {dict?.profile?.orders?.details || "Details"}
                                         <ChevronRight className="h-4 w-4" />
-                                    </Link>
+                                    </span>
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>
@@ -286,9 +257,10 @@ export default function OrdersPage() {
                         const StatusIcon = statusStyle.icon;
 
                         return (
-                            <div
+                            <Link
                                 key={order.id}
-                                className="group bg-white dark:bg-gray-900 border border-border dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
+                                href={getLink(`/profile/orders/${order.id}`)}
+                                className="group block bg-white dark:bg-gray-900 border border-border dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg active:scale-[0.99] transition-all duration-300"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between px-4 py-3">
@@ -302,7 +274,7 @@ export default function OrdersPage() {
                                                 #{order.id.slice(0, 6)} · {fmtMoney(order.total || 0)}
                                             </span>
                                             <p className="text-[11px] text-muted-foreground mt-0.5">
-                                                {order.items} {dict?.profile?.orders?.orderItems || "Items"} · {new Date(order.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                                {order.items} {dict?.profile?.orders?.orderItems || "items"} · {new Date(order.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                             </p>
                                         </div>
                                     </div>
@@ -314,12 +286,12 @@ export default function OrdersPage() {
 
                                 {/* Product images */}
                                 {order.images && order.images.length > 0 && (
-                                    <div className="px-4 pb-2 flex gap-1.5">
+                                    <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto scrollbar-none">
                                         {order.images.slice(0, 4).map((img, idx) => (
-                                            <Link key={img.id || idx} href={getLink(`/product/${img.productId}`)} className="h-12 w-12 rounded-lg overflow-hidden border border-border dark:border-white/10 bg-gray-50 dark:bg-white/5 flex-shrink-0 hover:ring-2 hover:ring-brand-primary/40 transition-all">
+                                            <div key={img.id || idx} className="h-12 w-12 rounded-lg overflow-hidden border border-border dark:border-white/10 bg-gray-50 dark:bg-white/5 flex-shrink-0">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img alt="Product" className="h-full w-full object-cover" src={img.imagePath} />
-                                            </Link>
+                                            </div>
                                         ))}
                                         {order.images.length > 4 && (
                                             <div className="h-12 w-12 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-muted-foreground flex-shrink-0">
@@ -331,19 +303,22 @@ export default function OrdersPage() {
 
                                 {/* Details link */}
                                 <div className="px-4 pb-3 pt-1">
-                                    <Link
-                                        className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
-                                        href={getLink(`/profile/orders/${order.id}`)}
-                                    >
+                                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary group-hover:underline">
                                         {dict?.profile?.orders?.details || "Details"}
                                         <ChevronRight className="h-4 w-4" />
-                                    </Link>
+                                    </span>
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>
             )}
+
+            <Pagination
+                currentPage={paged.page}
+                totalPages={Math.max(1, Math.ceil(paged.total / paged.pageSize))}
+                onPageChange={(page) => setPaged(p => ({ ...p, page }))}
+            />
         </div>
     );
 }

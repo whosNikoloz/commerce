@@ -27,14 +27,14 @@ export function formatPrice(price: number, currency: string = "₾"): string {
   return `${symbol}${formatted}`;
 }
 
-export function currencyFmt(amount: number, currency: string = "USD") {
+export function currencyFmt(amount: number, currency: string = "GEL") {
   try {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("ka-GE", {
       style: "currency",
       currency,
     }).format(amount);
   } catch {
-    return `${amount.toFixed(2)} ${currency}`;
+    return `${amount.toFixed(2)} ₾`;
   }
 }
 

@@ -136,7 +136,7 @@ export default function CategoryDropdown() {
 
   const getCategoryHref = (id: string) => `/${localeCode}/category/${id}`;
 
-  const renderParentCard = (cat: CategoryModel, isActive: boolean) => (
+  const renderParentCard = (cat: CategoryModel, isActive: boolean, hasChildren: boolean) => (
     <div className="flex items-center justify-between w-full gap-3">
       <div className="flex flex-col items-start text-left flex-1">
         <span
@@ -174,12 +174,32 @@ export default function CategoryDropdown() {
           )}
         </div>
 
-        <ChevronRight
-          className={cn(
-            "w-4 h-4 text-muted-foreground transition-transform duration-300",
-            isActive ? "rotate-90 text-primary" : "group-hover:translate-x-1"
-          )}
-        />
+        {hasChildren ? (
+          <button
+            aria-label={
+              isActive
+                ? tDrawer?.ariaHideSubcategories ?? "Hide subcategories"
+                : tDrawer?.ariaShowSubcategories ?? "Show subcategories"
+            }
+            className="p-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleCategory(cat.id);
+            }}
+          >
+            <ChevronRight
+              className={cn(
+                "w-4 h-4 text-muted-foreground transition-transform duration-300",
+                isActive ? "rotate-90 text-primary" : "group-hover:translate-x-1"
+              )}
+            />
+          </button>
+        ) : (
+          <ChevronRight
+            className="w-4 h-4 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1"
+          />
+        )}
       </div>
     </div>
   );
@@ -268,49 +288,21 @@ export default function CategoryDropdown() {
                                     (childrenMap[cat.id]?.length || 0) > 0;
                                   const isActive = activeCategory === cat.id;
 
-                                  // No subcategories → direct link card
-                                  if (!hasChildren) {
-                                    return (
-                                      <Link
-                                        key={cat.id}
-                                        className={cn(
-                                          "group flex items-stretch p-3 rounded-2xl transition-all border text-left",
-                                          "bg-neutral-50 dark:bg-neutral-900/80 border-border/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-primary/60 hover:shadow-md"
-                                        )}
-                                        href={getCategoryHref(cat.id)}
-                                        onClick={() => setIsOpen(false)}
-                                      >
-                                        {renderParentCard(cat, false)}
-                                      </Link>
-                                    );
-                                  }
-
-                                  // Has subcategories → toggle dropdown
+                                  // All categories are links – subcategory toggle is on the chevron
                                   return (
-                                    <button
+                                    <Link
                                       key={cat.id}
-                                      aria-expanded={isActive}
-                                      aria-label={
-                                        isActive
-                                          ? `${cat.name} - ${
-                                              tDrawer?.ariaHideSubcategories ??
-                                              "Hide subcategories"
-                                            }`
-                                          : `${cat.name} - ${
-                                              tDrawer?.ariaShowSubcategories ??
-                                              "Show subcategories"
-                                            }`
-                                      }
                                       className={cn(
                                         "group flex items-stretch p-3 rounded-2xl transition-all border text-left",
                                         isActive
                                           ? "bg-primary/5 border-primary shadow-md shadow-primary/30"
                                           : "bg-neutral-50 dark:bg-neutral-900/80 border-border/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-primary/60 hover:shadow-md"
                                       )}
-                                      onClick={() => toggleCategory(cat.id)}
+                                      href={getCategoryHref(cat.id)}
+                                      onClick={() => setIsOpen(false)}
                                     >
-                                      {renderParentCard(cat, isActive)}
-                                    </button>
+                                      {renderParentCard(cat, isActive, hasChildren)}
+                                    </Link>
                                   );
                                 })}
                               </div>

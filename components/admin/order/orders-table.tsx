@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Eye, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Eye, Truck, Package, CheckCircle, XCircle, Clock, RefreshCw, ChevronLeft, ChevronRight, Bell } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
 import { toast } from "sonner";
 
@@ -89,13 +89,22 @@ function ConnectionIndicator({ status }: { status: ConnectionStatus }) {
   );
 }
 
+/** Normalize a status value that may arrive as a string name from SSE */
+function normalizeStatus(status: OrderStatus | string): OrderStatus {
+  if (typeof status === 'number') return status;
+  const key = String(status);
+  const mapped = OrderStatus[key as keyof typeof OrderStatus];
+
+  return typeof mapped === 'number' ? mapped : OrderStatus.Pending;
+}
+
 /** Convert an SSE OrderEvent into an OrderSummary for the table */
 function eventToSummary(event: OrderEvent): OrderSummary {
   return {
     id: event.orderId,
     date: event.timestamp,
-    status: event.currentStatus,
-    items: event.items, // not available from SSE — refreshed on next page load
+    status: normalizeStatus(event.currentStatus),
+    items: event.items,
     total: event.total,
   };
 }
@@ -159,6 +168,22 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
     autoConnect: true,
   });
 
+  // Track rows that should be highlighted (recently changed via SSE)
+  const [highlightedRows, setHighlightedRows] = useState<Set<string>>(new Set());
+
+  const highlightRow = useCallback((orderId: string) => {
+    setHighlightedRows(prev => new Set(prev).add(orderId));
+    setTimeout(() => {
+      setHighlightedRows(prev => {
+        const next = new Set(prev);
+
+        next.delete(orderId);
+
+        return next;
+      });
+    }, 3000);
+  }, []);
+
   // Process incoming SSE events into the orders table
   const lastProcessedRef = useRef(0);
 
@@ -173,6 +198,24 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
     const unprocessed = sseEvents.slice(0, newCount - lastProcessedRef.current);
 
     lastProcessedRef.current = newCount;
+
+    for (const event of unprocessed) {
+      highlightRow(event.orderId);
+
+      if (event.eventType === 'Created') {
+        toast(t.realtime.eventTypes.Created, {
+          description: `#${event.orderNumber || event.orderId.slice(0, 8)} — ${currencyFmt(event.total)}`,
+          icon: <Bell className="h-4 w-4" />,
+        });
+      } else {
+        const newStatusLabel = statusLabel(normalizeStatus(event.currentStatus), dict);
+
+        toast(t.realtime.eventTypes[event.eventType] || t.realtime.eventTypes.StatusChanged, {
+          description: `#${event.orderNumber || event.orderId.slice(0, 8)} → ${newStatusLabel}`,
+          icon: <RefreshCw className="h-4 w-4" />,
+        });
+      }
+    }
 
     setData(prev => {
       let updated = [...prev.data];
@@ -189,14 +232,14 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
           // Update existing order status
           updated[existingIdx] = {
             ...updated[existingIdx],
-            status: event.currentStatus,
+            status: normalizeStatus(event.currentStatus),
           };
         }
       }
 
       return { ...prev, data: updated, total: prev.total + totalDelta };
     });
-  }, [sseEvents]);
+  }, [sseEvents, dict, t, highlightRow]);
 
   // list fetch
   useEffect(() => {
@@ -424,7 +467,7 @@ export default function OrdersTable({ lang = "en" }: OrdersTableProps) {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((o) => (
-                    <TableRow key={o.id} className="border-slate-200 dark:border-slate-700">
+                    <TableRow key={o.id} className={`border-slate-200 dark:border-slate-700 transition-colors duration-700 ${highlightedRows.has(o.id) ? "bg-emerald-50 dark:bg-emerald-900/20 animate-pulse" : ""}`}>
                       <TableCell className="font-medium">{o.id}</TableCell>
                       <TableCell>{new Date(o.date).toLocaleDateString(lang)}</TableCell>
                       <TableCell>{o.items}</TableCell>

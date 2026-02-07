@@ -297,7 +297,7 @@ export default function Footer() {
                   alt={companyName}
                   className="object-contain"
                   height={100}
-                  src={siteConfig.logoDark || siteConfig.logoLight || `https://via.placeholder.com/100x100.png?text=${logoText}`}
+                  src={siteConfig.logoDark || siteConfig.logoLight || siteConfig.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(logoText)}&background=random&color=fff&size=128`}
                   width={100}
                 />
               </div>

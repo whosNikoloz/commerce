@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useTheme } from "next-themes";
-import { cn } from "@/lib/utils";
 import { LocateFixed, AlertTriangle, Globe, Layers } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 import { useDictionary } from "@/app/context/dictionary-provider";
 
 interface Location {
@@ -51,6 +52,7 @@ function MapEvents({ onLocationSelect }: { onLocationSelect: (location: Location
     useMapEvents({
         click: async (e) => {
             const { lat, lng } = e.latlng;
+
             onLocationSelect({ lat, lng });
             map.panTo(e.latlng);
 
@@ -58,8 +60,10 @@ function MapEvents({ onLocationSelect }: { onLocationSelect: (location: Location
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
                 );
+
                 if (response.ok) {
                     const data = await response.json();
+
                     if (data && data.display_name) {
                         onLocationSelect({ lat, lng }, data.display_name, data.address);
                     }
@@ -69,11 +73,13 @@ function MapEvents({ onLocationSelect }: { onLocationSelect: (location: Location
             }
         },
     });
+
     return null;
 }
 
 function MapController({ center }: { center: Location | null }) {
     const map = useMap();
+
     useEffect(() => {
         const timer = setTimeout(() => {
             map.invalidateSize();
@@ -81,6 +87,7 @@ function MapController({ center }: { center: Location | null }) {
                 map.setView([center.lat, center.lng]);
             }
         }, 500);
+
         return () => clearTimeout(timer);
     }, [map, center]);
 
@@ -109,6 +116,7 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
         if (mapType === "satellite") {
             return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
         }
+
         return isDark
             ? "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
             : "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -123,12 +131,13 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
         if (typeof window === "undefined" || !navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition((pos) => {
             const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+
             handleSelect(loc);
         });
     };
 
     if (!mounted) return (
-        <div style={{ height }} className="w-full bg-slate-100 animate-pulse rounded-[2.5rem] border-2 border-dashed border-slate-300" />
+        <div className="w-full bg-slate-100 animate-pulse rounded-[2.5rem] border-2 border-dashed border-slate-300" style={{ height }} />
     );
 
     return (
@@ -147,13 +156,12 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
             <MapContainer
                 key={`${isDark ? "dark" : "light"}-${mapType}`}
                 center={selectedLocation ? [selectedLocation.lat, selectedLocation.lng] : [41.7151, 44.8271]}
-                zoom={14}
-                style={{ height: "100%", width: "100%" }}
-                scrollWheelZoom={true}
                 className="z-0"
+                scrollWheelZoom={true}
+                style={{ height: "100%", width: "100%" }}
+                zoom={14}
             >
                 <TileLayer
-                    url={tileUrl}
                     attribution={mapType === "satellite" ? '&copy; ESRI' : '&copy; OpenStreetMap'}
                     eventHandlers={{
                         tileerror: (e) => {
@@ -161,11 +169,12 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
                             setHasTileError(true);
                         }
                     }}
+                    url={tileUrl}
                 />
                 <MapController center={selectedLocation} />
                 <MapEvents onLocationSelect={handleSelect} />
                 {selectedLocation && markerIcon && (
-                    <Marker position={[selectedLocation.lat, selectedLocation.lng]} icon={markerIcon} />
+                    <Marker icon={markerIcon} position={[selectedLocation.lat, selectedLocation.lng]} />
                 )}
             </MapContainer>
 
@@ -182,14 +191,14 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
                     </div>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => window.location.reload()}
                             className="px-5 py-2.5 bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform"
+                            onClick={() => window.location.reload()}
                         >
                             {dict?.profile?.map?.retry || "Retry"}
                         </button>
                         <button
-                            onClick={() => setHasTileError(false)}
                             className="px-5 py-2.5 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-300 dark:hover:bg-white/20 transition-colors"
+                            onClick={() => setHasTileError(false)}
                         >
                             {dict?.profile?.map?.dismiss || "Dismiss"}
                         </button>
@@ -202,24 +211,19 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
                 <div className="flex flex-col gap-2 custom-map-control">
                     {/* LOCATE ME BUTTON */}
                     <button
+                        className="w-14 h-14 bg-white/95 dark:bg-black/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-black/5 dark:border-white/10 flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all duration-300 active:scale-95 group"
+                        title={dict?.profile?.map?.locateMe || "Find my location"}
                         type="button"
                         onClick={(e) => {
                             e.preventDefault();
                             handleLocateMe();
                         }}
-                        className="w-14 h-14 bg-white/95 dark:bg-black/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-black/5 dark:border-white/10 flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all duration-300 active:scale-95 group"
-                        title={dict?.profile?.map?.locateMe || "Find my location"}
                     >
                         <LocateFixed className="h-6 w-6 group-hover:scale-110 transition-transform" />
                     </button>
 
                     {/* SATELLITE TOGGLE BUTTON */}
                     <button
-                        type="button"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            setMapType(mapType === "street" ? "satellite" : "street");
-                        }}
                         className={cn(
                             "w-14 h-14 backdrop-blur-xl rounded-2xl shadow-2xl border transition-all duration-300 active:scale-95 group flex items-center justify-center",
                             mapType === "satellite"
@@ -227,6 +231,11 @@ export default function AddressMapPicker({ onLocationSelect, initialLocation, he
                                 : "bg-white/95 dark:bg-black/90 border-black/5 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-brand-primary hover:text-white"
                         )}
                         title={mapType === "street" ? (dict?.profile?.map?.switchToSatellite || "Switch to Satellite") : (dict?.profile?.map?.switchToStreet || "Switch to Street View")}
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setMapType(mapType === "street" ? "satellite" : "street");
+                        }}
                     >
                         {mapType === "street" ? <Globe className="h-6 w-6 group-hover:scale-110 transition-transform" /> : <Layers className="h-6 w-6 group-hover:scale-110 transition-transform" />}
                     </button>

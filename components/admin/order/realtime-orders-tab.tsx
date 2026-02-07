@@ -17,6 +17,14 @@ interface RealtimeOrdersTabProps {
 
 type EventTypeFilter = 'all' | 'Created' | 'StatusChanged' | 'Cancelled' | 'Paid' | 'PaymentCallback';
 
+function normalizeStatus(status: OrderStatus | string): OrderStatus {
+    if (typeof status === 'number') return status;
+    const key = String(status);
+    const mapped = OrderStatus[key as keyof typeof OrderStatus];
+
+    return typeof mapped === 'number' ? mapped : OrderStatus.Pending;
+}
+
 function getStatusIcon(status: OrderStatus) {
     switch (status) {
         case OrderStatus.Pending: return <Clock className="h-4 w-4" />;
@@ -191,16 +199,16 @@ export default function RealtimeOrdersTab({ token, domain }: RealtimeOrdersTabPr
                                         {/* Status transition */}
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <div className="flex items-center gap-1.5">
-                                                {getStatusIcon(event.previousStatus)}
-                                                <Badge className={getStatusColor(event.previousStatus)}>
-                                                    {statusLabel(event.previousStatus, dict)}
+                                                {getStatusIcon(normalizeStatus(event.previousStatus))}
+                                                <Badge className={getStatusColor(normalizeStatus(event.previousStatus))}>
+                                                    {statusLabel(normalizeStatus(event.previousStatus), dict)}
                                                 </Badge>
                                             </div>
                                             <span className="text-muted-foreground">→</span>
                                             <div className="flex items-center gap-1.5">
-                                                {getStatusIcon(event.currentStatus)}
-                                                <Badge className={getStatusColor(event.currentStatus)}>
-                                                    {statusLabel(event.currentStatus, dict)}
+                                                {getStatusIcon(normalizeStatus(event.currentStatus))}
+                                                <Badge className={getStatusColor(normalizeStatus(event.currentStatus))}>
+                                                    {statusLabel(normalizeStatus(event.currentStatus), dict)}
                                                 </Badge>
                                             </div>
                                         </div>

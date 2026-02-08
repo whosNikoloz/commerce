@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { CreditCard } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
 import { useDictionary } from "@/app/context/dictionary-provider";
 import { PaymentType, PAYMENT_PROVIDERS, PaymentProviderOption } from "@/types/payment";
 
@@ -98,41 +98,56 @@ export default function CheckoutForm({
 
     return (
       <button
-        className={`w-full text-left rounded-xl p-4 transition border
-          ${active
-            ? "border-brand-primary ring-2 ring-brand-primary/20"
-            : "border-brand-muted dark:border-brand-muteddark hover:border-brand-primary/50"
-          }`}
+        className={`relative w-full text-left rounded-2xl sm:rounded-3xl p-4 sm:p-5 transition-all duration-300 border-2 overflow-hidden group ${
+          active
+            ? "border-brand-primary bg-brand-primary/5 shadow-lg shadow-brand-primary/5"
+            : "border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900/80 hover:border-brand-primary/30"
+        }`}
         type="button"
         onClick={() => setSelected(provider.type)}
       >
-        <div className="flex items-center gap-4">
+        {/* Active accent */}
+        {active && (
+          <div className="absolute top-0 left-0 w-1 sm:w-1.5 h-full bg-brand-primary rounded-l-2xl sm:rounded-l-3xl" />
+        )}
+
+        <div className="flex items-center gap-3 sm:gap-4">
+          {/* Radio */}
           <div
-            className={`h-4 w-4 rounded-full border flex items-center justify-center
-              ${active ? "bg-brand-primary border-brand-primary" : "border-text-subtle/50"}`}
+            className={`h-5 w-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+              active ? "bg-brand-primary border-brand-primary" : "border-gray-300 dark:border-white/20"
+            }`}
           >
             {active && <div className="h-2 w-2 rounded-full bg-white" />}
           </div>
-          <Image
-            alt={label}
-            className="rounded bg-white object-contain"
-            height={40}
-            src={logoSrc}
-            width={40}
-          />
-          <div className="flex flex-col">
-            <span className="font-primary font-medium text-text-light dark:text-text-lightdark">
+
+          {/* Logo */}
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white dark:bg-white/10 ring-1 ring-gray-200/50 dark:ring-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <Image
+              alt={label}
+              className="rounded object-contain"
+              height={40}
+              src={logoSrc}
+              width={40}
+            />
+          </div>
+
+          {/* Label */}
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-sm sm:text-base dark:text-white tracking-tight">
               {label}
             </span>
-            <span className="font-primary text-xs text-text-subtle dark:text-text-subtledark">
+            <span className="text-[11px] sm:text-xs text-muted-foreground font-medium mt-0.5">
               {provider.isInstallment
                 ? dictionary.checkout?.installmentDescription || 'Pay in installments'
                 : dictionary.checkout?.secureHostedCheckout || 'Secure hosted checkout'
               }
             </span>
           </div>
+
+          {/* Installment badge */}
           {provider.isInstallment && (
-            <span className="ml-auto text-xs font-medium px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full">
+            <span className="ml-auto text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full border border-amber-200 dark:border-amber-800/50 uppercase tracking-wide flex-shrink-0">
               {dictionary.checkout?.installmentBadge || 'Installment'}
             </span>
           )}
@@ -142,22 +157,38 @@ export default function CheckoutForm({
   };
 
   return (
-    <Card className="p-6 bg-card border border-border/50 shadow-lg">
-      <div className="mb-4 font-semibold text-lg text-text-light dark:text-text-lightdark">
-        {dictionary.checkout?.chooseProvider || 'Choose Payment Method'}
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex items-center gap-2.5 mb-4 sm:mb-5">
+        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-white/10 dark:to-white/5 flex items-center justify-center ring-1 ring-gray-200/50 dark:ring-white/10">
+          <CreditCard className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        </div>
+        <h3 className="text-base sm:text-lg font-black dark:text-white tracking-tight uppercase">
+          {dictionary.checkout?.chooseProvider || 'Choose Payment Method'}
+        </h3>
       </div>
+
       {isLoadingOptions ? (
-        <div className="space-y-3">
-          <div className="h-14 rounded-xl bg-muted/60 dark:bg-muted/20 animate-pulse" />
-          <div className="h-14 rounded-xl bg-muted/60 dark:bg-muted/20 animate-pulse" />
+        <div className="space-y-3 sm:space-y-4">
+          {[1, 2].map(i => (
+            <div key={i} className="bg-white dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 p-4 sm:p-5 animate-pulse">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="h-5 w-5 rounded-full bg-muted dark:bg-white/10" />
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-muted dark:bg-white/10" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-muted dark:bg-white/10 rounded w-1/2" />
+                  <div className="h-3 bg-muted dark:bg-white/5 rounded w-2/3" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
           {availableProviders.map(provider => (
             <Option key={provider.type} provider={provider} />
           ))}
         </div>
       )}
-    </Card>
+    </div>
   );
 }

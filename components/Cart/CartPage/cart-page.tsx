@@ -152,44 +152,73 @@ export default function CartPage() {
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20">
           {/* Header Skeleton */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 animate-pulse">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-gray-200 dark:bg-gray-800 h-14 w-14" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4 animate-pulse">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="h-11 w-11 sm:h-14 sm:w-14 rounded-2xl bg-muted dark:bg-white/10" />
               <div className="space-y-2">
-                <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-32" />
-                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-24" />
+                <div className="h-7 sm:h-8 bg-muted dark:bg-white/10 rounded-lg w-28 sm:w-36" />
+                <div className="h-3.5 bg-muted dark:bg-white/5 rounded w-20 sm:w-24" />
               </div>
             </div>
-            <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded w-40" />
+            <div className="h-10 bg-muted dark:bg-white/10 rounded-xl w-36 sm:w-44" />
           </div>
 
           {/* Content Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-pulse">
-            <div className="lg:col-span-2 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 animate-pulse">
+            <div className="lg:col-span-2 space-y-3 sm:space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
-                  <div className="flex gap-4">
-                    <div className="h-24 w-24 bg-gray-200 dark:bg-gray-800 rounded-lg flex-shrink-0" />
-                    <div className="flex-1 space-y-3">
-                      <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded w-3/4" />
-                      <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
-                      <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/4" />
+                <div key={i} className="relative bg-white dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 sm:w-1.5 h-full bg-muted dark:bg-white/10 rounded-l-2xl sm:rounded-l-3xl" />
+                  <div className="pl-4 sm:pl-6 pr-3 sm:pr-5 py-3.5 sm:py-5">
+                    <div className="flex gap-3 sm:gap-4">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl bg-muted dark:bg-white/10 flex-shrink-0" />
+                      <div className="flex-1 space-y-3">
+                        <div className="h-4 sm:h-5 bg-muted dark:bg-white/10 rounded-lg w-3/4" />
+                        <div className="flex gap-1.5">
+                          <div className="h-5 w-16 bg-muted dark:bg-white/10 rounded-full" />
+                          <div className="h-5 w-14 bg-muted dark:bg-white/10 rounded-full" />
+                        </div>
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="h-5 w-20 bg-muted dark:bg-white/10 rounded" />
+                          <div className="h-8 w-24 bg-muted dark:bg-white/10 rounded-xl" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="lg:sticky lg:top-6 h-fit">
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
-                <div className="space-y-4">
-                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded" />
+            <div className="lg:sticky lg:top-6 h-fit space-y-4">
+              <div className="bg-white dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-xl bg-muted dark:bg-white/10" />
+                    <div className="h-5 w-32 bg-muted dark:bg-white/10 rounded-lg" />
                   </div>
-                  <div className="h-12 bg-gray-200 dark:bg-gray-800 rounded mt-4" />
                 </div>
+                <div className="px-4 sm:px-6 pb-5 sm:pb-6 space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex justify-between">
+                      <div className="h-4 w-24 bg-muted dark:bg-white/10 rounded" />
+                      <div className="h-4 w-16 bg-muted dark:bg-white/10 rounded" />
+                    </div>
+                  ))}
+                  <div className="h-px bg-gray-100 dark:bg-white/5" />
+                  <div className="flex justify-between">
+                    <div className="h-5 w-16 bg-muted dark:bg-white/10 rounded" />
+                    <div className="h-5 w-20 bg-muted dark:bg-white/10 rounded" />
+                  </div>
+                  <div className="h-11 sm:h-12 bg-muted dark:bg-white/10 rounded-xl sm:rounded-2xl mt-2" />
+                  <div className="h-10 sm:h-11 bg-muted dark:bg-white/10 rounded-xl sm:rounded-2xl" />
+                </div>
+              </div>
+              <div className="bg-white dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 p-4 sm:p-5 space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-lg bg-muted dark:bg-white/10" />
+                    <div className="h-3.5 w-32 bg-muted dark:bg-white/10 rounded" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -206,12 +235,13 @@ export default function CartPage() {
         <CartHeader itemCount={cartLen} />
 
         {stockEnabled && loading && (
-          <div className="mb-4 text-sm text-text-subtle dark:text-text-subtledark">
+          <div className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 animate-pulse">
+            <div className="h-2 w-2 rounded-full bg-blue-500 animate-ping" />
             {dictionary.cart.checkingStock}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-2">
             <CartItems availability={availability} loading={loading} stockEnabled={stockEnabled} />
             <div className="hidden lg:block">

@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import { AvailabilityMap } from "./cart-page";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/app/context/cartContext";
 import { CartItemType } from "@/types/cart";
@@ -61,8 +60,8 @@ export default function CartItems({
   }, [JSON.stringify(availability), loading]);
 
   return (
-    <div className="space-y-3">
-      {items.map((item) => {
+    <div className="space-y-3 sm:space-y-4">
+      {items.map((item, index) => {
         const price = toNumber(item.price);
         const originalPrice = item.originalPrice ? toNumber(item.originalPrice) : null;
         const hasDiscount = !!originalPrice && originalPrice > price;
@@ -75,165 +74,148 @@ export default function CartItems({
         const outOfStock = stockEnabled && !isCheckingStock && available <= 0;
 
         return (
-          <Card
+          <div
             key={`${item.id}`}
-            className={`p-3 sm:p-4 md:p-5 rounded-xl bg-white dark:bg-gray-900 border shadow-sm transition-all duration-300 ${outOfStock
-              ? "border-red-500/50 shadow-red-500/10"
-              : "border-gray-200 dark:border-gray-800 hover:border-brand-primary/40 hover:shadow-md"
-              }`}
+            className={`relative bg-white dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl border overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
+              outOfStock
+                ? "border-red-300 dark:border-red-500/30 shadow-sm shadow-red-500/5"
+                : "border-gray-200 dark:border-white/10 hover:border-brand-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
+            }`}
+            style={{ animationDelay: `${index * 50}ms` }}
           >
-            <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px_160px_48px] md:items-center">
-              {/* left */}
-              <div className="flex items-start gap-3 sm:gap-4">
+            {/* Left accent bar */}
+            <div className={`absolute top-0 left-0 w-1 sm:w-1.5 h-full rounded-l-2xl sm:rounded-l-3xl ${
+              outOfStock ? "bg-red-500" : hasDiscount ? "bg-amber-500" : "bg-brand-primary"
+            }`} />
+
+            <div className="pl-4 sm:pl-6 pr-3 sm:pr-5 py-3.5 sm:py-5">
+              <div className="flex gap-3 sm:gap-4">
+                {/* Product image */}
                 <div className="relative shrink-0">
-                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md overflow-hidden bg-brand-muted dark:bg-brand-muteddark">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl overflow-hidden bg-gray-50 dark:bg-white/5 ring-1 ring-black/[0.03] dark:ring-white/5">
                     <Image
                       fill
                       priority
                       alt={item.name}
-                      className="object-cover"
-                      sizes="96px"
+                      className="object-cover hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, 112px"
                       src={item.image || "/placeholder.png"}
                     />
                   </div>
+                  {hasDiscount && (
+                    <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-lg shadow-sm">
+                      -{discount}%
+                    </div>
+                  )}
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-heading font-medium leading-snug line-clamp-2 text-sm sm:text-base text-text-light dark:text-text-lightdark">
-                    {item.name}
-                  </h3>
+                {/* Content */}
+                <div className="flex-1 min-w-0 flex flex-col">
+                  {/* Name + remove button row */}
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-bold text-sm sm:text-base leading-snug line-clamp-2 dark:text-white tracking-tight">
+                      {item.name}
+                    </h3>
+                    <button
+                      aria-label="Remove"
+                      className="flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      <Trash2 className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
+                    </button>
+                  </div>
 
+                  {/* Variant badges */}
                   {!!specsLine && (
-                    <div className="mt-1 flex flex-wrap gap-1">
+                    <div className="mt-1.5 flex flex-wrap gap-1">
                       {Object.entries(item.selectedFacets!).map(([k, v]) => (
-                        <Badge
+                        <span
                           key={k}
-                          className="h-5 text-[11px] px-2 bg-brand-primary/10 text-brand-primary border border-brand-primary/30 shadow-sm rounded-full"
-                          variant="secondary"
+                          className="inline-flex items-center text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-brand-primary/8 text-brand-primary border border-brand-primary/15 font-semibold"
                         >
                           {k}: {v}
-                        </Badge>
+                        </span>
                       ))}
                     </div>
                   )}
 
-                  {/* stock info */}
+                  {/* Stock info */}
                   {stockEnabled && (
-                    <div className="mt-2 flex items-center gap-2">
+                    <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                       {isCheckingStock ? (
-                        <Badge className="text-[11px] px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 animate-pulse">
+                        <span className="inline-flex items-center text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold animate-pulse">
                           {dictionary.cart.checkingStock}
-                        </Badge>
+                        </span>
                       ) : outOfStock ? (
-                        <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
+                        <span className="inline-flex items-center text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 font-semibold">
                           {dictionary.cart.outOfStock}
-                        </Badge>
+                        </span>
                       ) : (
-                        <Badge className="text-[11px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                        <span className="inline-flex items-center text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold">
                           {dictionary.cart.stock.replace("{count}", String(available))}
-                        </Badge>
+                        </span>
                       )}
                       {!isCheckingStock && quantity > available && available > 0 && (
-                        <span className="font-primary flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
-                          <AlertTriangle className="h-3.5 w-3.5" />
+                        <span className="flex items-center gap-1 text-[11px] text-red-600 dark:text-red-400 font-medium">
+                          <AlertTriangle className="h-3 w-3" />
                           {dictionary.cart.stockLimitExceeded.replace("{count}", String(available))}
                         </span>
                       )}
                     </div>
                   )}
 
-                  {/* mobile price */}
-                  <div className="mt-2 md:hidden">
-                    <div className="flex items-center gap-2">
-                      <span className="font-primary text-base font-semibold text-text-light dark:text-text-lightdark">
-                        {formatPrice(price)}
+                  {/* Bottom row: Price + Quantity */}
+                  <div className="mt-auto pt-2.5 sm:pt-3 flex items-center justify-between gap-2">
+                    {/* Price */}
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-extrabold text-base sm:text-lg dark:text-white">
+                        {formatPrice(price * quantity)}
                       </span>
                       {hasDiscount && (
-                        <>
-                          <span className="font-primary text-sm text-text-subtle dark:text-text-subtledark line-through">
-                            {formatPrice(originalPrice!)}
-                          </span>
-                          <Badge className="text-[11px] px-1.5 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400">
-                            -{discount}%
-                          </Badge>
-                        </>
+                        <span className="text-xs sm:text-sm text-muted-foreground line-through">
+                          {formatPrice(originalPrice! * quantity)}
+                        </span>
                       )}
+                      {quantity > 1 && (
+                        <span className="text-[11px] text-muted-foreground font-medium">
+                          ({formatPrice(price)} x {quantity})
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Quantity controls */}
+                    <div className="inline-flex items-center rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/80 dark:bg-white/5 overflow-hidden">
+                      <button
+                        aria-label="Decrease"
+                        className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center text-foreground dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        disabled={quantity <= 1}
+                        onClick={() =>
+                          updateCartItem(item.id, Math.max(1, quantity - 1))
+                        }
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="min-w-[2rem] sm:min-w-[2.5rem] text-center text-sm font-bold dark:text-white select-none">
+                        {quantity}
+                      </span>
+                      <button
+                        aria-label="Increase"
+                        className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center text-foreground dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        disabled={outOfStock || quantity >= available}
+                        onClick={() => {
+                          const next = Math.min(quantity + 1, available);
+
+                          updateCartItem(item.id, next);
+                        }}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* qty */}
-              <div className="order-3 md:order-none flex md:justify-center">
-                <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                  <Button
-                    aria-label="Decrease"
-                    className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"
-                    disabled={quantity <= 1}
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                      updateCartItem(item.id, Math.max(1, quantity - 1))
-                    }
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="font-primary min-w-[2.75rem] text-center text-sm font-medium text-text-light dark:text-text-lightdark">
-                    {quantity}
-                  </span>
-                  <Button
-                    aria-label="Increase"
-                    className="h-9 w-10 sm:w-9 p-0 text-text-light dark:text-text-lightdark hover:bg-brand-muted/50 dark:hover:bg-brand-muteddark/40"
-                    disabled={outOfStock || quantity >= available}
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      const next = Math.min(quantity + 1, available);
-
-                      updateCartItem(item.id, next);
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* desktop price */}
-              <div className="hidden md:flex flex-col items-end gap-1">
-                <div className="text-lg font-semibold text-text-light dark:text-text-lightdark">
-                  {formatPrice(price)}
-                </div>
-                {hasDiscount && (
-                  <div className="flex items-center gap-2">
-                    <span className="font-primary text-sm text-text-subtle dark:text-text-subtledark line-through">
-                      {formatPrice(originalPrice!)}
-                    </span>
-                    <Badge
-                      className="text-xs px-2 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400"
-                      variant="destructive"
-                    >
-                      -{discount}%
-                    </Badge>
-                  </div>
-                )}
-              </div>
-
-              {/* remove */}
-              <div className="order-4 md:order-none flex justify-end">
-                <div className="flex items-center gap-1">
-                  <Button
-                    aria-label="Remove"
-                    className="text-text-subtle dark:text-text-subtledark hover:text-red-600 dark:hover:text-red-400"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => removeFromCart(item.id)}
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
             </div>
-          </Card>
+          </div>
         );
       })}
     </div>
